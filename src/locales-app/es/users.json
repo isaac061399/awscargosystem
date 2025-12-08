@@ -1,0 +1,37 @@
+{
+  "root": {
+    "errors": {
+      "userExist": "El correo electrónico ya está en uso"
+    }
+  },
+  "forgot-password": {
+    "errors": {
+      "emailNotExist": "El correo electrónico no existe"
+    }
+  },
+  "login": {
+    "errors": {
+      "invalidCredentials": "Credenciales inválidas"
+    }
+  },
+  "provider": {
+    "errors": {
+      "invalidUser": "Usuario inválido"
+    }
+  },
+  "refresh-token": {
+    "errors": {
+      "invalidToken": "Token inválido"
+    }
+  },
+  "register": {
+    "errors": {
+      "userExist": "El correo electrónico ya está en uso"
+    }
+  },
+  "reset-password": {
+    "errors": {
+      "invalidCode": "Código inválido"
+    }
+  }
+}

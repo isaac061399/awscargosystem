@@ -1,0 +1,55 @@
+{
+  "text": {
+    "title": "Mensajes Push",
+    "btnSend": "Enviar Mensaje Push",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Está seguro de que desea eliminar el mensaje push \"{{ title }}\"? Esta acción no se puede deshacer.",
+    "dialogSendTitle": "Enviar Mensaje Push",
+    "topics": {
+      "REGISTERED_USERS": "Usuarios Registrados",
+      "GUEST_USERS": "Usuarios Invitados"
+    },
+    "table": {
+      "title": {
+        "title": "Título"
+      },
+      "message": {
+        "title": "Mensaje"
+      },
+      "created_at": {
+        "title": "Fecha de Envío",
+        "format": "DD/MM/YYYY hh:mm A"
+      },
+      "topic": {
+        "title": "Topic"
+      },
+      "actions": {
+        "title": "Acciones",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  },
+  "form": {
+    "labels": {
+      "title": "Título",
+      "message": "Mensaje",
+      "topic": "Topic"
+    },
+    "placeholders": {
+      "title": "Ingrese un título",
+      "message": "Ingrese un mensaje",
+      "topic": "Seleccione un topic"
+    },
+    "errors": {
+      "title": "El título es obligatorio",
+      "titleMax": "El título debe tener como máximo 47 caracteres",
+      "message": "El mensaje es obligatorio",
+      "messageMax": "El mensaje debe tener como máximo 150 caracteres",
+      "topic": "El topic es obligatorio"
+    },
+    "successMessage": "Mensaje push enviado exitosamente",
+    "errorMessage": "Error al enviar el mensaje push, por favor intente de nuevo"
+  }
+}

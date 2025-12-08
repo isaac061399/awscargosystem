@@ -1,0 +1,103 @@
+{
+  "text": {
+    "title": "Profile",
+    "btnSave": "Save Changes",
+    "btnEnable": "Enable",
+    "btnDisable": "Disable",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "text2fa": {
+      "title": "Two-factor authentication (2FA)",
+      "subtitleEnabled": "Two-factor authentication is enabled.",
+      "subtitleDisabled": "Two-factor authentication is not enabled yet.",
+      "textDisabled": "Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.",
+      "dialog": {
+        "title": "Enable two-factor authentication (2FA)",
+        "subtitle": "Setup authenticator app",
+        "text1": "Use a phone app like 1Password, Authy, LastPass Authenticator, Microsoft Authenticator, or Google Authenticator, etc. to get 2FA codes when prompted during sign-in.",
+        "text2": ["If you are unable to scan, enter ", "this text code", " instead."]
+      },
+      "dialogDisable": {
+        "title": "Disable two-factor authentication (2FA)",
+        "text": "Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in. Are you sure to continue?"
+      }
+    }
+  },
+  "tabs": {
+    "account": {
+      "title": "Account",
+      "form": {
+        "labels": {
+          "first_name": "First Name",
+          "last_name": "Last name",
+          "email": "Email",
+          "role": "Role"
+        },
+        "placeholders": {
+          "first_name": "Enter the first name",
+          "last_name": "Enter the last name",
+          "email": "email@example.com",
+          "role": "Select"
+        },
+        "errors": {
+          "first_name": "First name is required",
+          "last_name": "Last name is required",
+          "email": "Email required",
+          "invalidEmail": "Invalid Email",
+          "role": "Role is required"
+        },
+        "successMessage": "Changes saved successfully",
+        "errorMessage": "Error saving the changes, please try again"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "form": {
+        "labels": {
+          "password": "Current Password",
+          "new_password": "New Password",
+          "confirmNewPassword": "Confirm new password"
+        },
+        "placeholders": {
+          "password": "Enter your password",
+          "new_password": "Enter a password",
+          "confirmNewPassword": "Confirm password"
+        },
+        "errors": {
+          "password": "Current password required",
+          "new_password": "Password required",
+          "confirmNewPassword": "Password required",
+          "confirmNewPasswordMatch": "Passwords must match"
+        },
+        "successMessage": "Changes saved successfully",
+        "errorMessage": "Error saving the changes, please try again"
+      },
+      "form2faA": {
+        "labels": {
+          "code": "Verify the code from the app"
+        },
+        "placeholders": {
+          "code": "XXXXXX"
+        },
+        "errors": {
+          "code": "Code is required"
+        },
+        "successMessage": "Two-factor authentication (2FA) enabled successfully",
+        "errorMessage": "Error saving the changes, please try again"
+      },
+      "form2faD": {
+        "labels": {
+          "password": "Current Password"
+        },
+        "placeholders": {
+          "password": "Enter your password"
+        },
+        "errors": {
+          "password": "Current password required"
+        },
+        "successMessage": "Two-factor authentication (2FA) disabled successfully",
+        "errorMessage": "Error saving the changes, please try again"
+      }
+    }
+  }
+}

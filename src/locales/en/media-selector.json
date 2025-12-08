@@ -1,0 +1,49 @@
+{
+  "list": {
+    "btnSelect": "Select",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "dialogDeleteTitle": "Confirm Deletion",
+    "dialogDeleteMessage": "Are you sure you want to delete the asset \"{{ name }}\"? This action cannot be undone.",
+    "table": {
+      "name": {
+        "title": "Name"
+      },
+      "type": {
+        "title": "Type"
+      },
+      "size": {
+        "title": "Size"
+      },
+      "updated_at": {
+        "title": "Last Modified",
+        "format": "MM/DD/YYYY hh:mm A"
+      },
+      "actions": {
+        "title": "Actions",
+        "viewLabel": "View",
+        "copyLabel": "Copy to Clipboard",
+        "copySuccessLabel": "Copied to clipboard!",
+        "copyErrorLabel": "Failed to copy",
+        "deleteLabel": "Delete"
+      }
+    }
+  },
+  "add": {
+    "btnAdd": "New Assets",
+    "btnUpload": "Upload",
+    "btnCancel": "Cancel",
+    "dialogTitle": "Add New Assets",
+    "dropzone": {
+      "text": "Drag and drop a file here or click",
+      "maxSizeText": "Max size: {{ size }} per file"
+    },
+    "upload": {
+      "noFiles": "No assets selected",
+      "success": "Assets uploaded successfully",
+      "error": "An error occurred while uploading the assets",
+      "warning": "The following assets could not be uploaded:",
+      "uploading": "Uploading asset:"
+    }
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "seo": {
+    "title": "Manage Your Platform",
+    "description": "Access the dashboard to efficiently manage data and settings. Get real-time analytics and powerful tools for your platform."
+  },
+  "navbar": {
+    "myProfile": "My Profile",
+    "logout": "Logout"
+  },
+  "sidebar": {
+    "menu": [
+      {
+        "sectionTitle": "CMS",
+        "permissions": [
+          "pages.list",
+          "pages.create",
+          "categories.list",
+          "categories.create",
+          "contents.list",
+          "contents.create",
+          "menus.list",
+          "menus.create",
+          "media.list",
+          "global-settings.view"
+        ],
+        "items": [
+          {
+            "label": "Pages",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-pages-line",
+            "permissions": ["pages.list", "pages.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/pages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["pages.list"]
+              },
+              {
+                "label": "New",
+                "link": "/pages/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["pages.create"]
+              }
+            ]
+          },
+          {
+            "label": "Categories",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-folders-line",
+            "permissions": ["categories.list", "categories.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/categories",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["categories.list"]
+              },
+              {
+                "label": "New",
+                "link": "/categories/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["categories.create"]
+              }
+            ]
+          },
+          {
+            "label": "Contents",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-article-line",
+            "permissions": ["contents.list", "contents.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/contents",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["contents.list"]
+              },
+              {
+                "label": "New",
+                "link": "/contents/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["contents.create"]
+              }
+            ]
+          },
+          {
+            "label": "Menus",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-menu-line",
+            "permissions": ["menus.list", "menus.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/menus",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["menus.list"]
+              },
+              {
+                "label": "New",
+                "link": "/menus/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["menus.create"]
+              }
+            ]
+          },
+          {
+            "label": "Media Library",
+            "link": "/media-library",
+            "externalLink": false,
+            "icon": "ri-folder-image-line",
+            "permissions": ["media.list"]
+          },
+          {
+            "label": "Global Settings",
+            "link": "/global-settings",
+            "externalLink": false,
+            "icon": "ri-settings-5-line",
+            "activeUrl": "/global-settings",
+            "exactMatch": false,
+            "permissions": ["global-settings.view"]
+          }
+        ]
+      },
+      {
+        "sectionTitle": "App",
+        "permissions": ["users.list", "push-messages.list"],
+        "items": [
+          {
+            "label": "Users",
+            "link": "/users",
+            "externalLink": false,
+            "icon": "ri-user-community-line",
+            "permissions": ["users.list"]
+          },
+          {
+            "label": "Push Messages",
+            "link": "/push-messages",
+            "externalLink": false,
+            "icon": "ri-send-plane-2-line",
+            "permissions": ["push-messages.list"]
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Security",
+        "permissions": ["administrators.list", "administrators.create", "roles.list", "roles.create"],
+        "items": [
+          {
+            "label": "Administrators",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-shield-user-line",
+            "permissions": ["administrators.list", "administrators.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/administrators",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["administrators.list"]
+              },
+              {
+                "label": "New",
+                "link": "/administrators/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["administrators.create"]
+              }
+            ]
+          },
+          {
+            "label": "Roles",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-shield-check-line",
+            "permissions": ["roles.list", "roles.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/roles",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["roles.list"]
+              },
+              {
+                "label": "New",
+                "link": "/roles/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["roles.create"]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "prefixAuthor": "Powered by",
+    "links": [
+      {
+        "label": "Support",
+        "link": "https://www.pangea.cr/contact",
+        "target": "_blank"
+      }
+    ]
+  },
+  "filterSearch": {
+    "placeholder": "Search..."
+  },
+  "filterSelect": {
+    "allLabel": "All"
+  },
+  "localeFilter": {
+    "allLabel": "All languages"
+  },
+  "cache": {
+    "btnClearCache": "Clear Cache",
+    "msgCacheCleared": "Cache cleared successfully",
+    "errorMsgCacheCleared": "Error clearing cache, please try again"
+  }
+}

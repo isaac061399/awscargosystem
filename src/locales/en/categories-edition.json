@@ -1,0 +1,59 @@
+{
+  "text": {
+    "titleNew": "New Category",
+    "titleEdit": "Editing Category: ",
+    "draft": "Draft",
+    "published": "Published",
+    "publishAt": "Publish At",
+    "dateFormat": "MM/DD/YYYY hh:mm a",
+    "relatedContents": "Related Contents",
+    "btnSave": "Save",
+    "btnPublish": "Publish",
+    "btnUnpublish": "Unpublish",
+    "btnDuplicate": "Duplicate",
+    "publishSuccessMessage": "Category published successfully",
+    "unpublishSuccessMessage": "Category unpublished successfully",
+    "dialogUnpublish": {
+      "title": "Confirm",
+      "message": "If you don't publish this category, it will automatically turn into a Draft. Are you sure you don't want to publish it?",
+      "btnYes": "Yes, continue",
+      "btnNo": "No, cancel"
+    },
+    "dialogPublish": {
+      "title": "Confirm",
+      "btnPublishNow": "Publish Now",
+      "orLabel": "Or",
+      "inputLabel": "Publish at",
+      "btnPublish": "Publish",
+      "btnCancel": "Cancel"
+    }
+  },
+  "form": {
+    "labels": {
+      "locale": "Language",
+      "slug": "Slug",
+      "name": "Name",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "description": "Description"
+    },
+    "placeholders": {
+      "locale": "Select a language",
+      "slug": "Enter a slug",
+      "name": "Enter a name",
+      "title": "Enter a title",
+      "subtitle": "Enter a subtitle",
+      "description": "Enter a description"
+    },
+    "errors": {
+      "locale": "Language is required",
+      "slug": "Slug is required",
+      "name": "Name is required",
+      "title": "",
+      "subtitle": "",
+      "description": ""
+    },
+    "successMessage": "Category saved successfully",
+    "errorMessage": "Error saving the category, please try again"
+  }
+}

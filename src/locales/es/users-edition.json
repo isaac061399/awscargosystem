@@ -1,0 +1,39 @@
+{
+  "text": {
+    "title": "Usuario: "
+  },
+  "tabs": {
+    "profile": {
+      "title": "Perfil",
+      "accountsTitle": "Cuentas",
+      "noAccountsText": "No hay cuentas asociadas",
+      "btnSave": "Guardar Cambios",
+      "successMessage": "Cambios guardados con éxito",
+      "errorMessage": "Error al guardar los cambios, por favor inténtalo de nuevo",
+      "labels": {
+        "name": "Nombre",
+        "email": "Correo electrónico",
+        "emailNotifications": "Notificaciones por email",
+        "pushNotifications": "Notificaciones push",
+        "enabled": "Habilitado",
+        "active": "Activas",
+        "inactive": "Inactivas"
+      }
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "table": {
+        "title": {
+          "title": "Título"
+        },
+        "message": {
+          "title": "Mensaje"
+        },
+        "created_at": {
+          "title": "Fecha",
+          "format": "DD/MM/YYYY hh:mm A"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "serviceUnavailable": "Service Unavailable",
+    "unauthorized": "Unauthorized",
+    "notFound": "Record not found",
+    "general": "An error has occurred. Please try again",
+    "validation": {
+      "errorMessage": "Missing required parameters",
+      "required": "Required",
+      "invalidType": "Invalid type",
+      "invalidEmail": "Invalid email address",
+      "invalidOption": "Invalid option. Available options \"{ options }\"",
+      "invalidDate": "Invalid date format",
+      "invalidFormJSON": "Invalid form JSON format [{label: string, value: string}]"
+    }
+  }
+}

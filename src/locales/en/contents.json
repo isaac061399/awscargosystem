@@ -1,0 +1,42 @@
+{
+  "text": {
+    "title": "Contents",
+    "btnCreate": "New Content",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "dialogDeleteTitle": "Confirm Deletion",
+    "dialogDeleteMessage": "Are you sure you want to delete the content \"{{ title }}\"? This action cannot be undone.",
+    "table": {
+      "slug": {
+        "title": "Slug"
+      },
+      "title": {
+        "title": "Title"
+      },
+      "category": {
+        "title": "Category"
+      },
+      "page": {
+        "title": "Page"
+      },
+      "locale": {
+        "title": "Language"
+      },
+      "published_at": {
+        "title": "Status",
+        "values": {
+          "published": "Published",
+          "publishAt": "Publish at",
+          "draft": "Draft"
+        },
+        "dateFormat": "MM/DD/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Actions",
+        "duplicateLabel": "Duplicate",
+        "editLabel": "Edit",
+        "deleteLabel": "Delete"
+      }
+    }
+  }
+}

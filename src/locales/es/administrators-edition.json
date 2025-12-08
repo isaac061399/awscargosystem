@@ -1,0 +1,43 @@
+{
+  "text": {
+    "titleNew": "Nuevo Administrador",
+    "titleEdit": "Editando Administrador: ",
+    "label2fa": "Autenticación de dos factores (2FA)",
+    "enabled2fa": "Activada",
+    "disabled2fa": "No Activada",
+    "btnSave": "Guardar"
+  },
+  "form": {
+    "labels": {
+      "first_name": "Nombre",
+      "last_name": "Apellidos",
+      "email": "Correo electrónico",
+      "role": "Rol",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "enabled": "Habilitado"
+    },
+    "placeholders": {
+      "first_name": "Ingrese el nombre",
+      "last_name": "Ingrese los apellidos",
+      "email": "correo@ejemplo.com",
+      "role": "Seleccionar",
+      "password": "Ingrese una contraseña",
+      "confirmPassword": "Confirme la contraseña",
+      "enabled": ""
+    },
+    "errors": {
+      "first_name": "El nombre es requerido",
+      "last_name": "Los apellidos son requeridos",
+      "email": "El correo electrónico es requerido",
+      "invalidEmail": "Correo electrónico inválido",
+      "role": "El rol es requerido",
+      "password": "La contraseña es obligatoria",
+      "confirmPassword": "La contraseña es obligatoria",
+      "confirmPasswordMatch": "Las contraseñas deben coincidir",
+      "enabled": ""
+    },
+    "successMessage": "Administrador guardado con éxito",
+    "errorMessage": "Error al guardar el administrador, por favor inténtalo de nuevo"
+  }
+}

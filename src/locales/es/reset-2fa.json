@@ -1,0 +1,19 @@
+{
+  "text": {
+    "title": "Restablece tu Autenticación de Dos Factores",
+    "successTitle": "Restablecimiento de Autenticación de Dos Factores Exitoso",
+    "subtitle": "Por favor, ingresa tu contraseña actual para continuar. Esto eliminará la autenticación de dos factores de tu inicio de sesión.",
+    "successSubtitle": "Tu autenticación de dos factores ha sido restablecida con éxito. Inicia sesión y configura nuevamente la autenticación de dos factores desde tu perfil para mantener tu cuenta segura.",
+    "backToLogin": "Iniciar sesión"
+  },
+  "form": {
+    "labels": {
+      "password": "Contraseña"
+    },
+    "errors": {
+      "password": "Contraseña requerida"
+    },
+    "submitButton": "Restablecer",
+    "errorMessage": "Se produjo un error, por favor inténtelo de nuevo."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "text": {
+    "title": "Bienvenido",
+    "subtitle": "Inicie sesión para continuar.",
+    "forgotPass": "¿Olvidaste tu contraseña?",
+    "lost2FACodes": "¿Perdiste tus códigos? Obtén un enlace para restablecer la autenticación de dos factores",
+    "successLost2FACodes": "Un enlace de restablecimiento se ha enviado con éxito. Por favor, revisa tu correo electrónico para más instrucciones",
+    "text2fa": {
+      "title": "Se requiere verificación adicional",
+      "subtitle": "Tu cuenta está protegida con autenticación de dos factores (2FA).",
+      "text": "Para finalizar el inicio de sesión, ingresa el código de la aplicación de autenticación."
+    }
+  },
+  "form": {
+    "labels": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "code": "Código"
+    },
+    "errors": {
+      "email": "Correo electrónico requerido",
+      "invalidEmail": "Correo electrónico inválido",
+      "password": "Contraseña requerida",
+      "code": "Código requerido"
+    },
+    "submitButton": "Continuar",
+    "errorMessage": "Credenciales inválidas"
+  }
+}

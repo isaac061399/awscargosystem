@@ -1,0 +1,23 @@
+{
+  "text": {
+    "title": "Roles",
+    "btnCreate": "New Role",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "dialogDeleteTitle": "Confirm Deletion",
+    "dialogDeleteMessage": "Are you sure you want to delete the role \"{{ name }}\"? This action cannot be undone.",
+    "table": {
+      "name": {
+        "title": "Name"
+      },
+      "description": {
+        "title": "Description"
+      },
+      "actions": {
+        "title": "Actions",
+        "editLabel": "Edit",
+        "deleteLabel": "Delete"
+      }
+    }
+  }
+}

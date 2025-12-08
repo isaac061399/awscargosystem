@@ -1,0 +1,44 @@
+{
+  "text": {
+    "titleNew": "New Role",
+    "titleEdit": "Editing Role: ",
+    "titlePermissions": "Permissions",
+    "btnSave": "Save",
+    "modules": {
+      "push-messages": "App - Push Messages",
+      "users": "App - Users",
+      "administrators": "Security - Administrators",
+      "roles": "Security - Roles",
+      "categories": "CMS - Categories",
+      "contents": "CMS - Contents",
+      "media": "CMS - Media Library",
+      "menus": "CMS - Menus",
+      "pages": "CMS - Pages",
+      "global-settings": "CMS - Global Settings"
+    },
+    "permissions": {
+      "list": "List",
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "send": "Send",
+      "view": "View"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Name",
+      "description": "Description"
+    },
+    "placeholders": {
+      "name": "Enter a name",
+      "description": "Enter a description"
+    },
+    "errors": {
+      "name": "Name is required",
+      "description": ""
+    },
+    "successMessage": "Role saved successfully",
+    "errorMessage": "Error saving the role, please try again"
+  }
+}

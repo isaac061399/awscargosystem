@@ -1,0 +1,29 @@
+{
+  "text": {
+    "title": "Welcome",
+    "subtitle": "Log in to continue.",
+    "forgotPass": "Forgot password?",
+    "lost2FACodes": "Lost your codes? Get a link to reset two-factor authentication",
+    "successLost2FACodes": "A reset link has been successfully sent. Please check your email for further instructions",
+    "text2fa": {
+      "title": "Additional verification required",
+      "subtitle": "Your account is protected with two-factor authentication (2FA).",
+      "text": "To finish signing in, enter the code from the authenticator app."
+    }
+  },
+  "form": {
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "code": "Code"
+    },
+    "errors": {
+      "email": "Email required",
+      "invalidEmail": "Invalid Email",
+      "password": "Password required",
+      "code": "Code required"
+    },
+    "submitButton": "Continue",
+    "errorMessage": "Invalid credentials"
+  }
+}

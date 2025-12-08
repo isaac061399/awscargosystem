@@ -1,0 +1,43 @@
+{
+  "text": {
+    "titleNew": "New Administrator",
+    "titleEdit": "Editing Administrator: ",
+    "label2fa": "Two-factor authentication (2FA)",
+    "enabled2fa": "Enabled",
+    "disabled2fa": "Not Enabled",
+    "btnSave": "Save"
+  },
+  "form": {
+    "labels": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email",
+      "role": "Role",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "enabled": "Enabled"
+    },
+    "placeholders": {
+      "first_name": "Enter the first name",
+      "last_name": "Enter the last name",
+      "email": "email@example.com",
+      "role": "Select",
+      "password": "Enter a password",
+      "confirmPassword": "Confirm password",
+      "enabled": ""
+    },
+    "errors": {
+      "first_name": "First name is required",
+      "last_name": "Last name is required",
+      "email": "Email required",
+      "invalidEmail": "Invalid Email",
+      "role": "Role is required",
+      "password": "Password required",
+      "confirmPassword": "Password required",
+      "confirmPasswordMatch": "Passwords must match",
+      "enabled": ""
+    },
+    "successMessage": "Administrator saved successfully",
+    "errorMessage": "Error saving the administrator, please try again"
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "responses": {
+    "400": {
+      "description": "Bad Request",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/objects/errorParams"
+          }
+        }
+      }
+    },
+    "401": {
+      "description": "Unauthorized",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/objects/error"
+          }
+        }
+      }
+    },
+    "500": {
+      "description": "Unexpected Error",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/objects/error"
+          }
+        }
+      }
+    },
+    "503": {
+      "description": "Service Unavailable",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/objects/error"
+          }
+        }
+      }
+    }
+  },
+  "objects": {
+    "defaultErrorResponses": {
+      "allOf": [
+        {
+          "400": {
+            "$ref": "#/components/responses/400"
+          }
+        },
+        {
+          "401": {
+            "$ref": "#/components/responses/401"
+          }
+        },
+        {
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        {
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      ]
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "default": false
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "errorParams": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "default": false
+        },
+        "message": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "param1": {
+              "type": "string"
+            },
+            "param2": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer"
+        },
+        "count": {
+          "type": "integer"
+        }
+      }
+    },
+    "session": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "expires_in": {
+          "type": "integer"
+        },
+        "expires_at": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "securitySchemes": {
+    "ApiKey": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-API-KEY"
+    },
+    "AccessToken": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "text": {
+    "title": "Administrators",
+    "btnCreate": "New Administrator",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "dialogDeleteTitle": "Confirm Deletion",
+    "dialogDeleteMessage": "Are you sure you want to delete the admin \"{{ name }}\"? This action cannot be undone.",
+    "table": {
+      "name": {
+        "title": "Name"
+      },
+      "email": {
+        "title": "Email"
+      },
+      "role": {
+        "title": "Role"
+      },
+      "status": {
+        "title": "Status",
+        "values": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "actions": {
+        "title": "Actions",
+        "editLabel": "Edit",
+        "deleteLabel": "Delete"
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "text": {
+    "title": "Categories",
+    "btnCreate": "New Category",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "dialogDeleteTitle": "Confirm Deletion",
+    "dialogDeleteMessage": "Are you sure you want to delete the category \"{{ name }}\"? This action cannot be undone.",
+    "table": {
+      "slug": {
+        "title": "Slug"
+      },
+      "name": {
+        "title": "Name"
+      },
+      "locale": {
+        "title": "Language"
+      },
+      "published_at": {
+        "title": "Status",
+        "values": {
+          "published": "Published",
+          "publishAt": "Publish at",
+          "draft": "Draft"
+        },
+        "dateFormat": "MM/DD/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Actions",
+        "duplicateLabel": "Duplicate",
+        "editLabel": "Edit",
+        "deleteLabel": "Delete"
+      }
+    }
+  }
+}

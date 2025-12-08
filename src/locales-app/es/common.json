@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "serviceUnavailable": "Servicio no disponible",
+    "unauthorized": "No autorizado",
+    "notFound": "Registro no encontrado",
+    "general": "Ha ocurrido un error. Por favor inténtalo de nuevo",
+    "validation": {
+      "errorMessage": "Faltan parámetros requeridos",
+      "required": "Requerido",
+      "invalidType": "Tipo inválido",
+      "invalidEmail": "Correo electrónico inválido",
+      "invalidOption": "Opción inválida. Opciones válidas \"{ options }\"",
+      "invalidDate": "Formato de fecha inválido",
+      "invalidFormJSON": "Formato de JSON de formulario inválido [{label: string, value: string}]"
+    }
+  }
+}

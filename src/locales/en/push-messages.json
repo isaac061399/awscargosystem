@@ -1,0 +1,55 @@
+{
+  "text": {
+    "title": "Push Messages",
+    "btnSend": "Send Push Message",
+    "btnContinue": "Continue",
+    "btnCancel": "Cancel",
+    "dialogDeleteTitle": "Confirm Deletion",
+    "dialogDeleteMessage": "Are you sure you want to delete the push message \"{{ title }}\"? This action cannot be undone.",
+    "dialogSendTitle": "Send Push Message",
+    "topics": {
+      "REGISTERED_USERS": "Registered Users",
+      "GUEST_USERS": "Guest Users"
+    },
+    "table": {
+      "title": {
+        "title": "Title"
+      },
+      "message": {
+        "title": "Message"
+      },
+      "created_at": {
+        "title": "Sent Date",
+        "format": "MM/DD/YYYY hh:mm A"
+      },
+      "topic": {
+        "title": "Topic"
+      },
+      "actions": {
+        "title": "Actions",
+        "deleteLabel": "Delete"
+      }
+    }
+  },
+  "form": {
+    "labels": {
+      "title": "Title",
+      "message": "Message",
+      "topic": "Topic"
+    },
+    "placeholders": {
+      "title": "Enter a title",
+      "message": "Enter a message",
+      "topic": "Select a topic"
+    },
+    "errors": {
+      "title": "Title is required",
+      "titleMax": "Title must be at most 47 characters",
+      "message": "Message is required",
+      "messageMax": "Message must be at most 150 characters",
+      "topic": "Topic is required"
+    },
+    "successMessage": "Push message sent successfully",
+    "errorMessage": "Error sending the push message, please try again"
+  }
+}

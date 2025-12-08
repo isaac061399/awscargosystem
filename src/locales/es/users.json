@@ -1,0 +1,26 @@
+{
+  "text": {
+    "title": "Usuarios",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "table": {
+      "name": {
+        "title": "Nombre"
+      },
+      "email": {
+        "title": "Correo Electrónico"
+      },
+      "status": {
+        "title": "Estado",
+        "values": {
+          "active": "Activo",
+          "inactive": "Inactivo"
+        }
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar"
+      }
+    }
+  }
+}

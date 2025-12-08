@@ -1,0 +1,66 @@
+{
+  "text": {
+    "titleNew": "Nuevo Menú",
+    "titleEdit": "Editando Menú: ",
+    "draft": "Borrador",
+    "published": "Publicado",
+    "publishAt": "Publicar el",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "btnSave": "Guardar",
+    "btnPublish": "Publicar",
+    "btnUnpublish": "Despublicar",
+    "btnDuplicate": "Duplicar",
+    "publishSuccessMessage": "Menú publicada con éxito",
+    "unpublishSuccessMessage": "Menú despublicada con éxito",
+    "dialogUnpublish": {
+      "title": "Confirmar",
+      "message": "Si no publicas este menú, se convertirá automáticamente en un borrador. ¿Estás seguro de que no quieres publicarla?",
+      "btnYes": "Si, continuar",
+      "btnNo": "No, cancelar"
+    },
+    "dialogPublish": {
+      "title": "Confirmar",
+      "btnPublishNow": "Publicar Ahora",
+      "orLabel": "O",
+      "inputLabel": "Publicar el",
+      "btnPublish": "Publicar",
+      "btnCancel": "Cancelar"
+    }
+  },
+  "form": {
+    "labels": {
+      "locale": "Idioma",
+      "slug": "Slug",
+      "name": "Nombre",
+      "items": "Items",
+      "subitems": "Subitems",
+      "itemsTitle": "Título",
+      "itemsUrl": "URL",
+      "itemsTarget": "Target"
+    },
+    "placeholders": {
+      "locale": "Seleccione un idioma",
+      "slug": "Ingrese un slug",
+      "name": "Ingrese un nombre",
+      "items": "",
+      "subitems": "",
+      "itemsTitle": "Ingrese un título",
+      "itemsUrl": "Ingrese una URL",
+      "itemsTarget": "Seleccione una opción"
+    },
+    "errors": {
+      "locale": "El idioma es requerido",
+      "slug": "El slug es requerido",
+      "name": "El nombre es requerido",
+      "items": "",
+      "subitems": "",
+      "itemsTitle": "Campo requerido",
+      "itemsUrl": "Campo requerido",
+      "itemsTarget": "Campo requerido"
+    },
+    "addItemsBtn": "Agregar Items",
+    "addSubitemsBtn": "Agregar Subitems",
+    "successMessage": "Menú guardada con éxito",
+    "errorMessage": "Error al guardar el menú, por favor inténtalo de nuevo"
+  }
+}

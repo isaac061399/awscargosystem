@@ -1,0 +1,36 @@
+{
+  "text": {
+    "title": "Menús",
+    "btnCreate": "Nuevo Menú",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el menú \"{{ name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "slug": {
+        "title": "Slug"
+      },
+      "name": {
+        "title": "Nombre"
+      },
+      "locale": {
+        "title": "Idioma"
+      },
+      "published_at": {
+        "title": "Estado",
+        "values": {
+          "published": "Publicado",
+          "publishAt": "Publicar el",
+          "draft": "Borrador"
+        },
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Acciones",
+        "duplicateLabel": "Duplicar",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

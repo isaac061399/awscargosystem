@@ -1,0 +1,39 @@
+{
+  "text": {
+    "title": "User: "
+  },
+  "tabs": {
+    "profile": {
+      "title": "Profile",
+      "accountsTitle": "Accounts",
+      "noAccountsText": "There are no associated accounts",
+      "btnSave": "Save Changes",
+      "successMessage": "Changes saved successfully",
+      "errorMessage": "Error saving the changes, please try again",
+      "labels": {
+        "name": "Name",
+        "email": "Email",
+        "emailNotifications": "Email notifications",
+        "pushNotifications": "Push notifications",
+        "enabled": "Enabled",
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "table": {
+        "title": {
+          "title": "Title"
+        },
+        "message": {
+          "title": "Message"
+        },
+        "created_at": {
+          "title": "Date",
+          "format": "MM/DD/YYYY hh:mm A"
+        }
+      }
+    }
+  }
+}

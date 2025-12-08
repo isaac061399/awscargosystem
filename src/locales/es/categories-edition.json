@@ -1,0 +1,59 @@
+{
+  "text": {
+    "titleNew": "Nueva Categoría",
+    "titleEdit": "Editando Categoría: ",
+    "draft": "Borrador",
+    "published": "Publicado",
+    "publishAt": "Publicar el",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "relatedContents": "Contenidos Relacionados",
+    "btnSave": "Guardar",
+    "btnPublish": "Publicar",
+    "btnUnpublish": "Despublicar",
+    "btnDuplicate": "Duplicar",
+    "publishSuccessMessage": "Categoría publicada con éxito",
+    "unpublishSuccessMessage": "Categoría despublicada con éxito",
+    "dialogUnpublish": {
+      "title": "Confirmar",
+      "message": "Si no publicas esta categoría, se convertirá automáticamente en un borrador. ¿Estás seguro de que no quieres publicarla?",
+      "btnYes": "Si, continuar",
+      "btnNo": "No, cancelar"
+    },
+    "dialogPublish": {
+      "title": "Confirmar",
+      "btnPublishNow": "Publicar Ahora",
+      "orLabel": "O",
+      "inputLabel": "Publicar el",
+      "btnPublish": "Publicar",
+      "btnCancel": "Cancelar"
+    }
+  },
+  "form": {
+    "labels": {
+      "locale": "Idioma",
+      "slug": "Slug",
+      "name": "Nombre",
+      "title": "Título",
+      "subtitle": "Subtítulo",
+      "description": "Descripción"
+    },
+    "placeholders": {
+      "locale": "Seleccione un idioma",
+      "slug": "Ingrese un slug",
+      "name": "Ingrese un nombre",
+      "title": "Ingrese un título",
+      "subtitle": "Ingrese un subtítulo",
+      "description": "Ingrese una descripción"
+    },
+    "errors": {
+      "locale": "El idioma es requerido",
+      "slug": "El slug es requerido",
+      "name": "El nombre es requerido",
+      "title": "",
+      "subtitle": "",
+      "description": ""
+    },
+    "successMessage": "Categoría guardada con éxito",
+    "errorMessage": "Error al guardar la categoría, por favor inténtalo de nuevo"
+  }
+}

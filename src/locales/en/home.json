@@ -1,0 +1,26 @@
+{
+  "text": {
+    "welcome": {
+      "title": "Welcome {{ name }}!",
+      "auth2fa": "Two-factor authentication: Enabled",
+      "auth2faNo": "Two-factor authentication: Disabled",
+      "btnProfile": "View Profile"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "subtitle": "Overview of the main entries (drafts and published)",
+      "pages": "Pages",
+      "categories": "Categories",
+      "contents": "Contents",
+      "menus": "Menus"
+    },
+    "admins": {
+      "administrator": "Administrator",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  }
+}

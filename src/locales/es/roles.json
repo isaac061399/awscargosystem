@@ -1,0 +1,23 @@
+{
+  "text": {
+    "title": "Roles",
+    "btnCreate": "Nuevo Rol",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el rol \"{{ name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "name": {
+        "title": "Nombre"
+      },
+      "description": {
+        "title": "Descripción"
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

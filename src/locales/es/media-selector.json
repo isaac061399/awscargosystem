@@ -1,0 +1,49 @@
+{
+  "list": {
+    "btnSelect": "Seleccionar",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el archivo \"{{ name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "name": {
+        "title": "Nombre"
+      },
+      "type": {
+        "title": "Tipo"
+      },
+      "size": {
+        "title": "Tamaño"
+      },
+      "updated_at": {
+        "title": "Última Modificación",
+        "format": "DD/MM/YYYY hh:mm A"
+      },
+      "actions": {
+        "title": "Acciones",
+        "viewLabel": "Ver",
+        "copyLabel": "Copiar al Portapapeles",
+        "copySuccessLabel": "¡Copiado al portapapeles!",
+        "copyErrorLabel": "Error al copiar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  },
+  "add": {
+    "btnAdd": "Nuevos Archivos",
+    "btnUpload": "Subir",
+    "btnCancel": "Cancelar",
+    "dialogTitle": "Agregar Nuevos Archivos",
+    "dropzone": {
+      "text": "Arrastra y suelta un archivo aquí o haz clic",
+      "maxSizeText": "Tamaño máximo: {{ size }} por archivo"
+    },
+    "upload": {
+      "noFiles": "No se han seleccionado archivos",
+      "success": "Archivos subidos con éxito",
+      "error": "Ocurrió un error al subir los archivos",
+      "warning": "Los siguientes archivos no pudieron ser subidos:",
+      "uploading": "Subiendo archivo:"
+    }
+  }
+}

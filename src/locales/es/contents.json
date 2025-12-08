@@ -1,0 +1,42 @@
+{
+  "text": {
+    "title": "Contenidos",
+    "btnCreate": "Nuevo Contenido",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el contenido \"{{ title }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "slug": {
+        "title": "Slug"
+      },
+      "title": {
+        "title": "Título"
+      },
+      "category": {
+        "title": "Categoría"
+      },
+      "page": {
+        "title": "Página"
+      },
+      "locale": {
+        "title": "Idioma"
+      },
+      "published_at": {
+        "title": "Estado",
+        "values": {
+          "published": "Publicado",
+          "publishAt": "Publicar el",
+          "draft": "Borrador"
+        },
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Acciones",
+        "duplicateLabel": "Duplicar",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

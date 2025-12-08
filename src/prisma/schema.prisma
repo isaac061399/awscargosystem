@@ -1,0 +1,482 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Admin Auth module
+
+model Account {
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("auth_account")
+}
+
+model Administrator {
+  id          Int      @id @default(autoincrement())
+  role_id     Int
+  first_name  String   @default("")
+  last_name   String   @default("")
+  full_name   String   @default("")
+  email       String   @unique
+  enabled_2fa Boolean  @default(false)
+  secret_2fa  String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user User @relation(fields: [email], references: [email], onDelete: Restrict)
+  role Role @relation(fields: [role_id], references: [id], onDelete: Restrict)
+
+  @@map("auth_administrator")
+}
+
+model Permission {
+  id          String           @id
+  name        String
+  description String?
+  roles       RolePermission[]
+
+  @@map("auth_permission")
+}
+
+model ResetToken {
+  user_id String
+  token   String
+  type    String   @default("password")
+  expires DateTime
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, token])
+  @@map("auth_reset_token")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  permissions RolePermission[]
+  admins      Administrator[]
+
+  @@map("auth_role")
+}
+
+model RolePermission {
+  role_id       Int
+  permission_id String
+
+  role       Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, permission_id])
+  @@map("auth_role_permission")
+}
+
+model Session {
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("auth_session")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  password      String?
+  image         String?
+  enabled       Boolean   @default(true)
+
+  administrator Administrator?
+  accounts      Account[]
+  sessions      Session[]
+  tokens        ResetToken[]
+  logs          UserLog[]      @relation("user")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("auth_user")
+}
+
+model UserLog {
+  user_log_id Int       @id @default(autoincrement())
+  user_id     String
+  action      String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+
+  user User? @relation("user", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("auth_user_log")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("auth_verification_token")
+}
+
+// App module
+
+model AppAccount {
+  id          Int          @id @default(autoincrement())
+  user_id     Int
+  provider    AuthProvider
+  provider_id String
+  created_at  DateTime     @default(now())
+
+  user     AppUser      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  sessions AppSession[]
+
+  @@unique([provider, provider_id])
+  @@map("app_account")
+}
+
+model AppDevice {
+  id         Int            @id @default(autoincrement())
+  user_id    Int?
+  device_id  String         @unique // Unique device identifier
+  push_token String?
+  platform   DevicePlatform
+  created_at DateTime       @default(now())
+
+  user AppUser? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("app_device")
+}
+
+model AppNotification {
+  id         Int      @id @default(autoincrement())
+  service_id String
+  user_id    Int
+  title      String
+  message    String
+  data       Json?
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user AppUser @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("app_notification")
+}
+
+model AppTopicNotification {
+  id         Int               @id @default(autoincrement())
+  service_id String
+  topic      NotificationTopic @default(REGISTERED_USERS)
+  title      String
+  message    String
+  data       Json?
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
+
+  @@map("app_topic_notification")
+}
+
+model AppUser {
+  id                  Int      @id @default(autoincrement())
+  email               String   @unique
+  name                String?
+  avatar              String?
+  password            String?
+  enabled             Boolean  @default(true)
+  email_notifications Boolean  @default(true)
+  push_notifications  Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  accounts           AppAccount[]
+  sessions           AppSession[]
+  devices            AppDevice[]
+  verificationTokens AppVerificationToken[]
+  notifications      AppNotification[]
+
+  @@map("app_user")
+}
+
+model AppVerificationToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  type       String   @default("password")
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  user AppUser @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("app_verification_token")
+}
+
+model AppSession {
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  account_id    Int?
+  refresh_token String    @unique
+  expires_at    DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  user    AppUser     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  account AppAccount? @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@map("app_session")
+}
+
+// CMS module
+
+model CmsCategory {
+  id           Int       @id @default(autoincrement())
+  locale       String
+  slug         String
+  name         String
+  title        String?
+  subtitle     String?
+  description  String?
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  contents CmsContent[]
+
+  @@map("cms_category")
+}
+
+model CmsContent {
+  id           Int       @id @default(autoincrement())
+  seo_id       Int?
+  category_id  Int?
+  page_id      Int?
+  locale       String
+  slug         String
+  title        String?
+  subtitle     String?
+  description  String?
+  content      String?
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  seo           CmsSeo?           @relation(fields: [seo_id], references: [id], onDelete: SetNull)
+  category      CmsCategory?      @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  page          CmsPage?          @relation(fields: [page_id], references: [id], onDelete: SetNull)
+  media         CmsMediaContent[]
+  custom_values CmsCustomValue[]
+
+  @@map("cms_content")
+}
+
+model CmsCustomValue {
+  id                 Int      @id @default(autoincrement())
+  content_id         Int?
+  global_settings_id Int?
+  key                String
+  value              String
+  order              Int      @default(0)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  content         CmsContent?        @relation(fields: [content_id], references: [id], onDelete: Cascade)
+  global_settings CmsGlobalSettings? @relation(fields: [global_settings_id], references: [id], onDelete: Cascade)
+
+  @@map("cms_custom_value")
+}
+
+model CmsForm {
+  id         Int      @id @default(autoincrement())
+  type       String
+  data       Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("cms_form")
+}
+
+model CmsGlobalSettings {
+  id               Int      @id @default(autoincrement())
+  seo_id           Int?
+  locale           String   @unique
+  website_name     String
+  footer_text      String?
+  analytics_code   String?
+  contact_phone    String?
+  contact_mobile   String?
+  contact_email    String?
+  contact_address  String?
+  contact_schedule String?
+  contact_maps_url String?
+  social_facebook  String?
+  social_instagram String?
+  social_twitter   String?
+  social_youtube   String?
+  social_whatsapp  String?
+  social_linkedin  String?
+  social_tiktok    String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  seo           CmsSeo?          @relation(fields: [seo_id], references: [id], onDelete: SetNull)
+  custom_values CmsCustomValue[]
+
+  @@map("cms_global_settings")
+}
+
+model CmsMedia {
+  id         Int      @id @default(autoincrement())
+  src        String
+  thumbnail  String
+  name       String
+  size       Int
+  type       String
+  width      Int
+  height     Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  contents CmsMediaContent[]
+  CmsSeo   CmsSeo[]
+
+  @@map("cms_media")
+}
+
+model CmsMediaContent {
+  id         Int       @id @default(autoincrement())
+  media_id   Int
+  content_id Int
+  title      String?
+  link       String?
+  type       MediaType
+  order      Int       @default(0)
+
+  media   CmsMedia   @relation(fields: [media_id], references: [id], onDelete: Cascade)
+  content CmsContent @relation(fields: [content_id], references: [id], onDelete: Cascade)
+
+  @@map("cms_media_content")
+}
+
+model CmsMenu {
+  id           Int       @id @default(autoincrement())
+  locale       String
+  slug         String
+  name         String
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  items CmsMenuItem[]
+
+  @@map("cms_menu")
+}
+
+model CmsMenuItem {
+  id           Int      @id @default(autoincrement())
+  menu_id      Int?
+  menu_item_id Int?
+  title        String
+  url          String
+  target       String
+  order        Int      @default(0)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  menu     CmsMenu?      @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  parent   CmsMenuItem?  @relation("parent", fields: [menu_item_id], references: [id], onDelete: Cascade)
+  subitems CmsMenuItem[] @relation("parent")
+
+  @@map("cms_menu_item")
+}
+
+model CmsPage {
+  id           Int       @id @default(autoincrement())
+  seo_id       Int?
+  locale       String
+  slug         String
+  name         String
+  title        String?
+  subtitle     String?
+  description  String?
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  seo      CmsSeo?      @relation(fields: [seo_id], references: [id], onDelete: SetNull)
+  contents CmsContent[]
+
+  @@map("cms_page")
+}
+
+model CmsSeo {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  media_id    Int?
+  keywords    String?
+  robots      String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  media           CmsMedia?           @relation(fields: [media_id], references: [id], onDelete: Cascade)
+  global_settings CmsGlobalSettings[]
+  contents        CmsContent[]
+  pages           CmsPage[]
+
+  @@map("cms_seo")
+}
+
+// ENUMS
+enum AuthProvider {
+  GOOGLE
+  APPLE
+  FACEBOOK
+  TWITTER
+}
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+}
+
+enum MediaType {
+  THUMBNAIL
+  IMAGE
+}
+
+enum NotificationTopic {
+  REGISTERED_USERS
+  GUEST_USERS
+}

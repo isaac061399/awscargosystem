@@ -1,0 +1,112 @@
+{
+  "common": {
+    "unauthorizedError": "Unauthorized",
+    "generalError": "An error has occurred. Please try again",
+    "missingParamsError": "Missing required parameters"
+  },
+  "auth/forgot-password": {
+    "errors": {
+      "general": "An error occurred, please try again"
+    }
+  },
+  "auth/lost-2fa": {
+    "errors": {
+      "general": "An error occurred, please try again"
+    }
+  },
+  "auth/reset-2fa": {
+    "errors": {
+      "invalidToken": "Invalid token, please request a new reset link",
+      "invalidPassword": "Invalid password",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "auth/reset-password": {
+    "errors": {
+      "invalidToken": "Invalid token, please request a new password reset link",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "administrators": {
+    "errors": {
+      "email": "This email address is already associated with an existing administrator. Please use a different email",
+      "save": "Error saving the administrator, please try again",
+      "delete": "Error deleting the administrator",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "categories": {
+    "errors": {
+      "slug": "The slug is already in use. Please use a different one",
+      "save": "Error saving the category, please try again",
+      "delete": "Error deleting the category, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "contents": {
+    "errors": {
+      "slug": "The slug is already in use. Please use a different one",
+      "save": "Error saving the content, please try again",
+      "delete": "Error deleting the content, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "global-settings": {
+    "errors": {
+      "delete": "Error deleting the settings, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "media": {
+    "errors": {
+      "requiredParams": "Missing required parameters, fileName and fileType",
+      "save": "Error saving the media, please try again",
+      "delete": "Error deleting the media, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "menus": {
+    "errors": {
+      "slug": "The slug is already in use. Please use a different one",
+      "save": "Error saving the menu, please try again",
+      "delete": "Error deleting the menu, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "pages": {
+    "errors": {
+      "slug": "The slug is already in use. Please use a different one",
+      "save": "Error saving the page, please try again",
+      "delete": "Error deleting the page, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "profile": {
+    "errors": {
+      "password": "Incorrect current password",
+      "verification2FA": "Invalid code",
+      "save": "Error saving the changes, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "push-messages": {
+    "errors": {
+      "send": "Error sending the push message, please try again",
+      "delete": "Error deleting the push message, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "roles": {
+    "errors": {
+      "save": "Error saving the role, please try again",
+      "delete": "Error deleting the role, please ensure it is not linked to any administrator before deleting it",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "users": {
+    "errors": {
+      "save": "Error saving data, please try again",
+      "general": "An error occurred, please try again"
+    }
+  }
+}

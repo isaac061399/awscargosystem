@@ -1,0 +1,103 @@
+{
+  "text": {
+    "title": "Perfil",
+    "btnSave": "Guardar Cambios",
+    "btnEnable": "Activar",
+    "btnDisable": "Desactivar",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "text2fa": {
+      "title": "Autenticación de dos factores (2FA)",
+      "subtitleEnabled": "La autenticación de dos factores está activada.",
+      "subtitleDisabled": "La autenticación de dos factores aún no está activada.",
+      "textDisabled": "La autenticación de dos factores agrega una capa adicional de seguridad a tu cuenta al requerir más que solo una contraseña para iniciar sesión.",
+      "dialog": {
+        "title": "Activar autenticación de dos factores (2FA)",
+        "subtitle": "Configurar la aplicación de autenticación",
+        "text1": "Usa una aplicación móvil como 1Password, Authy, LastPass Authenticator, Microsoft Authenticator, o Google Authenticator, etc. para obtener códigos 2FA cuando se te solicite durante el inicio de sesión.",
+        "text2": ["Si no puedes escanear, ingresa ", "este código de texto", " en su lugar."]
+      },
+      "dialogDisable": {
+        "title": "Desactivar la autenticación de dos factores (2FA)",
+        "text": "La autenticación de dos factores agrega una capa adicional de seguridad a tu cuenta al requerir más que solo una contraseña para iniciar sesión. ¿Estás seguro de continuar?"
+      }
+    }
+  },
+  "tabs": {
+    "account": {
+      "title": "Cuenta",
+      "form": {
+        "labels": {
+          "first_name": "Nombre",
+          "last_name": "Apellidos",
+          "email": "Correo electrónico",
+          "role": "Rol"
+        },
+        "placeholders": {
+          "first_name": "Ingrese el nombre",
+          "last_name": "Ingrese los apellidos",
+          "email": "correo@ejemplo.com",
+          "role": "Seleccionar"
+        },
+        "errors": {
+          "first_name": "El nombre es requerido",
+          "last_name": "Los apellidos son requeridos",
+          "email": "El correo electrónico es requerido",
+          "invalidEmail": "Correo electrónico inválido",
+          "role": "El rol es requerido"
+        },
+        "successMessage": "Cambios guardados con éxito",
+        "errorMessage": "Error al guardar los cambios, por favor inténtalo de nuevo"
+      }
+    },
+    "security": {
+      "title": "Seguridad",
+      "form": {
+        "labels": {
+          "password": "Contraseña actual",
+          "new_password": "Nueva contraseña",
+          "confirmNewPassword": "Confirmar nueva contraseña"
+        },
+        "placeholders": {
+          "password": "Ingrese su contraseña",
+          "new_password": "Ingrese una contraseña",
+          "confirmNewPassword": "Confirme la contraseña"
+        },
+        "errors": {
+          "password": "La contraseña actual es requerida",
+          "new_password": "La contraseña es requerida",
+          "confirmNewPassword": "La contraseña es requerida",
+          "confirmNewPasswordMatch": "Las contraseñas deben coincidir"
+        },
+        "successMessage": "Cambios guardados con éxito",
+        "errorMessage": "Error al guardar los cambios, por favor inténtalo de nuevo"
+      },
+      "form2faA": {
+        "labels": {
+          "code": "Verifica el código desde la aplicación"
+        },
+        "placeholders": {
+          "code": "XXXXXX"
+        },
+        "errors": {
+          "code": "El código es requerido"
+        },
+        "successMessage": "La autenticación de dos factores (2FA) se activó correctamente",
+        "errorMessage": "Error al guardar los cambios, por favor inténtalo de nuevo"
+      },
+      "form2faD": {
+        "labels": {
+          "password": "Contraseña actual"
+        },
+        "placeholders": {
+          "password": "Ingrese su contraseña"
+        },
+        "errors": {
+          "password": "La contraseña actual es requerida"
+        },
+        "successMessage": "La autenticación de dos factores (2FA) se desactivó correctamente",
+        "errorMessage": "Error al guardar los cambios, por favor inténtalo de nuevo"
+      }
+    }
+  }
+}

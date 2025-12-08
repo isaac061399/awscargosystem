@@ -1,0 +1,33 @@
+{
+  "text": {
+    "title": "Administradores",
+    "btnCreate": "Nuevo Administrador",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el administrador \"{{ name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "name": {
+        "title": "Nombre"
+      },
+      "email": {
+        "title": "Correo Electrónico"
+      },
+      "role": {
+        "title": "Rol"
+      },
+      "status": {
+        "title": "Estado",
+        "values": {
+          "active": "Activo",
+          "inactive": "Inactivo"
+        }
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

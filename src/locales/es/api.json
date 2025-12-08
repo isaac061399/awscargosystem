@@ -1,0 +1,112 @@
+{
+  "common": {
+    "unauthorizedError": "No autorizado",
+    "generalError": "Ha ocurrido un error. Por favor inténtalo de nuevo",
+    "missingParamsError": "Faltan parámetros requeridos"
+  },
+  "auth/forgot-password": {
+    "errors": {
+      "general": "Se produjo un error, por favor inténtelo de nuevo"
+    }
+  },
+  "auth/lost-2fa": {
+    "errors": {
+      "general": "Se produjo un error, por favor inténtelo de nuevo"
+    }
+  },
+  "auth/reset-2fa": {
+    "errors": {
+      "invalidToken": "Token inválido, por favor solicita un nuevo enlace de restablecimiento",
+      "invalidPassword": "Contraseña inválida",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "auth/reset-password": {
+    "errors": {
+      "invalidToken": "Token inválido, por favor solicite un nuevo enlace para restablecer la contraseña",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "administrators": {
+    "errors": {
+      "email": "Esta dirección de correo electrónico ya está asociada a un administrador existente. Por favor, use un correo diferente",
+      "save": "Error al guardar el administrador, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el administrador",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "categories": {
+    "errors": {
+      "slug": "El slug ya se encuentra en uso. Por favor utilice otro",
+      "save": "Error al guardar la categoría, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar la categoría, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "contents": {
+    "errors": {
+      "slug": "El slug ya se encuentra en uso. Por favor utilice otro",
+      "save": "Error al guardar el contenido, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el contenido, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "global-settings": {
+    "errors": {
+      "delete": "Error al eliminar la configuración, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "media": {
+    "errors": {
+      "requiredParams": "Faltan parámetros requeridos, fileName y fileType",
+      "save": "Error al guardar el archivo, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el archivo, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "menus": {
+    "errors": {
+      "slug": "El slug ya se encuentra en uso. Por favor utilice otro",
+      "save": "Error al guardar el menú, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el menú, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "pages": {
+    "errors": {
+      "slug": "El slug ya se encuentra en uso. Por favor utilice otro",
+      "save": "Error al guardar la página, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar la página, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "profile": {
+    "errors": {
+      "password": "Contraseña actual incorrecta",
+      "verification2FA": "Código inválido",
+      "save": "Error al guardar los cambios, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "push-messages": {
+    "errors": {
+      "send": "Error al enviar el mensaje push, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el mensaje push, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "roles": {
+    "errors": {
+      "save": "Error al guardar el rol, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el rol, asegúrese de que no está ligado a ningún administrador antes de eliminarlo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "users": {
+    "errors": {
+      "save": "Error al guardar los datos, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  }
+}

@@ -1,0 +1,685 @@
+{
+  "responses": {
+    "categories": {
+      "get": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/objects/category"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/objects/pagination"
+          }
+        }
+      }
+    },
+    "contents": {
+      "get": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "contents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/objects/content"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/objects/pagination"
+          }
+        }
+      }
+    },
+    "forms": {
+      "post": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "global_settings": {
+      "get": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "global_settings": {
+            "$ref": "#/definitions/objects/global_settings"
+          }
+        }
+      }
+    },
+    "devices": {
+      "guests": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      },
+      "users": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+    "menus": {
+      "get": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "menus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/objects/menu"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/objects/pagination"
+          }
+        }
+      }
+    },
+    "notifications": {
+      "get": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/objects/notification"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/objects/pagination"
+          }
+        }
+      }
+    },
+    "pages": {
+      "get": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/objects/page"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/objects/pagination"
+          }
+        }
+      }
+    },
+    "support": {
+      "post": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "users": {
+      "forgot-password": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      },
+      "login": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            },
+            "user": {
+              "$ref": "#/definitions/objects/user"
+            },
+            "session": {
+              "$ref": "#/components/objects/session"
+            }
+          }
+        }
+      },
+      "logout": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      },
+      "me": {
+        "get": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            },
+            "user": {
+              "$ref": "#/definitions/objects/user"
+            }
+          }
+        }
+      },
+      "provider-register": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            },
+            "user": {
+              "$ref": "#/definitions/objects/user"
+            },
+            "session": {
+              "$ref": "#/components/objects/session"
+            }
+          }
+        }
+      },
+      "refresh-token": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            },
+            "session": {
+              "$ref": "#/components/objects/session"
+            }
+          }
+        }
+      },
+      "reset-password": {
+        "post": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      },
+      "put": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          },
+          "user": {
+            "$ref": "#/definitions/objects/user"
+          }
+        }
+      },
+      "delete": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    }
+  },
+  "objects": {
+    "category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/content"
+          }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "seo": {
+          "$ref": "#/definitions/objects/seo"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/objects/media_content"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/media_content"
+          }
+        },
+        "custom_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/custom_value"
+          }
+        }
+      }
+    },
+    "global_settings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "website_name": {
+          "type": "string"
+        },
+        "footer_text": {
+          "type": "string"
+        },
+        "analytics_code": {
+          "type": "string"
+        },
+        "contact_phone": {
+          "type": "string"
+        },
+        "contact_mobile": {
+          "type": "string"
+        },
+        "contact_email": {
+          "type": "string"
+        },
+        "contact_address": {
+          "type": "string"
+        },
+        "contact_schedule": {
+          "type": "string"
+        },
+        "contact_maps_url": {
+          "type": "string"
+        },
+        "social_facebook": {
+          "type": "string"
+        },
+        "social_instagram": {
+          "type": "string"
+        },
+        "social_twitter": {
+          "type": "string"
+        },
+        "social_youtube": {
+          "type": "string"
+        },
+        "social_whatsapp": {
+          "type": "string"
+        },
+        "social_linkedin": {
+          "type": "string"
+        },
+        "social_tiktok": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "seo": {
+          "$ref": "#/definitions/objects/seo"
+        },
+        "custom_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/custom_value"
+          }
+        }
+      }
+    },
+    "custom_value": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "media": {
+      "type": "object",
+      "properties": {
+        "src": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        }
+      }
+    },
+    "media_content": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "media": {
+          "$ref": "#/definitions/objects/media"
+        }
+      }
+    },
+    "menu": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/menu_item"
+          }
+        }
+      }
+    },
+    "menu_item": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "subitems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/menu_subitem"
+          }
+        }
+      }
+    },
+    "menu_subitem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      }
+    },
+    "notification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "is_read": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "seo": {
+          "$ref": "#/definitions/objects/seo"
+        },
+        "contents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objects/content"
+          }
+        }
+      }
+    },
+    "seo": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "string"
+        },
+        "robots": {
+          "type": "string"
+        },
+        "media": {
+          "$ref": "#/definitions/objects/media"
+        }
+      }
+    },
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email_notifications": {
+          "type": "boolean"
+        },
+        "push_notifications": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

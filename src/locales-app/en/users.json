@@ -1,0 +1,37 @@
+{
+  "root": {
+    "errors": {
+      "userExist": "Email is already in use"
+    }
+  },
+  "forgot-password": {
+    "errors": {
+      "emailNotExist": "The email does not exist"
+    }
+  },
+  "login": {
+    "errors": {
+      "invalidCredentials": "Invalid credentials"
+    }
+  },
+  "provider": {
+    "errors": {
+      "invalidUser": "Invalid user"
+    }
+  },
+  "refresh-token": {
+    "errors": {
+      "invalidToken": "Invalid token"
+    }
+  },
+  "register": {
+    "errors": {
+      "userExist": "Email is already in use"
+    }
+  },
+  "reset-password": {
+    "errors": {
+      "invalidCode": "Invalid code"
+    }
+  }
+}

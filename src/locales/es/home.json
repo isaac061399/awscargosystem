@@ -1,0 +1,26 @@
+{
+  "text": {
+    "welcome": {
+      "title": "Bienvenid@ {{ name }}!",
+      "auth2fa": "Autenticación de dos factores: Activada",
+      "auth2faNo": "Autenticación de dos factores: Inactiva",
+      "btnProfile": "Ver Perfil"
+    },
+    "statistics": {
+      "title": "Estadísticas",
+      "subtitle": "Descripción general de las entradas principales (borradores y publicados)",
+      "pages": "Páginas",
+      "categories": "Categorías",
+      "contents": "Contenidos",
+      "menus": "Menús"
+    },
+    "admins": {
+      "administrator": "Administrador",
+      "email": "Email",
+      "role": "Rol",
+      "status": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo"
+    }
+  }
+}

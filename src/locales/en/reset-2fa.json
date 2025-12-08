@@ -1,0 +1,19 @@
+{
+  "text": {
+    "title": "Reset Your Two-Factor Authentication",
+    "successTitle": "Two-Factor Authentication Reset Successful",
+    "subtitle": "Please enter your current password to proceed. This will remove two-factor authentication from your login.",
+    "successSubtitle": "Your two-factor authentication has been successfully reset. Please log in and set up two-factor authentication again from your profile to keep your account secure.",
+    "backToLogin": "Login"
+  },
+  "form": {
+    "labels": {
+      "password": "Password"
+    },
+    "errors": {
+      "password": "Password required"
+    },
+    "submitButton": "Reset",
+    "errorMessage": "An error occurred, please try again"
+  }
+}

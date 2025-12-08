@@ -1,0 +1,44 @@
+{
+  "text": {
+    "titleNew": "Nuevo Rol",
+    "titleEdit": "Editando Rol: ",
+    "titlePermissions": "Permisos",
+    "btnSave": "Guardar",
+    "modules": {
+      "push-messages": "App - Mensajes Push",
+      "users": "App - Usuarios",
+      "administrators": "Seguridad - Administradores",
+      "roles": "Seguridad - Roles",
+      "categories": "CMS - Categorías",
+      "contents": "CMS - Contenidos",
+      "media": "CMS - Galería de Medios",
+      "menus": "CMS - Menús",
+      "pages": "CMS - Páginas",
+      "global-settings": "CMS - Configuración Global"
+    },
+    "permissions": {
+      "list": "Listar",
+      "create": "Crear",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "send": "Enviar",
+      "view": "Ver"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Nombre",
+      "description": "Descripción"
+    },
+    "placeholders": {
+      "name": "Ingrese un nombre",
+      "description": "Ingrese una descripción"
+    },
+    "errors": {
+      "name": "El nombre es requerido",
+      "description": ""
+    },
+    "successMessage": "Rol guardado con éxito",
+    "errorMessage": "Error al guardar el rol, por favor inténtalo de nuevo"
+  }
+}
