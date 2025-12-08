@@ -14,7 +14,9 @@
       "media": "CMS - Galería de Medios",
       "menus": "CMS - Menús",
       "pages": "CMS - Páginas",
-      "global-settings": "CMS - Configuración Global"
+      "global-settings": "CMS - Configuración Global",
+      "offices": "Administración - Oficinas",
+      "configuration": "Administración - Configuración"
     },
     "permissions": {
       "list": "Listar",

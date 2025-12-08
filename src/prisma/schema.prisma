@@ -480,3 +480,34 @@ enum NotificationTopic {
   REGISTERED_USERS
   GUEST_USERS
 }
+
+// Custom
+
+model CusOffice {
+  id         Int      @id @default(autoincrement())
+  name       String
+  shelves    String?
+  rows       String?
+  enabled    Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("cus_office")
+}
+
+model CusConfiguration {
+  id                       Int      @id @default(autoincrement())
+  pound_fee                Float    @default(0)
+  additional_exchange_rate Float    @default(0)
+  iva_percentage           Float    @default(0)
+  address_line_1           String?
+  address_line_2           String?
+  address_city             String?
+  address_state            String?
+  address_postal_code      String?
+  address_phone            String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+
+  @@map("cus_configuration")
+}

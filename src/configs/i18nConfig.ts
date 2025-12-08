@@ -37,7 +37,14 @@ const i18nConfig = {
     '/[locale]/(dashboard)/roles/new': ['roles-edition'],
     '/[locale]/(dashboard)/roles/edit/[id]': ['roles-edition'],
     '/[locale]/(dashboard)/users': ['users'],
-    '/[locale]/(dashboard)/users/edit/[id]': ['users-edition']
+    '/[locale]/(dashboard)/users/edit/[id]': ['users-edition'],
+
+    // customs
+
+    '/[locale]/(dashboard)/configuration': ['configuration'],
+    '/[locale]/(dashboard)/offices': ['offices'],
+    '/[locale]/(dashboard)/offices/new': ['offices-edition'],
+    '/[locale]/(dashboard)/offices/edit/[id]': ['offices-edition']
   }
 };
 

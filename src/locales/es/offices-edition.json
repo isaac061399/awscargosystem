@@ -1,0 +1,30 @@
+{
+  "text": {
+    "titleNew": "Nueva Oficina",
+    "titleEdit": "Editando Oficina: ",
+    "titlePermissions": "Permisos",
+    "btnSave": "Guardar"
+  },
+  "form": {
+    "labels": {
+      "name": "Nombre",
+      "shelves": "Estantes",
+      "rows": "Filas",
+      "enabled": "Activa"
+    },
+    "placeholders": {
+      "name": "Ingrese un nombre",
+      "shelves": "Escriba y presione enter para agregar estantes",
+      "rows": "Escriba y presione enter para agregar filas",
+      "enabled": ""
+    },
+    "errors": {
+      "name": "El nombre es requerido",
+      "shelves": "Los estantes son requeridos",
+      "rows": "Las filas son requeridas",
+      "enabled": ""
+    },
+    "successMessage": "Oficina guardada con éxito",
+    "errorMessage": "Error al guardar la oficina, por favor inténtalo de nuevo"
+  }
+}

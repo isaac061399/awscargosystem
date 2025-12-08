@@ -108,5 +108,18 @@
       "save": "Error saving data, please try again",
       "general": "An error occurred, please try again"
     }
+  },
+  "configuration": {
+    "errors": {
+      "save": "Error saving the configuration, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
+  "offices": {
+    "errors": {
+      "save": "Error saving the office, please try again",
+      "delete": "Error deleting the office. If it already has associated data, you will not be able to delete it.",
+      "general": "An error occurred, please try again"
+    }
   }
 }

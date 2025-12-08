@@ -108,5 +108,18 @@
       "save": "Error al guardar los datos, por favor inténtalo de nuevo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
+  },
+  "configuration": {
+    "errors": {
+      "save": "Error al guardar la configuración, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "offices": {
+    "errors": {
+      "save": "Error al guardar la oficina, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar la oficina. Si ya tiene datos asociados, no podrá eliminarla.",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
   }
 }

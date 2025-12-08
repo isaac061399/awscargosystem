@@ -1,0 +1,207 @@
+'use client';
+
+// React Imports
+import { useMemo, useState } from 'react';
+
+// Next Imports
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+
+// Form Imports
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+
+// MUI Imports
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Switch,
+  TextField,
+  Typography
+} from '@mui/material';
+import { MuiChipsInput } from 'mui-chips-input';
+
+// Component Imports
+import DashboardLayout from '@components/layout/DashboardLayout';
+
+// Helpers Imports
+import { requestEditOffice, requestNewOffice } from '@helpers/request';
+
+const defaultAlertState = { open: false, type: 'success', message: '' };
+
+const OfficesEdition = ({ office }: { office?: any }) => {
+  const router = useRouter();
+
+  const { t, i18n } = useTranslation();
+  const textT: any = useMemo(() => t('offices-edition:text', { returnObjects: true, default: {} }), [t]);
+  const formT: any = useMemo(() => t('offices-edition:form', { returnObjects: true, default: {} }), [t]);
+
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
+
+  const formik = useFormik({
+    validateOnChange: false,
+    validateOnBlur: false,
+    initialValues: useMemo(
+      () => ({
+        name: office ? `${office.name}` : '',
+        shelves: office ? `${office.shelves}`.split(',') : [],
+        rows: office ? `${office.rows}`.split(',') : [],
+        enabled: office ? office.enabled : true
+      }),
+      [office]
+    ),
+    validationSchema: yup.object({
+      name: yup.string().required(formT?.errors?.name),
+      shelves: yup.array().min(1, formT?.errors?.shelves).required(formT?.errors?.shelves),
+      rows: yup.array().min(1, formT?.errors?.rows).required(formT?.errors?.rows),
+      enabled: yup.boolean()
+    }),
+    onSubmit: async (values) => {
+      setAlertState({ ...defaultAlertState });
+
+      const newValues = {
+        ...values,
+        shelves: values.shelves.map((s: string) => s.trim()).join(','),
+        rows: values.rows.map((r: string) => r.trim()).join(',')
+      };
+
+      try {
+        const result = office
+          ? await requestEditOffice(office.id, newValues, i18n.language)
+          : await requestNewOffice(newValues, i18n.language);
+
+        if (!result.valid) {
+          return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
+        }
+
+        setAlertState({ open: true, type: 'success', message: formT?.successMessage });
+
+        if (!office) {
+          setIsRedirecting(true);
+          setTimeout(() => {
+            router.push(`/offices/edit/${result.id}`);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            setAlertState({ ...defaultAlertState });
+          }, 5000);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        // console.error(error);
+        return setAlertState({ open: true, type: 'error', message: formT?.errorMessage });
+      }
+    }
+  });
+
+  return (
+    <DashboardLayout>
+      <form noValidate onSubmit={formik.handleSubmit}>
+        <Grid container spacing={6}>
+          <Grid size={{ xs: 12 }}>
+            <div className="flex items-center justify-between mb-3">
+              <Typography variant="h3" className="flex items-center gap-1">
+                <IconButton className="p-1" color="default" LinkComponent={Link} href="/offices">
+                  <i className="ri-arrow-left-s-line text-4xl" />
+                </IconButton>
+                {office ? `${textT?.titleEdit} ${formik.values.name}` : textT?.titleNew}
+              </Typography>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  loading={formik.isSubmitting || isRedirecting}
+                  startIcon={<i className="ri-save-line" />}>
+                  {textT?.btnSave}
+                </Button>
+              </div>
+            </div>
+            <Divider />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <Card>
+              {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
+              <CardContent>
+                <Grid container spacing={5}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="name"
+                      name="name"
+                      label={formT?.labels?.name}
+                      placeholder={formT?.placeholders?.name}
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.name && formik.errors.name)}
+                      color={Boolean(formik.touched.name && formik.errors.name) ? 'error' : 'primary'}
+                      helperText={formik.touched.name && formik.errors.name}
+                      disabled={formik.isSubmitting || isRedirecting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <MuiChipsInput
+                      fullWidth
+                      id="shelves"
+                      name="shelves"
+                      label={formT?.labels?.shelves}
+                      placeholder={formT?.placeholders?.shelves}
+                      value={formik.values.shelves}
+                      onChange={(value) => formik.setFieldValue('shelves', value)}
+                      error={Boolean(formik.touched.shelves && formik.errors.shelves)}
+                      color={Boolean(formik.touched.shelves && formik.errors.shelves) ? 'error' : 'primary'}
+                      helperText={formik.touched.shelves && formik.errors.shelves}
+                      disabled={formik.isSubmitting || isRedirecting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <MuiChipsInput
+                      fullWidth
+                      id="rows"
+                      name="rows"
+                      label={formT?.labels?.rows}
+                      placeholder={formT?.placeholders?.rows}
+                      value={formik.values.rows}
+                      onChange={(value) => formik.setFieldValue('rows', value)}
+                      error={Boolean(formik.touched.rows && formik.errors.rows)}
+                      color={Boolean(formik.touched.rows && formik.errors.rows) ? 'error' : 'primary'}
+                      helperText={formik.touched.rows && formik.errors.rows}
+                      disabled={formik.isSubmitting || isRedirecting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={formik.values.enabled}
+                          onChange={(e) => {
+                            formik.setFieldValue('enabled', e.target.checked);
+                          }}
+                        />
+                      }
+                      label={formT?.labels?.enabled}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </form>
+    </DashboardLayout>
+  );
+};
+
+export default OfficesEdition;

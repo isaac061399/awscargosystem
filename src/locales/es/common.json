@@ -155,6 +155,42 @@
         ]
       },
       {
+        "sectionTitle": "Administración",
+        "permissions": ["offices.list", "offices.create", "configuration.view"],
+        "items": [
+          {
+            "label": "Oficinas",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-building-line",
+            "permissions": ["offices.list", "offices.create"],
+            "subItems": [
+              {
+                "label": "Listar",
+                "link": "/offices",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["offices.list"]
+              },
+              {
+                "label": "Nueva",
+                "link": "/offices/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["offices.create"]
+              }
+            ]
+          },
+          {
+            "label": "Configuración",
+            "link": "/configuration",
+            "externalLink": false,
+            "icon": "ri-settings-5-line",
+            "permissions": ["configuration.view"]
+          }
+        ]
+      },
+      {
         "sectionTitle": "Seguridad",
         "permissions": ["administrators.list", "administrators.create", "roles.list", "roles.create"],
         "items": [

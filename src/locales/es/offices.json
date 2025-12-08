@@ -1,0 +1,25 @@
+{
+  "text": {
+    "title": "Oficinas",
+    "btnCreate": "Nueva Oficina",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar la oficina \"{{ name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "name": {
+        "title": "Nombre"
+      },
+      "enabled": {
+        "title": "Estado",
+        "active": "Activa",
+        "inactive": "Inactiva"
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

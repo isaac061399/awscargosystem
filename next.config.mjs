@@ -38,7 +38,7 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
-  transpilePackages: ['@mui/x-data-grid'],
+  transpilePackages: ['@mui/x-data-grid', 'mui-chips-input'],
   async headers() {
     return [
       {

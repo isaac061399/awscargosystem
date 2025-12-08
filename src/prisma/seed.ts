@@ -44,9 +44,15 @@ const permissions = [
   { id: 'roles.create', name: 'Create' },
   { id: 'roles.delete', name: 'Delete' },
   { id: 'roles.edit', name: 'Edit' },
-  { id: 'roles.list', name: 'List' }
+  { id: 'roles.list', name: 'List' },
   // { id: 'users.edit', name: 'Edit' },
-  // { id: 'users.list', name: 'List' }
+  // { id: 'users.list', name: 'List' },
+  { id: 'configuration.edit', name: 'Edit' },
+  { id: 'configuration.view', name: 'View' },
+  { id: 'offices.create', name: 'Create' },
+  { id: 'offices.delete', name: 'Delete' },
+  { id: 'offices.edit', name: 'Edit' },
+  { id: 'offices.list', name: 'List' }
 ];
 
 const adminRole = { name: 'Super Admin', description: 'Administrator role with all permissions' };

@@ -20,6 +20,11 @@ export const imageContentTypes = {
   'image/avif': 'AVIF'
 };
 
+export const Currencies: Record<string, { symbol: string; name: string }> = {
+  USD: { symbol: '$', name: 'USD' },
+  CRC: { symbol: '₡', name: 'CRC' }
+};
+
 // App Constants
 
 export const userProviders: Record<AuthProvider, { icon: string }> = {

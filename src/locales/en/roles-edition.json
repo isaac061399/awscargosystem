@@ -14,7 +14,9 @@
       "media": "CMS - Media Library",
       "menus": "CMS - Menus",
       "pages": "CMS - Pages",
-      "global-settings": "CMS - Global Settings"
+      "global-settings": "CMS - Global Settings",
+      "offices": "Administration - Offices",
+      "configuration": "Administration - Configuration"
     },
     "permissions": {
       "list": "List",

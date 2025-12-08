@@ -1,0 +1,46 @@
+{
+  "text": {
+    "title": "Configuración",
+    "generalTitle": "Configuración General",
+    "addressTitle": "Configuración de Dirección",
+    "btnSave": "Guardar"
+  },
+  "form": {
+    "labels": {
+      "pound_fee": "Tarifa por libra",
+      "additional_exchange_rate": "Tasa de cambio adicional",
+      "iva_percentage": "Porcentaje de IVA",
+      "address_line_1": "Línea 1",
+      "address_line_2": "Línea 2",
+      "address_city": "Ciudad",
+      "address_state": "Estado",
+      "address_postal_code": "Código Postal",
+      "address_phone": "Teléfono"
+    },
+    "placeholders": {
+      "pound_fee": "Ingrese un valor en dólares",
+      "additional_exchange_rate": "Ingrese un valor en colones",
+      "iva_percentage": "Ingrese un porcentaje",
+      "address_line_1": "Ingrese un valor",
+      "address_line_2": "Ingrese un valor",
+      "address_city": "Ingrese un valor",
+      "address_state": "Ingrese un valor",
+      "address_postal_code": "Ingrese un valor",
+      "address_phone": "Ingrese un valor"
+    },
+    "errors": {
+      "invalidType": "Tipo inválido",
+      "pound_fee": "Campo requerido",
+      "additional_exchange_rate": "Campo requerido",
+      "iva_percentage": "Campo requerido",
+      "address_line_1": "Campo requerido",
+      "address_line_2": "Campo requerido",
+      "address_city": "Campo requerido",
+      "address_state": "Campo requerido",
+      "address_postal_code": "Campo requerido",
+      "address_phone": "Campo requerido"
+    },
+    "successMessage": "Configuración guardada con éxito",
+    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
+  }
+}
