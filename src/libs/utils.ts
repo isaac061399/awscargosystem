@@ -119,3 +119,52 @@ export const formatFileSize = (bytes: number, decimals = 1): string => {
 
   return `${size} ${sizes[i]}`;
 };
+
+export const getTelInputValue = (value: string): string => {
+  if (!value) return '';
+
+  const digitsOnly = value.replace(/\D/g, '');
+
+  return digitsOnly.length > 4 ? value : '';
+};
+
+export const formatMoney = (value: number | string): string => {
+  const prefix = '₡ ';
+  const suffix = '';
+  const decimalSeparator = '.';
+  const thousandSeparator = ',';
+  const decimalScale = 2;
+
+  const num = Number(value);
+
+  if (isNaN(num)) return '';
+
+  let [intPart, decPart = ''] = num.toString().split('.');
+
+  // Add thousand separator
+  intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+
+  // If original number has decimals
+  const hasDecimal = value.toString().includes('.');
+
+  let decimalOutput = '';
+
+  if (hasDecimal && decimalScale !== undefined) {
+    decPart = (decPart + '0'.repeat(decimalScale)).slice(0, decimalScale);
+    decimalOutput = decimalSeparator + decPart;
+  }
+
+  return `${prefix}${intPart}${decimalOutput}${suffix}`;
+};
+
+export const padStartZeros = (num: number | string, length: number): string => {
+  const strNum = typeof num === 'number' ? num.toString() : num;
+
+  return strNum.padStart(length, '0');
+};
+
+export const generateUrl = (baseUrl: string, params: Record<string, any>) => {
+  const query = new URLSearchParams(params).toString();
+
+  return `${baseUrl}?${query}`;
+};

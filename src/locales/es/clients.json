@@ -1,0 +1,32 @@
+{
+  "text": {
+    "title": "Clientes",
+    "btnCreate": "Nuevo Cliente",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el cliente \"{{ full_name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "box_number": {
+        "title": "Número de Casillero"
+      },
+      "full_name": {
+        "title": "Nombre"
+      },
+      "identification": {
+        "title": "Identificación"
+      },
+      "email": {
+        "title": "Correo Electrónico"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

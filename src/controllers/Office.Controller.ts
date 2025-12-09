@@ -3,7 +3,6 @@ import { prismaRead } from '@libs/prisma';
 export const getAllOffices = async () => {
   try {
     const offices = await prismaRead.cusOffice.findMany({
-      where: { enabled: true },
       select: { id: true, name: true, shelves: true, rows: true }
     });
 

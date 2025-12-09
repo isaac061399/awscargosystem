@@ -483,16 +483,37 @@ enum NotificationTopic {
 
 // Custom
 
-model CusOffice {
-  id         Int      @id @default(autoincrement())
-  name       String
-  shelves    String?
-  rows       String?
-  enabled    Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model CusClient {
+  id                          Int                @id @default(autoincrement())
+  office_id                   Int
+  box_number                  String?            @unique
+  full_name                   String
+  identification_type         IdentificationType
+  identification              String
+  email                       String
+  phone                       String?
+  district_id                 Int?
+  address                     String?            @db.Text
+  password                    String?
+  billing_full_name           String
+  billing_identification_type IdentificationType
+  billing_identification      String
+  billing_email               String
+  billing_phone               String?
+  billing_district_id         Int?
+  billing_address             String?            @db.Text
+  billing_activity_type       String?
+  billing_activity_code       String?
+  pound_fee                   Float              @default(0)
+  status                      ClientStatus
+  created_at                  DateTime           @default(now())
+  updated_at                  DateTime           @updatedAt
 
-  @@map("cus_office")
+  office           CusOffice    @relation(fields: [office_id], references: [id], onDelete: Restrict)
+  district         CusDistrict? @relation("district", fields: [district_id], references: [id], onDelete: Restrict)
+  billing_district CusDistrict? @relation("billing_district", fields: [billing_district_id], references: [id], onDelete: Restrict)
+
+  @@map("cus_client")
 }
 
 model CusConfiguration {
@@ -510,4 +531,62 @@ model CusConfiguration {
   updated_at               DateTime @updatedAt
 
   @@map("cus_configuration")
+}
+
+model CusProvince {
+  id      Int         @id @default(autoincrement())
+  name    String
+  cantons CusCanton[]
+
+  @@map("cus_province")
+}
+
+model CusCanton {
+  id          Int    @id @default(autoincrement())
+  province_id Int
+  name        String
+
+  province  CusProvince   @relation(fields: [province_id], references: [id], onDelete: Cascade)
+  districts CusDistrict[]
+
+  @@map("cus_canton")
+}
+
+model CusDistrict {
+  id        Int    @id @default(autoincrement())
+  canton_id Int
+  name      String
+
+  canton          CusCanton   @relation(fields: [canton_id], references: [id], onDelete: Cascade)
+  clients         CusClient[] @relation("district")
+  billing_clients CusClient[] @relation("billing_district")
+
+  @@map("cus_district")
+}
+
+model CusOffice {
+  id         Int      @id @default(autoincrement())
+  name       String
+  shelves    String?
+  rows       String?
+  enabled    Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  clients CusClient[]
+
+  @@map("cus_office")
+}
+
+// Custom ENUMS
+enum IdentificationType {
+  PHYSICAL
+  LEGAL
+  DIMEX
+  PASSPORT
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
 }

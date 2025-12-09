@@ -25,6 +25,8 @@ export const Currencies: Record<string, { symbol: string; name: string }> = {
   CRC: { symbol: '₡', name: 'CRC' }
 };
 
+export const boxNumberPrefix = 'AWS-';
+
 // App Constants
 
 export const userProviders: Record<AuthProvider, { icon: string }> = {

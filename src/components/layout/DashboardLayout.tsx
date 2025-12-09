@@ -11,12 +11,14 @@ import type { ChildrenType } from '@core/types';
 import Navigation from '@components/layout/vertical/Navigation';
 import Navbar from '@components/layout/vertical/Navbar';
 import VerticalFooter from '@components/layout/vertical/Footer';
+import TimezoneCookie from '@components/layout/TimezoneCookie';
 
 const DashboardLayout = ({ children }: ChildrenType) => {
   return (
     <LayoutWrapper
       verticalLayout={
         <VerticalLayout navigation={<Navigation />} navbar={<Navbar />} footer={<VerticalFooter />}>
+          <TimezoneCookie />
           {children}
         </VerticalLayout>
       }

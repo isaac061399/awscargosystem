@@ -15,8 +15,9 @@
       "menus": "CMS - Menus",
       "pages": "CMS - Pages",
       "global-settings": "CMS - Global Settings",
-      "offices": "Administration - Offices",
-      "configuration": "Administration - Configuration"
+      "clients": "Administration - Clients",
+      "configuration": "Administration - Configuration",
+      "offices": "Administration - Offices"
     },
     "permissions": {
       "list": "List",

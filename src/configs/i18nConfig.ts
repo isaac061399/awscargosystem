@@ -3,7 +3,7 @@ const i18nConfig = {
   localesLabel: { es: 'ES' },
   defaultLocale: 'es',
   pages: {
-    '*': ['common'],
+    '*': ['common', 'constants'],
     '/[locale]/[...not-found]': ['not-found'],
     '/[locale]/(errors)/maintenance': ['maintenance'],
     '/[locale]/(errors)/not-found': ['not-found'],
@@ -41,6 +41,9 @@ const i18nConfig = {
 
     // customs
 
+    '/[locale]/(dashboard)/clients': ['clients'],
+    '/[locale]/(dashboard)/clients/new': ['clients-edition'],
+    '/[locale]/(dashboard)/clients/edit/[id]': ['clients-edition'],
     '/[locale]/(dashboard)/configuration': ['configuration'],
     '/[locale]/(dashboard)/offices': ['offices'],
     '/[locale]/(dashboard)/offices/new': ['offices-edition'],

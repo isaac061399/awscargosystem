@@ -109,6 +109,15 @@
       "general": "An error occurred, please try again"
     }
   },
+  "clients": {
+    "errors": {
+      "email": "This email address is already associated with an existing client.",
+      "identification": "This identification number is already associated with an existing client.",
+      "save": "Error saving the client, please try again",
+      "delete": "Error deleting the client, if it already has associated data, you will not be able to delete it.",
+      "general": "An error occurred, please try again"
+    }
+  },
   "configuration": {
     "errors": {
       "save": "Error saving the configuration, please try again",

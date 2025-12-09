@@ -1,0 +1,212 @@
+{
+  "text": {
+    "titleNew": "Nuevo Cliente",
+    "titleEdit": "Editando Cliente: "
+  },
+  "tabs": {
+    "info": {
+      "title": "Información",
+      "text": {
+        "btnSave": "Guardar",
+        "boxNumberLabel": "Número de Casillero",
+        "personalDataLabel": "Datos Personales",
+        "addressLabel": "Dirección",
+        "billingLabel": "Datos de Facturación",
+        "useSameBillingLabel": "Usar la misma información del cliente para facturación"
+      },
+      "form": {
+        "labels": {
+          "office_id": "Oficina",
+          "full_name": "Nombre",
+          "identification_type": "Tipo de identificación",
+          "identification": "Identificación",
+          "email": "Correo electrónico",
+          "phone": "Teléfono",
+
+          "province_id": "Provincia",
+          "canton_id": "Cantón",
+          "district_id": "Distrito",
+          "address": "Dirección",
+
+          "billing_full_name": "Nombre",
+          "billing_identification_type": "Tipo de identificación",
+          "billing_identification": "Identificación",
+          "billing_email": "Correo electrónico",
+          "billing_phone": "Teléfono",
+
+          "billing_province_id": "Provincia",
+          "billing_canton_id": "Cantón",
+          "billing_district_id": "Distrito",
+          "billing_address": "Dirección",
+
+          "billing_activity_type": "Tipo de actividad",
+          "billing_activity_code": "Código de actividad",
+
+          "pound_fee": "Tarifa por libra",
+          "status": "Estado"
+        },
+        "placeholders": {
+          "office_id": "Seleccione una oficina",
+          "full_name": "Ingrese el nombre",
+          "identification_type": "Seleccione una opción",
+          "identification": "Ingrese la identificación",
+          "email": "Ingrese el correo electrónico",
+          "phone": "Ingrese el teléfono",
+
+          "province_id": "Seleccione una opción",
+          "canton_id": "Seleccione una opción",
+          "district_id": "Seleccione una opción",
+          "address": "Ingrese la dirección",
+
+          "billing_full_name": "Ingrese el nombre",
+          "billing_identification_type": "Seleccione una opción",
+          "billing_identification": "Ingrese la identificación",
+          "billing_email": "Ingrese el correo electrónico",
+          "billing_phone": "Ingrese el teléfono",
+
+          "billing_province_id": "Seleccione una opción",
+          "billing_canton_id": "Seleccione una opción",
+          "billing_district_id": "Seleccione una opción",
+          "billing_address": "Ingrese la dirección",
+
+          "billing_activity_type": "Ingrese el tipo de actividad",
+          "billing_activity_code": "Seleccione el código de actividad",
+
+          "pound_fee": "Ingrese la tarifa",
+          "status": "Seleccione una opción"
+        },
+        "errors": {
+          "office_id": "La oficina es requerida",
+          "full_name": "El nombre es requerido",
+          "identification_type": "El tipo de identificación es requerido",
+          "identification": "La identificación es requerida",
+          "email": "El correo electrónico es requerido",
+          "phone": "El teléfono es requerido",
+
+          "province_id": "La provincia es requerida",
+          "canton_id": "El cantón es requerido",
+          "district_id": "El distrito es requerido",
+          "address": "La dirección es requerida",
+
+          "billing_full_name": "El nombre es requerido",
+          "billing_identification_type": "El tipo de identificación es requerido",
+          "billing_identification": "La identificación es requerida",
+          "billing_email": "El correo electrónico es requerido",
+          "billing_phone": "El teléfono es requerido",
+
+          "billing_province_id": "La provincia es requerida",
+          "billing_canton_id": "El cantón es requerido",
+          "billing_district_id": "El distrito es requerido",
+          "billing_address": "La dirección es requerida",
+
+          "billing_activity_type": "El tipo de actividad es requerido",
+          "billing_activity_code": "El código de actividad es requerido",
+
+          "pound_fee": "La tarifa es requerida",
+          "status": "El estado es requerido",
+
+          "invalidEmail": "Correo electrónico inválido",
+          "invalidAmount": "Debe ser un monto válido"
+        },
+        "successMessage": "Cliente guardado con éxito",
+        "errorMessage": "Error al guardar el cliente, por favor inténtalo de nuevo"
+      }
+    },
+    "credits": {
+      "title": "Créditos",
+      "text": {
+        "btnExport": "Exportar"
+      },
+      "table": {
+        "beneficiary": {
+          "title": "Beneficiario",
+          "identification": "Identificación",
+          "email": "Correo"
+        },
+        "detail": {
+          "title": "Detalle",
+          "amount": "Monto",
+          "interest": "Interés",
+          "installments": "Cuotas"
+        },
+        "balance": {
+          "title": "Saldo"
+        },
+        "start_date": {
+          "title": "Fecha de Inicio",
+          "dateFormat": "DD/MM/YYYY"
+        },
+        "next_payment": {
+          "title": "Próximo Pago",
+          "dateFormat": "DD/MM/YYYY"
+        },
+        "status": {
+          "title": "Estado"
+        },
+        "actions": {
+          "title": "Acciones",
+          "editLabel": "Editar"
+        }
+      }
+    },
+    "wallet": {
+      "title": "Billetera",
+      "text": {
+        "currentBalance": "Saldo Actual",
+        "btnAddBalance": "Agregar Saldo",
+        "btnAdd": "Agregar",
+        "btnContinue": "Continuar",
+        "btnCancel": "Cancelar",
+        "btnExport": "Exportar",
+        "dialogAddBalanceTitle": "Agregar Saldo",
+        "dialogDeleteTitle": "Confirmar Eliminación",
+        "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar la transacción de \"{{ amount }}\"? Esta acción no se puede deshacer."
+      },
+      "table": {
+        "amount": {
+          "title": "Monto"
+        },
+        "balance": {
+          "title": "Saldo"
+        },
+        "type": {
+          "title": "Tipo"
+        },
+        "method": {
+          "title": "Método"
+        },
+        "date": {
+          "title": "Fecha",
+          "dateFormat": "DD/MM/YYYY hh:mm A"
+        },
+        "comment": {
+          "title": "Comentario"
+        },
+        "actions": {
+          "title": "Acciones",
+          "printLabel": "Imprimir Recibo",
+          "deleteLabel": "Eliminar"
+        }
+      },
+      "form": {
+        "labels": {
+          "amount": "Monto",
+          "method": "Método de pago",
+          "comment": "Comentario"
+        },
+        "placeholders": {
+          "amount": "Ingrese un monto",
+          "method": "Seleccione el método de pago",
+          "comment": "Ingrese un comentario..."
+        },
+        "errors": {
+          "amount": "El monto es requerido",
+          "method": "El método de pago es requerido",
+          "comment": "El comentario es requerido"
+        },
+        "successMessage": "Saldo agregado con éxito",
+        "errorMessage": "Error al agregar el saldo, por favor inténtalo de nuevo"
+      }
+    }
+  }
+}

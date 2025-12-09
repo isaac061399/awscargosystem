@@ -1,0 +1,14 @@
+{
+  "labels": {
+    "identificationType": {
+      "PHYSICAL": "Física",
+      "LEGAL": "Jurídica",
+      "DIMEX": "DIMEX",
+      "PASSPORT": "Pasaporte"
+    },
+    "clientStatus": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo"
+    }
+  }
+}

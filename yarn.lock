@@ -4507,6 +4507,13 @@
   dependencies:
     undici-types "~7.12.0"
 
+"@types/node@^22.14.1":
+  version "22.19.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.19.2.tgz#2f0956fba46518aaf7578c84e37bddab55f85d01"
+  integrity sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==
+  dependencies:
+    undici-types "~6.21.0"
+
 "@types/node@^22.8.7":
   version "22.18.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-22.18.6.tgz#38172ef0b65e09d1a4fc715eb09a7d5decfdc748"
@@ -8067,6 +8074,11 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
+libphonenumber-js@^1.12.6:
+  version "1.12.31"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.12.31.tgz#3cdb45641c6b77228dd1238f3d810c3bb5d91199"
+  integrity sha512-Z3IhgVgrqO1S5xPYM3K5XwbkDasU67/Vys4heW+lfSBALcUZjeIIzI8zCLifY+OCzSq+fpDdywMDa7z+4srJPQ==
+
 lightningcss-android-arm64@1.30.2:
   version "1.30.2"
   resolved "https://registry.yarnpkg.com/lightningcss-android-arm64/-/lightningcss-android-arm64-1.30.2.tgz#6966b7024d39c94994008b548b71ab360eb3a307"
@@ -8906,6 +8918,14 @@ mui-chips-input@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/mui-chips-input/-/mui-chips-input-7.0.1.tgz#405b7e90fb9996c9f6c30362d4210c9f376317c6"
   integrity sha512-9dd5yvem/E0Ft/Gk8SptgYcG7tmmF1khy+Q7cvKBiJXTJf77zsENlSUETFd661ug/edtNEHeI82qFGhh/cmhGg==
+
+mui-tel-input@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/mui-tel-input/-/mui-tel-input-9.0.1.tgz#65bb37a2f2acad6971743edb3d05ceaccbcdd6d9"
+  integrity sha512-rt5S7kskx4UpDJfXsclaGJSumG4NHI087aDrzxSXKY84qVQeo6ddd96sD/JurY5gVe/s+M2HVRAZ6uNmzbcXGg==
+  dependencies:
+    "@types/node" "^22.14.1"
+    libphonenumber-js "^1.12.6"
 
 mysql2@3.15.3:
   version "3.15.3"

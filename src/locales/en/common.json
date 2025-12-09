@@ -156,8 +156,31 @@
       },
       {
         "sectionTitle": "Administration",
-        "permissions": ["offices.list", "offices.create"],
+        "permissions": ["clients.list", "clients.create", "offices.list", "offices.create", "configuration.view"],
         "items": [
+          {
+            "label": "Clients",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-group-2-line",
+            "permissions": ["clients.list", "clients.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/clients",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["clients.list"]
+              },
+              {
+                "label": "New",
+                "link": "/clients/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["clients.create"]
+              }
+            ]
+          },
           {
             "label": "Offices",
             "link": "",

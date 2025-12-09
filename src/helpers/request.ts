@@ -1028,6 +1028,84 @@ export const requestEditUser = async (id: number, params: any, lang: string) => 
 
 /* ******************* Custom Entities ******************* */
 
+// clients
+
+export const requestGetClients = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/clients',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestNewClient = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/clients`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestEditClient = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'put',
+      url: `/api/clients/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestDeleteClient = async (id: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'delete',
+      url: `/api/clients/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // configuration
 
 export const requestEditConfiguration = async (params: any, lang: string) => {
