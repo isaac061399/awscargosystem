@@ -116,6 +116,33 @@
       "save": "Error al guardar el cliente, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el cliente, si ya tiene datos asociados, no podrá eliminarlo.",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
+    },
+    "export": {
+      "id": "ID",
+      "office": "Oficina",
+      "box_number": "Número de Casillero",
+      "full_name": "Nombre",
+      "identification_type": "Tipo de Identificación",
+      "identification": "Identificación",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "province": "Provincia",
+      "canton": "Cantón",
+      "district": "Distrito",
+      "address": "Dirección",
+      "billing_full_name": "Nombre de Facturación",
+      "billing_identification_type": "Tipo de Identificación de Facturación",
+      "billing_identification": "Identificación de Facturación",
+      "billing_email": "Correo Electrónico de Facturación",
+      "billing_phone": "Teléfono de Facturación",
+      "billing_province": "Provincia de Facturación",
+      "billing_canton": "Cantón de Facturación",
+      "billing_district": "Distrito de Facturación",
+      "billing_address": "Dirección de Facturación",
+      "billing_activity_code": "Código de Actividad de Facturación",
+      "pound_fee": "Tarifa por Libra",
+      "status": "Estado",
+      "created_at": "Fecha de Registro"
     }
   },
   "configuration": {

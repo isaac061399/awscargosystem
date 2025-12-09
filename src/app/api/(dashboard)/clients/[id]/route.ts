@@ -60,7 +60,6 @@ export const PUT = withAuthApi(['clients.edit'], async (req, { params }: { param
           billing_phone: data.billing_phone,
           billing_district_id: data.billing_district_id === '' ? null : data.billing_district_id,
           billing_address: data.billing_address,
-          billing_activity_type: data.billing_activity_type,
           billing_activity_code: data.billing_activity_code,
           pound_fee: parseFloat(data.pound_fee),
           status: data.status

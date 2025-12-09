@@ -25,7 +25,7 @@ import { getAddressOptions } from '@/helpers/address';
 
 // Utility Imports
 import { getTelInputValue } from '@/libs/utils';
-import { Currencies } from '@/libs/constants';
+import { Currencies, defaultActivityCode } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -64,7 +64,7 @@ const Info = ({
   const [districtsOptions, setDistrictsOptions] = useState<any[]>(addressData.districts);
   const [billingCantonsOptions, setBillingCantonsOptions] = useState<any[]>(billingAddressData.cantons);
   const [billingDistrictsOptions, setBillingDistrictsOptions] = useState<any[]>(billingAddressData.districts);
-  const [useSameBilling, setUseSameBilling] = useState<boolean>(true);
+  const [useSameBilling, setUseSameBilling] = useState<boolean>(!client ? true : false);
 
   const formik = useFormik({
     validateOnChange: false,
@@ -92,8 +92,7 @@ const Info = ({
         billing_canton_id: client ? client.billing_district?.canton?.id : '',
         billing_district_id: client ? client.billing_district?.id : '',
         billing_address: client ? client.billing_address : '',
-        billing_activity_type: client ? client.billing_activity_type : '',
-        billing_activity_code: client ? client.billing_activity_code : '',
+        billing_activity_code: client ? client.billing_activity_code : defaultActivityCode,
 
         pound_fee: client ? client.pound_fee : poundFee,
         status: client ? client.status : Object.keys(labelsT?.clientStatus)[0] || ''
@@ -140,6 +139,7 @@ const Info = ({
 
       try {
         const data = {
+          office_id: values.office_id,
           full_name: values.full_name,
           identification_type: values.identification_type,
           identification: values.identification,
@@ -154,7 +154,7 @@ const Info = ({
           billing_email: values.billing_email,
           billing_phone: getTelInputValue(values.billing_phone),
           billing_district_id: values.billing_district_id,
-          billing_activity_type: values.billing_activity_type,
+          billing_address: values.billing_address,
           billing_activity_code: values.billing_activity_code,
 
           pound_fee: values.pound_fee,
@@ -191,6 +191,8 @@ const Info = ({
   });
 
   useEffect(() => {
+    if (client) return;
+
     formik.setFieldValue('billing_full_name', '');
     formik.setFieldValue('billing_identification_type', '');
     formik.setFieldValue('billing_identification', '');
@@ -206,16 +208,25 @@ const Info = ({
   return (
     <Box sx={{ p: 5 }}>
       <form noValidate onSubmit={formik.handleSubmit}>
-        <div className="flex items-center justify-end gap-2 mb-5">
-          <Button
-            size="small"
-            type="submit"
-            variant="contained"
-            color="primary"
-            loading={formik.isSubmitting || isRedirecting}
-            startIcon={<i className="ri-save-line" />}>
-            {textT?.btnSave}
-          </Button>
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            {client && (
+              <Typography variant="h4">
+                {textT?.boxNumberLabel}: {client.box_number}
+              </Typography>
+            )}
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              size="small"
+              type="submit"
+              variant="contained"
+              color="primary"
+              loading={formik.isSubmitting || isRedirecting}
+              startIcon={<i className="ri-save-line" />}>
+              {textT?.btnSave}
+            </Button>
+          </div>
         </div>
 
         <Divider sx={{ my: 5 }} />
@@ -486,18 +497,20 @@ const Info = ({
           <Typography variant="h6">{textT?.billingLabel}</Typography>
         </Divider>
         <Grid container spacing={5}>
-          <Grid size={{ xs: 12, md: 12 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={useSameBilling}
-                  onChange={(e) => setUseSameBilling(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label={textT?.useSameBillingLabel}
-            />
-          </Grid>
+          {!client && (
+            <Grid size={{ xs: 12, md: 12 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={useSameBilling}
+                    onChange={(e) => setUseSameBilling(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label={textT?.useSameBillingLabel}
+              />
+            </Grid>
+          )}
 
           {!useSameBilling && (
             <>
@@ -705,6 +718,26 @@ const Info = ({
               </Grid>
             </>
           )}
+          <Grid size={{ xs: 12, md: 3 }}>
+            <TextField
+              fullWidth
+              type="text"
+              id="billing_activity_code"
+              name="billing_activity_code"
+              label={formT?.labels?.billing_activity_code}
+              placeholder={formT?.placeholders?.billing_activity_code}
+              value={formik.values.billing_activity_code}
+              onChange={formik.handleChange}
+              error={Boolean(formik.touched.billing_activity_code && formik.errors.billing_activity_code)}
+              color={
+                Boolean(formik.touched.billing_activity_code && formik.errors.billing_activity_code)
+                  ? 'error'
+                  : 'primary'
+              }
+              helperText={formik.touched.billing_activity_code && (formik.errors.billing_activity_code as string)}
+              disabled={formik.isSubmitting || isRedirecting}
+            />
+          </Grid>
         </Grid>
       </form>
     </Box>

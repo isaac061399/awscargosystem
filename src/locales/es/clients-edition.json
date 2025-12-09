@@ -39,7 +39,6 @@
           "billing_district_id": "Distrito",
           "billing_address": "Dirección",
 
-          "billing_activity_type": "Tipo de actividad",
           "billing_activity_code": "Código de actividad",
 
           "pound_fee": "Tarifa por libra",
@@ -69,7 +68,6 @@
           "billing_district_id": "Seleccione una opción",
           "billing_address": "Ingrese la dirección",
 
-          "billing_activity_type": "Ingrese el tipo de actividad",
           "billing_activity_code": "Seleccione el código de actividad",
 
           "pound_fee": "Ingrese la tarifa",
@@ -99,7 +97,6 @@
           "billing_district_id": "El distrito es requerido",
           "billing_address": "La dirección es requerida",
 
-          "billing_activity_type": "El tipo de actividad es requerido",
           "billing_activity_code": "El código de actividad es requerido",
 
           "pound_fee": "La tarifa es requerida",

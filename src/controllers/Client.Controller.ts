@@ -7,6 +7,7 @@ export const getClient = async (id: number) => {
       where: { id },
       select: {
         id: true,
+        office_id: true,
         box_number: true,
         full_name: true,
         identification_type: true,
@@ -20,10 +21,10 @@ export const getClient = async (id: number) => {
         billing_email: true,
         billing_phone: true,
         billing_address: true,
-        billing_activity_type: true,
         billing_activity_code: true,
         pound_fee: true,
         status: true,
+        created_at: true,
         office: {
           select: {
             id: true,

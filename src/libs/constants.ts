@@ -27,6 +27,8 @@ export const Currencies: Record<string, { symbol: string; name: string }> = {
 
 export const boxNumberPrefix = 'AWS-';
 
+export const defaultActivityCode = '00';
+
 // App Constants
 
 export const userProviders: Record<AuthProvider, { icon: string }> = {

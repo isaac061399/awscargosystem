@@ -41,6 +41,8 @@ import { requestDeleteClient, requestGetClients } from '@/helpers/request';
 import { useAdmin } from '@/components/AdminProvider';
 import { hasAllPermissions } from '@/helpers/permissions';
 
+import { generateUrl } from '@/libs/utils';
+
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const statusColors = {
@@ -138,6 +140,15 @@ const Clients = () => {
     }
   };
 
+  const handleExport = async () => {
+    const exportUrl = generateUrl('/api/clients/export', {
+      s: searchState,
+      status: statusState
+    });
+
+    window.open(exportUrl, '_blank');
+  };
+
   // data
   const columns: GridColDef[] = [
     {
@@ -148,7 +159,7 @@ const Clients = () => {
       renderCell: (params) =>
         canEdit ? (
           <Link
-            href={`/offices/edit/${params.row.id}`}
+            href={`/clients/edit/${params.row.id}`}
             className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
             {params.row.box_number}
           </Link>
@@ -246,17 +257,30 @@ const Clients = () => {
           <Divider />
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <div className="flex items-center gap-2">
-            <FilterSearch
-              value={searchState}
-              onChange={(e) => setSearchState(e.target.value)}
-              onSearch={handleFetchClients}
-            />
-            <FilterSelect
-              options={statusOptions}
-              value={statusState}
-              onChange={(e) => setStatusState(e.target.value)}
-            />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FilterSearch
+                value={searchState}
+                onChange={(e) => setSearchState(e.target.value)}
+                onSearch={handleFetchClients}
+              />
+              <FilterSelect
+                options={statusOptions}
+                value={statusState}
+                onChange={(e) => setStatusState(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                size="small"
+                type="button"
+                variant="contained"
+                color="primary"
+                startIcon={<i className="ri-file-download-line" />}
+                onClick={() => handleExport()}>
+                {textT?.btnExport}
+              </Button>
+            </div>
           </div>
           <Paper>
             <DataGrid

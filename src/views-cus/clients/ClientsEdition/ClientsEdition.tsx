@@ -78,14 +78,14 @@ const ClientsEdition = ({
                       iconPosition="start"
                       value="info"
                     />
-                    {client && (
+                    {/* {client && (
                       <Tab
                         label={tabsT?.packages?.title}
                         icon={<i className="ri-bank-card-line" />}
                         iconPosition="start"
                         value="packages"
                       />
-                    )}
+                    )} */}
                   </TabList>
                 </Grid>
                 <Grid size={{ xs: 12 }}>

@@ -4,6 +4,7 @@
     "btnCreate": "Nuevo Cliente",
     "btnContinue": "Continuar",
     "btnCancel": "Cancelar",
+    "btnExport": "Exportar",
     "dialogDeleteTitle": "Confirmar Eliminación",
     "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el cliente \"{{ full_name }}\"? Esta acción no se puede deshacer.",
     "table": {
