@@ -46,8 +46,10 @@ model Administrator {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  user User @relation(fields: [email], references: [email], onDelete: Restrict)
-  role Role @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  user               User                 @relation(fields: [email], references: [email], onDelete: Restrict)
+  role               Role                 @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  money_outflows     CusMoneyOutflow[]
+  money_outflow_logs CusMoneyOutflowLog[]
 
   @@map("auth_administrator")
 }
@@ -564,6 +566,37 @@ model CusDistrict {
   @@map("cus_district")
 }
 
+model CusMoneyOutflow {
+  id               Int           @id @default(autoincrement())
+  administrator_id Int?
+  currency         Currency      @default(CRC)
+  amount           Float
+  description      String        @db.Text
+  method           PaymentMethod @default(CASH)
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+
+  administrator Administrator?       @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
+  logs          CusMoneyOutflowLog[]
+
+  @@map("cus_money_outflow")
+}
+
+model CusMoneyOutflowLog {
+  id               Int       @id @default(autoincrement())
+  money_outflow_id Int?
+  administrator_id Int?
+  action           String
+  data             Json?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime? @updatedAt
+
+  money_outflow CusMoneyOutflow? @relation(fields: [money_outflow_id], references: [id], onDelete: SetNull)
+  author        Administrator?   @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
+
+  @@map("cus_money_outflow_log")
+}
+
 model CusOffice {
   id         Int      @id @default(autoincrement())
   name       String
@@ -580,7 +613,7 @@ model CusOffice {
 
 model CusPackage {
   id                Int           @id @default(autoincrement())
-  client_id         Int
+  client_id         Int?
   tracking          String        @unique
   courier_company   String?
   purchase_page     String?
@@ -597,7 +630,7 @@ model CusPackage {
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
 
-  client      CusClient             @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  client      CusClient?            @relation(fields: [client_id], references: [id], onDelete: Restrict)
   status_logs CusPackageStatusLog[]
 
   @@map("cus_package")
@@ -632,4 +665,16 @@ enum PackageStatus {
   PRE_ALERTED
   READY
   DELIVERED
+}
+
+enum PaymentMethod {
+  CASH
+  SINPE
+  TRANSFER
+  CARD
+}
+
+enum Currency {
+  CRC
+  USD
 }

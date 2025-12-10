@@ -18,7 +18,8 @@
       "clients": "Administration - Clients",
       "configuration": "Administration - Configuration",
       "offices": "Administration - Offices",
-      "packages": "Administration - Packages"
+      "packages": "Administration - Packages",
+      "money-outflows": "Cash Register - Money Outflows"
     },
     "permissions": {
       "list": "List",

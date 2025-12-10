@@ -151,6 +151,26 @@
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
+  "money-outflows": {
+    "errors": {
+      "noOpenCash": "No hay una caja abierta. No se pueden procesar transacciones.",
+      "save": "Error al guardar la salida de dinero, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar la salida de dinero, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    },
+    "export": {
+      "headers": {
+        "id": "ID",
+        "administrator_name": "Nombre del Administrador",
+        "administrator_email": "Correo del Administrador",
+        "currency": "Moneda",
+        "amount": "Monto",
+        "description": "Descripción",
+        "method": "Método de Pago",
+        "date": "Fecha"
+      }
+    }
+  },
   "offices": {
     "errors": {
       "save": "Error al guardar la oficina, por favor inténtalo de nuevo",

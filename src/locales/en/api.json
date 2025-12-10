@@ -124,6 +124,26 @@
       "general": "An error occurred, please try again"
     }
   },
+  "money-outflows": {
+    "errors": {
+      "noOpenCash": "There is no open cash register. Transactions cannot be processed.",
+      "save": "Error saving the money outflow, please try again",
+      "delete": "Error deleting the money outflow, please try again",
+      "general": "An error occurred, please try again"
+    },
+    "export": {
+      "headers": {
+        "id": "ID",
+        "administrator_name": "Administrator Name",
+        "administrator_email": "Administrator Email",
+        "currency": "Currency",
+        "amount": "Amount",
+        "description": "Description",
+        "method": "Payment Method",
+        "date": "Date"
+      }
+    }
+  },
   "offices": {
     "errors": {
       "save": "Error saving the office, please try again",

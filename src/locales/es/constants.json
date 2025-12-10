@@ -9,6 +9,16 @@
     "clientStatus": {
       "ACTIVE": "Activo",
       "INACTIVE": "Inactivo"
+    },
+    "paymentMethod": {
+      "CASH": "Efectivo",
+      "SINPE": "SINPE",
+      "TRANSFER": "Transferencia",
+      "CARD": "Tarjeta"
+    },
+    "currency": {
+      "CRC": "Colones",
+      "USD": "Dólares"
     }
   }
 }

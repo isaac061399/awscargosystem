@@ -128,8 +128,7 @@ export const getTelInputValue = (value: string): string => {
   return digitsOnly.length > 4 ? value : '';
 };
 
-export const formatMoney = (value: number | string): string => {
-  const prefix = '₡ ';
+export const formatMoney = (value: number | string, prefix: string): string => {
   const suffix = '';
   const decimalSeparator = '.';
   const thousandSeparator = ',';

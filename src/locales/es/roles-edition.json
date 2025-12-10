@@ -18,7 +18,8 @@
       "clients": "Administración - Clientes",
       "configuration": "Administración - Configuración",
       "offices": "Administración - Oficinas",
-      "packages": "Administración - Paquetes"
+      "packages": "Administración - Paquetes",
+      "money-outflows": "Caja - Salidas de Dinero"
     },
     "permissions": {
       "list": "Listar",

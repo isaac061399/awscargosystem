@@ -245,6 +245,19 @@
         ]
       },
       {
+        "sectionTitle": "Caja",
+        "permissions": ["money-outflows.list"],
+        "items": [
+          {
+            "label": "Salidas de Dinero",
+            "link": "/money-outflows",
+            "externalLink": false,
+            "icon": "ri-wallet-3-line",
+            "permissions": ["money-outflows.list"]
+          }
+        ]
+      },
+      {
         "sectionTitle": "Seguridad",
         "permissions": ["administrators.list", "administrators.create", "roles.list", "roles.create"],
         "items": [

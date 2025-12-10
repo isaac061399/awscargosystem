@@ -1,0 +1,58 @@
+{
+  "text": {
+    "title": "Salidas de Dinero",
+    "btnCreate": "Nueva Salida de Dinero",
+    "btnSave": "Guardar",
+    "btnExport": "Exportar",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogCreateTitle": "Nueva Salida de Dinero",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar la salida de dinero de \"{{ description }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "administrator": {
+        "title": "Autor",
+        "email": "Correo"
+      },
+      "amount": {
+        "title": "Monto"
+      },
+      "description": {
+        "title": "Descripción"
+      },
+      "method": {
+        "title": "Método de Pago"
+      },
+      "created_at": {
+        "title": "Fecha",
+        "dateFormat": "DD/MM/YYYY hh:mm A"
+      },
+      "actions": {
+        "title": "Acciones",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  },
+  "form": {
+    "labels": {
+      "currency": "Moneda",
+      "amount": "Monto",
+      "description": "Descripción",
+      "method": "Método de pago"
+    },
+    "placeholders": {
+      "currency": "Seleccione una moneda",
+      "amount": "Ingrese un monto",
+      "description": "Ingrese una descripción",
+      "method": "Seleccione el método de pago"
+    },
+    "errors": {
+      "currency": "La moneda es requerida",
+      "amount": "El monto es requerido",
+      "description": "La descripción es requerida",
+      "method": "El método de pago es requerido"
+    },
+    "successMessage": "Salida de dinero agregada con éxito",
+    "errorMessage": "Error al agregar la salida de dinero, por favor inténtalo de nuevo"
+  }
+}

@@ -45,6 +45,7 @@ const i18nConfig = {
     '/[locale]/(dashboard)/clients/new': ['clients-edition'],
     '/[locale]/(dashboard)/clients/edit/[id]': ['clients-edition'],
     '/[locale]/(dashboard)/configuration': ['configuration'],
+    '/[locale]/(dashboard)/money-outflows': ['money-outflows'],
     '/[locale]/(dashboard)/offices': ['offices'],
     '/[locale]/(dashboard)/offices/new': ['offices-edition'],
     '/[locale]/(dashboard)/offices/edit/[id]': ['offices-edition']

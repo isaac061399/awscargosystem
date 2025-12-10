@@ -245,6 +245,19 @@
         ]
       },
       {
+        "sectionTitle": "Cash Register",
+        "permissions": ["money-outflows.list"],
+        "items": [
+          {
+            "label": "Money Outflows",
+            "link": "/money-outflows",
+            "externalLink": false,
+            "icon": "ri-wallet-3-line",
+            "permissions": ["money-outflows.list"]
+          }
+        ]
+      },
+      {
         "sectionTitle": "Security",
         "permissions": ["administrators.list", "administrators.create", "roles.list", "roles.create"],
         "items": [
