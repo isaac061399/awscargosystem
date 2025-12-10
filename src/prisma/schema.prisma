@@ -504,13 +504,14 @@ model CusClient {
   billing_address             String?            @db.Text
   billing_activity_code       String?
   pound_fee                   Float              @default(0)
-  status                      ClientStatus
+  status                      ClientStatus       @default(ACTIVE)
   created_at                  DateTime           @default(now())
   updated_at                  DateTime           @updatedAt
 
   office           CusOffice    @relation(fields: [office_id], references: [id], onDelete: Restrict)
   district         CusDistrict? @relation("district", fields: [district_id], references: [id], onDelete: Restrict)
   billing_district CusDistrict? @relation("billing_district", fields: [billing_district_id], references: [id], onDelete: Restrict)
+  packages         CusPackage[]
 
   @@map("cus_client")
 }
@@ -577,6 +578,43 @@ model CusOffice {
   @@map("cus_office")
 }
 
+model CusPackage {
+  id                Int           @id @default(autoincrement())
+  client_id         Int
+  tracking          String        @unique
+  courier_company   String?
+  purchase_page     String?
+  price             Float?
+  description       String?
+  notes             String?
+  billing_weight    Float         @default(0)
+  billing_pound_fee Float         @default(0)
+  billing_amount    Float         @default(0)
+  location_shelve   String?
+  location_row      String?
+  status            PackageStatus @default(PRE_ALERTED)
+  status_date       DateTime      @default(now())
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  client      CusClient             @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  status_logs CusPackageStatusLog[]
+
+  @@map("cus_package")
+}
+
+model CusPackageStatusLog {
+  id         Int           @id @default(autoincrement())
+  package_id Int
+  status     PackageStatus
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+
+  package CusPackage @relation(fields: [package_id], references: [id], onDelete: Cascade)
+
+  @@map("cus_package_status_log")
+}
+
 // Custom ENUMS
 enum IdentificationType {
   PHYSICAL
@@ -588,4 +626,10 @@ enum IdentificationType {
 enum ClientStatus {
   ACTIVE
   INACTIVE
+}
+
+enum PackageStatus {
+  PRE_ALERTED
+  READY
+  DELIVERED
 }

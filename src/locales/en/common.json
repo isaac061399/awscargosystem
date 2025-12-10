@@ -156,7 +156,15 @@
       },
       {
         "sectionTitle": "Administration",
-        "permissions": ["clients.list", "clients.create", "offices.list", "offices.create", "configuration.view"],
+        "permissions": [
+          "clients.list",
+          "clients.create",
+          "packages.list",
+          "packages.create",
+          "offices.list",
+          "offices.create",
+          "configuration.view"
+        ],
         "items": [
           {
             "label": "Clients",
@@ -178,6 +186,29 @@
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["clients.create"]
+              }
+            ]
+          },
+          {
+            "label": "Packages",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-shopping-bag-4-line",
+            "permissions": ["packages.list", "packages.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.list"]
+              },
+              {
+                "label": "New",
+                "link": "/packages/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.create"]
               }
             ]
           },

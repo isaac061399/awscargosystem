@@ -17,7 +17,8 @@
       "global-settings": "CMS - Configuración Global",
       "clients": "Administración - Clientes",
       "configuration": "Administración - Configuración",
-      "offices": "Administración - Oficinas"
+      "offices": "Administración - Oficinas",
+      "packages": "Administración - Paquetes"
     },
     "permissions": {
       "list": "Listar",
