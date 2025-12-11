@@ -1,5 +1,9 @@
 {
   "labels": {
+    "currency": {
+      "CRC": "Colones",
+      "USD": "Dólares"
+    },
     "identificationType": {
       "PHYSICAL": "Física",
       "LEGAL": "Jurídica",
@@ -16,9 +20,15 @@
       "TRANSFER": "Transferencia",
       "CARD": "Tarjeta"
     },
-    "currency": {
-      "CRC": "Colones",
-      "USD": "Dólares"
+    "orderStatus": {
+      "PENDING": "Pendiente",
+      "ON_THE_WAY": "En Camino",
+      "READY": "Listo para Retirar",
+      "DELIVERED": "Entregado"
+    },
+    "orderPaymentStatus": {
+      "PENDING": "Pendiente",
+      "PAID": "Pagado"
     }
   }
 }

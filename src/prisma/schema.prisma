@@ -50,6 +50,8 @@ model Administrator {
   role               Role                 @relation(fields: [role_id], references: [id], onDelete: Restrict)
   money_outflows     CusMoneyOutflow[]
   money_outflow_logs CusMoneyOutflowLog[]
+  package_logs       CusPackageLog[]
+  order_logs         CusOrderLog[]
 
   @@map("auth_administrator")
 }
@@ -514,6 +516,7 @@ model CusClient {
   district         CusDistrict? @relation("district", fields: [district_id], references: [id], onDelete: Restrict)
   billing_district CusDistrict? @relation("billing_district", fields: [billing_district_id], references: [id], onDelete: Restrict)
   packages         CusPackage[]
+  orders           CusOrder[]
 
   @@map("cus_client")
 }
@@ -611,6 +614,71 @@ model CusOffice {
   @@map("cus_office")
 }
 
+model CusOrder {
+  id             Int                @id @default(autoincrement())
+  client_id      Int
+  number         String             @unique
+  purchase_page  String?
+  payment_status OrderPaymentStatus @default(PENDING)
+  status         OrderStatus        @default(PENDING)
+  status_date    DateTime           @default(now())
+  created_at     DateTime           @default(now())
+  updated_at     DateTime           @updatedAt
+
+  client      CusClient           @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  products    CusOrderProduct[]
+  logs        CusOrderLog[]
+  status_logs CusOrderStatusLog[]
+
+  @@map("cus_order")
+}
+
+model CusOrderProduct {
+  id            Int      @id @default(autoincrement())
+  order_id      Int
+  tracking      String?
+  code          String
+  name          String
+  description   String
+  price         Float
+  service_price Float
+  url           String?
+  image_url     String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Restrict)
+
+  @@map("cus_order_product")
+}
+
+model CusOrderLog {
+  id               Int       @id @default(autoincrement())
+  order_id         Int?
+  administrator_id Int?
+  action           String
+  data             Json?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime? @updatedAt
+
+  order  CusOrder?      @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  author Administrator? @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
+
+  @@map("cus_order_log")
+}
+
+model CusOrderStatusLog {
+  id         Int         @id @default(autoincrement())
+  order_id   Int
+  status     OrderStatus
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+
+  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@map("cus_order_status_log")
+}
+
 model CusPackage {
   id                Int           @id @default(autoincrement())
   client_id         Int?
@@ -631,9 +699,25 @@ model CusPackage {
   updated_at        DateTime      @updatedAt
 
   client      CusClient?            @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  logs        CusPackageLog[]
   status_logs CusPackageStatusLog[]
 
   @@map("cus_package")
+}
+
+model CusPackageLog {
+  id               Int       @id @default(autoincrement())
+  package_id       Int?
+  administrator_id Int?
+  action           String
+  data             Json?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime? @updatedAt
+
+  package CusPackage?    @relation(fields: [package_id], references: [id], onDelete: SetNull)
+  author  Administrator? @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
+
+  @@map("cus_package_log")
 }
 
 model CusPackageStatusLog {
@@ -649,6 +733,11 @@ model CusPackageStatusLog {
 }
 
 // Custom ENUMS
+enum Currency {
+  CRC
+  USD
+}
+
 enum IdentificationType {
   PHYSICAL
   LEGAL
@@ -674,7 +763,14 @@ enum PaymentMethod {
   CARD
 }
 
-enum Currency {
-  CRC
-  USD
+enum OrderStatus {
+  PENDING
+  ON_THE_WAY
+  READY
+  DELIVERED
+}
+
+enum OrderPaymentStatus {
+  PENDING
+  PAID
 }

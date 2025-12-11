@@ -177,5 +177,12 @@
       "delete": "Error al eliminar la oficina. Si ya tiene datos asociados, no podrá eliminarla.",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
+  },
+  "orders": {
+    "errors": {
+      "save": "Error al guardar el pedido, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el pedido, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
   }
 }

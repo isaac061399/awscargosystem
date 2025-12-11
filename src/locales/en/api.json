@@ -150,5 +150,12 @@
       "delete": "Error deleting the office. If it already has associated data, you will not be able to delete it.",
       "general": "An error occurred, please try again"
     }
+  },
+  "orders": {
+    "errors": {
+      "save": "Error saving the order, please try again",
+      "delete": "Error deleting the order, please try again",
+      "general": "An error occurred, please try again"
+    }
   }
 }

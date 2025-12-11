@@ -7,12 +7,13 @@ import { MenuItem, Select } from '@mui/material';
 interface FilterSelectProps {
   id?: string;
   name?: string;
+  allLabel?: string;
   options: { label: string; value: string }[];
   value: string;
   onChange: (e: any) => void;
 }
 
-const FilterSelect = ({ id, name, options, value, onChange }: FilterSelectProps) => {
+const FilterSelect = ({ id, name, allLabel, options, value, onChange }: FilterSelectProps) => {
   const { t } = useTranslation('common');
   const textT: any = useMemo(() => t('filterSelect', { returnObjects: true, default: {} }), [t]);
 
@@ -27,7 +28,7 @@ const FilterSelect = ({ id, name, options, value, onChange }: FilterSelectProps)
       inputProps={{ 'aria-label': 'Without label' }}
       className="mb-3">
       <MenuItem value="">
-        <em>{textT?.allLabel}</em>
+        <em>{allLabel || textT?.allLabel}</em>
       </MenuItem>
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>

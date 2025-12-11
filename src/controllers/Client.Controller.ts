@@ -79,3 +79,12 @@ export const getClient = async (id: number) => {
 export const getBoxNumber = (id: number) => {
   return `${boxNumberPrefix}${id.toString().padStart(3, '0')}`;
 };
+
+export const clientSelectSchema = {
+  id: true,
+  box_number: true,
+  full_name: true,
+  identification_type: true,
+  identification: true,
+  email: true
+};

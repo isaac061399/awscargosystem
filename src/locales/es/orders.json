@@ -1,0 +1,41 @@
+{
+  "text": {
+    "title": "Pedidos",
+    "btnCreate": "Nuevo Pedido",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el pedido \"{{ id }}\"? Esta acción no se puede deshacer.",
+    "filterPaymentStatus": "Filtrar por Estado de Pago",
+    "filterStatus": "Filtrar por Estado",
+    "table": {
+      "id": {
+        "title": "ID"
+      },
+      "number": {
+        "title": "Número de Pedido"
+      },
+      "client": {
+        "title": "Cliente",
+        "box_number": "Número de Casillero",
+        "identification": "Identificación",
+        "email": "Correo"
+      },
+      "payment_status": {
+        "title": "Estado de Pago"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "created_at": {
+        "title": "Fecha de Registro",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

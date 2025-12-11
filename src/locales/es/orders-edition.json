@@ -1,0 +1,44 @@
+{
+  "text": {
+    "titleNew": "Nuevo Pedido",
+    "titleEdit": "Editando Pedido: ",
+    "paymentStatusLabel": "Estado de Pago",
+    "statusLabel": "Estado",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "loading": "Cargando...",
+    "noOptions": "No hay opciones disponibles",
+    "btnSave": "Guardar"
+  },
+  "form": {
+    "labels": {
+      "client_id": "Cliente",
+      "number": "Número de pedido",
+      "purchase_page": "Página de compra",
+
+      "customValues": "Valores Custom",
+      "customValuesKey": "Llave",
+      "customValuesValue": "Valor"
+    },
+    "placeholders": {
+      "client_id": "Buscar cliente",
+      "number": "Ingrese el número de pedido",
+      "purchase_page": "Ingrese la página de compra",
+
+      "customValues": "",
+      "customValuesKey": "Ingrese una llave",
+      "customValuesValue": "Ingrese un valor"
+    },
+    "errors": {
+      "client_id": "El cliente es requerido",
+      "number": "El número de",
+      "purchase_page": "Ingrese la página de compra",
+
+      "customValues": "",
+      "customValuesKey": "Campo requerido",
+      "customValuesValue": "Campo requerido"
+    },
+    "addProductBtn": "Agregar Producto",
+    "successMessage": "Contenido guardado con éxito",
+    "errorMessage": "Error al guardar el contenido, por favor inténtalo de nuevo"
+  }
+}

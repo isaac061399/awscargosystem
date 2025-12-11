@@ -19,6 +19,7 @@
       "configuration": "Administration - Configuration",
       "offices": "Administration - Offices",
       "packages": "Administration - Packages",
+      "orders": "Administration - Orders",
       "money-outflows": "Cash Register - Money Outflows"
     },
     "permissions": {

@@ -161,6 +161,8 @@
           "clients.create",
           "packages.list",
           "packages.create",
+          "orders.list",
+          "orders.create",
           "offices.list",
           "offices.create",
           "configuration.view"
@@ -209,6 +211,29 @@
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["packages.create"]
+              }
+            ]
+          },
+          {
+            "label": "Orders",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-shopping-basket-line",
+            "permissions": ["orders.list", "orders.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/orders",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["orders.list"]
+              },
+              {
+                "label": "New",
+                "link": "/orders/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["orders.create"]
               }
             ]
           },

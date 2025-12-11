@@ -1106,6 +1106,26 @@ export const requestDeleteClient = async (id: number, lang: string) => {
   }
 };
 
+export const requestSearchClients = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/clients/search',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // configuration
 
 export const requestEditConfiguration = async (params: any, lang: string) => {
@@ -1191,6 +1211,22 @@ export const requestDeleteMoneyOutflow = async (id: number, lang: string) => {
 
 // offices
 
+export const requestGetOfficesNavbar = async () => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/offices/navbar',
+      headers: { ...defaultHeaders }
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
 export const requestGetOffices = async (params: any, lang: string) => {
   try {
     const response = await axios.request({
@@ -1254,6 +1290,104 @@ export const requestDeleteOffice = async (id: number, lang: string) => {
       method: 'delete',
       url: `/api/offices/${id}`,
       headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+// orders
+
+export const requestGetOrders = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/orders',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestNewOrder = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/orders`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestEditOrder = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'put',
+      url: `/api/orders/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestDeleteOrder = async (id: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'delete',
+      url: `/api/orders/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestStatusOrder = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'put',
+      url: `/api/orders/${id}/status`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
     });
 
     return response.data;
