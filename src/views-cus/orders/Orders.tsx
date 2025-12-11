@@ -44,6 +44,8 @@ import { requestDeleteOrder, requestGetOrders } from '@helpers/request';
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
+import { padStartZeros } from '@/libs/utils';
+
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const statusColors: any = {
@@ -79,8 +81,7 @@ const Orders = () => {
   const [deleteState, setDeleteState] = useState({
     open: false,
     loading: false,
-    id: null,
-    title: null
+    id: null
   });
 
   useEffect(() => {
@@ -128,8 +129,8 @@ const Orders = () => {
     setAlertState({ ...defaultAlertState });
   };
 
-  const handleDeleteOpen = (id: number, title: string) => {
-    setDeleteState((prevState: any) => ({ ...prevState, open: true, id, title }));
+  const handleDeleteOpen = (id: number) => {
+    setDeleteState((prevState: any) => ({ ...prevState, open: true, id }));
   };
 
   const handleDeleteClose = () => {
@@ -164,10 +165,10 @@ const Orders = () => {
             <Link
               href={`/orders/edit/${params.row.id}`}
               className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-              {params.row.id}
+              {`# ${padStartZeros(params.row.id, 4)}`}
             </Link>
           ) : (
-            params.row.id
+            `# ${padStartZeros(params.row.id, 4)}`
           )}
         </div>
       )
@@ -242,7 +243,7 @@ const Orders = () => {
       minWidth: 150,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          {moment.utc(params.row.created_at).format(textT?.table?.created_at?.dateFormat)}
+          {moment(params.row.created_at).format(textT?.table?.created_at?.dateFormat)}
         </div>
       )
     },
@@ -263,7 +264,7 @@ const Orders = () => {
                   color="primary"
                   size="small"
                   onClick={() => {
-                    handleDeleteOpen(params.row.id, params.row.title);
+                    handleDeleteOpen(params.row.id);
                   }}>
                   <i className="ri-delete-bin-2-fill" />
                 </IconButton>
@@ -366,7 +367,7 @@ const Orders = () => {
         <DialogTitle id="alert-dialog-title">{textT?.dialogDeleteTitle}</DialogTitle>
         <DialogContent dividers>
           <DialogContentText id="alert-dialog-description">
-            {textT?.dialogDeleteMessage?.replace('{{ title }}', deleteState.title)}
+            {textT?.dialogDeleteMessage?.replace('{{ id }}', `# ${padStartZeros(deleteState.id || 0, 4)}`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

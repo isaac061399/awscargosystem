@@ -1381,13 +1381,16 @@ export const requestDeleteOrder = async (id: number, lang: string) => {
   }
 };
 
-export const requestStatusOrder = async (id: number, params: any, lang: string) => {
+export const requestChangeStatusOrder = async (
+  id: number,
+  action: 'on-the-way' | 'ready' | 'delivered',
+  lang: string
+) => {
   try {
     const response = await axios.request({
       method: 'put',
-      url: `/api/orders/${id}/status`,
-      headers: { ...defaultHeaders, 'Accept-Language': lang },
-      data: params
+      url: `/api/credits/${id}/${action}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
     });
 
     return response.data;

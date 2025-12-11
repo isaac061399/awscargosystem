@@ -640,6 +640,7 @@ model CusOrderProduct {
   code          String
   name          String
   description   String
+  quantity      Int
   price         Float
   service_price Float
   url           String?
@@ -647,7 +648,7 @@ model CusOrderProduct {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
-  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Restrict)
+  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
 
   @@map("cus_order_product")
 }

@@ -19,7 +19,6 @@ import {
   AccordionSummary,
   Alert,
   Autocomplete,
-  Box,
   Button,
   Card,
   CardContent,
@@ -34,33 +33,26 @@ import {
   Divider,
   Grid,
   IconButton,
+  Stack,
   TextField,
   Typography
 } from '@mui/material';
 
-// Others Imports
-import moment from 'moment';
-
 // Component Imports
 import DashboardLayout from '@components/layout/DashboardLayout';
-import Select from '@components/Select';
-import SelectAutocomplete from '@components/SelectAutocomplete';
+import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import { requestEditOrder, requestNewOrder, requestSearchClients, requestStatusOrder } from '@helpers/request';
+import { requestChangeStatusOrder, requestEditOrder, requestNewOrder, requestSearchClients } from '@helpers/request';
 
 // Auth Imports
-import { useAdmin } from '@components/AdminProvider';
-import { hasAllPermissions } from '@helpers/permissions';
+// import { useAdmin } from '@components/AdminProvider';
+// import { hasAllPermissions } from '@helpers/permissions';
 
-// Components Imports
-import EditorField from '@components/EditorField';
-import ImageField from '@components/ImageField';
-import DateTimeField from '@components/DateTimeField';
-import SortableComponent from '@components/SortableComponent';
-
-import i18nConfigApp from '@/configs/i18nConfigApp';
-import cmsConfig from '@/configs/cmsConfig';
+import { Currencies } from '@/libs/constants';
+import { formatMoney, padStartZeros } from '@/libs/utils';
+import { getOrderTotal } from '@/helpers/calculations';
+import { OrderStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -98,10 +90,22 @@ const formatOption = (option: any) => {
   return `${option.full_name} (${extras.join(' - ')})`;
 };
 
+const productInitialValues = {
+  tracking: '',
+  code: '',
+  name: '',
+  description: '',
+  quantity: '',
+  price: '',
+  service_price: '',
+  url: '',
+  image_url: ''
+};
+
 const OrdersEdition = ({ order }: { order?: any }) => {
   const router = useRouter();
-  const { data: admin } = useAdmin();
-  const canCreateMedia = hasAllPermissions('media.create', admin.permissions);
+  // const { data: admin } = useAdmin();
+  // const canCreateMedia = hasAllPermissions('media.create', admin.permissions);
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('orders-edition:text', { returnObjects: true, default: {} }), [t]);
@@ -110,15 +114,13 @@ const OrdersEdition = ({ order }: { order?: any }) => {
 
   const [isEditing] = useState(order);
   const [isRedirecting, setIsRedirecting] = useState(false);
+
   const [isStatusLoading, setIsStatusLoading] = useState(false);
+  const [statusState, setStatusState] = useState({ open: false, action: '' });
+
   const [clientLoading, setClientLoading] = useState(false);
   const [clientOptions, setClientOptions] = useState<any[]>(order ? [order.client] : []);
 
-  // const [openDialogPublish, setOpenDialogPublish] = useState(false);
-  // const [isPublished, setIsPublished] = useState(Boolean(order?.published_at));
-  // const [publishAt, setPublishAt] = useState<any>(order?.published_at ? moment(order?.published_at) : null);
-  // const [publishAtError, setPublishAtError] = useState(false);
-  // const [openDialogUnpublish, setOpenDialogUnpublish] = useState(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -140,10 +142,20 @@ const OrdersEdition = ({ order }: { order?: any }) => {
       number: yup.string().required(formT?.errors?.number),
       purchase_page: yup.string().required(formT?.errors?.purchase_page),
 
-      customValues: yup.array(
+      products: yup.array(
         yup.object({
-          key: yup.string().required(formT?.errors?.customValuesKey),
-          value: yup.string().required(formT?.errors?.customValuesValue)
+          tracking: yup.string(),
+          code: yup.string().required(formT?.errors?.products?.code),
+          name: yup.string().required(formT?.errors?.products?.name),
+          description: yup.string(),
+          quantity: yup
+            .number()
+            .integer(formT?.errors?.products?.invalidInteger)
+            .required(formT?.errors?.products?.quantity),
+          price: yup.number().required(formT?.errors?.products?.price),
+          service_price: yup.number().required(formT?.errors?.products?.service_price),
+          url: yup.string(),
+          image_url: yup.string()
         })
       )
     }),
@@ -151,30 +163,9 @@ const OrdersEdition = ({ order }: { order?: any }) => {
       setAlertState({ ...defaultAlertState });
 
       try {
-        const params: any = { ...values };
-
-        // delete params.category;
-        // params.category_id = values.category?.id;
-        // delete params.page;
-        // params.page_id = values.page?.id;
-        // params.thumbnail = values.thumbnail
-        //   ? { media_id: values.thumbnail.media.id, title: values.thumbnail.title, link: values.thumbnail.link }
-        //   : null;
-        // params.images = values.images.map((img: any, index: number) => ({
-        //   media_id: img.media.id,
-        //   title: img.title,
-        //   link: img.link,
-        //   order: index
-        // }));
-        // params.customValues = values.customValues.map((cv: any, index: number) => ({
-        //   key: cv.key,
-        //   value: cv.value,
-        //   order: index
-        // }));
-
         const result = isEditing
-          ? await requestEditOrder(order.id, params, i18n.language)
-          : await requestNewOrder(params, i18n.language);
+          ? await requestEditOrder(order.id, values, i18n.language)
+          : await requestNewOrder(values, i18n.language);
 
         if (!result.valid) {
           return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
@@ -222,78 +213,44 @@ const OrdersEdition = ({ order }: { order?: any }) => {
     }, 500); // 500ms debounce
   };
 
-  const handleUnpublish = async () => {
-    setOpenDialogUnpublish(true);
+  const handleStatusOpen = (action: 'on-the-way' | 'ready' | 'delivered') => {
+    setStatusState({ open: true, action });
   };
 
-  const handleBtnUnpublish = async () => {
-    handleRequestStatus('unpublish');
-    setOpenDialogUnpublish(false);
+  const handleStatusClose = () => {
+    setStatusState({ open: false, action: '' });
   };
 
-  const handlePublish = async () => {
-    setPublishAt(null);
-    setPublishAtError(false);
-    setOpenDialogPublish(true);
-  };
-
-  const handleBtnPublish = async (publishNow: boolean) => {
-    setPublishAtError(false);
-
-    if (publishNow) {
-      handleRequestStatus('publishNow');
-      setOpenDialogPublish(false);
-    } else if (!publishAt) {
-      setPublishAtError(true);
-    } else {
-      handleRequestStatus('publishAt', publishAt.toISOString());
-      setOpenDialogPublish(false);
-    }
-  };
-
-  const handleRequestStatus = async (type: 'unpublish' | 'publishNow' | 'publishAt', value?: string) => {
-    setIsStatusLoading(true);
+  const handleStatus = async () => {
     setAlertState({ ...defaultAlertState });
+    setIsStatusLoading(true);
 
-    try {
-      const result = await requestStatusOrder(order.id, { type, value }, i18n.language);
+    const result = await requestChangeStatusOrder(
+      order?.id,
+      statusState.action as 'on-the-way' | 'ready' | 'delivered',
+      i18n.language
+    );
 
-      setIsStatusLoading(false);
+    setIsStatusLoading(false);
+    handleStatusClose();
 
-      if (!result.valid) {
-        return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
-      }
-
-      if (type === 'unpublish') {
-        setIsPublished(false);
-        setPublishAt(null);
-      } else if (type === 'publishNow') {
-        setIsPublished(true);
-        setPublishAt(moment());
-      } else if (type === 'publishAt') {
-        setIsPublished(true);
-        setPublishAt(moment(value));
-      }
-
-      setAlertState({
-        open: true,
-        type: 'success',
-        message: type !== 'unpublish' ? textT?.publishSuccessMessage : textT?.unpublishSuccessMessage
-      });
-
-      setTimeout(() => {
-        setAlertState({ ...defaultAlertState });
-      }, 5000);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      // console.error(error);
-      return setAlertState({ open: true, type: 'error', message: formT?.errorMessage });
+    if (!result.valid) {
+      setAlertState({ open: true, type: 'error', message: result.message || textT?.errors?.status });
+    } else {
+      router.refresh();
     }
   };
+
+  const isPending = order ? order.status === ('PENDING' as OrderStatus) : false;
+  const isOnTheWay = order ? order.status === ('ON_THE_WAY' as OrderStatus) : false;
+  const isReady = order ? order.status === ('READY' as OrderStatus) : false;
+  // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
 
   const paymentStatusChip: any = { label: '', color: 'info' };
 
   const statusChip: any = { label: '', color: 'info' };
+
+  let orderTotal = 0;
 
   if (isEditing) {
     paymentStatusChip.label = labelsT?.orderPaymentStatus?.[order.status] || 'Unknown';
@@ -301,6 +258,8 @@ const OrdersEdition = ({ order }: { order?: any }) => {
 
     statusChip.label = labelsT?.orderStatus?.[order.status] || 'Unknown';
     statusChip.color = statusColors[order.status] || 'info';
+
+    orderTotal = getOrderTotal(formik.values.products);
   }
 
   return (
@@ -308,57 +267,59 @@ const OrdersEdition = ({ order }: { order?: any }) => {
       <form noValidate onSubmit={formik.handleSubmit}>
         <Grid container spacing={6}>
           <Grid size={{ xs: 12 }}>
-            <div className="flex items-center justify-between mb-3">
-              <Typography variant="h3" className="flex items-center gap-1">
-                <IconButton className="p-1" color="default" LinkComponent={Link} href="/orders">
-                  <i className="ri-arrow-left-s-line text-4xl" />
-                </IconButton>
-                {isEditing ? (
-                  <>
-                    {`${textT?.titleEdit} ${order.id}`}
-                    <Chip
-                      label={statusChip.label}
-                      color={statusChip.color}
-                      size="small"
-                      variant="outlined"
-                      sx={{ ml: 2 }}
-                    />
-                  </>
-                ) : (
-                  textT?.titleNew
-                )}
-              </Typography>
+            <div className="flex flex-col sm:flex-row sm:justify-between justify-start items-center gap-3 mb-3">
               <div className="flex items-center gap-2">
-                {isEditing && (
-                  <>
-                    <Button
-                      size="small"
-                      type="button"
-                      variant="contained"
-                      color="primary"
-                      LinkComponent={Link}
-                      href={`/orders/new?ref=${order.id}`}
-                      startIcon={<i className="ri-file-copy-line" />}>
-                      {textT?.btnDuplicate}
-                    </Button>
-                    <Button
-                      size="small"
-                      type="button"
-                      variant={isPublished ? 'outlined' : 'contained'}
-                      color="primary"
-                      loading={isStatusLoading}
-                      onClick={isPublished ? handleUnpublish : handlePublish}
-                      startIcon={<i className="ri-check-line" />}>
-                      {isPublished ? textT?.btnUnpublish : textT?.btnPublish}
-                    </Button>
-                  </>
+                <Typography variant="h3" className="flex items-center gap-1">
+                  <IconButton className="p-1" color="default" LinkComponent={Link} href="/orders">
+                    <i className="ri-arrow-left-s-line text-4xl" />
+                  </IconButton>
+                  {isEditing ? `${textT?.titleEdit} # ${padStartZeros(order.id, 4)}` : textT?.titleNew}
+                </Typography>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                {isPending && (
+                  <Button
+                    size="small"
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    loading={formik.isSubmitting || isRedirecting || isStatusLoading}
+                    startIcon={<i className="ri-truck-line" />}
+                    onClick={() => handleStatusOpen('on-the-way')}>
+                    {textT?.btnOnTheWay}
+                  </Button>
+                )}
+                {isOnTheWay && (
+                  <Button
+                    size="small"
+                    type="button"
+                    variant="contained"
+                    color="info"
+                    loading={formik.isSubmitting || isRedirecting || isStatusLoading}
+                    startIcon={<i className="ri-inbox-unarchive-line" />}
+                    onClick={() => handleStatusOpen('ready')}>
+                    {textT?.btnReady}
+                  </Button>
+                )}
+                {isReady && (
+                  <Button
+                    size="small"
+                    type="button"
+                    variant="contained"
+                    color="success"
+                    loading={formik.isSubmitting || isRedirecting || isStatusLoading}
+                    startIcon={<i className="ri-check-double-line" />}
+                    onClick={() => handleStatusOpen('delivered')}>
+                    {textT?.btnDelivered}
+                  </Button>
                 )}
                 <Button
                   size="small"
                   type="submit"
                   variant="contained"
                   color="primary"
-                  loading={formik.isSubmitting || isRedirecting}
+                  loading={formik.isSubmitting || isRedirecting || isStatusLoading}
                   startIcon={<i className="ri-save-line" />}>
                   {textT?.btnSave}
                 </Button>
@@ -369,6 +330,50 @@ const OrdersEdition = ({ order }: { order?: any }) => {
           <Grid size={{ xs: 12 }}>
             <Card>
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
+
+              {isEditing && (
+                <CardContent>
+                  <Grid container spacing={3} alignItems="center">
+                    {/* Total */}
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Stack spacing={0.5}>
+                        <Typography variant="overline" color="text.secondary">
+                          {textT?.totalLabel}
+                        </Typography>
+                        <Typography variant="h5" fontWeight={600}>
+                          {formatMoney(orderTotal, Currencies.USD.symbol)}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+
+                    {/* Payment status */}
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Stack spacing={1}>
+                        <Typography variant="overline" color="text.secondary">
+                          {textT?.paymentStatusLabel}
+                        </Typography>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                          <Chip label={paymentStatusChip.label} color={paymentStatusChip.color} size="small" />
+                        </Stack>
+                      </Stack>
+                    </Grid>
+
+                    {/* Order status */}
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Stack spacing={1}>
+                        <Typography variant="overline" color="text.secondary">
+                          {textT?.statusLabel}
+                        </Typography>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                          <Chip label={statusChip.label} color={statusChip.color} size="small" />
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                  <Divider sx={{ mt: 5 }} />
+                </CardContent>
+              )}
+
               <CardContent>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 8 }}>
@@ -388,7 +393,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                       loading={clientLoading}
                       loadingText={textT?.loading}
                       noOptionsText={textT?.noOptions}
-                      disabled={formik.isSubmitting || isRedirecting}
+                      disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -399,7 +404,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                           error={Boolean(formik.touched.client_id && formik.errors.client_id)}
                           color={Boolean(formik.touched.client_id && formik.errors.client_id) ? 'error' : 'primary'}
                           helperText={formik.touched.client_id && (formik.errors.client_id as string)}
-                          disabled={formik.isSubmitting || isRedirecting}
+                          disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
                           slotProps={{
                             input: {
                               ...params.InputProps,
@@ -432,7 +437,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                       error={Boolean(formik.touched.number && formik.errors.number)}
                       color={Boolean(formik.touched.number && formik.errors.number) ? 'error' : 'primary'}
                       helperText={formik.touched.number && formik.errors.number}
-                      disabled={formik.isSubmitting || isRedirecting}
+                      disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
                     />
                   </Grid>
 
@@ -450,22 +455,26 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                       error={Boolean(formik.touched.purchase_page && formik.errors.purchase_page)}
                       color={Boolean(formik.touched.purchase_page && formik.errors.purchase_page) ? 'error' : 'primary'}
                       helperText={formik.touched.purchase_page && formik.errors.purchase_page}
-                      disabled={formik.isSubmitting || isRedirecting}
+                      disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
                     />
                   </Grid>
 
-                  {/* Custom Values Fields */}
-                  {/* <Grid size={{ xs: 12 }}>
+                  {/* Products Fields */}
+                  <Grid size={{ xs: 12 }}>
                     <Divider textAlign="left" sx={{ '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
-                      <Typography variant="h5" className={`${Boolean(formik.errors.customValues) ? 'text-error' : ''}`}>
-                        {formT?.labels?.customValues}
+                      <Typography variant="h5" className={`${Boolean(formik.errors.products) ? 'text-error' : ''}`}>
+                        {formT?.labels?.products?.title}
                       </Typography>
                     </Divider>
                   </Grid>
 
                   <Grid size={{ xs: 12 }}>
-                    <CustomValuesAccordionComponent formik={formik} formT={formT} isRedirecting={isRedirecting} />
-                  </Grid> */}
+                    <ProductsAccordionComponent
+                      formik={formik}
+                      formT={formT}
+                      isLoading={isRedirecting || isStatusLoading}
+                    />
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
@@ -476,74 +485,24 @@ const OrdersEdition = ({ order }: { order?: any }) => {
       {isEditing && (
         <>
           <Dialog
-            open={openDialogUnpublish}
-            onClose={() => setOpenDialogUnpublish(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description">
-            <DialogTitle id="alert-dialog-title">{textT?.dialogUnpublish?.title}</DialogTitle>
+            open={statusState.open}
+            onClose={handleStatusClose}
+            aria-labelledby="dialog-status-title"
+            aria-describedby="dialog-status-description">
+            <DialogTitle id="dialog-status-title">{textT?.dialogStatus?.title}</DialogTitle>
             <DialogContent dividers>
-              <DialogContentText id="alert-dialog-description">{textT?.dialogUnpublish?.message}</DialogContentText>
+              <DialogContentText id="dialog-status-description">
+                {statusState.action === 'on-the-way' && textT?.dialogStatus?.onTheWayMessage}
+                {statusState.action === 'ready' && textT?.dialogStatus?.readyMessage}
+                {statusState.action === 'delivered' && textT?.dialogStatus?.deliveredMessage}
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button variant="text" color="secondary" onClick={() => setOpenDialogUnpublish(false)}>
-                {textT?.dialogUnpublish?.btnNo}
+              <Button variant="text" color="secondary" onClick={handleStatusClose} disabled={isStatusLoading}>
+                {textT?.btnCancel}
               </Button>
-              <Button variant="text" color="primary" onClick={handleBtnUnpublish}>
-                {textT?.dialogUnpublish?.btnYes}
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          <Dialog
-            open={openDialogPublish}
-            onClose={() => setOpenDialogPublish(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description">
-            <DialogTitle id="alert-dialog-title">{textT?.dialogPublish?.title}</DialogTitle>
-            <DialogContent dividers>
-              <div className="text-center">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    handleBtnPublish(true);
-                  }}>
-                  {textT?.dialogPublish?.btnPublishNow}
-                </Button>
-              </div>
-              <Divider sx={{ my: 4 }}>{textT?.dialogPublish?.orLabel}</Divider>
-              <div className="text-center">
-                <DateTimeField
-                  locale={i18n.language}
-                  disablePast
-                  name="publish-at"
-                  label={textT?.dialogPublish?.inputLabel}
-                  defaultValue={publishAt}
-                  onChange={(value) => setPublishAt(value)}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      required: true,
-                      error: publishAtError,
-                      color: publishAtError ? 'error' : 'primary',
-                      disabled: formik.isSubmitting || isRedirecting
-                    }
-                  }}
-                  sx={{ mb: 5 }}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    handleBtnPublish(false);
-                  }}>
-                  {textT?.dialogPublish?.btnPublish}
-                </Button>
-              </div>
-            </DialogContent>
-            <DialogActions>
-              <Button variant="text" color="secondary" onClick={() => setOpenDialogPublish(false)}>
-                {textT?.dialogPublish?.btnCancel}
+              <Button variant="text" color="primary" onClick={handleStatus} loading={isStatusLoading}>
+                {textT?.btnContinue}
               </Button>
             </DialogActions>
           </Dialog>
@@ -553,431 +512,249 @@ const OrdersEdition = ({ order }: { order?: any }) => {
   );
 };
 
-// const ThumbnailComponent = ({
-//   formik,
-//   formT,
-//   isRedirecting,
-//   fileManager
-// }: {
-//   formik: any;
-//   formT: any;
-//   isRedirecting: boolean;
-//   fileManager: { title: string; canAdd: boolean; canDelete: boolean };
-// }) => {
-//   const handleAdd = () => {
-//     const newValue = { id: Date.now(), media: null, title: '', link: '' };
+const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any; formT: any; isLoading: boolean }) => {
+  const [expanded, setExpanded] = useState<string | false>(false);
 
-//     formik.setFieldValue('thumbnail', newValue);
-//   };
+  const handleChangeExpanded = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+    setExpanded(newExpanded ? panel : false);
+  };
 
-//   const handleRemove = () => {
-//     formik.setFieldValue('thumbnail', null);
-//   };
+  const handleAdd = () => {
+    const newValue = [...formik.values.products, { ...productInitialValues }];
 
-//   const handleChangeMedia = (media?: any) => {
-//     const newValue: any = { ...formik.values.thumbnail };
+    formik.setFieldValue('products', newValue);
 
-//     if (media) {
-//       newValue.media = media;
-//     } else {
-//       newValue.media = null;
-//     }
+    setExpanded(`products[${newValue.length - 1}]`);
+  };
 
-//     formik.setFieldValue('thumbnail', newValue);
-//   };
+  const handleRemove = (index: number) => {
+    const newValue = [...formik.values.products];
 
-//   return (
-//     <Grid container spacing={5}>
-//       <Grid size={{ xs: 12 }}>
-//         <div>
-//           {formik.values.thumbnail && (
-//             <Accordion variant="outlined" disableGutters expanded>
-//               <AccordionDetails sx={{ p: 5 }}>
-//                 <Grid container spacing={5}>
-//                   <Grid size={{ xs: 12 }}>
-//                     <Box display="flex" alignItems="center" width="100%" justifyOrder="end">
-//                       <IconButton className="p-0" onClick={() => handleRemove()}>
-//                         <i className="ri-delete-bin-2-line" />
-//                       </IconButton>
-//                     </Box>
-//                   </Grid>
-//                   <Grid size={{ xs: 12 }}>
-//                     <ImageField
-//                       fullWidth
-//                       required
-//                       label={formT?.labels?.imagesImage}
-//                       placeholder={formT?.placeholders?.imagesImage}
-//                       value={formik.values.thumbnail?.media}
-//                       onChange={handleChangeMedia}
-//                       error={Boolean(formik.touched.thumbnail?.media && formik.errors.thumbnail?.media)}
-//                       color={
-//                         Boolean(formik.touched.thumbnail?.media && formik.errors.thumbnail?.media) ? 'error' : 'primary'
-//                       }
-//                       helperText={formik.touched.thumbnail?.media && formik.errors.thumbnail?.media}
-//                       disabled={formik.isSubmitting || isRedirecting}
-//                       fileManager={fileManager}
-//                     />
-//                   </Grid>
-//                   <Grid size={{ xs: 12, md: 6 }}>
-//                     <TextField
-//                       fullWidth
-//                       type="text"
-//                       id="thumbnail.title"
-//                       name="thumbnail.title"
-//                       label={formT?.labels?.imagesTitle}
-//                       placeholder={formT?.placeholders?.imagesTitle}
-//                       value={formik.values.thumbnail?.title}
-//                       onChange={formik.handleChange}
-//                       error={Boolean(formik.touched.thumbnail?.title && formik.errors.thumbnail?.title)}
-//                       color={
-//                         Boolean(formik.touched.thumbnail?.title && formik.errors.thumbnail?.title) ? 'error' : 'primary'
-//                       }
-//                       helperText={formik.touched.thumbnail?.title && formik.errors.thumbnail?.title}
-//                       disabled={formik.isSubmitting || isRedirecting}
-//                     />
-//                   </Grid>
-//                   <Grid size={{ xs: 12, md: 6 }}>
-//                     <TextField
-//                       fullWidth
-//                       type="text"
-//                       id="thumbnail.link"
-//                       name="thumbnail.link"
-//                       label={formT?.labels?.imagesLink}
-//                       placeholder={formT?.placeholders?.imagesLink}
-//                       value={formik.values.thumbnail?.link}
-//                       onChange={formik.handleChange}
-//                       error={Boolean(formik.touched.thumbnail?.link && formik.errors.thumbnail?.link)}
-//                       color={
-//                         Boolean(formik.touched.thumbnail?.link && formik.errors.thumbnail?.link) ? 'error' : 'primary'
-//                       }
-//                       helperText={formik.touched.thumbnail?.link && formik.errors.thumbnail?.link}
-//                       disabled={formik.isSubmitting || isRedirecting}
-//                     />
-//                   </Grid>
-//                 </Grid>
-//               </AccordionDetails>
-//             </Accordion>
-//           )}
-//           {!formik.values.thumbnail && (
-//             <Accordion variant="outlined" disableGutters expanded>
-//               <AccordionDetails sx={{ py: 1, px: 5 }}>
-//                 <div className="text-center">
-//                   <Button type="button" variant="text" onClick={handleAdd}>
-//                     {formT?.addThumbnailBtn}
-//                   </Button>
-//                 </div>
-//               </AccordionDetails>
-//             </Accordion>
-//           )}
-//         </div>
-//       </Grid>
-//     </Grid>
-//   );
-// };
+    newValue.splice(index, 1);
 
-// const ImagesAccordionComponent = ({
-//   formik,
-//   formT,
-//   isRedirecting,
-//   fileManager
-// }: {
-//   formik: any;
-//   formT: any;
-//   isRedirecting: boolean;
-//   fileManager: { title: string; canAdd: boolean; canDelete: boolean };
-// }) => {
-//   const [expanded, setExpanded] = useState<string | false>(false);
+    formik.setFieldValue('products', newValue);
 
-//   const handleChangeExpanded = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-//     setExpanded(newExpanded ? panel : false);
-//   };
+    setExpanded(false);
+  };
 
-//   const handleAdd = () => {
-//     const newValue = [...formik.values.images, { id: Date.now(), media: null, title: '', link: '' }];
+  return (
+    <Grid container spacing={5}>
+      <Grid size={{ xs: 12 }}>
+        <div>
+          {formik.values.products?.map((item: any, index: number) => {
+            const errors: any = Array.isArray(formik.errors.products) ? formik.errors.products[index] || {} : {};
+            const touched: any = Array.isArray(formik.touched.products) ? formik.touched.products[index] || {} : {};
+            const hasErrors = Object.keys(errors).length > 0;
 
-//     formik.setFieldValue('images', newValue);
-
-//     setExpanded(`images[${newValue.length - 1}]`);
-//   };
-
-//   const handleRemove = (index: number) => {
-//     const newValue = [...formik.values.images];
-
-//     newValue.splice(index, 1);
-
-//     formik.setFieldValue('images', newValue);
-
-//     setExpanded(false);
-//   };
-
-//   const handleChangeMedia = (index: number, media?: any) => {
-//     const newValues = [...formik.values.images];
-
-//     if (!newValues[index]) {
-//       return;
-//     }
-
-//     if (media) {
-//       newValues[index].media = media;
-//     } else {
-//       newValues[index].media = null;
-//     }
-
-//     formik.setFieldValue(`images`, newValues);
-//   };
-
-//   return (
-//     <Grid container spacing={5}>
-//       <Grid size={{ xs: 12 }}>
-//         <div>
-//           <SortableComponent
-//             strategy="vertical"
-//             items={formik.values.images}
-//             renderItem={({ item, index, containerProps, listenersProps }) => {
-//               const errors: any = Array.isArray(formik.errors.images) ? formik.errors.images[index] || {} : {};
-
-//               const touched: any = Array.isArray(formik.touched.images) ? formik.touched.images[index] || {} : {};
-
-//               const hasErrors = Object.keys(errors).length > 0;
-
-//               return (
-//                 <Accordion
-//                   variant="outlined"
-//                   disableGutters
-//                   expanded={expanded === `images[${index}]`}
-//                   onChange={handleChangeExpanded(`images[${index}]`)}
-//                   sx={hasErrors ? { borderColor: 'var(--mui-palette-error-main)' } : undefined}
-//                   {...containerProps}>
-//                   <AccordionSummary
-//                     component="div"
-//                     aria-controls={`images[${index}]-order`}
-//                     id={`images[${index}]-header`}
-//                     sx={{
-//                       flexDirection: 'row-reverse',
-//                       color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
-//                     }}>
-//                     <div className="flex items-center w-full justify-between">
-//                       <Typography component="span">{item.media?.name}</Typography>
-//                       <div className="flex items-center gap-2">
-//                         <IconButton className="p-0" onClick={() => handleRemove(index)}>
-//                           <i className="ri-delete-bin-2-line" />
-//                         </IconButton>
-//                         <IconButton className="p-1" {...listenersProps}>
-//                           <i className="ri-more-2-fill" />
-//                         </IconButton>
-//                       </div>
-//                     </div>
-//                   </AccordionSummary>
-//                   <AccordionDetails>
-//                     <Grid container spacing={5} sx={{ mt: 2 }}>
-//                       <Grid size={{ xs: 12 }}>
-//                         <ImageField
-//                           fullWidth
-//                           required
-//                           label={formT?.labels?.imagesImage}
-//                           placeholder={formT?.placeholders?.imagesImage}
-//                           value={item.media}
-//                           onChange={(media) => handleChangeMedia(index, media)}
-//                           error={Boolean(touched.media && errors.media)}
-//                           color={Boolean(touched.media && errors.media) ? 'error' : 'primary'}
-//                           helperText={touched.media && errors.media}
-//                           disabled={formik.isSubmitting || isRedirecting}
-//                           fileManager={fileManager}
-//                         />
-//                       </Grid>
-//                       <Grid size={{ xs: 12, md: 6 }}>
-//                         <TextField
-//                           fullWidth
-//                           type="text"
-//                           id={`images[${index}].title`}
-//                           name={`images[${index}].title`}
-//                           label={formT?.labels?.imagesTitle}
-//                           placeholder={formT?.placeholders?.imagesTitle}
-//                           value={item.title}
-//                           onChange={formik.handleChange}
-//                           error={Boolean(touched.title && errors.title)}
-//                           color={Boolean(touched.title && errors.title) ? 'error' : 'primary'}
-//                           helperText={touched.title && errors.title}
-//                           disabled={formik.isSubmitting || isRedirecting}
-//                         />
-//                       </Grid>
-//                       <Grid size={{ xs: 12, md: 6 }}>
-//                         <TextField
-//                           fullWidth
-//                           type="text"
-//                           id={`images[${index}].link`}
-//                           name={`images[${index}].link`}
-//                           label={formT?.labels?.imagesLink}
-//                           placeholder={formT?.placeholders?.imagesLink}
-//                           value={item.link}
-//                           onChange={formik.handleChange}
-//                           error={Boolean(touched.link && errors.link)}
-//                           color={Boolean(touched.link && errors.link) ? 'error' : 'primary'}
-//                           helperText={touched.link && errors.link}
-//                           disabled={formik.isSubmitting || isRedirecting}
-//                         />
-//                       </Grid>
-//                     </Grid>
-//                   </AccordionDetails>
-//                 </Accordion>
-//               );
-//             }}
-//             onChange={(items) => formik.setFieldValue('images', items).then(() => formik.validateField('images'))}
-//             onStart={() => setExpanded(false)}
-//           />
-//           <Accordion variant="outlined" disableGutters expanded>
-//             <AccordionDetails sx={{ py: 1, px: 5 }}>
-//               <div className="text-center">
-//                 <Button type="button" variant="text" onClick={handleAdd}>
-//                   {formT?.addImageBtn}
-//                 </Button>
-//               </div>
-//             </AccordionDetails>
-//           </Accordion>
-//         </div>
-//       </Grid>
-//     </Grid>
-//   );
-// };
-
-// const CustomValuesAccordionComponent = ({
-//   formik,
-//   formT,
-//   isRedirecting
-// }: {
-//   formik: any;
-//   formT: any;
-//   isRedirecting: boolean;
-// }) => {
-//   const [expanded, setExpanded] = useState<string | false>(false);
-
-//   const handleChangeExpanded = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-//     setExpanded(newExpanded ? panel : false);
-//   };
-
-//   const handleAdd = () => {
-//     const newValue = [...formik.values.customValues, { id: Date.now(), key: '', value: '' }];
-
-//     formik.setFieldValue('customValues', newValue);
-
-//     setExpanded(`customValues[${newValue.length - 1}]`);
-//   };
-
-//   const handleRemove = (index: number) => {
-//     const newValue = [...formik.values.customValues];
-
-//     newValue.splice(index, 1);
-
-//     formik.setFieldValue('customValues', newValue);
-
-//     setExpanded(false);
-//   };
-
-//   return (
-//     <Grid container spacing={5}>
-//       <Grid size={{ xs: 12 }}>
-//         <div>
-//           <SortableComponent
-//             strategy="vertical"
-//             items={formik.values.customValues}
-//             renderItem={({ item, index, containerProps, listenersProps }) => {
-//               const errors: any = Array.isArray(formik.errors.customValues)
-//                 ? formik.errors.customValues[index] || {}
-//                 : {};
-
-//               const touched: any = Array.isArray(formik.touched.customValues)
-//                 ? formik.touched.customValues[index] || {}
-//                 : {};
-
-//               const hasErrors = Object.keys(errors).length > 0;
-
-//               return (
-//                 <Accordion
-//                   variant="outlined"
-//                   disableGutters
-//                   expanded={expanded === `customValues[${index}]`}
-//                   onChange={handleChangeExpanded(`customValues[${index}]`)}
-//                   sx={hasErrors ? { borderColor: 'var(--mui-palette-error-main)' } : undefined}
-//                   {...containerProps}>
-//                   <AccordionSummary
-//                     component="div"
-//                     aria-controls={`customValues[${index}]-order`}
-//                     id={`customValues[${index}]-header`}
-//                     sx={{
-//                       flexDirection: 'row-reverse',
-//                       color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
-//                     }}>
-//                     <div className="flex items-center w-full justify-between">
-//                       <Typography component="span">{item.key}</Typography>
-//                       <div className="flex items-center gap-2">
-//                         <IconButton className="p-1" onClick={() => handleRemove(index)}>
-//                           <i className="ri-delete-bin-2-line" />
-//                         </IconButton>
-//                         <IconButton className="p-1" {...listenersProps}>
-//                           <i className="ri-more-2-fill" />
-//                         </IconButton>
-//                       </div>
-//                     </div>
-//                   </AccordionSummary>
-//                   <AccordionDetails>
-//                     <Grid container spacing={5} sx={{ mt: 2 }}>
-//                       <Grid size={{ xs: 12, md: 6 }}>
-//                         <TextField
-//                           fullWidth
-//                           required
-//                           type="text"
-//                           id={`customValues[${index}].key`}
-//                           name={`customValues[${index}].key`}
-//                           label={formT?.labels?.customValuesKey}
-//                           placeholder={formT?.placeholders?.customValuesKey}
-//                           value={item.key}
-//                           onChange={formik.handleChange}
-//                           error={Boolean(touched.key && errors.key)}
-//                           color={Boolean(touched.key && errors.key) ? 'error' : 'primary'}
-//                           helperText={touched.key && errors.key}
-//                           disabled={formik.isSubmitting || isRedirecting}
-//                         />
-//                       </Grid>
-//                       <Grid size={{ xs: 12, md: 6 }}>
-//                         <TextField
-//                           fullWidth
-//                           required
-//                           type="text"
-//                           id={`customValues[${index}].value`}
-//                           name={`customValues[${index}].value`}
-//                           label={formT?.labels?.customValuesValue}
-//                           placeholder={formT?.placeholders?.customValuesValue}
-//                           value={item.value}
-//                           onChange={formik.handleChange}
-//                           error={Boolean(touched.value && errors.value)}
-//                           color={Boolean(touched.value && errors.value) ? 'error' : 'primary'}
-//                           helperText={touched.value && errors.value}
-//                           disabled={formik.isSubmitting || isRedirecting}
-//                         />
-//                       </Grid>
-//                     </Grid>
-//                   </AccordionDetails>
-//                 </Accordion>
-//               );
-//             }}
-//             onChange={(items) =>
-//               formik.setFieldValue('customValues', items).then(() => formik.validateField('customValues'))
-//             }
-//             onStart={() => setExpanded(false)}
-//           />
-//           <Accordion variant="outlined" disableGutters expanded>
-//             <AccordionDetails sx={{ py: 1, px: 5 }}>
-//               <div className="text-center">
-//                 <Button type="button" variant="text" onClick={handleAdd}>
-//                   {formT?.addCustomValueBtn}
-//                 </Button>
-//               </div>
-//             </AccordionDetails>
-//           </Accordion>
-//         </div>
-//       </Grid>
-//     </Grid>
-//   );
-// };
+            return (
+              <Accordion
+                key={index}
+                variant="outlined"
+                disableGutters
+                expanded={expanded === `products[${index}]`}
+                onChange={handleChangeExpanded(`products[${index}]`)}
+                sx={hasErrors ? { borderColor: 'var(--mui-palette-error-main)' } : undefined}>
+                <AccordionSummary
+                  component="div"
+                  aria-controls={`products[${index}]-order`}
+                  id={`products[${index}]-header`}
+                  sx={{
+                    flexDirection: 'row-reverse',
+                    color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
+                  }}>
+                  <div className="flex items-center w-full justify-between">
+                    <Typography component="span">
+                      {item.name}{' '}
+                      {item.id && !item.tracking && (
+                        <Typography component="span" className="text-sm font-bold text-warning">
+                          {`( ${formT?.noTracking} )`}
+                        </Typography>
+                      )}
+                    </Typography>
+                    <div className="flex items-center gap-2">
+                      <IconButton className="p-1" onClick={() => handleRemove(index)}>
+                        <i className="ri-delete-bin-2-line" />
+                      </IconButton>
+                    </div>
+                  </div>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={5} sx={{ mt: 2 }}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        type="text"
+                        id={`products[${index}].tracking`}
+                        name={`products[${index}].tracking`}
+                        label={formT?.labels?.products?.tracking}
+                        placeholder={formT?.placeholders?.products?.tracking}
+                        value={item.tracking}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.tracking && errors.tracking)}
+                        color={Boolean(touched.tracking && errors.tracking) ? 'error' : 'primary'}
+                        helperText={touched.tracking && errors.tracking}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        required
+                        type="text"
+                        id={`products[${index}].code`}
+                        name={`products[${index}].code`}
+                        label={formT?.labels?.products?.code}
+                        placeholder={formT?.placeholders?.products?.code}
+                        value={item.code}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.code && errors.code)}
+                        color={Boolean(touched.code && errors.code) ? 'error' : 'primary'}
+                        helperText={touched.code && errors.code}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        required
+                        type="text"
+                        id={`products[${index}].name`}
+                        name={`products[${index}].name`}
+                        label={formT?.labels?.products?.name}
+                        placeholder={formT?.placeholders?.products?.name}
+                        value={item.name}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.name && errors.name)}
+                        color={Boolean(touched.name && errors.name) ? 'error' : 'primary'}
+                        helperText={touched.name && errors.name}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 12 }}>
+                      <TextField
+                        fullWidth
+                        type="text"
+                        id={`products[${index}].description`}
+                        name={`products[${index}].description`}
+                        label={formT?.labels?.products?.description}
+                        placeholder={formT?.placeholders?.products?.description}
+                        value={item.description}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.description && errors.description)}
+                        color={Boolean(touched.description && errors.description) ? 'error' : 'primary'}
+                        helperText={touched.description && errors.description}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        required
+                        type="number"
+                        id={`products[${index}].quantity`}
+                        name={`products[${index}].quantity`}
+                        label={formT?.labels?.products?.quantity}
+                        placeholder={formT?.placeholders?.products?.quantity}
+                        value={item.quantity}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.quantity && errors.quantity)}
+                        color={Boolean(touched.quantity && errors.quantity) ? 'error' : 'primary'}
+                        helperText={touched.quantity && errors.quantity}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <MoneyField
+                        fullWidth
+                        required
+                        type="text"
+                        decimalScale={2}
+                        decimalSeparator="."
+                        thousandSeparator=","
+                        prefix={`${Currencies.USD.symbol} `}
+                        id={`products[${index}].price`}
+                        name={`products[${index}].price`}
+                        label={formT?.labels?.products?.price}
+                        placeholder={formT?.placeholders?.products?.price}
+                        value={item.price}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.price && errors.price)}
+                        color={Boolean(touched.price && errors.price) ? 'error' : 'primary'}
+                        helperText={touched.price && errors.price}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <MoneyField
+                        fullWidth
+                        required
+                        type="text"
+                        decimalScale={2}
+                        decimalSeparator="."
+                        thousandSeparator=","
+                        prefix={`${Currencies.USD.symbol} `}
+                        id={`products[${index}].service_price`}
+                        name={`products[${index}].service_price`}
+                        label={formT?.labels?.products?.service_price}
+                        placeholder={formT?.placeholders?.products?.service_price}
+                        value={item.service_price}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.service_price && errors.service_price)}
+                        color={Boolean(touched.service_price && errors.service_price) ? 'error' : 'primary'}
+                        helperText={touched.service_price && errors.service_price}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 12 }}>
+                      <TextField
+                        fullWidth
+                        type="text"
+                        id={`products[${index}].url`}
+                        name={`products[${index}].url`}
+                        label={formT?.labels?.products?.url}
+                        placeholder={formT?.placeholders?.products?.url}
+                        value={item.url}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.url && errors.url)}
+                        color={Boolean(touched.url && errors.url) ? 'error' : 'primary'}
+                        helperText={touched.url && errors.url}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 12 }}>
+                      <TextField
+                        fullWidth
+                        type="text"
+                        id={`products[${index}].image_url`}
+                        name={`products[${index}].image_url`}
+                        label={formT?.labels?.products?.image_url}
+                        placeholder={formT?.placeholders?.products?.image_url}
+                        value={item.image_url}
+                        onChange={formik.handleChange}
+                        error={Boolean(touched.image_url && errors.image_url)}
+                        color={Boolean(touched.image_url && errors.image_url) ? 'error' : 'primary'}
+                        helperText={touched.image_url && errors.image_url}
+                        disabled={formik.isSubmitting || isLoading}
+                      />
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
+          <Accordion variant="outlined" disableGutters expanded>
+            <AccordionDetails sx={{ py: 1, px: 5 }}>
+              <div className="text-center">
+                <Button type="button" variant="text" onClick={handleAdd}>
+                  {formT?.addProductBtn}
+                </Button>
+              </div>
+            </AccordionDetails>
+          </Accordion>
+        </div>
+      </Grid>
+    </Grid>
+  );
+};
 
 export default OrdersEdition;

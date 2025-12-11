@@ -1,109 +1,63 @@
 import { NextResponse } from 'next/server';
 
-import type { MediaType } from '@/prisma/generated/client';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { TransactionError, withTransaction } from '@libs/prisma';
-import { cleanCache } from '@/libs/app/cache';
 
-export const PUT = withAuthApi(['contents.edit'], async (req, { params }: { params: Promise<{ id: string }> }) => {
+export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:contents', { returnObjects: true, default: {} });
+  const textT: any = t('api:orders', { returnObjects: true, default: {} });
 
+  const admin = req.session;
   const data = await req.json();
 
   try {
     const result = await withTransaction(async (tx) => {
-      const exist = await tx.cmsContent.findFirst({
-        where: { NOT: { id: Number(id) }, locale: data.locale, slug: data.slug },
-        select: { id: true }
-      });
-
-      if (exist) {
-        throw new TransactionError(400, textT?.errors?.slug);
-      }
-
       // delete relations
-      await tx.cmsMediaContent.deleteMany({ where: { content_id: Number(id) } });
-      await tx.cmsCustomValue.deleteMany({ where: { content_id: Number(id) } });
+      await tx.cusOrderProduct.deleteMany({ where: { order_id: Number(id) } });
 
       // load relations
-      const media = [];
-
-      if (data.thumbnail) {
-        media.push({
-          media_id: data.thumbnail?.media_id,
-          title: data.thumbnail?.title,
-          link: data.thumbnail?.link,
-          type: 'THUMBNAIL' as MediaType,
-          order: 0
-        });
-      }
-
-      if (data.images) {
-        for (const image of data.images) {
-          media.push({
-            media_id: image?.media_id,
-            title: image?.title,
-            link: image?.link,
-            type: 'IMAGE' as MediaType,
-            order: image?.order
-          });
-        }
-      }
-
-      const customValues = data.customValues?.map((cv: any) => ({
-        key: cv.key,
-        value: cv.value,
-        order: cv.order
+      const products = data.products?.map((p: any) => ({
+        tracking: p.tracking,
+        code: p.code,
+        name: p.name,
+        description: p.description,
+        quantity: p.quantity ? parseInt(p.quantity) : 0,
+        price: p.price ? parseFloat(p.price) : 0,
+        service_price: p.service_price ? parseFloat(p.service_price) : 0,
+        url: p.url,
+        image_url: p.image_url
       }));
 
-      // update content
-      const content = await tx.cmsContent.update({
+      // update order
+      const order = await tx.cusOrder.update({
         where: { id: Number(id) },
         data: {
-          locale: data.locale,
-          slug: data.slug,
-          title: data.title,
-          subtitle: data.subtitle,
-          description: data.description,
-          content: data.content,
-          seo: {
-            upsert: {
-              create: {
-                title: data.seo_title,
-                description: data.seo_description,
-                media_id: data.seo_media?.id || null,
-                keywords: data.seo_keywords,
-                robots: data.seo_robots
-              },
-              update: {
-                title: data.seo_title,
-                description: data.seo_description,
-                media_id: data.seo_media?.id || null,
-                keywords: data.seo_keywords,
-                robots: data.seo_robots
-              }
-            }
-          },
-          category: data.category_id ? { connect: { id: Number(data.category_id) } } : undefined,
-          page: data.page_id ? { connect: { id: Number(data.page_id) } } : undefined,
-          media: { create: media },
-          custom_values: { create: customValues }
+          client_id: data.client_id,
+          number: data.number,
+          purchase_page: data.purchase_page,
+          products: { create: products }
         }
       });
 
-      if (!content) {
+      if (!order) {
         throw new TransactionError(400, textT?.errors?.save);
       }
 
-      return content;
-    });
+      // save log
+      await tx.cusOrderLog.create({
+        data: {
+          order_id: order.id,
+          administrator_id: admin.id,
+          action: 'order.edit',
+          data: JSON.stringify(data)
+        }
+      });
 
-    // clean cache
-    await cleanCache(['/contents', '/categories', '/pages']);
+      return order;
+    });
 
     return NextResponse.json({ valid: true, id: result.id }, { status: 200 });
   } catch (error) {
@@ -117,26 +71,43 @@ export const PUT = withAuthApi(['contents.edit'], async (req, { params }: { para
   }
 });
 
-export const DELETE = withAuthApi(['contents.delete'], async (req, { params }: { params: Promise<{ id: string }> }) => {
+export const DELETE = withAuthApi(['orders.delete'], async (req, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:contents', { returnObjects: true, default: {} });
+  const textT: any = t('api:orders', { returnObjects: true, default: {} });
+
+  const admin = req.session;
 
   try {
     await withTransaction(async (tx) => {
-      // delete content
-      const result = await tx.cmsContent.delete({
+      // delete order
+      const entry = await tx.cusOrder.findFirst({
+        where: { id: Number(id) },
+        include: { products: true }
+      });
+
+      if (!entry) {
+        throw new TransactionError(400, textT?.errors?.delete);
+      }
+
+      const result = await tx.cusOrder.delete({
         where: { id: Number(id) }
       });
 
       if (!result) {
         throw new TransactionError(400, textT?.errors?.delete);
       }
-    });
 
-    // clean cache
-    await cleanCache(['/contents', '/categories', '/pages']);
+      // save log
+      await tx.cusOrderLog.create({
+        data: {
+          administrator_id: admin.id,
+          action: 'order.delete',
+          data: JSON.stringify(entry)
+        }
+      });
+    });
 
     return NextResponse.json({ valid: true }, { status: 200 });
   } catch (error) {

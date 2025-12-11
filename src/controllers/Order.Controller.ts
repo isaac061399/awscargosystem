@@ -22,6 +22,7 @@ export const getOrder = async (id: number) => {
             code: true,
             name: true,
             description: true,
+            quantity: true,
             price: true,
             service_price: true,
             url: true,

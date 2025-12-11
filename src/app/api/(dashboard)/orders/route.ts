@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import type { MediaType } from '@/prisma/generated/client';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
-import { cleanCache } from '@/libs/app/cache';
 
 import { clientSelectSchema } from '@/controllers/Client.Controller';
 
@@ -79,71 +77,30 @@ export const POST = withAuthApi(['orders.create'], async (req) => {
   const { t } = await initTranslationsApi(req);
   const textT: any = t('api:orders', { returnObjects: true, default: {} });
 
+  const admin = req.session;
   const data = await req.json();
 
   try {
     const result = await withTransaction(async (tx) => {
-      const exist = await tx.cusOrder.findFirst({
-        where: { locale: data.locale, slug: data.slug },
-        select: { id: true }
-      });
-
-      if (exist) {
-        throw new TransactionError(400, textT?.errors?.slug);
-      }
-
       // load relations
-      const media = [];
-
-      if (data.thumbnail) {
-        media.push({
-          media_id: data.thumbnail?.media_id,
-          title: data.thumbnail?.title,
-          link: data.thumbnail?.link,
-          type: 'THUMBNAIL' as MediaType,
-          order: 0
-        });
-      }
-
-      if (data.images) {
-        for (const image of data.images) {
-          media.push({
-            media_id: image?.media_id,
-            title: image?.title,
-            link: image?.link,
-            type: 'IMAGE' as MediaType,
-            order: image?.order
-          });
-        }
-      }
-
-      const customValues = data.customValues?.map((cv: any) => ({
-        key: cv.key,
-        value: cv.value,
-        order: cv.order
+      const products = data.products?.map((p: any) => ({
+        tracking: p.tracking,
+        code: p.code,
+        name: p.name,
+        description: p.description,
+        quantity: p.quantity ? parseInt(p.quantity) : 0,
+        price: p.price ? parseFloat(p.price) : 0,
+        service_price: p.service_price ? parseFloat(p.service_price) : 0,
+        url: p.url,
+        image_url: p.image_url
       }));
 
       const order = await tx.cusOrder.create({
         data: {
-          locale: data.locale,
-          slug: data.slug,
-          title: data.title,
-          subtitle: data.subtitle,
-          description: data.description,
-          order: data.order,
-          seo: {
-            create: {
-              title: data.seo_title,
-              description: data.seo_description,
-              media_id: data.seo_media?.id || null,
-              keywords: data.seo_keywords,
-              robots: data.seo_robots
-            }
-          },
-          category: data.category_id ? { connect: { id: Number(data.category_id) } } : undefined,
-          page: data.page_id ? { connect: { id: Number(data.page_id) } } : undefined,
-          media: { create: media },
-          custom_values: { create: customValues }
+          client_id: data.client_id,
+          number: data.number,
+          purchase_page: data.purchase_page,
+          products: { create: products }
         }
       });
 
@@ -151,11 +108,18 @@ export const POST = withAuthApi(['orders.create'], async (req) => {
         throw new TransactionError(400, textT?.errors?.save);
       }
 
+      // save log
+      await tx.cusOrderLog.create({
+        data: {
+          order_id: order.id,
+          administrator_id: admin.id,
+          action: 'order.create',
+          data: JSON.stringify(data)
+        }
+      });
+
       return order;
     });
-
-    // clean cache
-    await cleanCache(['/orders', '/categories', '/pages']);
 
     return NextResponse.json({ valid: true, id: result.id }, { status: 200 });
   } catch (error) {
