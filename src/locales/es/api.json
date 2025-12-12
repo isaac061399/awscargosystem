@@ -180,6 +180,8 @@
   },
   "orders": {
     "errors": {
+      "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo",
+      "productsWithoutTracking": "Existen productos sin número de tracking. Por favor, asegúrate de que todos los productos tengan un número de tracking antes de proceder.",
       "save": "Error al guardar el pedido, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el pedido, por favor inténtalo de nuevo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"

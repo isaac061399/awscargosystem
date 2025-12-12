@@ -253,8 +253,8 @@ const OrdersEdition = ({ order }: { order?: any }) => {
   let orderTotal = 0;
 
   if (isEditing) {
-    paymentStatusChip.label = labelsT?.orderPaymentStatus?.[order.status] || 'Unknown';
-    paymentStatusChip.color = paymentStatusColors[order.status] || 'info';
+    paymentStatusChip.label = labelsT?.orderPaymentStatus?.[order.payment_status] || 'Unknown';
+    paymentStatusChip.color = paymentStatusColors[order.payment_status] || 'info';
 
     statusChip.label = labelsT?.orderStatus?.[order.status] || 'Unknown';
     statusChip.color = statusColors[order.status] || 'info';

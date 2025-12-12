@@ -34,7 +34,7 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
       // update order
       const result = await tx.cusOrder.update({
         where: { id: Number(id) },
-        data: { status: 'ON_THE_WAY', status_date: new Date() }
+        data: { status: 'READY', status_date: new Date() }
       });
 
       if (!result) {
@@ -46,7 +46,7 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
         data: {
           order_id: entry.id,
           administrator_id: admin.id,
-          action: 'order.on_the_way',
+          action: 'order.ready',
           data: JSON.stringify(entry)
         }
       });

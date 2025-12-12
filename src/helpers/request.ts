@@ -1389,7 +1389,7 @@ export const requestChangeStatusOrder = async (
   try {
     const response = await axios.request({
       method: 'put',
-      url: `/api/credits/${id}/${action}`,
+      url: `/api/orders/${id}/${action}`,
       headers: { ...defaultHeaders, 'Accept-Language': lang }
     });
 
