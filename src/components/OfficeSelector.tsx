@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { MenuItem, Select, Skeleton, Typography } from '@mui/material';
 
 import { requestGetOfficesNavbar } from '@/helpers/request';
@@ -17,10 +18,14 @@ const saveCookie = (value: string) => {
 };
 
 export default function OfficeSelector() {
+  const router = useRouter();
+
+  const { t } = useTranslation('common');
+  const textT: any = useMemo(() => t('navbar', { returnObjects: true, default: {} }), [t]);
+
   const [offices, setOffices] = useState<Office[]>([]);
   const [selectedOffice, setSelectedOffice] = useState<string>(officeCookie.defaultValue);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchOffices = async () => {
@@ -65,6 +70,11 @@ export default function OfficeSelector() {
       disableUnderline
       value={selectedOffice}
       onChange={(e) => handleOfficeChange(e.target.value)}>
+      <MenuItem value={0}>
+        <Typography className="text-text-primary flex items-center gap-2">
+          <i className="ri-building-line" style={{ fontSize: '1.3em' }}></i> {textT.allLabel}
+        </Typography>
+      </MenuItem>
       {offices.map((o) => (
         <MenuItem key={`${o.id}`} value={o.id}>
           <Typography className="text-text-primary flex items-center gap-2">

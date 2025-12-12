@@ -4,6 +4,7 @@
     "btnCreate": "Nuevo Pedido",
     "btnContinue": "Continuar",
     "btnCancel": "Cancelar",
+    "btnExport": "Exportar",
     "dialogDeleteTitle": "Confirmar Eliminación",
     "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el pedido \"{{ id }}\"? Esta acción no se puede deshacer.",
     "filterPaymentStatus": "Filtrar por Estado de Pago",

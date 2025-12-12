@@ -5,7 +5,8 @@
   },
   "navbar": {
     "myProfile": "Mi Perfil",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "allLabel": "Todas"
   },
   "sidebar": {
     "menu": [

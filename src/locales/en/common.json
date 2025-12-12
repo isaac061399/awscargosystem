@@ -5,7 +5,8 @@
   },
   "navbar": {
     "myProfile": "My Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "allLabel": "All"
   },
   "sidebar": {
     "menu": [

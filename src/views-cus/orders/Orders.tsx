@@ -44,7 +44,7 @@ import { requestDeleteOrder, requestGetOrders } from '@helpers/request';
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
-import { padStartZeros } from '@/libs/utils';
+import { generateUrl, padStartZeros } from '@/libs/utils';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -150,6 +150,16 @@ const Orders = () => {
     } else {
       handleFetchOrders();
     }
+  };
+
+  const handleExport = async () => {
+    const exportUrl = generateUrl('/api/orders/export', {
+      s: searchState,
+      payment_status: paymentStatusState,
+      status: statusState
+    });
+
+    window.open(exportUrl, '_blank');
   };
 
   // data
@@ -317,24 +327,37 @@ const Orders = () => {
           <Divider />
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <div className="flex gap-2">
-            <FilterSearch
-              value={searchState}
-              onChange={(e) => setSearchState(e.target.value)}
-              onSearch={handleFetchOrders}
-            />
-            <FilterSelect
-              allLabel={textT?.filterPaymentStatus}
-              options={paymentStatusOptions}
-              value={paymentStatusState}
-              onChange={(e) => setPaymentStatusState(e.target.value)}
-            />
-            <FilterSelect
-              allLabel={textT?.filterStatus}
-              options={statusOptions}
-              value={statusState}
-              onChange={(e) => setStatusState(e.target.value)}
-            />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FilterSearch
+                value={searchState}
+                onChange={(e) => setSearchState(e.target.value)}
+                onSearch={handleFetchOrders}
+              />
+              <FilterSelect
+                allLabel={textT?.filterPaymentStatus}
+                options={paymentStatusOptions}
+                value={paymentStatusState}
+                onChange={(e) => setPaymentStatusState(e.target.value)}
+              />
+              <FilterSelect
+                allLabel={textT?.filterStatus}
+                options={statusOptions}
+                value={statusState}
+                onChange={(e) => setStatusState(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                size="small"
+                type="button"
+                variant="contained"
+                color="primary"
+                startIcon={<i className="ri-file-download-line" />}
+                onClick={() => handleExport()}>
+                {textT?.btnExport}
+              </Button>
+            </div>
           </div>
           <Paper>
             <DataGrid

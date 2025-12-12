@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { parse } from 'json2csv';
 import moment from 'moment-timezone';
 
@@ -117,6 +118,8 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
 });
 
 const formatEntries = async (headers: any, labelsT: any, clients: any[]) => {
+  const tz = (await cookies()).get('tz')?.value || 'UTC';
+
   return {
     headers: Object.values(headers) as string[],
     data: clients.map((c) => {
@@ -145,7 +148,7 @@ const formatEntries = async (headers: any, labelsT: any, clients: any[]) => {
         [headers.billing_activity_code]: c.billing_activity_code,
         [headers.pound_fee]: c.pound_fee,
         [headers.status]: labelsT?.clientStatus[c.status],
-        [headers.created_at]: moment.utc(c.created_at).format('YYYY-MM-DD HH:mm:ss')
+        [headers.created_at]: moment(c.created_at).tz(tz).format('YYYY-MM-DD HH:mm:ss')
       };
     })
   };

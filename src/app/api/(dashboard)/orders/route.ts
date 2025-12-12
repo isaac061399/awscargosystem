@@ -15,14 +15,9 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
   try {
     // filters
     const where: any = {};
-    const locale = params.locale || '';
     const search = params.s || '';
     const status = params.status || '';
     const payment_status = params.payment_status || '';
-
-    if (locale !== '') {
-      where.locale = locale;
-    }
 
     if (search !== '') {
       where['OR'] = [

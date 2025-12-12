@@ -185,6 +185,27 @@
       "save": "Error al guardar el pedido, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el pedido, por favor inténtalo de nuevo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
+    },
+    "export": {
+      "id": "ID",
+      "client_box_number": "Número de Casillero del Cliente",
+      "client_full_name": "Nombre del Cliente",
+      "client_identification": "Identificación del Cliente",
+      "client_email": "Correo Electrónico del Cliente",
+      "number": "Número de Pedido",
+      "purchase_page": "Página de Compra",
+      "payment_status": "Estado de Pago",
+      "status": "Estado",
+      "created_at": "Fecha de Registro",
+      "product_tracking": "Tracking del Producto",
+      "product_code": "Código del Producto",
+      "product_name": "Nombre del Producto",
+      "product_description": "Descripción del Producto",
+      "product_quantity": "Cantidad del Producto",
+      "product_price": "Precio del Producto",
+      "product_service_price": "Precio del Servicio del Producto",
+      "product_url": "URL del Producto",
+      "product_image_url": "URL de la Imagen del Producto"
     }
   }
 }
