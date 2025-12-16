@@ -18,7 +18,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const InfoTab = dynamic(() => import('./Info'));
-const PackagesTab = dynamic(() => import('./Packages'));
+// const PackagesTab = dynamic(() => import('./Packages'));
 
 const tabContentList = (
   poundFee: number,
@@ -26,8 +26,8 @@ const tabContentList = (
   offices: any[],
   client?: any
 ): { [key: string]: ReactElement } => ({
-  info: <InfoTab poundFee={poundFee} provinces={provinces} offices={offices} client={client} />,
-  packages: <PackagesTab client={client} />
+  info: <InfoTab poundFee={poundFee} provinces={provinces} offices={offices} client={client} />
+  // packages: <PackagesTab client={client} />
 });
 
 const ClientsEdition = ({
