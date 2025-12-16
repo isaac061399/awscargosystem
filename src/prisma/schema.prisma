@@ -496,6 +496,7 @@ model CusClient {
   identification              String
   email                       String
   phone                       String?
+  notes                       String?
   district_id                 Int?
   address                     String?            @db.Text
   password                    String?

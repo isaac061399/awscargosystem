@@ -22,6 +22,7 @@
           "identification": "Identificación",
           "email": "Correo electrónico",
           "phone": "Teléfono",
+          "notes": "Notas",
 
           "province_id": "Provincia",
           "canton_id": "Cantón",
@@ -51,6 +52,7 @@
           "identification": "Ingrese la identificación",
           "email": "Ingrese el correo electrónico",
           "phone": "Ingrese el teléfono",
+          "notes": "Ingrese sus notas",
 
           "province_id": "Seleccione una opción",
           "canton_id": "Seleccione una opción",
@@ -80,6 +82,7 @@
           "identification": "La identificación es requerida",
           "email": "El correo electrónico es requerido",
           "phone": "El teléfono es requerido",
+          "notes": "Las notas son requeridas",
 
           "province_id": "La provincia es requerida",
           "canton_id": "El cantón es requerido",

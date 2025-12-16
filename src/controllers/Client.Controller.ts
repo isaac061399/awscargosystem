@@ -14,6 +14,7 @@ export const getClient = async (id: number) => {
         identification: true,
         email: true,
         phone: true,
+        notes: true,
         address: true,
         billing_full_name: true,
         billing_identification_type: true,

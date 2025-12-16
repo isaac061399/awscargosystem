@@ -118,7 +118,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
             <Card>
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
-                <Divider textAlign="left" sx={{ mb: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                   <Typography variant="h5">{textT?.generalTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
@@ -192,7 +192,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                 </Grid>
               </CardContent>
               <CardContent>
-                <Divider textAlign="left" sx={{ mb: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                   <Typography variant="h5">{textT?.addressTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>

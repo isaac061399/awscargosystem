@@ -77,6 +77,7 @@ const Info = ({
         identification: client ? client.identification : '',
         email: client ? client.email : '',
         phone: client ? client.phone : '',
+        notes: client ? client.notes : '',
 
         province_id: client ? client.district?.canton?.province?.id : '',
         canton_id: client ? client.district?.canton?.id : '',
@@ -111,6 +112,7 @@ const Info = ({
         .test('validPhone', formT?.errors?.phone, (value) => {
           return getTelInputValue(value) !== '';
         }),
+      notes: yup.string(),
 
       billing_full_name: useSameBilling ? yup.string() : yup.string().required(formT?.errors?.billing_full_name),
       billing_identification_type: useSameBilling
@@ -145,6 +147,7 @@ const Info = ({
           identification: values.identification,
           email: values.email,
           phone: getTelInputValue(values.phone),
+          notes: values.notes,
           district_id: values.district_id,
           address: values.address,
 
@@ -238,7 +241,7 @@ const Info = ({
         )}
 
         {/* Personal data */}
-        <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+        <Divider textAlign="left" sx={{ my: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
           <Typography variant="h6">{textT?.personalDataLabel}</Typography>
         </Divider>
         <Grid container spacing={5}>
@@ -394,10 +397,28 @@ const Info = ({
               disabled={formik.isSubmitting || isRedirecting}
             />
           </Grid>
+          <Grid size={{ xs: 12, md: 12 }}>
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              type="text"
+              id="notes"
+              name="notes"
+              label={formT?.labels?.notes}
+              placeholder={formT?.placeholders?.notes}
+              value={formik.values.notes}
+              onChange={formik.handleChange}
+              error={Boolean(formik.touched.notes && formik.errors.notes)}
+              color={Boolean(formik.touched.notes && formik.errors.notes) ? 'error' : 'primary'}
+              helperText={formik.touched.notes && (formik.errors.notes as string)}
+              disabled={formik.isSubmitting || isRedirecting}
+            />
+          </Grid>
         </Grid>
 
         {/* Address data */}
-        <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+        <Divider textAlign="left" sx={{ my: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
           <Typography variant="h6">{textT?.addressLabel}</Typography>
         </Divider>
         <Grid container spacing={5}>
@@ -493,7 +514,7 @@ const Info = ({
         </Grid>
 
         {/* Billing data */}
-        <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+        <Divider textAlign="left" sx={{ my: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
           <Typography variant="h6">{textT?.billingLabel}</Typography>
         </Divider>
         <Grid container spacing={5}>
