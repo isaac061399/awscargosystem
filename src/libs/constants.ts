@@ -31,7 +31,7 @@ export const boxNumberPrefix = 'AWS-';
 
 export const defaultActivityCode = '00';
 
-export const officeCookie = { name: 'office', maxAge: 60 * 60 * 24 * 365, defaultValue: '1' };
+export const officeCookie = { name: 'office', maxAge: 60 * 60 * 24 * 365 };
 
 export const additionalExchangeRate = 6;
 

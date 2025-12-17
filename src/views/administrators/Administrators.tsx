@@ -161,6 +161,13 @@ const Administrators = () => {
       renderCell: (params: any) => `${params.row.role?.name}`
     },
     {
+      field: 'office',
+      headerName: textT?.table?.office?.title,
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params: any) => (params.row.office ? `${params.row.office?.name}` : 'N/A')
+    },
+    {
       field: 'status',
       headerName: textT?.table?.status?.title,
       flex: 1,

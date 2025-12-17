@@ -16,6 +16,9 @@
       "role": {
         "title": "Role"
       },
+      "office": {
+        "title": "Office"
+      },
       "status": {
         "title": "Status",
         "values": {

@@ -37,7 +37,8 @@ export const GET = withAuthApi(['administrators.list'], async (req) => {
         full_name: true,
         email: true,
         role: { select: { id: true, name: true } },
-        user: { select: { email: true, enabled: true } }
+        user: { select: { email: true, enabled: true } },
+        office: { select: { id: true, name: true } }
       }
     });
 
@@ -97,7 +98,8 @@ export const POST = withAuthApi(['administrators.create'], async (req) => {
                 enabled: true
               }
             }
-          }
+          },
+          office: data.office_id ? { connect: { id: Number(data.office_id) } } : undefined
         },
         include: { user: true }
       });

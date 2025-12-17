@@ -13,6 +13,7 @@
       "last_name": "Last name",
       "email": "Email",
       "role": "Role",
+      "office": "Assigned office",
       "password": "Password",
       "confirmPassword": "Confirm password",
       "enabled": "Enabled"
@@ -22,6 +23,7 @@
       "last_name": "Enter the last name",
       "email": "email@example.com",
       "role": "Select",
+      "office": "Select",
       "password": "Enter a password",
       "confirmPassword": "Confirm password",
       "enabled": ""
@@ -32,6 +34,7 @@
       "email": "Email required",
       "invalidEmail": "Invalid Email",
       "role": "Role is required",
+      "office": "Office is required",
       "password": "Password required",
       "confirmPassword": "Password required",
       "confirmPasswordMatch": "Passwords must match",

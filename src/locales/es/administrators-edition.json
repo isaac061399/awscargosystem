@@ -13,6 +13,7 @@
       "last_name": "Apellidos",
       "email": "Correo electrónico",
       "role": "Rol",
+      "office": "Oficina asignada",
       "password": "Contraseña",
       "confirmPassword": "Confirmar contraseña",
       "enabled": "Habilitado"
@@ -22,6 +23,7 @@
       "last_name": "Ingrese los apellidos",
       "email": "correo@ejemplo.com",
       "role": "Seleccionar",
+      "office": "Seleccionar",
       "password": "Ingrese una contraseña",
       "confirmPassword": "Confirme la contraseña",
       "enabled": ""
@@ -32,6 +34,7 @@
       "email": "El correo electrónico es requerido",
       "invalidEmail": "Correo electrónico inválido",
       "role": "El rol es requerido",
+      "office": "La oficina es requerida",
       "password": "La contraseña es obligatoria",
       "confirmPassword": "La contraseña es obligatoria",
       "confirmPasswordMatch": "Las contraseñas deben coincidir",

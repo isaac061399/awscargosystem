@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 // Controller Imports
 import { getAllRoles } from '@controllers/Role.Controller';
+import { getAllOffices } from '@/controllers/Office.Controller';
 import { getAdmin } from '@controllers/Administrator.Controller';
 
 // Components Imports
@@ -17,6 +18,7 @@ const AdministratorsNewPage = withAuthPage(
   ['administrators.edit'],
   async ({ params }: { params: Promise<{ locale: string; id: string }> }) => {
     const roles = await getAllRoles();
+    const offices = await getAllOffices();
 
     const { id } = await params;
     const admin = await getAdmin(Number(id));
@@ -27,7 +29,7 @@ const AdministratorsNewPage = withAuthPage(
 
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <AdministratorsEdition roles={roles} admin={admin} />
+        <AdministratorsEdition roles={roles} offices={offices} admin={admin} />
       </TranslationsProvider>
     );
   }

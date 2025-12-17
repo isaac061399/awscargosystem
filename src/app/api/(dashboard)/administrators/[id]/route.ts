@@ -41,7 +41,8 @@ export const PUT = withAuthApi(
                   enabled: data.enabled
                 }
               }
-            }
+            },
+            office: data.office_id ? { connect: { id: Number(data.office_id) } } : { disconnect: true }
           }
         });
 

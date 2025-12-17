@@ -8,6 +8,8 @@ import { MenuItem, Select, Skeleton, Typography } from '@mui/material';
 import { requestGetOfficesNavbar } from '@/helpers/request';
 import { officeCookie } from '@/libs/constants';
 
+import { useAdmin } from './AdminProvider';
+
 interface Office {
   id: string;
   name: string;
@@ -19,12 +21,15 @@ const saveCookie = (value: string) => {
 
 export default function OfficeSelector() {
   const router = useRouter();
+  const { data: admin } = useAdmin();
 
   const { t } = useTranslation('common');
   const textT: any = useMemo(() => t('navbar', { returnObjects: true, default: {} }), [t]);
 
+  const defaultOfficeId = admin?.office ? String(admin.office.id) : '0';
+
   const [offices, setOffices] = useState<Office[]>([]);
-  const [selectedOffice, setSelectedOffice] = useState<string>(officeCookie.defaultValue);
+  const [selectedOffice, setSelectedOffice] = useState<string>(defaultOfficeId);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +48,7 @@ export default function OfficeSelector() {
         if (savedOffice) {
           setSelectedOffice(savedOffice);
         } else {
-          saveCookie(officeCookie.defaultValue);
+          saveCookie(defaultOfficeId);
         }
       } catch (error) {
         console.error('Failed to fetch offices:', error);
@@ -53,7 +58,7 @@ export default function OfficeSelector() {
     };
 
     fetchOffices();
-  }, []);
+  }, [defaultOfficeId]);
 
   const handleOfficeChange = (officeId: string) => {
     setSelectedOffice(officeId);

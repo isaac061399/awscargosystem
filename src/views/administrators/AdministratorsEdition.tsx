@@ -38,7 +38,15 @@ import { requestEditAdministrator, requestNewAdministrator } from '@helpers/requ
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: string }[]; admin?: any }) => {
+const AdministratorsEdition = ({
+  roles,
+  offices,
+  admin
+}: {
+  roles: { id: number; name: string }[];
+  offices: { id: number; name: string }[];
+  admin?: any;
+}) => {
   const router = useRouter();
 
   const { t, i18n } = useTranslation();
@@ -66,7 +74,8 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
         first_name: admin ? `${admin.first_name}` : '',
         last_name: admin ? `${admin.last_name}` : '',
         email: admin ? `${admin.email}` : '',
-        role: admin ? `${admin.role?.id}` : '',
+        role: admin && admin.role ? `${admin.role?.id}` : '',
+        office: admin && admin.office ? `${admin.office?.id}` : '0',
         password: '',
         confirmPassword: '',
         enabled: admin ? Boolean(admin.user?.enabled) : true
@@ -78,6 +87,7 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
       last_name: yup.string().required(formT?.errors?.last_name),
       email: yup.string().required(formT?.errors?.email).email(formT?.errors?.invalidEmail),
       role: yup.number().required(formT?.errors?.role),
+      office: yup.number(),
       password: passwordValidation,
       confirmPassword: confirmPasswordValidation
     }),
@@ -90,6 +100,7 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
           last_name: values.last_name,
           email: values.email,
           role_id: values.role,
+          office_id: values.office !== '0' ? values.office : undefined,
           password: values.password,
           enabled: values.enabled
         };
@@ -154,7 +165,7 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
                 <Grid container spacing={5}>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <TextField
                       fullWidth
                       required
@@ -171,7 +182,7 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <TextField
                       fullWidth
                       required
@@ -188,7 +199,7 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     {admin ? (
                       <TextField
                         fullWidth
@@ -231,6 +242,23 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
                       error={Boolean(formik.touched.role && formik.errors.role)}
                       color={Boolean(formik.touched.role && formik.errors.role) ? 'error' : 'primary'}
                       helperText={formik.touched.role && formik.errors.role}
+                      disabled={formik.isSubmitting || isRedirecting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Select
+                      options={[{ value: 0, label: 'N/A' }].concat(
+                        offices.map((o) => ({ value: o.id, label: o.name }))
+                      )}
+                      fullWidth
+                      id="office"
+                      name="office"
+                      label={formT?.labels?.office}
+                      value={formik.values.office}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.office && formik.errors.office)}
+                      color={Boolean(formik.touched.office && formik.errors.office) ? 'error' : 'primary'}
+                      helperText={formik.touched.office && formik.errors.office}
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>

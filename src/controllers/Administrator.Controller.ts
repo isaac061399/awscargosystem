@@ -1,7 +1,4 @@
-import { cookies } from 'next/headers';
-
 import { prismaRead } from '@libs/prisma';
-import { officeCookie } from '@/libs/constants';
 
 export const getAdminSessionData = async (email?: string | null) => {
   if (!email) return;
@@ -17,13 +14,12 @@ export const getAdminSessionData = async (email?: string | null) => {
         email: true,
         enabled_2fa: true,
         role: { select: { name: true, permissions: { select: { permission_id: true } } } },
-        user: { select: { email: true, enabled: true } }
+        user: { select: { email: true, enabled: true } },
+        office: { select: { id: true, name: true } }
       }
     });
 
     if (!admin) return;
-
-    const officeId = (await cookies()).get(officeCookie.name)?.value || officeCookie.defaultValue;
 
     return {
       id: admin.id,
@@ -35,7 +31,7 @@ export const getAdminSessionData = async (email?: string | null) => {
       enabled: admin.user.enabled,
       enabled_2fa: admin.enabled_2fa,
       permissions: admin.role.permissions.map((p) => p.permission_id),
-      office_id: parseInt(officeId.toString())
+      office: admin.office
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
@@ -59,6 +55,9 @@ export const getAdmin = async (id: number) => {
         },
         user: {
           select: { email: true, enabled: true }
+        },
+        office: {
+          select: { id: true, name: true }
         }
       }
     });
