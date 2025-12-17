@@ -45,9 +45,11 @@ model Administrator {
   secret_2fa  String?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  office_id   Int?
 
   user               User                 @relation(fields: [email], references: [email], onDelete: Restrict)
   role               Role                 @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  office             CusOffice?           @relation(fields: [office_id], references: [id], onDelete: Restrict)
   money_outflows     CusMoneyOutflow[]
   money_outflow_logs CusMoneyOutflowLog[]
   package_logs       CusPackageLog[]
@@ -523,18 +525,26 @@ model CusClient {
 }
 
 model CusConfiguration {
-  id                       Int      @id @default(autoincrement())
-  pound_fee                Float    @default(0)
-  additional_exchange_rate Float    @default(0)
-  iva_percentage           Float    @default(0)
-  address_line_1           String?
-  address_line_2           String?
-  address_city             String?
-  address_state            String?
-  address_postal_code      String?
-  address_phone            String?
-  created_at               DateTime @default(now())
-  updated_at               DateTime @updatedAt
+  id                           Int      @id @default(autoincrement())
+  pound_fee                    Float    @default(0)
+  iva_percentage               Float    @default(0)
+  selling_exchange_rate        Float    @default(0)
+  buying_exchange_rate         Float    @default(0)
+  updated_exchange_rate        DateTime @default(now())
+  air_address_line_1           String?
+  air_address_line_2           String?
+  air_address_city             String?
+  air_address_state            String?
+  air_address_postal_code      String?
+  air_address_phone            String?
+  maritime_address_line_1      String?
+  maritime_address_line_2      String?
+  maritime_address_city        String?
+  maritime_address_state       String?
+  maritime_address_postal_code String?
+  maritime_address_phone       String?
+  created_at                   DateTime @default(now())
+  updated_at                   DateTime @updatedAt
 
   @@map("cus_configuration")
 }
@@ -610,7 +620,8 @@ model CusOffice {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  clients CusClient[]
+  clients        CusClient[]
+  administrators Administrator[]
 
   @@map("cus_office")
 }

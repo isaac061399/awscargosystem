@@ -2,43 +2,73 @@
   "text": {
     "title": "Configuración",
     "generalTitle": "Configuración General",
-    "addressTitle": "Configuración de Dirección",
+    "airAddressTitle": "Configuración de Dirección Aerea",
+    "maritimeAddressTitle": "Configuración de Dirección Marítima",
+    "lastExchangeRateUpdate": "Última actualización automática del tipo de cambio",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
     "btnSave": "Guardar"
   },
   "form": {
     "labels": {
       "pound_fee": "Tarifa por libra",
-      "additional_exchange_rate": "Tasa de cambio adicional",
       "iva_percentage": "Porcentaje de IVA",
-      "address_line_1": "Línea 1",
-      "address_line_2": "Línea 2",
-      "address_city": "Ciudad",
-      "address_state": "Estado",
-      "address_postal_code": "Código Postal",
-      "address_phone": "Teléfono"
+      "selling_exchange_rate": "Tipo de cambio de venta (cobros)",
+      "buying_exchange_rate": "Tipo de cambio de compra (vueltos)",
+
+      "air_address_line_1": "Línea 1",
+      "air_address_line_2": "Línea 2",
+      "air_address_city": "Ciudad",
+      "air_address_state": "Estado",
+      "air_address_postal_code": "Código Postal",
+      "air_address_phone": "Teléfono",
+
+      "maritime_address_line_1": "Línea 1",
+      "maritime_address_line_2": "Línea 2",
+      "maritime_address_city": "Ciudad",
+      "maritime_address_state": "Estado",
+      "maritime_address_postal_code": "Código Postal",
+      "maritime_address_phone": "Teléfono"
     },
     "placeholders": {
       "pound_fee": "Ingrese un valor en dólares",
-      "additional_exchange_rate": "Ingrese un valor en colones",
       "iva_percentage": "Ingrese un porcentaje",
-      "address_line_1": "Ingrese un valor",
-      "address_line_2": "Ingrese un valor",
-      "address_city": "Ingrese un valor",
-      "address_state": "Ingrese un valor",
-      "address_postal_code": "Ingrese un valor",
-      "address_phone": "Ingrese un valor"
+      "selling_exchange_rate": "Ingrese un valor en colones",
+      "buying_exchange_rate": "Ingrese un valor en colones",
+
+      "air_address_line_1": "Ingrese un valor",
+      "air_address_line_2": "Ingrese un valor",
+      "air_address_city": "Ingrese un valor",
+      "air_address_state": "Ingrese un valor",
+      "air_address_postal_code": "Ingrese un valor",
+      "air_address_phone": "Ingrese un valor",
+
+      "maritime_address_line_1": "Ingrese un valor",
+      "maritime_address_line_2": "Ingrese un valor",
+      "maritime_address_city": "Ingrese un valor",
+      "maritime_address_state": "Ingrese un valor",
+      "maritime_address_postal_code": "Ingrese un valor",
+      "maritime_address_phone": "Ingrese un valor"
     },
     "errors": {
       "invalidType": "Tipo inválido",
       "pound_fee": "Campo requerido",
-      "additional_exchange_rate": "Campo requerido",
       "iva_percentage": "Campo requerido",
-      "address_line_1": "Campo requerido",
-      "address_line_2": "Campo requerido",
-      "address_city": "Campo requerido",
-      "address_state": "Campo requerido",
-      "address_postal_code": "Campo requerido",
-      "address_phone": "Campo requerido"
+      "selling_exchange_rate": "Campo requerido",
+      "buying_exchange_rate": "Campo requerido",
+
+      "air_address_line_1": "Campo requerido",
+      "air_address_line_2": "Campo requerido",
+      "air_address_city": "Campo requerido",
+      "air_address_state": "Campo requerido",
+      "air_address_postal_code": "Campo requerido",
+      "air_address_phone": "Campo requerido",
+
+      "maritime_address_line_1": "Campo requerido",
+      "maritime_address_line_2": "Campo requerido",
+      "maritime_address_city": "Campo requerido",
+      "maritime_address_state": "Campo requerido",
+      "maritime_address_postal_code": "Campo requerido",
+      "maritime_address_phone": "Campo requerido"
     },
     "successMessage": "Configuración guardada con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"

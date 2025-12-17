@@ -23,9 +23,9 @@ const siteConfig: Config = {
   authorUrl: 'https://pangea.cr',
   siteName: `AWS Cargo & Courier`,
   siteLogo: '/logos/logo.svg',
-  siteFromEmail: 'AWS Cargo & Courier <noreply@pangea.cr>',
+  siteFromEmail: 'AWS Cargo & Courier <no-reply@awscargo.com>',
   appName: 'AWS Cargo & Courier',
-  appFromEmail: 'AWS Cargo & Courier <noreply@pangea.cr>',
+  appFromEmail: 'AWS Cargo & Courier <no-reply@awscargo.com>',
   settingsCookieName: 'awscargo-system-settings',
   mode: 'light', // 'light', 'dark'
   layoutPadding: 24, // Common padding for header, content, footer layout components (in px)

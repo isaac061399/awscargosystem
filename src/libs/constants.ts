@@ -25,11 +25,15 @@ export const Currencies: Record<string, { symbol: string; name: string }> = {
   CRC: { symbol: '₡', name: 'CRC' }
 };
 
+export const defaultConfigId = 1;
+
 export const boxNumberPrefix = 'AWS-';
 
 export const defaultActivityCode = '00';
 
 export const officeCookie = { name: 'office', maxAge: 60 * 60 * 24 * 365, defaultValue: '1' };
+
+export const additionalExchangeRate = 6;
 
 // App Constants
 

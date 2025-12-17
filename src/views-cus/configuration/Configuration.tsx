@@ -11,7 +11,22 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 // MUI Imports
-import { Alert, Button, Card, CardContent, CardHeader, Divider, Grid, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  Divider,
+  Grid,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material';
+
+import moment from 'moment';
 
 // Component Imports
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -44,27 +59,45 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
     initialValues: useMemo(
       () => ({
         pound_fee: configuration ? configuration.pound_fee : 0,
-        additional_exchange_rate: configuration ? configuration.additional_exchange_rate : 0,
         iva_percentage: configuration ? configuration.iva_percentage : 0,
-        address_line_1: configuration ? configuration.address_line_1 : '',
-        address_line_2: configuration ? configuration.address_line_2 : '',
-        address_city: configuration ? configuration.address_city : '',
-        address_state: configuration ? configuration.address_state : '',
-        address_postal_code: configuration ? configuration.address_postal_code : '',
-        address_phone: configuration ? configuration.address_phone : ''
+        selling_exchange_rate: configuration ? configuration.selling_exchange_rate : 0,
+        buying_exchange_rate: configuration ? configuration.buying_exchange_rate : 0,
+
+        air_address_line_1: configuration ? configuration.air_address_line_1 : '',
+        air_address_line_2: configuration ? configuration.air_address_line_2 : '',
+        air_address_city: configuration ? configuration.air_address_city : '',
+        air_address_state: configuration ? configuration.air_address_state : '',
+        air_address_postal_code: configuration ? configuration.air_address_postal_code : '',
+        air_address_phone: configuration ? configuration.air_address_phone : '',
+
+        maritime_address_line_1: configuration ? configuration.maritime_address_line_1 : '',
+        maritime_address_line_2: configuration ? configuration.maritime_address_line_2 : '',
+        maritime_address_city: configuration ? configuration.maritime_address_city : '',
+        maritime_address_state: configuration ? configuration.maritime_address_state : '',
+        maritime_address_postal_code: configuration ? configuration.maritime_address_postal_code : '',
+        maritime_address_phone: configuration ? configuration.maritime_address_phone : ''
       }),
       [configuration]
     ),
     validationSchema: yup.object({
       pound_fee: yup.number().required(formT?.errors?.pound_fee),
-      additional_exchange_rate: yup.number().required(formT?.errors?.additional_exchange_rate),
       iva_percentage: yup.number().required(formT?.errors?.iva_percentage),
-      address_line_1: yup.string().required(formT?.errors?.address_line_1),
-      address_line_2: yup.string().required(formT?.errors?.address_line_2),
-      address_city: yup.string().required(formT?.errors?.address_city),
-      address_state: yup.string().required(formT?.errors?.address_state),
-      address_postal_code: yup.string().required(formT?.errors?.address_postal_code),
-      address_phone: yup.string().required(formT?.errors?.address_phone)
+      selling_exchange_rate: yup.number().required(formT?.errors?.selling_exchange_rate),
+      buying_exchange_rate: yup.number().required(formT?.errors?.buying_exchange_rate),
+
+      air_address_line_1: yup.string().required(formT?.errors?.air_address_line_1),
+      air_address_line_2: yup.string().required(formT?.errors?.air_address_line_2),
+      air_address_city: yup.string().required(formT?.errors?.air_address_city),
+      air_address_state: yup.string().required(formT?.errors?.air_address_state),
+      air_address_postal_code: yup.string().required(formT?.errors?.air_address_postal_code),
+      air_address_phone: yup.string().required(formT?.errors?.air_address_phone),
+
+      maritime_address_line_1: yup.string().required(formT?.errors?.maritime_address_line_1),
+      maritime_address_line_2: yup.string().required(formT?.errors?.maritime_address_line_2),
+      maritime_address_city: yup.string().required(formT?.errors?.maritime_address_city),
+      maritime_address_state: yup.string().required(formT?.errors?.maritime_address_state),
+      maritime_address_postal_code: yup.string().required(formT?.errors?.maritime_address_postal_code),
+      maritime_address_phone: yup.string().required(formT?.errors?.maritime_address_phone)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
@@ -88,6 +121,8 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
       }
     }
   });
+
+  const lastExchangeRateUpdate = moment(configuration?.updated_exchange_rate).format(textT?.dateFormat);
 
   return (
     <DashboardLayout>
@@ -115,6 +150,27 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
             <Divider />
           </Grid>
           <Grid size={{ xs: 12 }}>
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ mb: 2 }}>
+              <i className="ri-history-fill text-lg" />
+
+              <Typography variant="body2" color="text.secondary">
+                {textT?.lastExchangeRateUpdate}:
+              </Typography>
+
+              <Tooltip title={textT?.lastExchangeRateUpdate} arrow>
+                <Chip
+                  size="small"
+                  label={lastExchangeRateUpdate}
+                  sx={{
+                    fontWeight: 600,
+                    letterSpacing: 0.2,
+                    borderRadius: 999,
+                    bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(144,202,249,0.12)' : 'rgba(25,118,210,0.10)')
+                  }}
+                />
+              </Tooltip>
+            </Stack>
+
             <Card>
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
@@ -122,7 +178,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                   <Typography variant="h5">{textT?.generalTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <MoneyField
                       fullWidth
                       required
@@ -143,34 +199,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       disabled={formik.isSubmitting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <MoneyField
-                      fullWidth
-                      required
-                      type="text"
-                      decimalScale={2}
-                      decimalSeparator="."
-                      thousandSeparator=","
-                      prefix={`${Currencies.CRC.symbol} `}
-                      id="additional_exchange_rate"
-                      name="additional_exchange_rate"
-                      label={formT?.labels?.additional_exchange_rate}
-                      placeholder={formT?.placeholders?.additional_exchange_rate}
-                      value={formik.values.additional_exchange_rate}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.additional_exchange_rate && formik.errors.additional_exchange_rate)}
-                      color={
-                        Boolean(formik.touched.additional_exchange_rate && formik.errors.additional_exchange_rate)
-                          ? 'error'
-                          : 'primary'
-                      }
-                      helperText={
-                        formik.touched.additional_exchange_rate && (formik.errors.additional_exchange_rate as string)
-                      }
-                      disabled={formik.isSubmitting}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       fullWidth
                       required
@@ -189,11 +218,63 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       disabled={formik.isSubmitting}
                     />
                   </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <MoneyField
+                      fullWidth
+                      required
+                      type="text"
+                      decimalScale={2}
+                      decimalSeparator="."
+                      thousandSeparator=","
+                      prefix={`${Currencies.CRC.symbol} `}
+                      id="selling_exchange_rate"
+                      name="selling_exchange_rate"
+                      label={formT?.labels?.selling_exchange_rate}
+                      placeholder={formT?.placeholders?.selling_exchange_rate}
+                      value={formik.values.selling_exchange_rate}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.selling_exchange_rate && formik.errors.selling_exchange_rate)}
+                      color={
+                        Boolean(formik.touched.selling_exchange_rate && formik.errors.selling_exchange_rate)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.selling_exchange_rate && (formik.errors.selling_exchange_rate as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <MoneyField
+                      fullWidth
+                      required
+                      type="text"
+                      decimalScale={2}
+                      decimalSeparator="."
+                      thousandSeparator=","
+                      prefix={`${Currencies.CRC.symbol} `}
+                      id="buying_exchange_rate"
+                      name="buying_exchange_rate"
+                      label={formT?.labels?.buying_exchange_rate}
+                      placeholder={formT?.placeholders?.buying_exchange_rate}
+                      value={formik.values.buying_exchange_rate}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.buying_exchange_rate && formik.errors.buying_exchange_rate)}
+                      color={
+                        Boolean(formik.touched.buying_exchange_rate && formik.errors.buying_exchange_rate)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={formik.touched.buying_exchange_rate && (formik.errors.buying_exchange_rate as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
                 </Grid>
               </CardContent>
               <CardContent>
                 <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
-                  <Typography variant="h5">{textT?.addressTitle}</Typography>
+                  <Typography variant="h5">{textT?.airAddressTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 4 }}>
@@ -201,91 +282,19 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       fullWidth
                       required
                       type="text"
-                      id="address_line_1"
-                      name="address_line_1"
-                      label={formT?.labels?.address_line_1}
-                      placeholder={formT?.placeholders?.address_line_1}
-                      value={formik.values.address_line_1}
+                      id="air_address_line_1"
+                      name="air_address_line_1"
+                      label={formT?.labels?.air_address_line_1}
+                      placeholder={formT?.placeholders?.air_address_line_1}
+                      value={formik.values.air_address_line_1}
                       onChange={formik.handleChange}
-                      error={Boolean(formik.touched.address_line_1 && formik.errors.address_line_1)}
+                      error={Boolean(formik.touched.air_address_line_1 && formik.errors.air_address_line_1)}
                       color={
-                        Boolean(formik.touched.address_line_1 && formik.errors.address_line_1) ? 'error' : 'primary'
-                      }
-                      helperText={formik.touched.address_line_1 && (formik.errors.address_line_1 as string)}
-                      disabled={formik.isSubmitting}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      id="address_line_2"
-                      name="address_line_2"
-                      label={formT?.labels?.address_line_2}
-                      placeholder={formT?.placeholders?.address_line_2}
-                      value={formik.values.address_line_2}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.address_line_2 && formik.errors.address_line_2)}
-                      color={
-                        Boolean(formik.touched.address_line_2 && formik.errors.address_line_2) ? 'error' : 'primary'
-                      }
-                      helperText={formik.touched.address_line_2 && (formik.errors.address_line_2 as string)}
-                      disabled={formik.isSubmitting}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      id="address_city"
-                      name="address_city"
-                      label={formT?.labels?.address_city}
-                      placeholder={formT?.placeholders?.address_city}
-                      value={formik.values.address_city}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.address_city && formik.errors.address_city)}
-                      color={Boolean(formik.touched.address_city && formik.errors.address_city) ? 'error' : 'primary'}
-                      helperText={formik.touched.address_city && (formik.errors.address_city as string)}
-                      disabled={formik.isSubmitting}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      id="address_state"
-                      name="address_state"
-                      label={formT?.labels?.address_state}
-                      placeholder={formT?.placeholders?.address_state}
-                      value={formik.values.address_state}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.address_state && formik.errors.address_state)}
-                      color={Boolean(formik.touched.address_state && formik.errors.address_state) ? 'error' : 'primary'}
-                      helperText={formik.touched.address_state && (formik.errors.address_state as string)}
-                      disabled={formik.isSubmitting}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      id="address_postal_code"
-                      name="address_postal_code"
-                      label={formT?.labels?.address_postal_code}
-                      placeholder={formT?.placeholders?.address_postal_code}
-                      value={formik.values.address_postal_code}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.address_postal_code && formik.errors.address_postal_code)}
-                      color={
-                        Boolean(formik.touched.address_postal_code && formik.errors.address_postal_code)
+                        Boolean(formik.touched.air_address_line_1 && formik.errors.air_address_line_1)
                           ? 'error'
                           : 'primary'
                       }
-                      helperText={formik.touched.address_postal_code && (formik.errors.address_postal_code as string)}
+                      helperText={formik.touched.air_address_line_1 && (formik.errors.air_address_line_1 as string)}
                       disabled={formik.isSubmitting}
                     />
                   </Grid>
@@ -294,15 +303,253 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       fullWidth
                       required
                       type="text"
-                      id="address_phone"
-                      name="address_phone"
-                      label={formT?.labels?.address_phone}
-                      placeholder={formT?.placeholders?.address_phone}
-                      value={formik.values.address_phone}
+                      id="air_address_line_2"
+                      name="air_address_line_2"
+                      label={formT?.labels?.air_address_line_2}
+                      placeholder={formT?.placeholders?.air_address_line_2}
+                      value={formik.values.air_address_line_2}
                       onChange={formik.handleChange}
-                      error={Boolean(formik.touched.address_phone && formik.errors.address_phone)}
-                      color={Boolean(formik.touched.address_phone && formik.errors.address_phone) ? 'error' : 'primary'}
-                      helperText={formik.touched.address_phone && (formik.errors.address_phone as string)}
+                      error={Boolean(formik.touched.air_address_line_2 && formik.errors.air_address_line_2)}
+                      color={
+                        Boolean(formik.touched.air_address_line_2 && formik.errors.air_address_line_2)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={formik.touched.air_address_line_2 && (formik.errors.air_address_line_2 as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="air_address_city"
+                      name="air_address_city"
+                      label={formT?.labels?.air_address_city}
+                      placeholder={formT?.placeholders?.air_address_city}
+                      value={formik.values.air_address_city}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.air_address_city && formik.errors.air_address_city)}
+                      color={
+                        Boolean(formik.touched.air_address_city && formik.errors.air_address_city) ? 'error' : 'primary'
+                      }
+                      helperText={formik.touched.air_address_city && (formik.errors.air_address_city as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="air_address_state"
+                      name="air_address_state"
+                      label={formT?.labels?.air_address_state}
+                      placeholder={formT?.placeholders?.air_address_state}
+                      value={formik.values.air_address_state}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.air_address_state && formik.errors.air_address_state)}
+                      color={
+                        Boolean(formik.touched.air_address_state && formik.errors.air_address_state)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={formik.touched.air_address_state && (formik.errors.air_address_state as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="air_address_postal_code"
+                      name="air_address_postal_code"
+                      label={formT?.labels?.air_address_postal_code}
+                      placeholder={formT?.placeholders?.air_address_postal_code}
+                      value={formik.values.air_address_postal_code}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.air_address_postal_code && formik.errors.air_address_postal_code)}
+                      color={
+                        Boolean(formik.touched.air_address_postal_code && formik.errors.air_address_postal_code)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.air_address_postal_code && (formik.errors.air_address_postal_code as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="air_address_phone"
+                      name="air_address_phone"
+                      label={formT?.labels?.air_address_phone}
+                      placeholder={formT?.placeholders?.air_address_phone}
+                      value={formik.values.air_address_phone}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.air_address_phone && formik.errors.air_address_phone)}
+                      color={
+                        Boolean(formik.touched.air_address_phone && formik.errors.air_address_phone)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={formik.touched.air_address_phone && (formik.errors.air_address_phone as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+              <CardContent>
+                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h5">{textT?.maritimeAddressTitle}</Typography>
+                </Divider>
+                <Grid container spacing={5}>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="maritime_address_line_1"
+                      name="maritime_address_line_1"
+                      label={formT?.labels?.maritime_address_line_1}
+                      placeholder={formT?.placeholders?.maritime_address_line_1}
+                      value={formik.values.maritime_address_line_1}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.maritime_address_line_1 && formik.errors.maritime_address_line_1)}
+                      color={
+                        Boolean(formik.touched.maritime_address_line_1 && formik.errors.maritime_address_line_1)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.maritime_address_line_1 && (formik.errors.maritime_address_line_1 as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="maritime_address_line_2"
+                      name="maritime_address_line_2"
+                      label={formT?.labels?.maritime_address_line_2}
+                      placeholder={formT?.placeholders?.maritime_address_line_2}
+                      value={formik.values.maritime_address_line_2}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.maritime_address_line_2 && formik.errors.maritime_address_line_2)}
+                      color={
+                        Boolean(formik.touched.maritime_address_line_2 && formik.errors.maritime_address_line_2)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.maritime_address_line_2 && (formik.errors.maritime_address_line_2 as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="maritime_address_city"
+                      name="maritime_address_city"
+                      label={formT?.labels?.maritime_address_city}
+                      placeholder={formT?.placeholders?.maritime_address_city}
+                      value={formik.values.maritime_address_city}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.maritime_address_city && formik.errors.maritime_address_city)}
+                      color={
+                        Boolean(formik.touched.maritime_address_city && formik.errors.maritime_address_city)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.maritime_address_city && (formik.errors.maritime_address_city as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="maritime_address_state"
+                      name="maritime_address_state"
+                      label={formT?.labels?.maritime_address_state}
+                      placeholder={formT?.placeholders?.maritime_address_state}
+                      value={formik.values.maritime_address_state}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.maritime_address_state && formik.errors.maritime_address_state)}
+                      color={
+                        Boolean(formik.touched.maritime_address_state && formik.errors.maritime_address_state)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.maritime_address_state && (formik.errors.maritime_address_state as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="maritime_address_postal_code"
+                      name="maritime_address_postal_code"
+                      label={formT?.labels?.maritime_address_postal_code}
+                      placeholder={formT?.placeholders?.maritime_address_postal_code}
+                      value={formik.values.maritime_address_postal_code}
+                      onChange={formik.handleChange}
+                      error={Boolean(
+                        formik.touched.maritime_address_postal_code && formik.errors.maritime_address_postal_code
+                      )}
+                      color={
+                        Boolean(
+                          formik.touched.maritime_address_postal_code && formik.errors.maritime_address_postal_code
+                        )
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.maritime_address_postal_code &&
+                        (formik.errors.maritime_address_postal_code as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="maritime_address_phone"
+                      name="maritime_address_phone"
+                      label={formT?.labels?.maritime_address_phone}
+                      placeholder={formT?.placeholders?.maritime_address_phone}
+                      value={formik.values.maritime_address_phone}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.maritime_address_phone && formik.errors.maritime_address_phone)}
+                      color={
+                        Boolean(formik.touched.maritime_address_phone && formik.errors.maritime_address_phone)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.maritime_address_phone && (formik.errors.maritime_address_phone as string)
+                      }
                       disabled={formik.isSubmitting}
                     />
                   </Grid>

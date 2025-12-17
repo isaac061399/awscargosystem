@@ -1,6 +1,5 @@
+import { defaultConfigId } from '@/libs/constants';
 import { prismaRead, prismaWrite } from '@libs/prisma';
-
-const defaultConfigId = 1;
 
 export const getConfiguration = async () => {
   try {
@@ -8,14 +7,22 @@ export const getConfiguration = async () => {
       where: { id: defaultConfigId },
       select: {
         pound_fee: true,
-        additional_exchange_rate: true,
         iva_percentage: true,
-        address_line_1: true,
-        address_line_2: true,
-        address_city: true,
-        address_state: true,
-        address_postal_code: true,
-        address_phone: true
+        selling_exchange_rate: true,
+        buying_exchange_rate: true,
+        updated_exchange_rate: true,
+        air_address_line_1: true,
+        air_address_line_2: true,
+        air_address_city: true,
+        air_address_state: true,
+        air_address_postal_code: true,
+        air_address_phone: true,
+        maritime_address_line_1: true,
+        maritime_address_line_2: true,
+        maritime_address_city: true,
+        maritime_address_state: true,
+        maritime_address_postal_code: true,
+        maritime_address_phone: true
       }
     });
 
@@ -33,31 +40,30 @@ export const getConfiguration = async () => {
 
 export const saveConfiguration = async (data: any) => {
   try {
+    const savedData = {
+      pound_fee: data.pound_fee ? parseFloat(data.pound_fee) : 0,
+      iva_percentage: data.iva_percentage ? parseFloat(data.iva_percentage) : 0,
+      selling_exchange_rate: data.selling_exchange_rate ? parseFloat(data.selling_exchange_rate) : 0,
+      buying_exchange_rate: data.buying_exchange_rate ? parseFloat(data.buying_exchange_rate) : 0,
+      // updated_exchange_rate: new Date(),
+      air_address_line_1: data.air_address_line_1 || '',
+      air_address_line_2: data.air_address_line_2 || '',
+      air_address_city: data.air_address_city || '',
+      air_address_state: data.air_address_state || '',
+      air_address_postal_code: data.air_address_postal_code || '',
+      air_address_phone: data.air_address_phone || '',
+      maritime_address_line_1: data.maritime_address_line_1 || '',
+      maritime_address_line_2: data.maritime_address_line_2 || '',
+      maritime_address_city: data.maritime_address_city || '',
+      maritime_address_state: data.maritime_address_state || '',
+      maritime_address_postal_code: data.maritime_address_postal_code || '',
+      maritime_address_phone: data.maritime_address_phone || ''
+    };
+
     const result = await prismaWrite.cusConfiguration.upsert({
       where: { id: defaultConfigId },
-      update: {
-        pound_fee: data.pound_fee ? parseFloat(data.pound_fee) : 0,
-        additional_exchange_rate: data.additional_exchange_rate ? parseFloat(data.additional_exchange_rate) : 0,
-        iva_percentage: data.iva_percentage ? parseFloat(data.iva_percentage) : 0,
-        address_line_1: data.address_line_1 || '',
-        address_line_2: data.address_line_2 || '',
-        address_city: data.address_city || '',
-        address_state: data.address_state || '',
-        address_postal_code: data.address_postal_code || '',
-        address_phone: data.address_phone || ''
-      },
-      create: {
-        id: defaultConfigId,
-        pound_fee: data.pound_fee ? parseFloat(data.pound_fee) : 0,
-        additional_exchange_rate: data.additional_exchange_rate ? parseFloat(data.additional_exchange_rate) : 0,
-        iva_percentage: data.iva_percentage ? parseFloat(data.iva_percentage) : 0,
-        address_line_1: data.address_line_1 || '',
-        address_line_2: data.address_line_2 || '',
-        address_city: data.address_city || '',
-        address_state: data.address_state || '',
-        address_postal_code: data.address_postal_code || '',
-        address_phone: data.address_phone || ''
-      }
+      update: { ...savedData },
+      create: { id: defaultConfigId, ...savedData }
     });
 
     if (!result) {
