@@ -4,6 +4,8 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { TransactionError, withTransaction } from '@libs/prisma';
 
+import { validateOrderStatus, validatePendingProducts } from '@/controllers/Order.Controller';
+
 export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
@@ -15,21 +17,34 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
 
   try {
     const result = await withTransaction(async (tx) => {
-      // delete relations
-      await tx.cusOrderProduct.deleteMany({ where: { order_id: Number(id) } });
+      // create/update relations
+      for (const p of data.products || []) {
+        const productData = {
+          tracking: p.tracking,
+          code: p.code,
+          name: p.name,
+          description: p.description,
+          quantity: p.quantity ? parseInt(p.quantity) : 0,
+          price: p.price ? parseFloat(p.price) : 0,
+          service_price: p.service_price ? parseFloat(p.service_price) : 0,
+          url: p.url,
+          image_url: p.image_url
+        };
 
-      // load relations
-      const products = data.products?.map((p: any) => ({
-        tracking: p.tracking,
-        code: p.code,
-        name: p.name,
-        description: p.description,
-        quantity: p.quantity ? parseInt(p.quantity) : 0,
-        price: p.price ? parseFloat(p.price) : 0,
-        service_price: p.service_price ? parseFloat(p.service_price) : 0,
-        url: p.url,
-        image_url: p.image_url
-      }));
+        if (p.id) {
+          await tx.cusOrderProduct.update({
+            where: { id: p.id },
+            data: productData
+          });
+        } else {
+          await tx.cusOrderProduct.create({
+            data: {
+              order_id: Number(id),
+              ...productData
+            }
+          });
+        }
+      }
 
       // update order
       const order = await tx.cusOrder.update({
@@ -37,8 +52,7 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
         data: {
           client_id: data.client_id,
           number: data.number,
-          purchase_page: data.purchase_page,
-          products: { create: products }
+          purchase_page: data.purchase_page
         }
       });
 
@@ -58,6 +72,12 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
 
       return order;
     });
+
+    // await validate pending products
+    await validatePendingProducts(result.id);
+
+    // validate order status
+    await validateOrderStatus(result.id);
 
     return NextResponse.json({ valid: true, id: result.id }, { status: 200 });
   } catch (error) {

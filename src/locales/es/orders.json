@@ -14,7 +14,8 @@
         "title": "ID"
       },
       "number": {
-        "title": "Número de Pedido"
+        "title": "Número de Pedido",
+        "products": "Productos"
       },
       "client": {
         "title": "Cliente",

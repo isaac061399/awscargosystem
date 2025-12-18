@@ -153,6 +153,7 @@
   },
   "orders": {
     "errors": {
+      "deleteProduct": "Error deleting the order product, please try again",
       "status": "Error changing the order status, please try again",
       "productsWithoutTracking": "There are products without a tracking number. Please ensure all products have a tracking number before proceeding.",
       "save": "Error saving the order, please try again",

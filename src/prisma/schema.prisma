@@ -627,42 +627,21 @@ model CusOffice {
 }
 
 model CusOrder {
-  id             Int                @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   client_id      Int
-  number         String             @unique
+  number         String        @unique
   purchase_page  String?
-  payment_status OrderPaymentStatus @default(PENDING)
-  status         OrderStatus        @default(PENDING)
-  status_date    DateTime           @default(now())
-  created_at     DateTime           @default(now())
-  updated_at     DateTime           @updatedAt
+  payment_status PaymentStatus @default(PENDING)
+  status         OrderStatus   @default(PENDING)
+  status_date    DateTime      @default(now())
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
 
-  client      CusClient           @relation(fields: [client_id], references: [id], onDelete: Restrict)
-  products    CusOrderProduct[]
-  logs        CusOrderLog[]
-  status_logs CusOrderStatusLog[]
+  client   CusClient         @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  products CusOrderProduct[]
+  logs     CusOrderLog[]
 
   @@map("cus_order")
-}
-
-model CusOrderProduct {
-  id            Int      @id @default(autoincrement())
-  order_id      Int
-  tracking      String?
-  code          String
-  name          String
-  description   String
-  quantity      Int
-  price         Float
-  service_price Float
-  url           String?
-  image_url     String?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
-
-  @@map("cus_order_product")
 }
 
 model CusOrderLog {
@@ -680,16 +659,42 @@ model CusOrderLog {
   @@map("cus_order_log")
 }
 
-model CusOrderStatusLog {
-  id         Int         @id @default(autoincrement())
-  order_id   Int
-  status     OrderStatus
-  created_at DateTime    @default(now())
-  updated_at DateTime    @updatedAt
+model CusOrderProduct {
+  id              Int           @id @default(autoincrement())
+  order_id        Int
+  tracking        String?
+  code            String
+  name            String
+  description     String
+  quantity        Int
+  price           Float
+  service_price   Float
+  url             String?
+  image_url       String?
+  location_shelve String?
+  location_row    String?
+  payment_status  PaymentStatus @default(PENDING)
+  status          OrderStatus   @default(PENDING)
+  status_date     DateTime      @default(now())
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
 
-  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order       CusOrder                   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  status_logs CusOrderProductStatusLog[]
 
-  @@map("cus_order_status_log")
+  @@map("cus_order_product")
+}
+
+model CusOrderProductStatusLog {
+  id               Int         @id @default(autoincrement())
+  order_product_id Int
+  status           OrderStatus
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @updatedAt
+
+  order_product CusOrderProduct @relation(fields: [order_product_id], references: [id], onDelete: Cascade)
+
+  @@map("cus_order_product_status_log")
 }
 
 model CusPackage {
@@ -763,8 +768,9 @@ enum ClientStatus {
   INACTIVE
 }
 
-enum PackageStatus {
-  PRE_ALERTED
+enum OrderStatus {
+  PENDING
+  ON_THE_WAY
   READY
   DELIVERED
 }
@@ -776,14 +782,14 @@ enum PaymentMethod {
   CARD
 }
 
-enum OrderStatus {
+enum PaymentStatus {
   PENDING
+  PAID
+}
+
+enum PackageStatus {
+  PRE_ALERTED
   ON_THE_WAY
   READY
   DELIVERED
-}
-
-enum OrderPaymentStatus {
-  PENDING
-  PAID
 }

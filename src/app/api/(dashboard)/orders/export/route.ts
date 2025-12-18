@@ -112,7 +112,7 @@ const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
           [headers.client_email]: o.client?.email || '',
           [headers.number]: o.number,
           [headers.purchase_page]: o.purchase_page,
-          [headers.payment_status]: labelsT?.orderPaymentStatus[o.payment_status],
+          [headers.payment_status]: labelsT?.paymentStatus[o.payment_status],
           [headers.status]: labelsT?.orderStatus[o.status],
           [headers.created_at]: moment(o.created_at).tz(tz).format('YYYY-MM-DD HH:mm:ss'),
           [headers.product_tracking]: p.tracking,

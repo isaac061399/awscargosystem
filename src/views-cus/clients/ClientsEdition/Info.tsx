@@ -25,7 +25,7 @@ import { getAddressOptions } from '@/helpers/address';
 
 // Utility Imports
 import { getTelInputValue } from '@/libs/utils';
-import { Currencies, defaultActivityCode } from '@/libs/constants';
+import { currencies, defaultActivityCode } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -365,7 +365,7 @@ const Info = ({
               decimalScale={2}
               decimalSeparator="."
               thousandSeparator=","
-              prefix={`${Currencies.USD.symbol} `}
+              prefix={`${currencies.USD.symbol} `}
               id="pound_fee"
               name="pound_fee"
               label={formT?.labels?.pound_fee}

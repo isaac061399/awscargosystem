@@ -1381,15 +1381,11 @@ export const requestDeleteOrder = async (id: number, lang: string) => {
   }
 };
 
-export const requestChangeStatusOrder = async (
-  id: number,
-  action: 'on-the-way' | 'ready' | 'delivered',
-  lang: string
-) => {
+export const requestDeleteOrderProduct = async (id: number, lang: string) => {
   try {
     const response = await axios.request({
-      method: 'put',
-      url: `/api/orders/${id}/${action}`,
+      method: 'delete',
+      url: `/api/orders/products/${id}`,
       headers: { ...defaultHeaders, 'Accept-Language': lang }
     });
 
@@ -1403,3 +1399,26 @@ export const requestChangeStatusOrder = async (
     return { valid: false };
   }
 };
+
+// export const requestChangeStatusOrder = async (
+//   id: number,
+//   action: 'on-the-way' | 'ready' | 'delivered',
+//   lang: string
+// ) => {
+//   try {
+//     const response = await axios.request({
+//       method: 'put',
+//       url: `/api/orders/${id}/${action}`,
+//       headers: { ...defaultHeaders, 'Accept-Language': lang }
+//     });
+
+//     return response.data;
+//   } catch (e: any) {
+//     // console.error(e);
+//     if (e?.response?.data) {
+//       return e?.response?.data;
+//     }
+
+//     return { valid: false };
+//   }
+// };

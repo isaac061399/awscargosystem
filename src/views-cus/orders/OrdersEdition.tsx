@@ -43,16 +43,16 @@ import DashboardLayout from '@components/layout/DashboardLayout';
 import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import { requestChangeStatusOrder, requestEditOrder, requestNewOrder, requestSearchClients } from '@helpers/request';
+import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder, requestSearchClients } from '@helpers/request';
 
 // Auth Imports
 // import { useAdmin } from '@components/AdminProvider';
 // import { hasAllPermissions } from '@helpers/permissions';
 
-import { Currencies } from '@/libs/constants';
+import { currencies, sellersPages } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
 import { getOrderTotal } from '@/helpers/calculations';
-import { OrderStatus } from '@/prisma/generated/enums';
+// import { OrderStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -102,7 +102,7 @@ const productInitialValues = {
   image_url: ''
 };
 
-const OrdersEdition = ({ order }: { order?: any }) => {
+const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
   const router = useRouter();
   // const { data: admin } = useAdmin();
   // const canCreateMedia = hasAllPermissions('media.create', admin.permissions);
@@ -112,11 +112,11 @@ const OrdersEdition = ({ order }: { order?: any }) => {
   const formT: any = useMemo(() => t('orders-edition:form', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
-  const [isEditing] = useState(order);
+  const [isEditing] = useState(Boolean(order));
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const [isStatusLoading, setIsStatusLoading] = useState(false);
-  const [statusState, setStatusState] = useState({ open: false, action: '' });
+  // const [isStatusLoading, setIsStatusLoading] = useState(false);
+  // const [statusState, setStatusState] = useState({ open: false, action: '' });
 
   const [clientLoading, setClientLoading] = useState(false);
   const [clientOptions, setClientOptions] = useState<any[]>(order ? [order.client] : []);
@@ -128,6 +128,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
   const formik = useFormik({
     validateOnChange: false,
     validateOnBlur: false,
+    enableReinitialize: true,
     initialValues: useMemo(
       () => ({
         client_id: order ? order.client?.id : null,
@@ -174,6 +175,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
         setAlertState({ open: true, type: 'success', message: formT?.successMessage });
 
         if (isEditing) {
+          router.refresh();
           setTimeout(() => {
             setAlertState({ ...defaultAlertState });
           }, 5000);
@@ -213,53 +215,52 @@ const OrdersEdition = ({ order }: { order?: any }) => {
     }, 500); // 500ms debounce
   };
 
-  const handleStatusOpen = (action: 'on-the-way' | 'ready' | 'delivered') => {
-    setStatusState({ open: true, action });
-  };
+  // const handleStatusOpen = (action: 'on-the-way' | 'ready' | 'delivered') => {
+  //   setStatusState({ open: true, action });
+  // };
 
-  const handleStatusClose = () => {
-    setStatusState({ open: false, action: '' });
-  };
+  // const handleStatusClose = () => {
+  //   setStatusState({ open: false, action: '' });
+  // };
 
-  const handleStatus = async () => {
-    setAlertState({ ...defaultAlertState });
-    setIsStatusLoading(true);
+  // const handleStatus = async () => {
+  //   setAlertState({ ...defaultAlertState });
+  //   setIsStatusLoading(true);
 
-    const result = await requestChangeStatusOrder(
-      order?.id,
-      statusState.action as 'on-the-way' | 'ready' | 'delivered',
-      i18n.language
-    );
+  //   const result = await requestChangeStatusOrder(
+  //     order?.id,
+  //     statusState.action as 'on-the-way' | 'ready' | 'delivered',
+  //     i18n.language
+  //   );
 
-    setIsStatusLoading(false);
-    handleStatusClose();
+  //   setIsStatusLoading(false);
+  //   handleStatusClose();
 
-    if (!result.valid) {
-      setAlertState({ open: true, type: 'error', message: result.message || textT?.errors?.status });
-    } else {
-      router.refresh();
-    }
-  };
+  //   if (!result.valid) {
+  //     setAlertState({ open: true, type: 'error', message: result.message || textT?.errors?.status });
+  //   } else {
+  //     router.refresh();
+  //   }
+  // };
 
-  const isPending = order ? order.status === ('PENDING' as OrderStatus) : false;
-  const isOnTheWay = order ? order.status === ('ON_THE_WAY' as OrderStatus) : false;
-  const isReady = order ? order.status === ('READY' as OrderStatus) : false;
+  // const isPending = order ? order.status === ('PENDING' as OrderStatus) : false;
+  // const isOnTheWay = order ? order.status === ('ON_THE_WAY' as OrderStatus) : false;
+  // const isReady = order ? order.status === ('READY' as OrderStatus) : false;
   // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
 
   const paymentStatusChip: any = { label: '', color: 'info' };
 
   const statusChip: any = { label: '', color: 'info' };
 
-  let orderTotal = 0;
+  let orderTotal = { subtotal: 0, total: 0 };
 
   if (isEditing) {
-    paymentStatusChip.label = labelsT?.orderPaymentStatus?.[order.payment_status] || 'Unknown';
-    paymentStatusChip.color = paymentStatusColors[order.payment_status] || 'info';
-
     statusChip.label = labelsT?.orderStatus?.[order.status] || 'Unknown';
     statusChip.color = statusColors[order.status] || 'info';
+    paymentStatusChip.label = labelsT?.paymentStatus?.[order.payment_status] || 'Unknown';
+    paymentStatusChip.color = paymentStatusColors[order.payment_status] || 'info';
 
-    orderTotal = getOrderTotal(formik.values.products);
+    orderTotal = getOrderTotal(formik.values.products, config.iva_percentage);
   }
 
   return (
@@ -278,48 +279,12 @@ const OrdersEdition = ({ order }: { order?: any }) => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                {isPending && (
-                  <Button
-                    size="small"
-                    type="button"
-                    variant="contained"
-                    color="primary"
-                    loading={formik.isSubmitting || isRedirecting || isStatusLoading}
-                    startIcon={<i className="ri-truck-line" />}
-                    onClick={() => handleStatusOpen('on-the-way')}>
-                    {textT?.btnOnTheWay}
-                  </Button>
-                )}
-                {isOnTheWay && (
-                  <Button
-                    size="small"
-                    type="button"
-                    variant="contained"
-                    color="info"
-                    loading={formik.isSubmitting || isRedirecting || isStatusLoading}
-                    startIcon={<i className="ri-inbox-unarchive-line" />}
-                    onClick={() => handleStatusOpen('ready')}>
-                    {textT?.btnReady}
-                  </Button>
-                )}
-                {isReady && (
-                  <Button
-                    size="small"
-                    type="button"
-                    variant="contained"
-                    color="success"
-                    loading={formik.isSubmitting || isRedirecting || isStatusLoading}
-                    startIcon={<i className="ri-check-double-line" />}
-                    onClick={() => handleStatusOpen('delivered')}>
-                    {textT?.btnDelivered}
-                  </Button>
-                )}
                 <Button
                   size="small"
                   type="submit"
                   variant="contained"
                   color="primary"
-                  loading={formik.isSubmitting || isRedirecting || isStatusLoading}
+                  loading={formik.isSubmitting || isRedirecting}
                   startIcon={<i className="ri-save-line" />}>
                   {textT?.btnSave}
                 </Button>
@@ -333,28 +298,26 @@ const OrdersEdition = ({ order }: { order?: any }) => {
 
               {isEditing && (
                 <CardContent>
-                  <Grid container spacing={3} alignItems="center">
+                  <Grid container spacing={3} alignItems="top">
                     {/* Total */}
                     <Grid size={{ xs: 12, md: 3 }}>
-                      <Stack spacing={0.5}>
-                        <Typography variant="overline" color="text.secondary">
-                          {textT?.totalLabel}
-                        </Typography>
-                        <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(orderTotal, Currencies.USD.symbol)}
-                        </Typography>
-                      </Stack>
-                    </Grid>
-
-                    {/* Payment status */}
-                    <Grid size={{ xs: 12, md: 3 }}>
-                      <Stack spacing={1}>
-                        <Typography variant="overline" color="text.secondary">
-                          {textT?.paymentStatusLabel}
-                        </Typography>
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                          <Chip label={paymentStatusChip.label} color={paymentStatusChip.color} size="small" />
-                        </Stack>
+                      <Stack>
+                        <div className="flex items-center gap-1">
+                          <Typography variant="overline" color="text.secondary">
+                            {textT?.subtotalLabel}:
+                          </Typography>
+                          <Typography variant="h5" fontWeight={600}>
+                            {formatMoney(orderTotal.subtotal, currencies.USD.symbol)}
+                          </Typography>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Typography variant="overline" color="text.secondary">
+                            {textT?.totalLabel}:
+                          </Typography>
+                          <Typography variant="h5" fontWeight={600}>
+                            {formatMoney(orderTotal.total, currencies.USD.symbol)}
+                          </Typography>
+                        </div>
                       </Stack>
                     </Grid>
 
@@ -366,6 +329,18 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                         </Typography>
                         <Stack direction="row" alignItems="center" spacing={1.5}>
                           <Chip label={statusChip.label} color={statusChip.color} size="small" />
+                        </Stack>
+                      </Stack>
+                    </Grid>
+
+                    {/* Payment status */}
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Stack spacing={1}>
+                        <Typography variant="overline" color="text.secondary">
+                          {textT?.paymentStatusLabel}
+                        </Typography>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                          <Chip label={paymentStatusChip.label} color={paymentStatusChip.color} size="small" />
                         </Stack>
                       </Stack>
                     </Grid>
@@ -393,7 +368,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                       loading={clientLoading}
                       loadingText={textT?.loading}
                       noOptionsText={textT?.noOptions}
-                      disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
+                      disabled={formik.isSubmitting || isRedirecting}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -404,7 +379,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                           error={Boolean(formik.touched.client_id && formik.errors.client_id)}
                           color={Boolean(formik.touched.client_id && formik.errors.client_id) ? 'error' : 'primary'}
                           helperText={formik.touched.client_id && (formik.errors.client_id as string)}
-                          disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
+                          disabled={formik.isSubmitting || isRedirecting}
                           slotProps={{
                             input: {
                               ...params.InputProps,
@@ -437,25 +412,37 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                       error={Boolean(formik.touched.number && formik.errors.number)}
                       color={Boolean(formik.touched.number && formik.errors.number) ? 'error' : 'primary'}
                       helperText={formik.touched.number && formik.errors.number}
-                      disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
+                      disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
 
                   <Grid size={{ xs: 12, md: 4 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      id="purchase_page"
-                      name="purchase_page"
-                      label={formT?.labels?.purchase_page}
-                      placeholder={formT?.placeholders?.purchase_page}
-                      value={formik.values.purchase_page}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.purchase_page && formik.errors.purchase_page)}
-                      color={Boolean(formik.touched.purchase_page && formik.errors.purchase_page) ? 'error' : 'primary'}
-                      helperText={formik.touched.purchase_page && formik.errors.purchase_page}
-                      disabled={formik.isSubmitting || isRedirecting || isStatusLoading}
+                    <Autocomplete
+                      freeSolo
+                      clearOnBlur={false}
+                      options={sellersPages}
+                      inputValue={formik.values.purchase_page}
+                      onInputChange={(_, newValue) => {
+                        // newValue is always a string (or null)
+                        formik.setFieldValue('purchase_page', newValue ?? '');
+                      }}
+                      disabled={formik.isSubmitting || isRedirecting}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          required
+                          id="purchase_page"
+                          name="purchase_page"
+                          label={formT?.labels?.purchase_page}
+                          placeholder={formT?.placeholders?.purchase_page}
+                          error={Boolean(formik.touched.purchase_page && formik.errors.purchase_page)}
+                          color={
+                            Boolean(formik.touched.purchase_page && formik.errors.purchase_page) ? 'error' : 'primary'
+                          }
+                          helperText={formik.touched.purchase_page && (formik.errors.purchase_page as string)}
+                          disabled={formik.isSubmitting || isRedirecting}
+                        />
+                      )}
                     />
                   </Grid>
 
@@ -471,8 +458,12 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                   <Grid size={{ xs: 12 }}>
                     <ProductsAccordionComponent
                       formik={formik}
+                      textT={textT}
                       formT={formT}
-                      isLoading={isRedirecting || isStatusLoading}
+                      labelsT={labelsT}
+                      isLoading={isRedirecting}
+                      isEditing={isEditing}
+                      language={i18n.language}
                     />
                   </Grid>
                 </Grid>
@@ -482,7 +473,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
         </Grid>
       </form>
 
-      {isEditing && (
+      {/* isEditing && (
         <>
           <Dialog
             open={statusState.open}
@@ -507,13 +498,31 @@ const OrdersEdition = ({ order }: { order?: any }) => {
             </DialogActions>
           </Dialog>
         </>
-      )}
+      ) */}
     </DashboardLayout>
   );
 };
 
-const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any; formT: any; isLoading: boolean }) => {
+const ProductsAccordionComponent = ({
+  formik,
+  textT,
+  formT,
+  labelsT,
+  isLoading,
+  isEditing,
+  language
+}: {
+  formik: any;
+  textT: any;
+  formT: any;
+  labelsT: any;
+  isLoading: boolean;
+  isEditing: boolean;
+  language: string;
+}) => {
   const [expanded, setExpanded] = useState<string | false>(false);
+  const [deleteState, setDeleteState] = useState({ open: false, loading: false, index: null, id: null, name: '' });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChangeExpanded = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
     setExpanded(newExpanded ? panel : false);
@@ -537,6 +546,28 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
     setExpanded(false);
   };
 
+  const handleDeleteOpen = (index: number, id: number, name: string) => {
+    setDeleteState((prevState: any) => ({ ...prevState, open: true, index, id, name }));
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteState((prevState: any) => ({ ...prevState, open: false, loading: false }));
+  };
+
+  const handleDelete = async () => {
+    setDeleteState((prevState: any) => ({ ...prevState, loading: true }));
+    setError(null);
+
+    const result = await requestDeleteOrderProduct(deleteState.id || 0, language);
+
+    if (!result.valid) {
+      setError(result.message || textT?.deleteProductDialog?.errorMessage);
+    } else {
+      if (deleteState.index !== null) handleRemove(deleteState.index);
+      handleDeleteClose();
+    }
+  };
+
   return (
     <Grid container spacing={5}>
       <Grid size={{ xs: 12 }}>
@@ -545,6 +576,22 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
             const errors: any = Array.isArray(formik.errors.products) ? formik.errors.products[index] || {} : {};
             const touched: any = Array.isArray(formik.touched.products) ? formik.touched.products[index] || {} : {};
             const hasErrors = Object.keys(errors).length > 0;
+
+            let statusChip: any;
+            let paymentStatusChip: any;
+
+            if (item.status) {
+              statusChip = {
+                label: labelsT?.orderStatus?.[item.status] || 'Unknown',
+                color: statusColors[item.status] || 'info'
+              };
+            }
+            if (item.payment_status) {
+              paymentStatusChip = {
+                label: labelsT?.paymentStatus?.[item.payment_status] || 'Unknown',
+                color: paymentStatusColors[item.payment_status] || 'info'
+              };
+            }
 
             return (
               <Accordion
@@ -563,16 +610,35 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
                     color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
                   }}>
                   <div className="flex items-center w-full justify-between">
-                    <Typography component="span">
-                      {item.name}{' '}
-                      {item.id && !item.tracking && (
-                        <Typography component="span" className="text-sm font-bold text-warning">
-                          {`( ${formT?.noTracking} )`}
-                        </Typography>
+                    <div className="flex items-center gap-1">
+                      <Typography component="span">{item.name}</Typography>
+                      {statusChip && (
+                        <Chip
+                          variant="outlined"
+                          label={`${textT?.statusLabel}: ${statusChip.label}`}
+                          color={statusChip.color}
+                          size="small"
+                        />
                       )}
-                    </Typography>
+                      {paymentStatusChip && (
+                        <Chip
+                          variant="outlined"
+                          label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
+                          color={paymentStatusChip.color}
+                          size="small"
+                        />
+                      )}
+                    </div>
                     <div className="flex items-center gap-2">
-                      <IconButton className="p-1" onClick={() => handleRemove(index)}>
+                      <IconButton
+                        className="p-1"
+                        onClick={() => {
+                          if (item.id) {
+                            handleDeleteOpen(index, item.id, item.name);
+                          } else {
+                            handleRemove(index);
+                          }
+                        }}>
                         <i className="ri-delete-bin-2-line" />
                       </IconButton>
                     </div>
@@ -580,22 +646,24 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={5} sx={{ mt: 2 }}>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        type="text"
-                        id={`products[${index}].tracking`}
-                        name={`products[${index}].tracking`}
-                        label={formT?.labels?.products?.tracking}
-                        placeholder={formT?.placeholders?.products?.tracking}
-                        value={item.tracking}
-                        onChange={formik.handleChange}
-                        error={Boolean(touched.tracking && errors.tracking)}
-                        color={Boolean(touched.tracking && errors.tracking) ? 'error' : 'primary'}
-                        helperText={touched.tracking && errors.tracking}
-                        disabled={formik.isSubmitting || isLoading}
-                      />
-                    </Grid>
+                    {isEditing && (
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <TextField
+                          fullWidth
+                          type="text"
+                          id={`products[${index}].tracking`}
+                          name={`products[${index}].tracking`}
+                          label={formT?.labels?.products?.tracking}
+                          placeholder={formT?.placeholders?.products?.tracking}
+                          value={item.tracking}
+                          onChange={formik.handleChange}
+                          error={Boolean(touched.tracking && errors.tracking)}
+                          color={Boolean(touched.tracking && errors.tracking) ? 'error' : 'primary'}
+                          helperText={touched.tracking && errors.tracking}
+                          disabled={formik.isSubmitting || isLoading}
+                        />
+                      </Grid>
+                    )}
                     <Grid size={{ xs: 12, md: 4 }}>
                       <TextField
                         fullWidth
@@ -671,7 +739,7 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
                         decimalScale={2}
                         decimalSeparator="."
                         thousandSeparator=","
-                        prefix={`${Currencies.USD.symbol} `}
+                        prefix={`${currencies.USD.symbol} `}
                         id={`products[${index}].price`}
                         name={`products[${index}].price`}
                         label={formT?.labels?.products?.price}
@@ -692,7 +760,7 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
                         decimalScale={2}
                         decimalSeparator="."
                         thousandSeparator=","
-                        prefix={`${Currencies.USD.symbol} `}
+                        prefix={`${currencies.USD.symbol} `}
                         id={`products[${index}].service_price`}
                         name={`products[${index}].service_price`}
                         label={formT?.labels?.products?.service_price}
@@ -753,6 +821,32 @@ const ProductsAccordionComponent = ({ formik, formT, isLoading }: { formik: any;
           </Accordion>
         </div>
       </Grid>
+
+      <Dialog
+        open={deleteState.open}
+        onClose={handleDeleteClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">{textT?.deleteProductDialog?.title}</DialogTitle>
+        <DialogContent dividers>
+          <DialogContentText id="alert-dialog-description">
+            {textT?.deleteProductDialog?.message?.replace('{{ name }}', deleteState.name || '')}
+          </DialogContentText>
+          {error && (
+            <DialogContentText id="alert-dialog-error" className="text-error mt-2">
+              {error} {textT?.deleteProductDialog?.errorMessage}
+            </DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" color="secondary" onClick={handleDeleteClose} disabled={deleteState.loading}>
+            {textT?.deleteProductDialog?.btnCancel}
+          </Button>
+          <Button variant="text" color="primary" onClick={handleDelete} loading={deleteState.loading}>
+            {textT?.deleteProductDialog?.btnContinue}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 };

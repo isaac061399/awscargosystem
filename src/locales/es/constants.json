@@ -20,15 +20,15 @@
       "TRANSFER": "Transferencia",
       "CARD": "Tarjeta"
     },
+    "paymentStatus": {
+      "PENDING": "Pendiente",
+      "PAID": "Pagado"
+    },
     "orderStatus": {
       "PENDING": "Pendiente",
       "ON_THE_WAY": "En Camino",
       "READY": "Listo para Retirar",
       "DELIVERED": "Entregado"
-    },
-    "orderPaymentStatus": {
-      "PENDING": "Pendiente",
-      "PAID": "Pagado"
     }
   }
 }

@@ -5,9 +5,10 @@
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "loading": "Cargando...",
     "noOptions": "No hay opciones disponibles",
-    "totalLabel": "Total del Pedido",
+    "subtotalLabel": "Subtotal",
+    "totalLabel": "Total",
+    "statusLabel": "Estado",
     "paymentStatusLabel": "Estado de Pago",
-    "statusLabel": "Estado del Pedido",
     "btnSave": "Guardar",
     "btnCancel": "Cancelar",
     "btnContinue": "Continuar",
@@ -19,6 +20,13 @@
       "onTheWayMessage": "¿Estás seguro de marcar el pedido como en camino?",
       "readyMessage": "¿Estás seguro de marcar el pedido como listo para retirar?",
       "deliveredMessage": "¿Estás seguro de marcar el pedido como entregado?"
+    },
+    "deleteProductDialog": {
+      "title": "Confirmar Eliminación del Producto",
+      "message": "¿Estás seguro de que deseas eliminar el producto \"{{ name }}\" del pedido?",
+      "errorMessage": "Error al eliminar el producto, por favor inténtalo de nuevo",
+      "btnContinue": "Continuar",
+      "btnCancel": "Cancelar"
     },
     "errors": {
       "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo"
@@ -46,7 +54,7 @@
     "placeholders": {
       "client_id": "Buscar cliente",
       "number": "Ingrese el número de pedido",
-      "purchase_page": "Ingrese la página de compra",
+      "purchase_page": "Seleccione o ingrese la página de compra",
 
       "products": {
         "title": "",
@@ -81,7 +89,6 @@
       }
     },
     "addProductBtn": "Agregar Producto",
-    "noTracking": "Producto sin tracking",
     "successMessage": "Pedido guardado con éxito",
     "errorMessage": "Error al guardar el pedido, por favor inténtalo de nuevo"
   }

@@ -47,7 +47,7 @@ import { hasAllPermissions } from '@/helpers/permissions';
 
 // Utility Imports
 import { formatMoney, generateUrl } from '@/libs/utils';
-import { Currencies } from '@/libs/constants';
+import { currencies } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -234,7 +234,7 @@ const MoneyOutflows = () => {
       minWidth: 150,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          {formatMoney(params.row.amount, `${Currencies[params.row.currency]?.symbol || ''} `)}
+          {formatMoney(params.row.amount, `${currencies[params.row.currency]?.symbol || ''} `)}
         </div>
       )
     },
@@ -396,7 +396,7 @@ const MoneyOutflows = () => {
                 decimalScale={2}
                 decimalSeparator="."
                 thousandSeparator=","
-                prefix={`${Currencies[formik.values.currency]?.symbol || ''} `}
+                prefix={`${currencies[formik.values.currency]?.symbol || ''} `}
                 id="amount"
                 name="amount"
                 label={formT?.labels?.amount}

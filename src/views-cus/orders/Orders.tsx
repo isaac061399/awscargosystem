@@ -189,7 +189,12 @@ const Orders = () => {
       flex: 1,
       minWidth: 150,
       renderCell: (params: any) => (
-        <div className="h-full inline-flex flex-col justify-center py-2">{params.row.number}</div>
+        <div className="h-full inline-flex flex-col justify-center py-2">
+          <span>{params.row.number}</span>
+          <span>
+            <strong>{textT?.table?.number?.products}</strong>: {params.row._count?.products || 0}
+          </span>
+        </div>
       )
     },
     {
@@ -218,7 +223,7 @@ const Orders = () => {
       flex: 1,
       minWidth: 150,
       renderCell: (params: any) => {
-        const label = labelsT?.orderPaymentStatus?.[params.row.payment_status] || 'Unknown';
+        const label = labelsT?.paymentStatus?.[params.row.payment_status] || 'Unknown';
         const status: keyof typeof paymentStatusColors = params.row.payment_status as keyof typeof paymentStatusColors;
         const color = (paymentStatusColors[status] as any) || 'info';
 
@@ -288,9 +293,9 @@ const Orders = () => {
 
   const paymentStatusOptions = useMemo(
     () =>
-      Object.keys(labelsT?.orderPaymentStatus || {}).map((key) => ({
+      Object.keys(labelsT?.paymentStatus || {}).map((key) => ({
         value: key,
-        label: labelsT?.orderPaymentStatus?.[key] || key
+        label: labelsT?.paymentStatus?.[key] || key
       })),
     [labelsT]
   );

@@ -20,7 +20,7 @@ export const imageContentTypes = {
   'image/avif': 'AVIF'
 };
 
-export const Currencies: Record<string, { symbol: string; name: string }> = {
+export const currencies: Record<string, { symbol: string; name: string }> = {
   USD: { symbol: '$', name: 'USD' },
   CRC: { symbol: '₡', name: 'CRC' }
 };
@@ -34,6 +34,8 @@ export const defaultActivityCode = '00';
 export const officeCookie = { name: 'office', maxAge: 60 * 60 * 24 * 365 };
 
 export const additionalExchangeRate = 6;
+
+export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein'];
 
 // App Constants
 

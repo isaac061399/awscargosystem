@@ -39,7 +39,7 @@ import { requestEditConfiguration } from '@/helpers/request';
 import { useAdmin } from '@/components/AdminProvider';
 import { hasAllPermissions } from '@/helpers/permissions';
 
-import { Currencies } from '@/libs/constants';
+import { currencies } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -186,7 +186,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       decimalScale={2}
                       decimalSeparator="."
                       thousandSeparator=","
-                      prefix={`${Currencies.USD.symbol} `}
+                      prefix={`${currencies.USD.symbol} `}
                       id="pound_fee"
                       name="pound_fee"
                       label={formT?.labels?.pound_fee}
@@ -226,7 +226,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       decimalScale={2}
                       decimalSeparator="."
                       thousandSeparator=","
-                      prefix={`${Currencies.CRC.symbol} `}
+                      prefix={`${currencies.CRC.symbol} `}
                       id="selling_exchange_rate"
                       name="selling_exchange_rate"
                       label={formT?.labels?.selling_exchange_rate}
@@ -253,7 +253,7 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
                       decimalScale={2}
                       decimalSeparator="."
                       thousandSeparator=","
-                      prefix={`${Currencies.CRC.symbol} `}
+                      prefix={`${currencies.CRC.symbol} `}
                       id="buying_exchange_rate"
                       name="buying_exchange_rate"
                       label={formT?.labels?.buying_exchange_rate}
