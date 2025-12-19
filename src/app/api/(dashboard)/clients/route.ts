@@ -117,6 +117,7 @@ export const POST = withAuthApi(['clients.create'], async (req) => {
           identification,
           email,
           phone: data.phone,
+          notes: data.notes,
           district_id: data.district_id === '' ? null : data.district_id,
           address: data.address,
           password: '',

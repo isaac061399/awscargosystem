@@ -50,6 +50,7 @@ export const PUT = withAuthApi(['clients.edit'], async (req, { params }: { param
           identification,
           email,
           phone: data.phone,
+          notes: data.notes,
           district_id: data.district_id === '' ? null : data.district_id,
           address: data.address,
           // password: data.password,

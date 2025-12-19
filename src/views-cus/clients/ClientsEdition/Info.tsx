@@ -12,7 +12,22 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 // MUI Imports
-import { Alert, Box, Button, Checkbox, Divider, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  TextField,
+  Typography
+} from '@mui/material';
 import { MuiTelInput } from 'mui-tel-input';
 
 // Component Imports
@@ -20,7 +35,7 @@ import Select from '@/components/Select';
 import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import { requestEditClient, requestNewClient } from '@/helpers/request';
+import { requestEditClient, requestNewClient, requestSearchActivityCodesClients } from '@/helpers/request';
 import { getAddressOptions } from '@/helpers/address';
 
 // Utility Imports
@@ -65,6 +80,12 @@ const Info = ({
   const [billingCantonsOptions, setBillingCantonsOptions] = useState<any[]>(billingAddressData.cantons);
   const [billingDistrictsOptions, setBillingDistrictsOptions] = useState<any[]>(billingAddressData.districts);
   const [useSameBilling, setUseSameBilling] = useState<boolean>(!client ? true : false);
+
+  const [activityCodesState, setActivityCodesStates] = useState<{
+    open: boolean;
+    loading: boolean;
+    codes: { code: string; description: string }[];
+  }>({ open: false, loading: false, codes: [] });
 
   const formik = useFormik({
     validateOnChange: false,
@@ -207,6 +228,33 @@ const Info = ({
     formik.setFieldValue('billing_address', '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useSameBilling]);
+
+  const handleActivityCodesOpen = async () => {
+    setActivityCodesStates((prevState) => ({ ...prevState, loading: true }));
+
+    const identification =
+      formik.values.billing_identification !== '' ? formik.values.billing_identification : formik.values.identification;
+
+    const response = await requestSearchActivityCodesClients({ identification }, i18n.language);
+
+    const codes = response.valid ? response.data : [];
+
+    setActivityCodesStates((prevState) => ({
+      ...prevState,
+      codes,
+      loading: false,
+      open: true
+    }));
+  };
+
+  const handleActivityCodesClose = () => {
+    setActivityCodesStates((prevState) => ({ ...prevState, open: false }));
+  };
+
+  const handleActivityCodeSelect = (code: string) => {
+    formik.setFieldValue('billing_activity_code', code);
+    handleActivityCodesClose();
+  };
 
   return (
     <Box sx={{ p: 5 }}>
@@ -757,10 +805,54 @@ const Info = ({
               }
               helperText={formik.touched.billing_activity_code && (formik.errors.billing_activity_code as string)}
               disabled={formik.isSubmitting || isRedirecting}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton
+                      color="primary"
+                      onClick={handleActivityCodesOpen}
+                      disabled={formik.isSubmitting || isRedirecting || activityCodesState.loading}>
+                      {activityCodesState.loading ? (
+                        <i className="ri-loader-4-line animate-spin" />
+                      ) : (
+                        <i className="ri-search-eye-line" />
+                      )}
+                    </IconButton>
+                  )
+                }
+              }}
             />
           </Grid>
         </Grid>
       </form>
+
+      <Dialog
+        open={activityCodesState.open}
+        onClose={handleActivityCodesClose}
+        aria-labelledby="dialog-add-balance-title"
+        maxWidth="sm"
+        fullWidth>
+        <DialogTitle id="dialog-add-balance-title">{textT?.activityCodesDialog?.title}</DialogTitle>
+        <DialogContent dividers className="flex flex-col gap-6">
+          <Select
+            options={activityCodesState.codes.map((c) => ({
+              value: c.code,
+              label: `${c.code} - ${c.description}`
+            }))}
+            fullWidth
+            id="code"
+            name="code"
+            label={textT?.activityCodesDialog?.codesTitle}
+            value=""
+            onChange={(e) => handleActivityCodeSelect(e.target.value as string)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" color="secondary" onClick={handleActivityCodesClose} disabled={formik.isSubmitting}>
+            {textT?.btnCancel}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

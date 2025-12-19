@@ -96,14 +96,10 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
 const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
   const tz = (await cookies()).get('tz')?.value || 'UTC';
 
-  console.log({ orders });
-
   return {
     headers: Object.values(headers) as string[],
     data: orders.flatMap((o) => {
       return o.products.map((p: any) => {
-        console.log({ o, p });
-
         return {
           [headers.id]: padStartZeros(o.id, 4),
           [headers.client_box_number]: o.client?.box_number || '',
@@ -123,7 +119,11 @@ const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
           [headers.product_price]: p.price,
           [headers.product_service_price]: p.service_price,
           [headers.product_url]: p.url,
-          [headers.product_image_url]: p.image_url
+          [headers.product_image_url]: p.image_url,
+          [headers.location_shelve]: p.location_shelve,
+          [headers.location_row]: p.location_row,
+          [headers.payment_status]: labelsT?.paymentStatus[p.payment_status],
+          [headers.status]: labelsT?.orderStatus[p.status]
         };
       });
     })

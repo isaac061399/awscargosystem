@@ -8,11 +8,17 @@
       "title": "Información",
       "text": {
         "btnSave": "Guardar",
+        "btnCancel": "Cancelar",
         "boxNumberLabel": "Número de Casillero",
         "personalDataLabel": "Datos Personales",
         "addressLabel": "Dirección",
         "billingLabel": "Datos de Facturación",
-        "useSameBillingLabel": "Usar la misma información del cliente para facturación"
+        "useSameBillingLabel": "Usar la misma información del cliente para facturación",
+        "loadActivityCodeLabel": "Cargar Códigos de Actividad",
+        "activityCodesDialog": {
+          "title": "Códigos de Actividad",
+          "codesTitle": "Seleccione"
+        }
       },
       "form": {
         "labels": {

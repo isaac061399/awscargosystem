@@ -126,6 +126,7 @@
       "identification": "Identificación",
       "email": "Correo Electrónico",
       "phone": "Teléfono",
+      "notes": "Notas",
       "province": "Provincia",
       "canton": "Cantón",
       "district": "Distrito",
@@ -206,7 +207,11 @@
       "product_price": "Precio del Producto",
       "product_service_price": "Precio del Servicio del Producto",
       "product_url": "URL del Producto",
-      "product_image_url": "URL de la Imagen del Producto"
+      "product_image_url": "URL de la Imagen del Producto",
+      "product_location_shelve": "Estante de Ubicación del Producto",
+      "product_location_row": "Fila de Ubicación del Producto",
+      "product_payment_status": "Estado de Pago del Producto",
+      "product_status": "Estado del Producto"
     }
   }
 }

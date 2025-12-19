@@ -132,6 +132,7 @@ const formatEntries = async (headers: any, labelsT: any, clients: any[]) => {
         [headers.identification]: c.identification,
         [headers.email]: c.email,
         [headers.phone]: c.phone,
+        [headers.notes]: c.notes,
         [headers.province]: c.district?.canton?.province?.name,
         [headers.canton]: c.district?.canton?.name,
         [headers.district]: c.district?.name,

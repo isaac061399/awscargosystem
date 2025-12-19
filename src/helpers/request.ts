@@ -1126,6 +1126,26 @@ export const requestSearchClients = async (params: any, lang: string) => {
   }
 };
 
+export const requestSearchActivityCodesClients = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/clients/search-activity',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // configuration
 
 export const requestEditConfiguration = async (params: any, lang: string) => {
