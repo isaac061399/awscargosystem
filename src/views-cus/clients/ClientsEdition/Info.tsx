@@ -302,11 +302,7 @@ const Info = ({
               name="office_id"
               label={formT?.labels?.office_id}
               value={formik.values.office_id}
-              onChange={(e) => {
-                formik.handleChange(e);
-                formik.setFieldValue('category', null);
-                formik.setFieldValue('page', null);
-              }}
+              onChange={formik.handleChange}
               error={Boolean(formik.touched.office_id && formik.errors.office_id)}
               color={Boolean(formik.touched.office_id && formik.errors.office_id) ? 'error' : 'primary'}
               helperText={

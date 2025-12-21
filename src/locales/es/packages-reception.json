@@ -4,8 +4,14 @@
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "btnSave": "Guardar",
     "btnCancel": "Cancelar",
+    "btnClose": "Cerrar",
     "btnSelect": "Seleccionar",
-    "clientTitle": "Información del Cliente",
+    "clientTitle": "Cliente",
+    "packageTitle": "Paquete",
+    "locationTitle": "Ubicación",
+    "alertTitle": "¡Atención!",
+    "officeAlertMessage": "Paquete pertenece a cliente en {{ office }}",
+    "clientAlertMessage": "Cliente no encontrado",
     "selectorDialog": {
       "title": "Seleccione un item del tracking",
       "packagesTitle": "Paquetes",
@@ -23,12 +29,19 @@
   },
   "form": {
     "labels": {
+      "office_id": "Recibiendo en",
       "tracking": "Tracking",
-      "box_number": "Número de Casillero"
+      "box_number": "Número de Casillero",
+      "weight": "Peso (libras)",
+      "shelve": "Estante",
+      "row": "Fila"
     },
     "placeholders": {
       "tracking": "Ingrese el tracking",
-      "box_number": "Buscar por número de casillero"
+      "box_number": "Buscar por número de casillero",
+      "weight": "Ingrese el peso",
+      "shelve": "Seleccione o ingrese el estante",
+      "row": "Seleccione o ingrese la fila"
     },
     "errors": {},
     "successMessage": "Configuración guardada con éxito",

@@ -23,3 +23,20 @@ export const getOrderTotal = (products: any[], iva: number) => {
     return result;
   }
 };
+
+export const calculateShippingPrice = (weight: string, poundFee: number): number => {
+  try {
+    if (isNaN(parseFloat(weight)) || isNaN(poundFee) || parseFloat(weight) <= 0 || poundFee <= 0) {
+      return 0;
+    }
+
+    const price = parseFloat(weight) * poundFee;
+
+    return parseFloat(price.toFixed(2));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating shipping price: ${error}`);
+
+    return 0;
+  }
+};
