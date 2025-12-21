@@ -35,7 +35,7 @@ export const officeCookie = { name: 'office', maxAge: 60 * 60 * 24 * 365 };
 
 export const additionalExchangeRate = 6;
 
-export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein'];
+export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein', 'Target'];
 
 // App Constants
 

@@ -156,17 +156,14 @@
         ]
       },
       {
-        "sectionTitle": "Administration",
+        "sectionTitle": "Logistics",
         "permissions": [
           "clients.list",
           "clients.create",
-          "packages.list",
-          "packages.create",
           "orders.list",
           "orders.create",
-          "offices.list",
-          "offices.create",
-          "configuration.view"
+          "packages.list",
+          "packages.reception"
         ],
         "items": [
           {
@@ -193,33 +190,10 @@
             ]
           },
           {
-            "label": "Packages",
-            "link": "",
-            "externalLink": false,
-            "icon": "ri-shopping-bag-4-line",
-            "permissions": ["packages.list", "packages.create"],
-            "subItems": [
-              {
-                "label": "List",
-                "link": "/packages",
-                "externalLink": false,
-                "icon": "",
-                "permissions": ["packages.list"]
-              },
-              {
-                "label": "New",
-                "link": "/packages/new",
-                "externalLink": false,
-                "icon": "",
-                "permissions": ["packages.create"]
-              }
-            ]
-          },
-          {
             "label": "Orders",
             "link": "",
             "externalLink": false,
-            "icon": "ri-shopping-basket-line",
+            "icon": "ri-shopping-bag-4-line",
             "permissions": ["orders.list", "orders.create"],
             "subItems": [
               {
@@ -239,11 +213,44 @@
             ]
           },
           {
+            "label": "Packages",
+            "link": "/packages",
+            "externalLink": false,
+            "icon": "ri-box-3-line",
+            "permissions": ["packages.list"]
+          },
+          {
+            "label": "Packages Reception",
+            "link": "/packages-reception",
+            "externalLink": false,
+            "icon": "ri-inbox-archive-line",
+            "permissions": ["packages.reception"]
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Cash",
+        "permissions": ["money-outflows.list"],
+        "items": [
+          {
+            "label": "Money Outflows",
+            "link": "/money-outflows",
+            "externalLink": false,
+            "icon": "ri-wallet-3-line",
+            "permissions": ["money-outflows.list"]
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Configuration",
+        "permissions": ["offices.list", "offices.create", "configuration.view"],
+        "items": [
+          {
             "label": "Offices",
             "link": "",
             "externalLink": false,
             "icon": "ri-building-line",
-            "permissions": ["offices.list", "offices.create", "configuration.view"],
+            "permissions": ["offices.list", "offices.create"],
             "subItems": [
               {
                 "label": "List",
@@ -267,19 +274,6 @@
             "externalLink": false,
             "icon": "ri-settings-5-line",
             "permissions": ["configuration.view"]
-          }
-        ]
-      },
-      {
-        "sectionTitle": "Cash Register",
-        "permissions": ["money-outflows.list"],
-        "items": [
-          {
-            "label": "Money Outflows",
-            "link": "/money-outflows",
-            "externalLink": false,
-            "icon": "ri-wallet-3-line",
-            "permissions": ["money-outflows.list"]
           }
         ]
       },

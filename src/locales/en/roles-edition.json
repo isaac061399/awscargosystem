@@ -15,12 +15,12 @@
       "menus": "CMS - Menus",
       "pages": "CMS - Pages",
       "global-settings": "CMS - Global Settings",
-      "clients": "Administration - Clients",
-      "configuration": "Administration - Configuration",
-      "offices": "Administration - Offices",
-      "packages": "Administration - Packages",
-      "orders": "Administration - Orders",
-      "money-outflows": "Cash Register - Money Outflows"
+      "clients": "Logistics - Clients",
+      "configuration": "Configuration - Configuration",
+      "offices": "Configuration - Offices",
+      "orders": "Logistics - Orders",
+      "packages": "Logistics - Packages",
+      "money-outflows": "Cash - Money Outflows"
     },
     "permissions": {
       "list": "List",
@@ -28,7 +28,8 @@
       "edit": "Edit",
       "delete": "Delete",
       "send": "Send",
-      "view": "View"
+      "view": "View",
+      "reception": "Reception"
     }
   },
   "form": {

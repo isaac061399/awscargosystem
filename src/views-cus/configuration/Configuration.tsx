@@ -43,7 +43,7 @@ import { currencies } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const RolesEdition = ({ configuration }: { configuration?: any }) => {
+const Configuration = ({ configuration }: { configuration?: any }) => {
   const { data: admin } = useAdmin();
   const canEdit = hasAllPermissions('configuration.edit', admin.permissions);
 
@@ -563,4 +563,4 @@ const RolesEdition = ({ configuration }: { configuration?: any }) => {
   );
 };
 
-export default RolesEdition;
+export default Configuration;

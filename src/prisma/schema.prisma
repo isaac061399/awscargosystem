@@ -711,6 +711,7 @@ model CusPackage {
   billing_amount    Float         @default(0)
   location_shelve   String?
   location_row      String?
+  payment_status    PaymentStatus @default(PENDING)
   status            PackageStatus @default(PRE_ALERTED)
   status_date       DateTime      @default(now())
   created_at        DateTime      @default(now())

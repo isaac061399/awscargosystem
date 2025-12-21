@@ -1,0 +1,37 @@
+{
+  "text": {
+    "title": "Recepción de Paquetes",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "btnSave": "Guardar",
+    "btnCancel": "Cancelar",
+    "btnSelect": "Seleccionar",
+    "clientTitle": "Información del Cliente",
+    "selectorDialog": {
+      "title": "Seleccione un item del tracking",
+      "packagesTitle": "Paquetes",
+      "ordersTitle": "Pedidos",
+      "productsLabel": "producto(s)"
+    },
+    "clientCard": {
+      "title": "Datos del Cliente",
+      "boxNumber": "Casillero",
+      "fullName": "Nombre",
+      "identification": "Identificación",
+      "email": "Correo electrónico",
+      "poundFee": "Tarifa por libra"
+    }
+  },
+  "form": {
+    "labels": {
+      "tracking": "Tracking",
+      "box_number": "Número de Casillero"
+    },
+    "placeholders": {
+      "tracking": "Ingrese el tracking",
+      "box_number": "Buscar por número de casillero"
+    },
+    "errors": {},
+    "successMessage": "Configuración guardada con éxito",
+    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
+  }
+}

@@ -213,5 +213,12 @@
       "product_payment_status": "Product Payment Status",
       "product_status": "Product Status"
     }
+  },
+  "packages-reception": {
+    "errors": {
+      "clientNotFound": "Client not found with the provided box number",
+      "save": "Error saving the information, please try again",
+      "general": "An error occurred, please try again"
+    }
   }
 }

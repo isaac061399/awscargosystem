@@ -15,11 +15,11 @@
       "menus": "CMS - Menús",
       "pages": "CMS - Páginas",
       "global-settings": "CMS - Configuración Global",
-      "clients": "Administración - Clientes",
-      "configuration": "Administración - Configuración",
-      "offices": "Administración - Oficinas",
-      "orders": "Administración - Pedidos",
-      "packages": "Administración - Paquetes",
+      "clients": "Logística - Clientes",
+      "configuration": "Configuración - Configuración",
+      "offices": "Configuración - Oficinas",
+      "orders": "Logística - Pedidos",
+      "packages": "Logística - Paquetes",
       "money-outflows": "Caja - Salidas de Dinero"
     },
     "permissions": {
@@ -28,7 +28,8 @@
       "edit": "Editar",
       "delete": "Eliminar",
       "send": "Enviar",
-      "view": "Ver"
+      "view": "Ver",
+      "reception": "Recepción"
     }
   },
   "form": {

@@ -1442,3 +1442,37 @@ export const requestDeleteOrderProduct = async (id: number, lang: string) => {
 //     return { valid: false };
 //   }
 // };
+
+// packages reception
+
+export const requestPackagesReceptionTracking = async (tracking: string, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: `/api/packages/reception/tracking/${tracking}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestPackagesReceptionClient = async (boxNumber: string, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: `/api/packages/reception/client/${boxNumber}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
