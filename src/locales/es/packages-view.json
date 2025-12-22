@@ -1,0 +1,94 @@
+{
+  "text": {
+    "title": "Paquete: ",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "loading": "Cargando...",
+    "noOptions": "No hay opciones disponibles",
+    "subtotalLabel": "Subtotal",
+    "totalLabel": "Total",
+    "statusLabel": "Estado",
+    "paymentStatusLabel": "Estado de Pago",
+    "btnSave": "Guardar",
+    "btnCancel": "Cancelar",
+    "btnContinue": "Continuar",
+    "btnOnTheWay": "Marcar como En Camino",
+    "btnReady": "Marcar como Listo para Retirar",
+    "btnDelivered": "Marcar como Entregado",
+    "dialogStatus": {
+      "title": "Confirmar Cambio de Estado",
+      "onTheWayMessage": "¿Estás seguro de marcar el pedido como en camino?",
+      "readyMessage": "¿Estás seguro de marcar el pedido como listo para retirar?",
+      "deliveredMessage": "¿Estás seguro de marcar el pedido como entregado?"
+    },
+    "deleteProductDialog": {
+      "title": "Confirmar Eliminación del Producto",
+      "message": "¿Estás seguro de que deseas eliminar el producto \"{{ name }}\" del pedido?",
+      "errorMessage": "Error al eliminar el producto, por favor inténtalo de nuevo",
+      "btnContinue": "Continuar",
+      "btnCancel": "Cancelar"
+    },
+    "errors": {
+      "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo"
+    }
+  },
+  "form": {
+    "labels": {
+      "client_id": "Cliente",
+      "number": "Número de pedido",
+      "purchase_page": "Página de compra",
+
+      "products": {
+        "title": "Productos",
+        "tracking": "Tracking",
+        "code": "Código",
+        "name": "Nombre",
+        "description": "Descripción",
+        "quantity": "Cantidad",
+        "price": "Precio",
+        "service_price": "Precio del servicio",
+        "url": "URL",
+        "image_url": "URL de la imagen"
+      }
+    },
+    "placeholders": {
+      "client_id": "Buscar cliente",
+      "number": "Ingrese el número de pedido",
+      "purchase_page": "Seleccione o ingrese la página de compra",
+
+      "products": {
+        "title": "",
+        "tracking": "Ingrese el tracking",
+        "code": "Ingrese el código",
+        "name": "Ingrese el nombre",
+        "description": "Ingrese la descripción",
+        "quantity": "Ingrese la cantidad",
+        "price": "Ingrese el precio",
+        "service_price": "Ingrese el precio del servicio",
+        "url": "Ingrese una URL",
+        "image_url": "Ingrese una URL"
+      }
+    },
+    "errors": {
+      "client_id": "El cliente es requerido",
+      "number": "El número de",
+      "purchase_page": "Ingrese la página de compra",
+
+      "products": {
+        "title": "",
+        "tracking": "",
+        "code": "El código es requerido",
+        "name": "El nombre es requerido",
+        "description": "",
+        "quantity": "La cantidad es requerida",
+        "price": "El precio es requerido",
+        "service_price": "El precio del servicio es requerido",
+        "url": "",
+        "image_url": "",
+        "invalidInteger": "El valor debe ser un número entero"
+      }
+    },
+    "addProductBtn": "Agregar Producto",
+    "successMessage": "Pedido guardado con éxito",
+    "errorMessage": "Error al guardar el pedido, por favor inténtalo de nuevo"
+  }
+}

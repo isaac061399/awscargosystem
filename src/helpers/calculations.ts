@@ -40,3 +40,22 @@ export const calculateShippingPrice = (weight: string, poundFee: number): number
     return 0;
   }
 };
+
+export const calculateShippingTotal = (amount: number, iva: number) => {
+  const result = { subtotal: 0, total: 0 };
+
+  try {
+    result.subtotal = amount;
+    result.total = result.subtotal + result.subtotal * (iva / 100);
+
+    return {
+      subtotal: parseFloat(result.subtotal.toFixed(2)),
+      total: parseFloat(result.total.toFixed(2))
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating shipping price: ${error}`);
+
+    return result;
+  }
+};

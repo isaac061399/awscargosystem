@@ -20,7 +20,7 @@ export const GET = withAuthApi(
 
       const client = await prismaRead.cusClient.findUnique({
         where: { box_number: searchBoxNumber },
-        select: { ...clientSelectSchema, pound_fee: true, office: { select: { id: true, name: true } } }
+        select: { ...clientSelectSchema, pound_fee: true }
       });
 
       if (!client) {

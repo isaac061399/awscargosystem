@@ -14,6 +14,12 @@
       "ACTIVE": "Activo",
       "INACTIVE": "Inactivo"
     },
+    "orderStatus": {
+      "PENDING": "Pendiente",
+      "ON_THE_WAY": "En Camino",
+      "READY": "Listo para Retirar",
+      "DELIVERED": "Entregado"
+    },
     "paymentMethod": {
       "CASH": "Efectivo",
       "SINPE": "SINPE",
@@ -24,8 +30,8 @@
       "PENDING": "Pendiente",
       "PAID": "Pagado"
     },
-    "orderStatus": {
-      "PENDING": "Pendiente",
+    "packageStatus": {
+      "PRE_ALERTED": "Pre-alertado",
       "ON_THE_WAY": "En Camino",
       "READY": "Listo para Retirar",
       "DELIVERED": "Entregado"

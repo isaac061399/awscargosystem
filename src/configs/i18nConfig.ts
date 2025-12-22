@@ -52,6 +52,8 @@ const i18nConfig = {
     '/[locale]/(dashboard)/orders/new': ['orders-edition'],
     '/[locale]/(dashboard)/orders/edit/[id]': ['orders-edition'],
     '/[locale]/(dashboard)/offices/edit/[id]': ['offices-edition'],
+    '/[locale]/(dashboard)/packages': ['packages'],
+    '/[locale]/(dashboard)/packages/view/[id]': ['packages-view'],
     '/[locale]/(dashboard)/packages-reception': ['packages-reception']
   }
 };

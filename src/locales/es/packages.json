@@ -1,21 +1,16 @@
 {
   "text": {
-    "title": "Pedidos",
-    "btnCreate": "Nuevo Pedido",
+    "title": "Paquetes",
     "btnContinue": "Continuar",
     "btnCancel": "Cancelar",
     "btnExport": "Exportar",
     "dialogDeleteTitle": "Confirmar Eliminación",
-    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el pedido \"{{ id }}\"? Esta acción no se puede deshacer.",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el paquete con tracking \"{{ tracking }}\"? Esta acción no se puede deshacer.",
     "filterPaymentStatus": "Filtrar por Estado de Pago",
     "filterStatus": "Filtrar por Estado",
     "table": {
-      "id": {
-        "title": "ID"
-      },
-      "number": {
-        "title": "Número de Pedido",
-        "products": "Productos"
+      "tracking": {
+        "title": "Tracking"
       },
       "office": {
         "title": "Oficina"
@@ -38,7 +33,6 @@
       },
       "actions": {
         "title": "Acciones",
-        "editLabel": "Editar",
         "deleteLabel": "Eliminar"
       }
     }

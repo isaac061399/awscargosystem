@@ -87,5 +87,6 @@ export const clientSelectSchema = {
   full_name: true,
   identification_type: true,
   identification: true,
-  email: true
+  email: true,
+  office: { select: { id: true, name: true } }
 };

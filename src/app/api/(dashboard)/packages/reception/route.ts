@@ -26,10 +26,6 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
     const shelve = data.shelve || '';
     const row = data.row || '';
 
-    console.log('Admin:', admin);
-
-    console.log('Reception Data:', { tracking, package_id, order_id, client_id, weight, shelve, row });
-
     const result = await withTransaction(async (tx) => {
       let processResult;
       if (package_id && package_id !== '') {
@@ -118,7 +114,7 @@ const savePackageReception = async (
     select: {
       id: true,
       tracking: true,
-      client: { select: { ...clientSelectSchema, pound_fee: true, office: { select: { id: true, name: true } } } }
+      client: { select: { ...clientSelectSchema, pound_fee: true } }
     }
   });
 
@@ -192,7 +188,7 @@ const saveOrderReception = async (
     },
     select: {
       id: true,
-      client: { select: { ...clientSelectSchema, pound_fee: true, office: { select: { id: true, name: true } } } },
+      client: { select: { ...clientSelectSchema, pound_fee: true } },
       products: {
         where: { tracking, AND: [{ status: { not: 'READY' } }, { status: { not: 'DELIVERED' } }] },
         select: {
@@ -272,7 +268,7 @@ const saveNewPackageReception = async (
 
   const client = await tx.cusClient.findUnique({
     where: { id: client_id },
-    select: { ...clientSelectSchema, pound_fee: true, office: { select: { id: true, name: true } } }
+    select: { ...clientSelectSchema, pound_fee: true }
   });
 
   if (!client) {
@@ -282,8 +278,13 @@ const saveNewPackageReception = async (
   // processing logic
   const result = await tx.cusPackage.create({
     data: {
-      tracking,
       client_id: client.id,
+      tracking,
+      courier_company: '',
+      purchase_page: '',
+      price: 0,
+      description: '',
+      notes: '',
       billing_weight: weight,
       billing_pound_fee: client.pound_fee,
       billing_amount: calculateShippingPrice(weight.toString(), client.pound_fee),

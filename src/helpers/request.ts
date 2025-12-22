@@ -1443,6 +1443,44 @@ export const requestDeleteOrderProduct = async (id: number, lang: string) => {
 //   }
 // };
 
+// packages
+
+export const requestGetPackages = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/packages',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestDeletePackage = async (id: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'delete',
+      url: `/api/packages/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // packages reception
 
 export const requestPackagesReceptionTracking = async (tracking: string, lang: string) => {

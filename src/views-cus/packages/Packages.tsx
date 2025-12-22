@@ -38,18 +38,18 @@ import FilterSearch from '@components/data-tables/FilterSearch';
 import FilterSelect from '@/components/data-tables/FilterSelect';
 
 // Helpers Imports
-import { requestDeleteOrder, requestGetOrders } from '@helpers/request';
+import { requestDeletePackage, requestGetPackages } from '@helpers/request';
 
 // Auth Imports
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
-import { generateUrl, padStartZeros } from '@/libs/utils';
+import { generateUrl } from '@/libs/utils';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const statusColors: any = {
-  PENDING: 'warning',
+  PRE_ALERTED: 'warning',
   ON_THE_WAY: 'primary',
   READY: 'info',
   DELIVERED: 'success'
@@ -60,14 +60,13 @@ const paymentStatusColors: any = {
   PAID: 'success'
 };
 
-const Orders = () => {
+const Packages = () => {
   const { data: admin } = useAdmin();
-  const canCreate = hasAllPermissions('orders.create', admin.permissions);
-  const canEdit = hasAllPermissions('orders.edit', admin.permissions);
-  const canDelete = hasAllPermissions('orders.delete', admin.permissions);
+  const canView = hasAllPermissions('packages.view', admin.permissions);
+  const canDelete = hasAllPermissions('packages.delete', admin.permissions);
 
   const { t, i18n } = useTranslation();
-  const textT: any = useMemo(() => t('orders:text', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('packages:text', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
   const dgLocale = i18n.language === 'en' ? enUS : esES;
 
@@ -81,15 +80,16 @@ const Orders = () => {
   const [deleteState, setDeleteState] = useState({
     open: false,
     loading: false,
-    id: null
+    id: null,
+    tracking: ''
   });
 
   useEffect(() => {
-    handleFetchOrders();
+    handleFetchPackages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationState, paymentStatusState, statusState]);
 
-  const handleFetchOrders = async () => {
+  const handleFetchPackages = async () => {
     // start loading
     setRowsState((prevState) => ({ ...prevState, isLoading: true }));
 
@@ -102,7 +102,7 @@ const Orders = () => {
       status: statusState
     };
 
-    const result = await requestGetOrders(params, i18n.language);
+    const result = await requestGetPackages(params, i18n.language);
 
     if (result.valid) {
       setRowsState((prevState) => ({
@@ -129,8 +129,8 @@ const Orders = () => {
     setAlertState({ ...defaultAlertState });
   };
 
-  const handleDeleteOpen = (id: number) => {
-    setDeleteState((prevState: any) => ({ ...prevState, open: true, id }));
+  const handleDeleteOpen = (id: number, tracking: string) => {
+    setDeleteState((prevState: any) => ({ ...prevState, open: true, id, tracking }));
   };
 
   const handleDeleteClose = () => {
@@ -141,19 +141,19 @@ const Orders = () => {
     setAlertState({ ...defaultAlertState });
     setDeleteState((prevState: any) => ({ ...prevState, loading: true }));
 
-    const result = await requestDeleteOrder(deleteState.id || 0, i18n.language);
+    const result = await requestDeletePackage(deleteState.id || 0, i18n.language);
 
     handleDeleteClose();
 
     if (!result.valid) {
       setAlertState({ open: true, type: 'error', message: result.message });
     } else {
-      handleFetchOrders();
+      handleFetchPackages();
     }
   };
 
   const handleExport = async () => {
-    const exportUrl = generateUrl('/api/orders/export', {
+    const exportUrl = generateUrl('/api/packages/export', {
       s: searchState,
       payment_status: paymentStatusState,
       status: statusState
@@ -165,35 +165,21 @@ const Orders = () => {
   // data
   const columns: GridColDef[] = [
     {
-      field: 'id',
-      headerName: textT?.table?.id?.title,
+      field: 'tracking',
+      headerName: textT?.table?.tracking?.title,
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          {canEdit ? (
+          {canView ? (
             <Link
-              href={`/orders/edit/${params.row.id}`}
+              href={`/packages/view/${params.row.id}`}
               className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-              {`# ${padStartZeros(params.row.id, 4)}`}
+              {params.row.tracking}
             </Link>
           ) : (
-            `# ${padStartZeros(params.row.id, 4)}`
+            params.row.tracking
           )}
-        </div>
-      )
-    },
-    {
-      field: 'number',
-      headerName: textT?.table?.number?.title,
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params: any) => (
-        <div className="h-full inline-flex flex-col justify-center py-2">
-          <span>{params.row.number}</span>
-          <span>
-            <strong>{textT?.table?.number?.products}</strong>: {params.row._count?.products || 0}
-          </span>
         </div>
       )
     },
@@ -232,7 +218,7 @@ const Orders = () => {
       flex: 1,
       minWidth: 150,
       renderCell: (params: any) => {
-        const label = labelsT?.orderStatus?.[params.row.status] || 'Unknown';
+        const label = labelsT?.packageStatus?.[params.row.status] || 'Unknown';
         const status: keyof typeof statusColors = params.row.status as keyof typeof statusColors;
         const color = (statusColors[status] as any) || 'info';
 
@@ -288,7 +274,7 @@ const Orders = () => {
                   color="primary"
                   size="small"
                   onClick={() => {
-                    handleDeleteOpen(params.row.id);
+                    handleDeleteOpen(params.row.id, params.row.tracking);
                   }}>
                   <i className="ri-delete-bin-2-fill" />
                 </IconButton>
@@ -311,9 +297,9 @@ const Orders = () => {
 
   const statusOptions = useMemo(
     () =>
-      Object.keys(labelsT?.orderStatus || {}).map((key) => ({
+      Object.keys(labelsT?.packageStatus || {}).map((key) => ({
         value: key,
-        label: labelsT?.orderStatus?.[key] || key
+        label: labelsT?.packageStatus?.[key] || key
       })),
     [labelsT]
   );
@@ -324,19 +310,7 @@ const Orders = () => {
         <Grid size={{ xs: 12 }}>
           <div className="flex justify-between mb-3">
             <Typography variant="h3">{textT?.title}</Typography>
-            <div className="flex items-center gap-2">
-              {canCreate && (
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  LinkComponent={Link}
-                  href="/orders/new"
-                  startIcon={<i className="ri-add-large-line" />}>
-                  {textT?.btnCreate}
-                </Button>
-              )}
-            </div>
+            <div className="flex items-center gap-2"></div>
           </div>
           <Divider />
         </Grid>
@@ -346,7 +320,7 @@ const Orders = () => {
               <FilterSearch
                 value={searchState}
                 onChange={(e) => setSearchState(e.target.value)}
-                onSearch={handleFetchOrders}
+                onSearch={handleFetchPackages}
               />
               <FilterSelect
                 allLabel={textT?.filterPaymentStatus}
@@ -404,7 +378,7 @@ const Orders = () => {
         <DialogTitle id="alert-dialog-title">{textT?.dialogDeleteTitle}</DialogTitle>
         <DialogContent dividers>
           <DialogContentText id="alert-dialog-description">
-            {textT?.dialogDeleteMessage?.replace('{{ id }}', `# ${padStartZeros(deleteState.id || 0, 4)}`)}
+            {textT?.dialogDeleteMessage?.replace('{{ tracking }}', deleteState.tracking)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -430,4 +404,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Packages;

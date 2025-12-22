@@ -19,7 +19,7 @@ export const GET = withAuthApi(
         where: { tracking, AND: [{ status: { not: 'READY' } }, { status: { not: 'DELIVERED' } }] },
         select: {
           id: true,
-          client: { select: { ...clientSelectSchema, pound_fee: true, office: { select: { id: true, name: true } } } }
+          client: { select: { ...clientSelectSchema, pound_fee: true } }
         }
       });
 
@@ -30,7 +30,7 @@ export const GET = withAuthApi(
         },
         select: {
           id: true,
-          client: { select: { ...clientSelectSchema, pound_fee: true, office: { select: { id: true, name: true } } } },
+          client: { select: { ...clientSelectSchema, pound_fee: true } },
           products: {
             where: { tracking, AND: [{ status: { not: 'READY' } }, { status: { not: 'DELIVERED' } }] },
             select: {

@@ -114,7 +114,7 @@
       "email": "Esta dirección de correo electrónico ya está asociada a un cliente existente.",
       "identification": "Este número de identificación ya está asociado a un cliente existente.",
       "save": "Error al guardar el cliente, por favor inténtalo de nuevo",
-      "delete": "Error al eliminar el cliente, si ya tiene datos asociados, no podrá eliminarlo.",
+      "delete": "Error al eliminar el cliente, si ya tiene datos asociados, no podrá eliminarlo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     },
     "export": {
@@ -185,7 +185,7 @@
       "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo",
       "productsWithoutTracking": "Existen productos sin número de tracking. Por favor, asegúrate de que todos los productos tengan un número de tracking antes de proceder.",
       "save": "Error al guardar el pedido, por favor inténtalo de nuevo",
-      "delete": "Error al eliminar el pedido, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el pedido, si ya tiene datos asociados, no podrá eliminarlo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     },
     "export": {
@@ -212,6 +212,13 @@
       "product_location_row": "Fila de Ubicación del Producto",
       "product_payment_status": "Estado de Pago del Producto",
       "product_status": "Estado del Producto"
+    }
+  },
+  "packages": {
+    "errors": {
+      "save": "Error al guardar la información, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el paquete, si ya tiene datos asociados, no podrá eliminarlo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
   "packages-reception": {
