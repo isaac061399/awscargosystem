@@ -1476,3 +1476,23 @@ export const requestPackagesReceptionClient = async (boxNumber: string, lang: st
     return { valid: false };
   }
 };
+
+export const requestPackagesReception = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/packages/reception`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};

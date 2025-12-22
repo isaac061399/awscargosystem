@@ -9,6 +9,7 @@
     "clientTitle": "Cliente",
     "packageTitle": "Paquete",
     "locationTitle": "Ubicación",
+    "priceLabel": "Precio",
     "alertTitle": "¡Atención!",
     "officeAlertMessage": "Paquete pertenece a cliente en {{ office }}",
     "clientAlertMessage": "Cliente no encontrado",
@@ -43,8 +44,12 @@
       "shelve": "Seleccione o ingrese el estante",
       "row": "Seleccione o ingrese la fila"
     },
-    "errors": {},
-    "successMessage": "Configuración guardada con éxito",
+    "errors": {
+      "tracking": "El tracking es requerido",
+      "weight": "El peso es requerido",
+      "client": "El cliente es requerido"
+    },
+    "successMessage": "Datos guardados con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
   }
 }

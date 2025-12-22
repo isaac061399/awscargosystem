@@ -638,6 +638,7 @@ model CusOrder {
   updated_at     DateTime      @updatedAt
 
   client   CusClient         @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  packages CusOrderPackage[]
   products CusOrderProduct[]
   logs     CusOrderLog[]
 
@@ -657,6 +658,21 @@ model CusOrderLog {
   author Administrator? @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
 
   @@map("cus_order_log")
+}
+
+model CusOrderPackage {
+  id                Int      @id @default(autoincrement())
+  order_id          Int
+  tracking          String
+  billing_weight    Float    @default(0)
+  billing_pound_fee Float    @default(0)
+  billing_amount    Float    @default(0)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  order CusOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@map("cus_order_package")
 }
 
 model CusOrderProduct {

@@ -41,7 +41,11 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import Select from '@/components/Select';
 
 // Helpers Imports
-import { requestPackagesReceptionClient, requestPackagesReceptionTracking } from '@/helpers/request';
+import {
+  requestPackagesReception,
+  requestPackagesReceptionClient,
+  requestPackagesReceptionTracking
+} from '@/helpers/request';
 
 // Auth Imports
 // import { useAdmin } from '@/components/AdminProvider';
@@ -52,6 +56,53 @@ import { formatMoney, padStartZeros } from '@/libs/utils';
 import { calculateShippingPrice } from '@/helpers/calculations';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
+
+// const htmlEscapeMap: Record<string, string> = {
+//   '&': '&amp;',
+//   '<': '&lt;',
+//   '>': '&gt;',
+//   '"': '&quot;',
+//   "'": '&#39;'
+// };
+// const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (match) => htmlEscapeMap[match]);
+
+// type TicketLine = { label: string; value: string };
+// const buildTicketHtml = (title: string, subtitle: string, lines: TicketLine[], footer: string) => {
+//   const lineItems = lines
+//     .filter((line) => line.value.trim() !== '')
+//     .map(
+//       (line) =>
+//         `<div class="row"><span class="label">${escapeHtml(line.label)}</span><span class="value">${escapeHtml(
+//           line.value
+//         )}</span></div>`
+//     )
+//     .join('');
+
+//   return `<!doctype html>
+// <html>
+//   <head>
+//     <meta charset="utf-8" />
+//     <title>${escapeHtml(title)}</title>
+//     <style>
+//       * { box-sizing: border-box; font-family: "Courier New", monospace; }
+//       body { margin: 0; padding: 12px; color: #000; }
+//       h1 { font-size: 14px; margin: 0 0 6px; text-align: center; letter-spacing: 0.5px; }
+//       h2 { font-size: 12px; margin: 0 0 8px; text-align: center; font-weight: 400; }
+//       .row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; margin: 2px 0; }
+//       .label { font-weight: 700; }
+//       .value { text-align: right; }
+//       .section { margin-top: 8px; border-top: 1px dashed #000; padding-top: 6px; }
+//       .footer { margin-top: 8px; font-size: 11px; text-align: center; }
+//     </style>
+//   </head>
+//   <body>
+//     <h1>${escapeHtml(title)}</h1>
+//     <h2>${escapeHtml(subtitle)}</h2>
+//     <div class="section">${lineItems}</div>
+//     <div class="footer">${escapeHtml(footer)}</div>
+//   </body>
+// </html>`;
+// };
 
 const PackageReception = ({ offices }: { offices: any[] }) => {
   // const { data: admin } = useAdmin();
@@ -67,10 +118,10 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
   const [showClientFields, setShowClientFields] = useState<boolean>(false);
   const [showAllOtherFields, setShowAllOtherFields] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
-  const [selectorState, setSelectorState] = useState<any>({
+  const [selectorState, setSelectorState] = useState({
     open: false,
     items: { orders: [], packages: [] },
-    selected: { type: '', id: '', client: null }
+    selected: { package_id: '', order_id: '', client: null }
   });
 
   const trackingFieldRef = useRef<HTMLInputElement>(null);
@@ -88,31 +139,77 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       () => ({
         office_id: offices[0]?.id || '',
         tracking: '',
+        package_id: '',
+        order_id: '',
         box_number: '',
+        client: null as any,
         weight: '',
         shelve: '',
-        row: '',
-        client: null as any,
-        data: {
-          type: 'package', // 'package' | 'order'
-          id: ''
-        }
+        row: ''
       }),
       [offices]
     ),
-    validationSchema: yup.object({}),
-    onSubmit: async (/* values */) => {
+    validationSchema: yup.object({
+      tracking: yup.string().required(formT?.errors?.tracking),
+      weight: yup.number().required(formT?.errors?.weight),
+      client: yup.object().required(formT?.errors?.client)
+    }),
+    onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
 
       try {
-        // const result = await requestEditConfiguration(values, i18n.language);
-        // if (!result.valid) {
-        //   return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
+        const newValues = {
+          office_id: values.office_id,
+          tracking: values.tracking,
+          package_id: values.package_id,
+          order_id: values.order_id,
+          client_id: values.client.id,
+          weight: values.weight,
+          shelve: values.shelve,
+          row: values.row
+        };
+
+        const result = await requestPackagesReception(newValues, i18n.language);
+
+        if (!result.valid) {
+          return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
+        }
+
+        setAlertState({ open: true, type: 'success', message: formT?.successMessage });
+        setTimeout(() => {
+          setAlertState({ ...defaultAlertState });
+        }, 5000);
+
+        // const officeName =
+        //   offices.find((office) => office.id === values.office_id)?.name || formik.values.client?.office?.name || '';
+        // const subtitle = `${textT?.title || 'Package Reception'} - ${officeName}`;
+        // const ticketLines: TicketLine[] = [
+        //   { label: formT?.labels?.tracking || 'Tracking', value: values.tracking },
+        //   { label: formT?.labels?.box_number || 'Box', value: formik.values.client?.box_number || values.box_number },
+        //   { label: formT?.labels?.weight || 'Weight', value: values.weight?.toString() || '' },
+        //   {
+        //     label: textT?.priceLabel || 'Price',
+        //     value: formatMoney(price, `${currencies.USD.symbol} `)
+        //   },
+        //   { label: formT?.labels?.shelve || 'Shelve', value: values.shelve || '' },
+        //   { label: formT?.labels?.row || 'Row', value: values.row || '' },
+        //   { label: textT?.clientCard?.fullName || 'Client', value: formik.values.client?.full_name || '' },
+        //   {
+        //     label: textT?.clientCard?.identification || 'ID',
+        //     value: formik.values.client?.identification || ''
+        //   }
+        // ];
+        // const footer = new Date().toLocaleString(i18n.language);
+        // const ticketHtml = buildTicketHtml(textT?.title || 'Package Reception', subtitle, ticketLines, footer);
+        // const electronBridge = (window as any)?.electron;
+        // if (typeof electronBridge?.printTicket === 'function') {
+        //   void electronBridge.printTicket({ html: ticketHtml, options: { silent: true, printBackground: true } });
+        // } else if (typeof electronBridge?.print === 'function') {
+        //   void electronBridge.print({ html: ticketHtml, options: { silent: true, printBackground: true } });
         // }
-        // setAlertState({ open: true, type: 'success', message: formT?.successMessage });
-        // setTimeout(() => {
-        //   setAlertState({ ...defaultAlertState });
-        // }, 5000);
+
+        resetProcess();
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         // console.error(error);
@@ -136,6 +233,15 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       }
     }
   }, [showClientFields]);
+
+  // focus weight field when showAllOtherFields is true
+  useEffect(() => {
+    if (showAllOtherFields) {
+      if (weightFieldRef.current) {
+        weightFieldRef.current.focus();
+      }
+    }
+  }, [showAllOtherFields]);
 
   // tracking field change effect
   useEffect(() => {
@@ -163,7 +269,12 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
 
       if (packages.length + orders.length > 1) {
         // show selector dialog
-        setSelectorState({ ...selectorState, open: true, items: { packages, orders } });
+        setSelectorState({
+          ...selectorState,
+          open: true,
+          items: { packages, orders },
+          selected: { package_id: '', order_id: '', client: null }
+        });
       } else {
         if (orders[0]) {
           handleSelectorItem('order', orders[0].id, orders[0].client);
@@ -229,6 +340,8 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
     if (formik.values.client) {
       if (formik.values.client.office.id !== formik.values.office_id) {
         setShowOfficeAlert(true);
+      } else if (weightFieldRef.current) {
+        weightFieldRef.current.focus();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,13 +364,43 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.weight]);
 
-  const handleSelectorItem = (type: string, id: string, client: any) => {
-    formik.setFieldValue('data', { type, id });
+  const handleSelectorItem = (type: 'package' | 'order', id: string, client: any) => {
+    if (type === 'package') {
+      formik.setFieldValue('package_id', id);
+    } else if (type === 'order') {
+      formik.setFieldValue('order_id', id);
+    }
+
     formik.setFieldValue('client', client);
 
     // show the rest of the fields
     setShowClientFields(true);
     setShowAllOtherFields(true);
+  };
+
+  const resetProcess = () => {
+    formik.setValues({
+      ...formik.values,
+      tracking: '',
+      package_id: '',
+      order_id: '',
+      box_number: '',
+      client: null,
+      weight: ''
+    });
+
+    setShowClientFields(false);
+    setShowAllOtherFields(false);
+    setPrice(0);
+    setSelectorState({
+      open: false,
+      items: { orders: [], packages: [] },
+      selected: { package_id: '', order_id: '', client: null }
+    });
+
+    if (trackingFieldRef.current) {
+      trackingFieldRef.current.focus();
+    }
   };
 
   return (
@@ -281,6 +424,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Select
                       options={offices.map((o) => ({ value: o.id, label: o.name }))}
+                      required
                       fullWidth
                       id="office_id"
                       name="office_id"
@@ -304,6 +448,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                     <TextField
                       inputRef={trackingFieldRef}
                       fullWidth
+                      required
                       type="text"
                       id="tracking"
                       name="tracking"
@@ -330,11 +475,12 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                       <Typography variant="h5">{textT?.clientTitle}</Typography>
                     </Divider>
                     <Grid container spacing={5}>
-                      {formik.values.data.id === '' && (
+                      {formik.values.package_id === '' && formik.values.order_id === '' && (
                         <Grid size={{ xs: 12, md: 3 }}>
                           <TextField
                             inputRef={boxNumberFieldRef}
                             fullWidth
+                            required
                             type="text"
                             id="box_number"
                             name="box_number"
@@ -345,7 +491,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                             error={Boolean(formik.touched.box_number && formik.errors.box_number)}
                             color={Boolean(formik.touched.box_number && formik.errors.box_number) ? 'error' : 'primary'}
                             helperText={formik.touched.box_number && (formik.errors.box_number as string)}
-                            disabled={formik.isSubmitting || isLoading || formik.values.data.id !== ''}
+                            disabled={formik.isSubmitting || isLoading}
                             slotProps={{
                               input: {
                                 endAdornment: isLoading ? <i className="ri-loader-4-line animate-spin" /> : null
@@ -395,6 +541,11 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                             </Grid>
                           </CardContent>
                         </Card>
+                        {Boolean(formik.touched.client && formik.errors.client) && (
+                          <Typography variant="body1" className="mt-2 text-error">
+                            {formik.touched.client && (formik.errors.client as string)}
+                          </Typography>
+                        )}
                       </Grid>
                     </Grid>
                   </>
@@ -410,6 +561,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                         <TextField
                           inputRef={weightFieldRef}
                           fullWidth
+                          required
                           type="number"
                           id="weight"
                           name="weight"
@@ -425,7 +577,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                       </Grid>
                       <Grid size={{ xs: 12, md: 3 }} className="flex flex-col gap-1 justify-center">
                         <Typography variant="body1" fontWeight={600} gutterBottom>
-                          {`Precio: ${formatMoney(price, `${currencies.USD.symbol} `)}`}
+                          {`${textT?.priceLabel}: ${formatMoney(price, `${currencies.USD.symbol} `)}`}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -434,7 +586,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                       <Typography variant="h5">{textT?.locationTitle}</Typography>
                     </Divider>
                     <Grid container spacing={5}>
-                      <Grid size={{ xs: 12, md: 4 }}>
+                      <Grid size={{ xs: 12, md: 3 }}>
                         <Autocomplete
                           freeSolo
                           clearOnBlur={false}
@@ -448,7 +600,6 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              required
                               id="shelve"
                               name="shelve"
                               label={formT?.labels?.shelve}
@@ -461,7 +612,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                           )}
                         />
                       </Grid>
-                      <Grid size={{ xs: 12, md: 4 }}>
+                      <Grid size={{ xs: 12, md: 3 }}>
                         <Autocomplete
                           freeSolo
                           clearOnBlur={false}
@@ -475,7 +626,6 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              required
                               id="row"
                               name="row"
                               label={formT?.labels?.row}
@@ -487,6 +637,19 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                             />
                           )}
                         />
+                      </Grid>
+                    </Grid>
+
+                    <Grid container spacing={5} className="mt-5">
+                      <Grid size={{ xs: 12, md: 3 }} offset={{ md: 4.5 }}>
+                        <Button
+                          fullWidth
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          disabled={formik.isSubmitting || isLoading}>
+                          {textT?.btnSave}
+                        </Button>
                       </Grid>
                     </Grid>
                   </>
@@ -507,8 +670,10 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
           <List dense disablePadding>
             {selectorState.items.packages.length > 0 && (
               <>
-                <ListSubheader disableSticky sx={{ bgcolor: 'transparent', px: 0 }}>
-                  {textT?.selectorDialog?.packagesTitle}
+                <ListSubheader disableSticky sx={{ bgcolor: 'transparent', p: 0 }}>
+                  <Typography variant="h4" fontWeight={600}>
+                    {textT?.selectorDialog?.packagesTitle}
+                  </Typography>
                 </ListSubheader>
 
                 {selectorState.items.packages.map((p: any) => (
@@ -517,30 +682,32 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                     onClick={() => {
                       setSelectorState({
                         ...selectorState,
-                        selected: { type: 'package', id: p.id, client: p.client }
+                        selected: { package_id: p.id, order_id: '', client: p.client }
                       });
                     }}
-                    selected={selectorState.selected.type === 'package' && selectorState.selected.id === p.id}
+                    selected={selectorState.selected.package_id === p.id}
                     sx={{ borderRadius: 1 }}>
-                    <Radio
-                      checked={selectorState.selected.type === 'package' && selectorState.selected.id === p.id}
-                      tabIndex={-1}
-                      disableRipple
+                    <Radio checked={selectorState.selected.package_id === p.id} tabIndex={-1} disableRipple />
+                    <ListItemText
+                      primary={
+                        <Typography variant="h5">{`${p.client.box_number} - ${p.client.full_name} - ${p.client.office.name}`}</Typography>
+                      }
                     />
-                    <ListItemText primary={`${p.client.box_number} - ${p.client.full_name}`} />
                   </ListItemButton>
                 ))}
               </>
             )}
 
             {selectorState.items.packages.length > 0 && selectorState.items.orders.length > 0 && (
-              <Divider sx={{ my: 1 }} />
+              <Divider sx={{ my: 4 }} />
             )}
 
             {selectorState.items.orders.length > 0 && (
               <>
-                <ListSubheader disableSticky sx={{ bgcolor: 'transparent', px: 0 }}>
-                  {textT?.selectorDialog?.ordersTitle}
+                <ListSubheader disableSticky sx={{ bgcolor: 'transparent', p: 0 }}>
+                  <Typography variant="h4" fontWeight={600}>
+                    {textT?.selectorDialog?.ordersTitle}
+                  </Typography>
                 </ListSubheader>
 
                 {selectorState.items.orders.map((o: any) => (
@@ -549,19 +716,19 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                     onClick={() => {
                       setSelectorState({
                         ...selectorState,
-                        selected: { type: 'order', id: o.id, client: o.client }
+                        selected: { package_id: '', order_id: o.id, client: o.client }
                       });
                     }}
-                    selected={selectorState.selected.type === 'order' && selectorState.selected.id === o.id}
+                    selected={selectorState.selected.order_id === o.id}
                     sx={{ borderRadius: 1 }}>
-                    <Radio
-                      checked={selectorState.selected.type === 'order' && selectorState.selected.id === o.id}
-                      tabIndex={-1}
-                      disableRipple
-                    />
+                    <Radio checked={selectorState.selected.order_id === o.id} tabIndex={-1} disableRipple />
                     <ListItemText
-                      primary={`${o.client.box_number} - ${o.client.full_name}`}
-                      secondary={`# ${padStartZeros(o.id, 4)} - ${o.products.length} ${textT?.selectorDialog?.productsLabel}`}
+                      primary={
+                        <Typography variant="h5">{`${o.client.box_number} - ${o.client.full_name} - ${o.client.office.name}`}</Typography>
+                      }
+                      secondary={
+                        <Typography variant="body1">{`# ${padStartZeros(o.id, 4)} - ${o.products.length} ${textT?.selectorDialog?.productsLabel}`}</Typography>
+                      }
                     />
                   </ListItemButton>
                 ))}
@@ -577,10 +744,15 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
             variant="text"
             color="primary"
             onClick={() => {
-              handleSelectorItem(selectorState.selected.type, selectorState.selected.id, selectorState.selected.client);
+              if (selectorState.selected.package_id !== '') {
+                handleSelectorItem('package', selectorState.selected.package_id, selectorState.selected.client);
+              } else if (selectorState.selected.order_id !== '') {
+                handleSelectorItem('order', selectorState.selected.order_id, selectorState.selected.client);
+              }
 
               setSelectorState({ ...selectorState, open: false });
-            }}>
+            }}
+            disabled={selectorState.selected.package_id === '' && selectorState.selected.order_id === ''}>
             {textT?.btnSelect}
           </Button>
         </DialogActions>
@@ -631,12 +803,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
 
 export default PackageReception;
 
-type LabelProps = {
-  label: string;
-  value: string;
-};
-
-const Label = ({ label, value }: LabelProps) => {
+const Label = ({ label, value }: { label: string; value: string }) => {
   return (
     <Stack spacing={0.25}>
       <Typography variant="body1" fontWeight={600}>

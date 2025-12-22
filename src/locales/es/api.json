@@ -216,6 +216,8 @@
   },
   "packages-reception": {
     "errors": {
+      "packageNotFound": "Paquete no encontrado o ya recibido",
+      "orderNotFound": "Pedido no encontrado o ya recibido",
       "clientNotFound": "Cliente no encontrado con el número de casillero proporcionado",
       "save": "Error al guardar la información, por favor inténtalo de nuevo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
