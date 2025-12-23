@@ -208,7 +208,7 @@
       "product_service_price": "Precio del Servicio del Producto",
       "product_url": "URL del Producto",
       "product_image_url": "URL de la Imagen del Producto",
-      "product_location_shelve": "Estante de Ubicación del Producto",
+      "product_location_shelf": "Estante de Ubicación del Producto",
       "product_location_row": "Fila de Ubicación del Producto",
       "product_payment_status": "Estado de Pago del Producto",
       "product_status": "Estado del Producto"
@@ -226,8 +226,8 @@
       "packageNotFound": "Paquete no encontrado o ya recibido",
       "orderNotFound": "Pedido no encontrado o ya recibido",
       "clientNotFound": "Cliente no encontrado con el número de casillero proporcionado",
-      "save": "Error al guardar la información, por favor inténtalo de nuevo",
-      "general": "Se produjo un error, por favor inténtalo de nuevo"
+      "save": "Error al guardar la información, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo"
     }
   }
 }

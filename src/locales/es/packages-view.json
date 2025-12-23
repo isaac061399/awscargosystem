@@ -11,24 +11,36 @@
     "btnSave": "Guardar",
     "btnCancel": "Cancelar",
     "btnContinue": "Continuar",
-    "btnOnTheWay": "Marcar como En Camino",
-    "btnReady": "Marcar como Listo para Retirar",
-    "btnDelivered": "Marcar como Entregado",
-    "dialogStatus": {
-      "title": "Confirmar Cambio de Estado",
-      "onTheWayMessage": "¿Estás seguro de marcar el pedido como en camino?",
-      "readyMessage": "¿Estás seguro de marcar el pedido como listo para retirar?",
-      "deliveredMessage": "¿Estás seguro de marcar el pedido como entregado?"
+    "trackingLabel": "Tracking",
+    "dateLabel": "Registrado el",
+    "clientInfo": {
+      "title": "Información del Cliente",
+      "boxNumber": "Número de Casillero",
+      "name": "Nombre",
+      "identification": "Identificación",
+      "email": "Correo Electrónico",
+      "office": "Oficina",
+      "profile": "Perfil",
+      "viewClient": "Ver Cliente"
     },
-    "deleteProductDialog": {
-      "title": "Confirmar Eliminación del Producto",
-      "message": "¿Estás seguro de que deseas eliminar el producto \"{{ name }}\" del pedido?",
-      "errorMessage": "Error al eliminar el producto, por favor inténtalo de nuevo",
-      "btnContinue": "Continuar",
-      "btnCancel": "Cancelar"
+    "packageInfo": {
+      "title": "Información del Paquete",
+      "courierCompany": "Compañía de Mensajería",
+      "purchasePage": "Página de Compra",
+      "price": "Precio",
+      "description": "Descripción"
     },
-    "errors": {
-      "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo"
+    "billingInfo": {
+      "title": "Facturación",
+      "weight": "Peso (libras)",
+      "poundFee": "Tarifa por Libra",
+      "subtotal": "Subtotal",
+      "total": "Total"
+    },
+    "locationInfo": {
+      "title": "Ubicación",
+      "shelf": "Estante",
+      "row": "Fila"
     }
   },
   "form": {

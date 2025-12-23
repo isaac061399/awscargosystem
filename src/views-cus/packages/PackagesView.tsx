@@ -15,6 +15,7 @@ import * as yup from 'yup';
 // MUI Imports
 import {
   Alert,
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -27,8 +28,8 @@ import {
 } from '@mui/material';
 
 // Component Imports
+import moment from 'moment';
 import DashboardLayout from '@components/layout/DashboardLayout';
-// import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
 // import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder, requestSearchClients } from '@helpers/request';
@@ -65,17 +66,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
   // const formT: any = useMemo(() => t('packages-view:form', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
-  // const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // const [isStatusLoading, setIsStatusLoading] = useState(false);
-  // const [statusState, setStatusState] = useState({ open: false, action: '' });
-
-  // const [clientLoading, setClientLoading] = useState(false);
-  // const [clientOptions, setClientOptions] = useState<any[]>(packageObj ? [packageObj.client] : []);
-
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-
-  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const formik = useFormik({
     validateOnChange: false,
@@ -124,33 +115,6 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
       // }
     }
   });
-
-  // const fetchClients = async (search: string) => {
-  //   if (!search.trim()) {
-  //     setClientOptions([]);
-
-  //     return;
-  //   }
-
-  //   if (timeoutRef.current) {
-  //     clearTimeout(timeoutRef.current);
-  //   }
-
-  //   timeoutRef.current = setTimeout(async () => {
-  //     setClientLoading(true);
-
-  //     const result = await requestSearchClients({ search }, i18n.language);
-
-  //     setClientOptions(result.valid ? result.data : []);
-
-  //     setClientLoading(false);
-  //   }, 500); // 500ms debounce
-  // };
-
-  // const isPending = order ? order.status === ('PENDING' as OrderStatus) : false;
-  // const isOnTheWay = order ? order.status === ('ON_THE_WAY' as OrderStatus) : false;
-  // const isReady = order ? order.status === ('READY' as OrderStatus) : false;
-  // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
 
   const statusChip: any = {
     label: labelsT?.packageStatus?.[packageObj.status] || 'Unknown',
@@ -207,7 +171,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                           {textT?.subtotalLabel}:
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(packageTotal.subtotal, currencies.USD.symbol)}
+                          {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
                         </Typography>
                       </div>
                       <div className="flex items-center gap-1">
@@ -215,7 +179,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                           {textT?.totalLabel}:
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(packageTotal.total, currencies.USD.symbol)}
+                          {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}
                         </Typography>
                       </div>
                     </Stack>
@@ -249,101 +213,131 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
               </CardContent>
 
               <CardContent>
+                {/* Header */}
+                <Stack
+                  direction={{ xs: 'column', md: 'row' }}
+                  spacing={2}
+                  alignItems={{ xs: 'flex-start', md: 'center' }}
+                  justifyContent="space-between"
+                  sx={{ mb: 2 }}>
+                  <Box>
+                    <Typography variant="h5" fontWeight={700}>
+                      {textT?.trackingLabel}: {packageObj.tracking}
+                    </Typography>
+                  </Box>
+
+                  <Stack direction="row" spacing={1}>
+                    <Chip
+                      size="small"
+                      variant="outlined"
+                      label={`${textT?.dateLabel}: ${moment(packageObj.created_at).format(textT?.dateFormat)}`}
+                    />
+                  </Stack>
+                </Stack>
+
+                {/* Cards */}
                 <Grid container spacing={5}>
-                  {/* <Grid size={{ xs: 12, md: 8 }}>
-                    <Autocomplete
-                      options={clientOptions}
-                      isOptionEqualToValue={(option, v) => option.id === v.id}
-                      value={clientOptions.find((option) => option.id === formik.values.client_id) || null}
-                      getOptionLabel={(option) => formatOption(option)}
-                      onInputChange={(event, value, reason) => {
-                        if (['input', 'clear'].includes(reason)) {
-                          fetchClients(value);
-                        }
-                      }}
-                      onChange={(event, value) => {
-                        formik.setFieldValue('client_id', value?.id || null);
-                      }}
-                      loading={clientLoading}
-                      loadingText={textT?.loading}
-                      noOptionsText={textT?.noOptions}
-                      disabled={formik.isSubmitting || isRedirecting}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          id="client_id"
-                          name="client_id"
-                          label={formT?.labels?.client_id}
-                          placeholder={formT?.placeholders?.client_id}
-                          error={Boolean(formik.touched.client_id && formik.errors.client_id)}
-                          color={Boolean(formik.touched.client_id && formik.errors.client_id) ? 'error' : 'primary'}
-                          helperText={formik.touched.client_id && (formik.errors.client_id as string)}
-                          disabled={formik.isSubmitting || isRedirecting}
-                          slotProps={{
-                            input: {
-                              ...params.InputProps,
-                              endAdornment: (
-                                <>
-                                  {clientLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                                  {params.InputProps.endAdornment}
-                                </>
+                  {/* Client Info */}
+                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
+                    <Card sx={{ flexGrow: 1 }}>
+                      <CardHeader title={textT?.clientInfo?.title} />
+                      <CardContent>
+                        <Stack spacing={1.25}>
+                          <InfoRow label={textT?.clientInfo?.boxNumber} value={packageObj.client?.box_number} />
+                          <Divider />
+                          <InfoRow label={textT?.clientInfo?.name} value={packageObj.client?.full_name} />
+                          <InfoRow
+                            label={textT?.clientInfo?.identification}
+                            value={packageObj.client?.identification}
+                          />
+                          <InfoRow label={textT?.clientInfo?.email} value={packageObj.client?.email} />
+                          <InfoRow label={textT?.clientInfo?.office} value={packageObj.client?.office?.name} />
+                          <Divider />
+                          <InfoRow
+                            label={textT?.clientInfo?.profile}
+                            value={
+                              packageObj.client?.id ? (
+                                <Link
+                                  href={`/clients/edit/${packageObj.client.id}`}
+                                  target="_blank"
+                                  className="underline">
+                                  {textT?.clientInfo?.viewClient}
+                                </Link>
+                              ) : (
+                                '—'
                               )
                             }
-                          }}
-                        />
-                      )}
-                    />
+                          />
+                        </Stack>
+                      </CardContent>
+                    </Card>
                   </Grid>
 
-                  <Grid size={{ xs: 12, md: 4 }} sx={{ display: { xs: 'none', md: 'block' } }} />
-
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      id="number"
-                      name="number"
-                      label={formT?.labels?.number}
-                      placeholder={formT?.placeholders?.number}
-                      value={formik.values.number}
-                      onChange={formik.handleChange}
-                      error={Boolean(formik.touched.number && formik.errors.number)}
-                      color={Boolean(formik.touched.number && formik.errors.number) ? 'error' : 'primary'}
-                      helperText={formik.touched.number && formik.errors.number}
-                      disabled={formik.isSubmitting || isRedirecting}
-                    />
+                  {/* Package Info */}
+                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
+                    <Card sx={{ flexGrow: 1 }}>
+                      <CardHeader title={textT?.packageInfo?.title} />
+                      <CardContent>
+                        <Stack spacing={1.25}>
+                          <InfoRow
+                            label={textT?.packageInfo?.courierCompany}
+                            value={packageObj.courier_company ?? '—'}
+                          />
+                          <InfoRow label={textT?.packageInfo?.purchasePage} value={packageObj.purchase_page ?? '—'} />
+                          <InfoRow label={textT?.packageInfo?.price} value={packageObj.price} />
+                          <Divider />
+                          <InfoRow label={textT?.packageInfo?.description} value={packageObj.description ?? '—'} />
+                        </Stack>
+                      </CardContent>
+                    </Card>
                   </Grid>
 
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Autocomplete
-                      freeSolo
-                      clearOnBlur={false}
-                      options={sellersPages}
-                      inputValue={formik.values.purchase_page}
-                      onInputChange={(_, newValue) => {
-                        // newValue is always a string (or null)
-                        formik.setFieldValue('purchase_page', newValue ?? '');
-                      }}
-                      disabled={formik.isSubmitting || isRedirecting}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          required
-                          id="purchase_page"
-                          name="purchase_page"
-                          label={formT?.labels?.purchase_page}
-                          placeholder={formT?.placeholders?.purchase_page}
-                          error={Boolean(formik.touched.purchase_page && formik.errors.purchase_page)}
-                          color={
-                            Boolean(formik.touched.purchase_page && formik.errors.purchase_page) ? 'error' : 'primary'
-                          }
-                          helperText={formik.touched.purchase_page && (formik.errors.purchase_page as string)}
-                          disabled={formik.isSubmitting || isRedirecting}
-                        />
-                      )}
-                    />
-                  </Grid> */}
+                  {/* Billing */}
+                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
+                    <Card sx={{ flexGrow: 1 }}>
+                      <CardHeader title={textT?.billingInfo?.title} />
+                      <CardContent>
+                        <Stack spacing={1.25}>
+                          <InfoRow label={textT?.billingInfo?.weight} value={packageObj.billing_weight} />
+                          <InfoRow
+                            label={textT?.billingInfo?.poundFee}
+                            value={formatMoney(packageObj.billing_pound_fee, `${currencies.USD.symbol} `)}
+                          />
+                          <Divider />
+                          <InfoRow
+                            label={textT?.billingInfo?.subtotal}
+                            value={
+                              <Typography fontWeight={700}>
+                                {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
+                              </Typography>
+                            }
+                          />
+                          <InfoRow
+                            label={textT?.billingInfo?.total}
+                            value={
+                              <Typography fontWeight={700}>
+                                {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}
+                              </Typography>
+                            }
+                          />
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Location & Status */}
+                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
+                    <Card sx={{ flexGrow: 1 }}>
+                      <CardHeader title={textT?.locationInfo?.title} />
+                      <CardContent>
+                        <Stack spacing={1.25}>
+                          <InfoRow label={textT?.locationInfo?.shelf} value={packageObj.location_shelf} />
+                          <InfoRow label={textT?.locationInfo?.row} value={packageObj.location_row} />
+                          <Divider />
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
@@ -353,5 +347,18 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
     </DashboardLayout>
   );
 };
+
+function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <Stack direction="row" spacing={2} alignItems="baseline">
+      <Typography variant="body1" fontWeight={600} sx={{ minWidth: 195 }}>
+        {label}
+      </Typography>
+      <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+        {value && value !== '' ? value : '—'}
+      </Typography>
+    </Stack>
+  );
+}
 
 export default OrdersEdition;

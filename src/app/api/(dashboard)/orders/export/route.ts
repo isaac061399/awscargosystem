@@ -120,7 +120,7 @@ const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
           [headers.product_service_price]: p.service_price,
           [headers.product_url]: p.url,
           [headers.product_image_url]: p.image_url,
-          [headers.location_shelve]: p.location_shelve,
+          [headers.location_shelf]: p.location_shelf,
           [headers.location_row]: p.location_row,
           [headers.payment_status]: labelsT?.paymentStatus[p.payment_status],
           [headers.status]: labelsT?.orderStatus[p.status]

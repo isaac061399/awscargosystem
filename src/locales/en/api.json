@@ -208,7 +208,7 @@
       "product_service_price": "Product Service Price",
       "product_url": "Product URL",
       "product_image_url": "Product Image URL",
-      "product_location_shelve": "Product Location Shelve",
+      "product_location_shelf": "Product Location Shelf",
       "product_location_row": "Product Location Row",
       "product_payment_status": "Product Payment Status",
       "product_status": "Product Status"
@@ -225,8 +225,8 @@
       "packageNotFound": "Package not found or already received",
       "orderNotFound": "Order not found or already received",
       "clientNotFound": "Client not found with the provided box number",
-      "save": "Error saving the information, please try again",
-      "general": "An error occurred, please try again"
+      "save": "Error saving the information, it is possible that the package has already been received, please try again",
+      "general": "An error occurred, it is possible that the package has already been received, please try again"
     }
   }
 }

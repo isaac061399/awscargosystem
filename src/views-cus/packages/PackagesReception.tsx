@@ -144,7 +144,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
         box_number: '',
         client: null as any,
         weight: '',
-        shelve: '',
+        shelf: '',
         row: ''
       }),
       [offices]
@@ -165,7 +165,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
           order_id: values.order_id,
           client_id: values.client.id,
           weight: values.weight,
-          shelve: values.shelve,
+          shelf: values.shelf,
           row: values.row
         };
 
@@ -191,7 +191,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
         //     label: textT?.priceLabel || 'Price',
         //     value: formatMoney(price, `${currencies.USD.symbol} `)
         //   },
-        //   { label: formT?.labels?.shelve || 'Shelve', value: values.shelve || '' },
+        //   { label: formT?.labels?.shelf || 'Shelve', value: values.shelf || '' },
         //   { label: formT?.labels?.row || 'Row', value: values.row || '' },
         //   { label: textT?.clientCard?.fullName || 'Client', value: formik.values.client?.full_name || '' },
         //   {
@@ -591,22 +591,23 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                           freeSolo
                           clearOnBlur={false}
                           options={offices[formik.values.office_id]?.shelves?.split(',') || []}
-                          inputValue={formik.values.shelve}
+                          filterOptions={(x) => x}
+                          inputValue={formik.values.shelf}
                           onInputChange={(_, newValue) => {
                             // newValue is always a string (or null)
-                            formik.setFieldValue('shelve', newValue ?? '');
+                            formik.setFieldValue('shelf', newValue ?? '');
                           }}
                           disabled={formik.isSubmitting || isLoading}
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              id="shelve"
-                              name="shelve"
-                              label={formT?.labels?.shelve}
-                              placeholder={formT?.placeholders?.shelve}
-                              error={Boolean(formik.touched.shelve && formik.errors.shelve)}
-                              color={Boolean(formik.touched.shelve && formik.errors.shelve) ? 'error' : 'primary'}
-                              helperText={formik.touched.shelve && (formik.errors.shelve as string)}
+                              id="shelf"
+                              name="shelf"
+                              label={formT?.labels?.shelf}
+                              placeholder={formT?.placeholders?.shelf}
+                              error={Boolean(formik.touched.shelf && formik.errors.shelf)}
+                              color={Boolean(formik.touched.shelf && formik.errors.shelf) ? 'error' : 'primary'}
+                              helperText={formik.touched.shelf && (formik.errors.shelf as string)}
                               disabled={formik.isSubmitting || isLoading}
                             />
                           )}
@@ -617,6 +618,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                           freeSolo
                           clearOnBlur={false}
                           options={offices[formik.values.office_id]?.rows?.split(',') || []}
+                          filterOptions={(x) => x}
                           inputValue={formik.values.row}
                           onInputChange={(_, newValue) => {
                             // newValue is always a string (or null)

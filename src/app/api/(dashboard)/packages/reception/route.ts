@@ -23,7 +23,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
     const order_id = data.order_id || '';
     const client_id = data.client_id || 0;
     const weight = data.weight || 0;
-    const shelve = data.shelve || '';
+    const shelf = data.shelf || '';
     const row = data.row || '';
 
     const result = await withTransaction(async (tx) => {
@@ -35,7 +35,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
           {
             package_id: Number(package_id),
             weight: Number(weight),
-            shelve,
+            shelf,
             row
           },
           admin.id,
@@ -49,7 +49,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
             order_id: Number(order_id),
             tracking,
             weight: Number(weight),
-            shelve,
+            shelf,
             row
           },
           admin.id,
@@ -63,7 +63,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
             tracking,
             client_id: Number(client_id),
             weight: Number(weight),
-            shelve,
+            shelf,
             row
           },
           admin.id,
@@ -100,14 +100,14 @@ const savePackageReception = async (
   data: {
     package_id: number;
     weight: number;
-    shelve: string;
+    shelf: string;
     row: string;
   },
   admin_id: number,
   textT: any
 ) => {
-  const { package_id, weight, shelve, row } = data;
-  const ready = shelve !== '' && row !== '';
+  const { package_id, weight, shelf, row } = data;
+  const ready = shelf !== '' && row !== '';
 
   const entry = await tx.cusPackage.findUnique({
     where: { id: package_id, AND: [{ status: { not: 'READY' } }, { status: { not: 'DELIVERED' } }] },
@@ -129,7 +129,7 @@ const savePackageReception = async (
       billing_weight: weight,
       billing_pound_fee: entry.client ? entry.client.pound_fee : undefined,
       billing_amount: entry.client ? calculateShippingPrice(weight.toString(), entry.client.pound_fee) : undefined,
-      location_shelve: ready ? shelve : null,
+      location_shelf: ready ? shelf : null,
       location_row: ready ? row : null,
       status: ready ? 'READY' : undefined,
       status_date: ready ? new Date() : undefined
@@ -171,14 +171,14 @@ const saveOrderReception = async (
     order_id: number;
     tracking: string;
     weight: number;
-    shelve: string;
+    shelf: string;
     row: string;
   },
   admin_id: number,
   textT: any
 ) => {
-  const { order_id, tracking, weight, shelve, row } = data;
-  const ready = shelve !== '' && row !== '';
+  const { order_id, tracking, weight, shelf, row } = data;
+  const ready = shelf !== '' && row !== '';
 
   const entry = await tx.cusOrder.findUnique({
     where: {
@@ -208,7 +208,7 @@ const saveOrderReception = async (
     const result = await tx.cusOrderProduct.update({
       where: { id: product.id },
       data: {
-        location_shelve: ready ? shelve : null,
+        location_shelf: ready ? shelf : null,
         location_row: ready ? row : null,
         status: ready ? 'READY' : undefined,
         status_date: ready ? new Date() : undefined
@@ -257,14 +257,14 @@ const saveNewPackageReception = async (
     tracking: string;
     client_id: number;
     weight: number;
-    shelve: string;
+    shelf: string;
     row: string;
   },
   admin_id: number,
   textT: any
 ) => {
-  const { tracking, client_id, weight, shelve, row } = data;
-  const ready = shelve !== '' && row !== '';
+  const { tracking, client_id, weight, shelf, row } = data;
+  const ready = shelf !== '' && row !== '';
 
   const client = await tx.cusClient.findUnique({
     where: { id: client_id },
@@ -288,7 +288,7 @@ const saveNewPackageReception = async (
       billing_weight: weight,
       billing_pound_fee: client.pound_fee,
       billing_amount: calculateShippingPrice(weight.toString(), client.pound_fee),
-      location_shelve: ready ? shelve : null,
+      location_shelf: ready ? shelf : null,
       location_row: ready ? row : null,
       status: ready ? 'READY' : 'ON_THE_WAY',
       status_date: new Date()

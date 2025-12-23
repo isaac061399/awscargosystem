@@ -676,24 +676,24 @@ model CusOrderPackage {
 }
 
 model CusOrderProduct {
-  id              Int           @id @default(autoincrement())
-  order_id        Int
-  tracking        String?
-  code            String
-  name            String
-  description     String
-  quantity        Int
-  price           Float
-  service_price   Float
-  url             String?
-  image_url       String?
-  location_shelve String?
-  location_row    String?
-  payment_status  PaymentStatus @default(PENDING)
-  status          OrderStatus   @default(PENDING)
-  status_date     DateTime      @default(now())
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
+  id             Int           @id @default(autoincrement())
+  order_id       Int
+  tracking       String?
+  code           String
+  name           String
+  description    String
+  quantity       Int
+  price          Float
+  service_price  Float
+  url            String?
+  image_url      String?
+  location_shelf String?
+  location_row   String?
+  payment_status PaymentStatus @default(PENDING)
+  status         OrderStatus   @default(PENDING)
+  status_date    DateTime      @default(now())
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
 
   order       CusOrder                   @relation(fields: [order_id], references: [id], onDelete: Cascade)
   status_logs CusOrderProductStatusLog[]
@@ -725,7 +725,7 @@ model CusPackage {
   billing_weight    Float         @default(0)
   billing_pound_fee Float         @default(0)
   billing_amount    Float         @default(0)
-  location_shelve   String?
+  location_shelf    String?
   location_row      String?
   payment_status    PaymentStatus @default(PENDING)
   status            PackageStatus @default(PRE_ALERTED)

@@ -34,14 +34,14 @@
       "tracking": "Tracking",
       "box_number": "Número de Casillero",
       "weight": "Peso (libras)",
-      "shelve": "Estante",
+      "shelf": "Estante",
       "row": "Fila"
     },
     "placeholders": {
       "tracking": "Ingrese el tracking",
       "box_number": "Buscar por número de casillero",
       "weight": "Ingrese el peso",
-      "shelve": "Seleccione o ingrese el estante",
+      "shelf": "Seleccione o ingrese el estante",
       "row": "Seleccione o ingrese la fila"
     },
     "errors": {

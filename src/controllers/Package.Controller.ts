@@ -17,7 +17,7 @@ export const getPackage = async (id: number) => {
         billing_weight: true,
         billing_pound_fee: true,
         billing_amount: true,
-        location_shelve: true,
+        location_shelf: true,
         location_row: true,
         payment_status: true,
         status: true,

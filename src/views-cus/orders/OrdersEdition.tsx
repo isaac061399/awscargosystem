@@ -307,7 +307,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                             {textT?.subtotalLabel}:
                           </Typography>
                           <Typography variant="h5" fontWeight={600}>
-                            {formatMoney(orderTotal.subtotal, currencies.USD.symbol)}
+                            {formatMoney(orderTotal.subtotal, `${currencies.USD.symbol} `)}
                           </Typography>
                         </div>
                         <div className="flex items-center gap-1">
@@ -315,7 +315,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                             {textT?.totalLabel}:
                           </Typography>
                           <Typography variant="h5" fontWeight={600}>
-                            {formatMoney(orderTotal.total, currencies.USD.symbol)}
+                            {formatMoney(orderTotal.total, `${currencies.USD.symbol} `)}
                           </Typography>
                         </div>
                       </Stack>
@@ -421,6 +421,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                       freeSolo
                       clearOnBlur={false}
                       options={sellersPages}
+                      filterOptions={(x) => x}
                       inputValue={formik.values.purchase_page}
                       onInputChange={(_, newValue) => {
                         // newValue is always a string (or null)
