@@ -1,7 +1,7 @@
 'use client';
 
 // React Imports
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 // Next Imports
 import Link from 'next/link';
@@ -24,7 +24,6 @@ import {
   CardContent,
   CardHeader,
   Chip,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -41,9 +40,11 @@ import {
 // Component Imports
 import DashboardLayout from '@components/layout/DashboardLayout';
 import MoneyField from '@/components/MoneyField';
+import ClientField from '@/components/custom/ClientField';
+import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
-import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder, requestSearchClients } from '@helpers/request';
+import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
 
 // Auth Imports
 // import { useAdmin } from '@components/AdminProvider';
@@ -52,7 +53,7 @@ import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder, requestSe
 import { currencies, sellersPages } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
 import { getOrderTotal } from '@/helpers/calculations';
-// import { OrderStatus } from '@/prisma/generated/enums';
+import { OrderStatus, PaymentStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -66,28 +67,6 @@ const statusColors: any = {
 const paymentStatusColors: any = {
   PENDING: 'warning',
   PAID: 'success'
-};
-
-const formatOption = (option: any) => {
-  const extras = [];
-
-  if (option.box_number) {
-    extras.push(option.box_number);
-  }
-
-  if (option.identification) {
-    extras.push(option.identification);
-  }
-
-  if (option.email) {
-    extras.push(option.email);
-  }
-
-  if (extras.length === 0) {
-    return `${option.full_name}`;
-  }
-
-  return `${option.full_name} (${extras.join(' - ')})`;
 };
 
 const productInitialValues = {
@@ -118,12 +97,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
   // const [isStatusLoading, setIsStatusLoading] = useState(false);
   // const [statusState, setStatusState] = useState({ open: false, action: '' });
 
-  const [clientLoading, setClientLoading] = useState(false);
-  const [clientOptions, setClientOptions] = useState<any[]>(order ? [order.client] : []);
-
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const formik = useFormik({
     validateOnChange: false,
@@ -131,7 +105,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
     enableReinitialize: true,
     initialValues: useMemo(
       () => ({
-        client_id: order ? order.client?.id : null,
+        client: order ? order.client : null,
         number: order ? `${order.number}` : '',
         purchase_page: order ? `${order.purchase_page}` : '',
         products: order ? order.products : []
@@ -139,7 +113,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
       [order]
     ),
     validationSchema: yup.object({
-      client_id: yup.number().required(formT?.errors?.client_id),
+      client: yup.object().required(formT?.errors?.client),
       number: yup.string().required(formT?.errors?.number),
       purchase_page: yup.string().required(formT?.errors?.purchase_page),
 
@@ -164,10 +138,12 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
       setAlertState({ ...defaultAlertState });
 
       try {
-        const result = isEditing
-          ? await requestEditOrder(order.id, values, i18n.language)
-          : await requestNewOrder(values, i18n.language);
+        const newValues = { ...values, client_id: values.client.id };
+        delete newValues.client;
 
+        const result = isEditing
+          ? await requestEditOrder(order.id, newValues, i18n.language)
+          : await requestNewOrder(newValues, i18n.language);
         if (!result.valid) {
           return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
         }
@@ -192,28 +168,6 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
       }
     }
   });
-
-  const fetchClients = async (search: string) => {
-    if (!search.trim()) {
-      setClientOptions([]);
-
-      return;
-    }
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(async () => {
-      setClientLoading(true);
-
-      const result = await requestSearchClients({ search }, i18n.language);
-
-      setClientOptions(result.valid ? result.data : []);
-
-      setClientLoading(false);
-    }, 500); // 500ms debounce
-  };
 
   // const handleStatusOpen = (action: 'on-the-way' | 'ready' | 'delivered') => {
   //   setStatusState({ open: true, action });
@@ -248,19 +202,15 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
   // const isReady = order ? order.status === ('READY' as OrderStatus) : false;
   // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
 
+  const orderTotal = getOrderTotal(formik.values.products, config.iva_percentage);
   const paymentStatusChip: any = { label: '', color: 'info' };
-
   const statusChip: any = { label: '', color: 'info' };
-
-  let orderTotal = { subtotal: 0, total: 0 };
 
   if (isEditing) {
     statusChip.label = labelsT?.orderStatus?.[order.status] || 'Unknown';
     statusChip.color = statusColors[order.status] || 'info';
     paymentStatusChip.label = labelsT?.paymentStatus?.[order.payment_status] || 'Unknown';
     paymentStatusChip.color = paymentStatusColors[order.payment_status] || 'info';
-
-    orderTotal = getOrderTotal(formik.values.products, config.iva_percentage);
   }
 
   return (
@@ -296,103 +246,81 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
             <Card>
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
 
-              {isEditing && (
-                <CardContent>
-                  <Grid container spacing={3} alignItems="top">
-                    {/* Total */}
-                    <Grid size={{ xs: 12, md: 3 }}>
-                      <Stack>
-                        <div className="flex items-center gap-1">
-                          <Typography variant="overline" color="text.secondary">
-                            {textT?.subtotalLabel}:
-                          </Typography>
-                          <Typography variant="h5" fontWeight={600}>
-                            {formatMoney(orderTotal.subtotal, `${currencies.USD.symbol} `)}
-                          </Typography>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Typography variant="overline" color="text.secondary">
-                            {textT?.totalLabel}:
-                          </Typography>
-                          <Typography variant="h5" fontWeight={600}>
-                            {formatMoney(orderTotal.total, `${currencies.USD.symbol} `)}
-                          </Typography>
-                        </div>
-                      </Stack>
-                    </Grid>
-
-                    {/* Order status */}
-                    <Grid size={{ xs: 12, md: 3 }}>
-                      <Stack spacing={1}>
+              <CardContent>
+                <Grid container spacing={3} alignItems="top">
+                  {/* Total */}
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <Stack>
+                      <div className="flex items-center gap-1">
                         <Typography variant="overline" color="text.secondary">
-                          {textT?.statusLabel}
+                          {textT?.subtotalLabel}:
                         </Typography>
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                          <Chip label={statusChip.label} color={statusChip.color} size="small" />
-                        </Stack>
-                      </Stack>
-                    </Grid>
-
-                    {/* Payment status */}
-                    <Grid size={{ xs: 12, md: 3 }}>
-                      <Stack spacing={1}>
+                        <Typography variant="h5" fontWeight={600}>
+                          {formatMoney(orderTotal.subtotal, `${currencies.USD.symbol} `)}
+                        </Typography>
+                      </div>
+                      <div className="flex items-center gap-1">
                         <Typography variant="overline" color="text.secondary">
-                          {textT?.paymentStatusLabel}
+                          {textT?.totalLabel}:
                         </Typography>
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                          <Chip label={paymentStatusChip.label} color={paymentStatusChip.color} size="small" />
-                        </Stack>
-                      </Stack>
-                    </Grid>
+                        <Typography variant="h5" fontWeight={600}>
+                          {formatMoney(orderTotal.total, `${currencies.USD.symbol} `)}
+                        </Typography>
+                      </div>
+                    </Stack>
                   </Grid>
-                  <Divider sx={{ mt: 5 }} />
-                </CardContent>
-              )}
+                  {isEditing && (
+                    <>
+                      {/* Order status */}
+                      <Grid size={{ xs: 12, md: 3 }}>
+                        <Stack spacing={1}>
+                          <Typography variant="overline" color="text.secondary">
+                            {textT?.statusLabel}
+                          </Typography>
+                          <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <Chip label={statusChip.label} color={statusChip.color} size="small" />
+                          </Stack>
+                        </Stack>
+                      </Grid>
+
+                      {/* Payment status */}
+                      <Grid size={{ xs: 12, md: 3 }}>
+                        <Stack spacing={1}>
+                          <Typography variant="overline" color="text.secondary">
+                            {textT?.paymentStatusLabel}
+                          </Typography>
+                          <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <Chip label={paymentStatusChip.label} color={paymentStatusChip.color} size="small" />
+                          </Stack>
+                        </Stack>
+                      </Grid>
+                    </>
+                  )}
+                </Grid>
+                <Divider sx={{ mt: 5 }} />
+              </CardContent>
 
               <CardContent>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 8 }}>
-                    <Autocomplete
-                      options={clientOptions}
+                    <ClientField
+                      language={i18n.language}
+                      initialOptions={order ? [order.client] : []}
                       isOptionEqualToValue={(option, v) => option.id === v.id}
-                      value={clientOptions.find((option) => option.id === formik.values.client_id) || null}
-                      getOptionLabel={(option) => formatOption(option)}
-                      onInputChange={(event, value, reason) => {
-                        if (['input', 'clear'].includes(reason)) {
-                          fetchClients(value);
-                        }
-                      }}
-                      onChange={(event, value) => {
-                        formik.setFieldValue('client_id', value?.id || null);
-                      }}
-                      loading={clientLoading}
                       loadingText={textT?.loading}
                       noOptionsText={textT?.noOptions}
+                      value={formik.values.client}
+                      onChange={(value) => {
+                        formik.setFieldValue('client', value || null);
+                      }}
+                      id="client"
+                      name="client"
+                      label={formT?.labels?.client}
+                      placeholder={formT?.placeholders?.client}
+                      error={Boolean(formik.touched.client && formik.errors.client)}
+                      color={Boolean(formik.touched.client && formik.errors.client) ? 'error' : 'primary'}
+                      helperText={formik.touched.client && (formik.errors.client as string)}
                       disabled={formik.isSubmitting || isRedirecting}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          id="client_id"
-                          name="client_id"
-                          label={formT?.labels?.client_id}
-                          placeholder={formT?.placeholders?.client_id}
-                          error={Boolean(formik.touched.client_id && formik.errors.client_id)}
-                          color={Boolean(formik.touched.client_id && formik.errors.client_id) ? 'error' : 'primary'}
-                          helperText={formik.touched.client_id && (formik.errors.client_id as string)}
-                          disabled={formik.isSubmitting || isRedirecting}
-                          slotProps={{
-                            input: {
-                              ...params.InputProps,
-                              endAdornment: (
-                                <>
-                                  {clientLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                                  {params.InputProps.endAdornment}
-                                </>
-                              )
-                            }
-                          }}
-                        />
-                      )}
                     />
                   </Grid>
 
@@ -594,6 +522,16 @@ const ProductsAccordionComponent = ({
               };
             }
 
+            const isPending = item ? item.status === OrderStatus.PENDING : false;
+            const isOnTheWay = item ? item.status === OrderStatus.ON_THE_WAY : false;
+            const isReady = item ? item.status === OrderStatus.READY : false;
+            const isDelivered = item ? item.status === OrderStatus.DELIVERED : false;
+
+            const isPaid = item ? item.payment_status === PaymentStatus.PAID : false;
+
+            const canEditInfo = (isPending || isOnTheWay || isReady) && !isDelivered;
+            const canEditPrice = (isPending || isOnTheWay) && !isReady && !isDelivered && !isPaid;
+
             return (
               <Accordion
                 key={index}
@@ -612,7 +550,10 @@ const ProductsAccordionComponent = ({
                   }}>
                   <div className="flex items-center w-full justify-between">
                     <div className="flex items-center gap-1">
-                      <Typography component="span">{item.name}</Typography>
+                      <Typography component="span">
+                        {item.name}
+                        {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
+                      </Typography>
                       {statusChip && (
                         <Chip
                           variant="outlined"
@@ -661,7 +602,7 @@ const ProductsAccordionComponent = ({
                           error={Boolean(touched.tracking && errors.tracking)}
                           color={Boolean(touched.tracking && errors.tracking) ? 'error' : 'primary'}
                           helperText={touched.tracking && errors.tracking}
-                          disabled={formik.isSubmitting || isLoading}
+                          disabled={formik.isSubmitting || isLoading || !canEditInfo}
                         />
                       </Grid>
                     )}
@@ -679,7 +620,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.code && errors.code)}
                         color={Boolean(touched.code && errors.code) ? 'error' : 'primary'}
                         helperText={touched.code && errors.code}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -696,7 +637,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.name && errors.name)}
                         color={Boolean(touched.name && errors.name) ? 'error' : 'primary'}
                         helperText={touched.name && errors.name}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 12 }}>
@@ -712,7 +653,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.description && errors.description)}
                         color={Boolean(touched.description && errors.description) ? 'error' : 'primary'}
                         helperText={touched.description && errors.description}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -729,7 +670,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.quantity && errors.quantity)}
                         color={Boolean(touched.quantity && errors.quantity) ? 'error' : 'primary'}
                         helperText={touched.quantity && errors.quantity}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditPrice}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -750,7 +691,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.price && errors.price)}
                         color={Boolean(touched.price && errors.price) ? 'error' : 'primary'}
                         helperText={touched.price && errors.price}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditPrice}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -771,7 +712,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.service_price && errors.service_price)}
                         color={Boolean(touched.service_price && errors.service_price) ? 'error' : 'primary'}
                         helperText={touched.service_price && errors.service_price}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditPrice}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 12 }}>
@@ -787,7 +728,7 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.url && errors.url)}
                         color={Boolean(touched.url && errors.url) ? 'error' : 'primary'}
                         helperText={touched.url && errors.url}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 12 }}>
@@ -803,10 +744,31 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.image_url && errors.image_url)}
                         color={Boolean(touched.image_url && errors.image_url) ? 'error' : 'primary'}
                         helperText={touched.image_url && errors.image_url}
-                        disabled={formik.isSubmitting || isLoading}
+                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
                       />
                     </Grid>
                   </Grid>
+
+                  {/* Location */}
+                  {isReady && (
+                    <Grid container spacing={5} sx={{ mt: 5 }}>
+                      <Grid size={{ xs: 12 }}>
+                        <Divider />
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 6 }} offset={{ md: 3 }} sx={{ display: 'flex' }}>
+                        <Card sx={{ flexGrow: 1 }}>
+                          <CardHeader title={textT?.locationInfo?.title} />
+                          <CardContent>
+                            <Stack spacing={1.25}>
+                              <InfoRow label={textT?.locationInfo?.shelf} value={item.location_shelf} />
+                              <InfoRow label={textT?.locationInfo?.row} value={item.location_row} />
+                              <Divider />
+                            </Stack>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    </Grid>
+                  )}
                 </AccordionDetails>
               </Accordion>
             );

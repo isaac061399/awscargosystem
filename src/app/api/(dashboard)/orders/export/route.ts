@@ -102,6 +102,7 @@ const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
       return o.products.map((p: any) => {
         return {
           [headers.id]: padStartZeros(o.id, 4),
+          [headers.client_office]: o.client?.office?.name || '',
           [headers.client_box_number]: o.client?.box_number || '',
           [headers.client_full_name]: o.client?.full_name || '',
           [headers.client_identification]: o.client?.identification || '',

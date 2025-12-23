@@ -98,8 +98,8 @@ const Packages = () => {
       limit: paginationState.pageSize,
       offset: paginationState.pageSize * paginationState.page,
       s: searchState,
-      payment_status: paymentStatusState,
-      status: statusState
+      status: statusState,
+      payment_status: paymentStatusState
     };
 
     const result = await requestGetPackages(params, i18n.language);
@@ -155,8 +155,8 @@ const Packages = () => {
   const handleExport = async () => {
     const exportUrl = generateUrl('/api/packages/export', {
       s: searchState,
-      payment_status: paymentStatusState,
-      status: statusState
+      status: statusState,
+      payment_status: paymentStatusState
     });
 
     window.open(exportUrl, '_blank');
@@ -199,9 +199,10 @@ const Packages = () => {
       minWidth: 300,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          <span>{params.row.client?.full_name}</span>
           <span>
-            <strong>{textT?.table?.client?.box_number}</strong>: {params.row.client?.box_number}
+            <strong>
+              {params.row.client?.box_number} - {params.row.client?.full_name}
+            </strong>
           </span>
           <span>
             <strong>{textT?.table?.client?.identification}</strong>: {params.row.client?.identification}
@@ -323,16 +324,16 @@ const Packages = () => {
                 onSearch={handleFetchPackages}
               />
               <FilterSelect
-                allLabel={textT?.filterPaymentStatus}
-                options={paymentStatusOptions}
-                value={paymentStatusState}
-                onChange={(e) => setPaymentStatusState(e.target.value)}
-              />
-              <FilterSelect
                 allLabel={textT?.filterStatus}
                 options={statusOptions}
                 value={statusState}
                 onChange={(e) => setStatusState(e.target.value)}
+              />
+              <FilterSelect
+                allLabel={textT?.filterPaymentStatus}
+                options={paymentStatusOptions}
+                value={paymentStatusState}
+                onChange={(e) => setPaymentStatusState(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2 mb-2">

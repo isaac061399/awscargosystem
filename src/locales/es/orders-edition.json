@@ -15,6 +15,11 @@
     "btnOnTheWay": "Marcar como En Camino",
     "btnReady": "Marcar como Listo para Retirar",
     "btnDelivered": "Marcar como Entregado",
+    "locationInfo": {
+      "title": "Ubicación",
+      "shelf": "Estante",
+      "row": "Fila"
+    },
     "dialogStatus": {
       "title": "Confirmar Cambio de Estado",
       "onTheWayMessage": "¿Estás seguro de marcar el pedido como en camino?",
@@ -34,7 +39,7 @@
   },
   "form": {
     "labels": {
-      "client_id": "Cliente",
+      "client": "Cliente",
       "number": "Número de pedido",
       "purchase_page": "Página de compra",
 
@@ -52,7 +57,7 @@
       }
     },
     "placeholders": {
-      "client_id": "Buscar cliente",
+      "client": "Buscar por nombre, casillero, identificación o correo electrónico",
       "number": "Ingrese el número de pedido",
       "purchase_page": "Seleccione o ingrese la página de compra",
 
@@ -70,8 +75,8 @@
       }
     },
     "errors": {
-      "client_id": "El cliente es requerido",
-      "number": "El número de",
+      "client": "El cliente es requerido",
+      "number": "El número de pedido es requerido",
       "purchase_page": "Ingrese la página de compra",
 
       "products": {

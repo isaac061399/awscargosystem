@@ -253,16 +253,16 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       setIsLoading(false);
 
       if (!result.valid) {
-        // show client field to search
-        setShowClientFields(true);
+        // set data not found
+        setNoTrackingItem();
 
         return;
       }
 
       const { packages, orders } = result;
       if (packages.length === 0 && orders.length === 0) {
-        // show client field to search
-        setShowClientFields(true);
+        // set data not found
+        setNoTrackingItem();
 
         return;
       }
@@ -276,10 +276,11 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
           selected: { package_id: '', order_id: '', client: null }
         });
       } else {
+        // set the found item
         if (orders[0]) {
-          handleSelectorItem('order', orders[0].id, orders[0].client);
+          setTrackingItem('order', orders[0].id, orders[0].client);
         } else if (packages[0]) {
-          handleSelectorItem('package', packages[0].id, packages[0].client);
+          setTrackingItem('package', packages[0].id, packages[0].client);
         }
       }
     };
@@ -364,11 +365,13 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.weight]);
 
-  const handleSelectorItem = (type: 'package' | 'order', id: string, client: any) => {
+  const setTrackingItem = (type: 'package' | 'order', id: string, client: any) => {
     if (type === 'package') {
       formik.setFieldValue('package_id', id);
+      formik.setFieldValue('order_id', '');
     } else if (type === 'order') {
       formik.setFieldValue('order_id', id);
+      formik.setFieldValue('package_id', '');
     }
 
     formik.setFieldValue('client', client);
@@ -376,6 +379,23 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
     // show the rest of the fields
     setShowClientFields(true);
     setShowAllOtherFields(true);
+  };
+
+  const setNoTrackingItem = () => {
+    formik.setFieldValue('package_id', '');
+    formik.setFieldValue('order_id', '');
+    formik.setFieldValue('client', null);
+
+    // show the client fields and focus box number field
+    setShowClientFields(true);
+    setTimeout(() => {
+      if (boxNumberFieldRef.current) {
+        boxNumberFieldRef.current.focus();
+      }
+    }, 100);
+
+    // hide the rest of the fields
+    setShowAllOtherFields(false);
   };
 
   const resetProcess = () => {
@@ -467,6 +487,16 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                       }}
                     />
                   </Grid>
+                  {showClientFields && (
+                    <Grid size={{ xs: 12, md: 3 }} className="flex flex-col gap-1 justify-center">
+                      <Typography variant="body1" fontWeight={600} gutterBottom>
+                        {formik.values.order_id !== '' &&
+                          `${textT?.orderLabel} #${padStartZeros(formik.values.order_id, 4)}`}
+                        {formik.values.package_id !== '' && textT?.packageLabel}
+                        {formik.values.order_id === '' && formik.values.package_id === '' && textT?.newPackageLabel}
+                      </Typography>
+                    </Grid>
+                  )}
                 </Grid>
 
                 {showClientFields && (
@@ -747,9 +777,9 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
             color="primary"
             onClick={() => {
               if (selectorState.selected.package_id !== '') {
-                handleSelectorItem('package', selectorState.selected.package_id, selectorState.selected.client);
+                setTrackingItem('package', selectorState.selected.package_id, selectorState.selected.client);
               } else if (selectorState.selected.order_id !== '') {
-                handleSelectorItem('order', selectorState.selected.order_id, selectorState.selected.client);
+                setTrackingItem('order', selectorState.selected.order_id, selectorState.selected.client);
               }
 
               setSelectorState({ ...selectorState, open: false });

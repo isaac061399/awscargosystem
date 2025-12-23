@@ -22,7 +22,6 @@
       },
       "client": {
         "title": "Cliente",
-        "box_number": "Número de Casillero",
         "identification": "Identificación",
         "email": "Correo"
       },

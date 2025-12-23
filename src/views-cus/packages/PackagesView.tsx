@@ -12,6 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
+import moment from 'moment';
+
 // MUI Imports
 import {
   Alert,
@@ -28,11 +30,11 @@ import {
 } from '@mui/material';
 
 // Component Imports
-import moment from 'moment';
 import DashboardLayout from '@components/layout/DashboardLayout';
+import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
-// import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder, requestSearchClients } from '@helpers/request';
+// import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
 
 // Auth Imports
 // import { useAdmin } from '@components/AdminProvider';
@@ -307,7 +309,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                           <InfoRow
                             label={textT?.billingInfo?.subtotal}
                             value={
-                              <Typography fontWeight={700}>
+                              <Typography component="span" fontWeight={600}>
                                 {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
                               </Typography>
                             }
@@ -315,7 +317,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                           <InfoRow
                             label={textT?.billingInfo?.total}
                             value={
-                              <Typography fontWeight={700}>
+                              <Typography component="span" fontWeight={600}>
                                 {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}
                               </Typography>
                             }
@@ -325,7 +327,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                     </Card>
                   </Grid>
 
-                  {/* Location & Status */}
+                  {/* Location */}
                   <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
                     <Card sx={{ flexGrow: 1 }}>
                       <CardHeader title={textT?.locationInfo?.title} />
@@ -347,18 +349,5 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
     </DashboardLayout>
   );
 };
-
-function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <Stack direction="row" spacing={2} alignItems="baseline">
-      <Typography variant="body1" fontWeight={600} sx={{ minWidth: 195 }}>
-        {label}
-      </Typography>
-      <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
-        {value && value !== '' ? value : '—'}
-      </Typography>
-    </Stack>
-  );
-}
 
 export default OrdersEdition;

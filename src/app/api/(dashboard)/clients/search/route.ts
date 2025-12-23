@@ -5,6 +5,8 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead } from '@libs/prisma';
 
+import { clientSelectSchema } from '@/controllers/Client.Controller';
+
 export const GET = withAuthApi(['clients.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
   const textT: any = t('api:clients', { returnObjects: true, default: {} });
@@ -31,14 +33,7 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
       skip: 0,
       where,
       orderBy: [{ id: 'asc' }],
-      select: {
-        id: true,
-        box_number: true,
-        full_name: true,
-        identification_type: true,
-        identification: true,
-        email: true
-      }
+      select: clientSelectSchema
     });
 
     if (!clients) {

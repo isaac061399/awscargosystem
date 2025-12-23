@@ -190,6 +190,7 @@
     },
     "export": {
       "id": "ID",
+      "client_office": "Client Office",
       "client_box_number": "Client Locker Number",
       "client_full_name": "Client Name",
       "client_identification": "Client Identification",
@@ -216,8 +217,31 @@
   },
   "packages": {
     "errors": {
-      "save": "Error al guardar la información, por favor inténtalo de nuevo",
-      "general": "Se produjo un error, por favor inténtalo de nuevo"
+      "save": "Error saving the information, please try again",
+      "delete": "Error deleting the package, if it already has associated data, you will not be able to delete it",
+      "general": "An error occurred, please try again"
+    },
+    "export": {
+      "id": "ID",
+      "client_office": "Client Office",
+      "client_box_number": "Client Locker Number",
+      "client_full_name": "Client Name",
+      "client_identification": "Client Identification",
+      "client_email": "Client Email",
+      "tracking": "Tracking",
+      "courier_company": "Courier Company",
+      "purchase_page": "Purchase Page",
+      "price": "Price",
+      "description": "Description",
+      "notes": "Notes",
+      "billing_weight": "Weight (pounds)",
+      "billing_pound_fee": "Pound Fee",
+      "billing_amount": "Amount",
+      "location_shelf": "Location Shelf",
+      "location_row": "Location Row",
+      "payment_status": "Payment Status",
+      "status": "Status",
+      "created_at": "Created At"
     }
   },
   "packages-reception": {

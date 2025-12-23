@@ -27,6 +27,8 @@ export const getOrder = async (id: number) => {
             service_price: true,
             url: true,
             image_url: true,
+            location_shelf: true,
+            location_row: true,
             payment_status: true,
             status: true
           }
