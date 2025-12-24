@@ -2,7 +2,7 @@
 import { getDashboardData } from '@controllers/Dashboard.Controller';
 
 // Component Imports
-import Home from '@views/home/Home';
+import Home from '@/views-cus/home/Home';
 
 // Server Action Imports
 import withAuthPage from '@libs/auth/withAuthPage';

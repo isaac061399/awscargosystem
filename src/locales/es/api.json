@@ -252,5 +252,13 @@
       "save": "Error al guardar la información, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo",
       "general": "Se produjo un error, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo"
     }
+  },
+  "products": {
+    "errors": {
+      "code": "Este código ya está asociado a un producto existente. Por favor, use un código diferente",
+      "save": "Error al guardar el producto, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el producto. Si ya tiene datos asociados, no podrá eliminarlo.",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
   }
 }

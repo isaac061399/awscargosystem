@@ -252,5 +252,13 @@
       "save": "Error saving the information, it is possible that the package has already been received, please try again",
       "general": "An error occurred, it is possible that the package has already been received, please try again"
     }
+  },
+  "products": {
+    "errors": {
+      "code": "This code is already associated with an existing product. Please use a different code",
+      "save": "Error saving the product, please try again",
+      "delete": "Error deleting the product. If it already has associated data, you will not be able to delete it.",
+      "general": "An error occurred, please try again"
+    }
   }
 }

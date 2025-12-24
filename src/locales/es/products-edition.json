@@ -1,0 +1,33 @@
+{
+  "text": {
+    "titleNew": "Nuevo Producto",
+    "titleEdit": "Editando Producto: ",
+    "btnSave": "Guardar"
+  },
+  "form": {
+    "labels": {
+      "code": "Código",
+      "name": "Nombre",
+      "cabys": "CAByS",
+      "price": "Precio",
+      "enabled": "Activo"
+    },
+    "placeholders": {
+      "code": "Ingrese un código",
+      "name": "Ingrese un nombre",
+      "cabys": "Ingrese el CAByS",
+      "price": "Ingrese el precio",
+      "enabled": ""
+    },
+    "errors": {
+      "code": "El código es requerido",
+      "name": "El nombre es requerido",
+      "cabys": "El CAByS es requerido",
+      "price": "El precio es requerido",
+      "enabled": "",
+      "invalidAmount": "El monto ingresado no es válido"
+    },
+    "successMessage": "Producto guardado con éxito",
+    "errorMessage": "Error al guardar el producto, por favor inténtalo de nuevo"
+  }
+}

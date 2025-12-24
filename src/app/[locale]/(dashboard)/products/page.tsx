@@ -1,17 +1,17 @@
 // Components Imports
-import Offices from '@/views-cus/offices/Offices';
+import Products from '@/views-cus/products/Products';
 
 // Server Action Imports
 import withAuthPage from '@libs/auth/withAuthPage';
 import { getNextPath } from '@libs/translate/functions';
 import TranslationsProvider from '@libs/translate/TranslationProvider';
 
-const OfficesPage = withAuthPage(['offices.list'], async ({ params }: { params: Promise<{ locale: string }> }) => {
+const ProductsPage = withAuthPage(['products.list'], async ({ params }: { params: Promise<{ locale: string }> }) => {
   return (
     <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-      <Offices />
+      <Products />
     </TranslationsProvider>
   );
 });
 
-export default OfficesPage;
+export default ProductsPage;

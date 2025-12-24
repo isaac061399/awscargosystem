@@ -1,0 +1,34 @@
+{
+  "text": {
+    "title": "Productos",
+    "btnCreate": "Nuevo Producto",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el producto \"{{ name }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "code": {
+        "title": "Código"
+      },
+      "name": {
+        "title": "Nombre"
+      },
+      "cabys": {
+        "title": "CAByS"
+      },
+      "price": {
+        "title": "Precio"
+      },
+      "enabled": {
+        "title": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

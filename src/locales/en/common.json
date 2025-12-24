@@ -243,8 +243,15 @@
       },
       {
         "sectionTitle": "Configuration",
-        "permissions": ["offices.list", "offices.create", "configuration.view"],
+        "permissions": ["configuration.view", "offices.list", "offices.create", "products.list", "products.create"],
         "items": [
+          {
+            "label": "Configuration",
+            "link": "/configuration",
+            "externalLink": false,
+            "icon": "ri-settings-5-line",
+            "permissions": ["configuration.view"]
+          },
           {
             "label": "Offices",
             "link": "",
@@ -269,11 +276,27 @@
             ]
           },
           {
-            "label": "Configuration",
-            "link": "/configuration",
+            "label": "Products",
+            "link": "",
             "externalLink": false,
-            "icon": "ri-settings-5-line",
-            "permissions": ["configuration.view"]
+            "icon": "ri-list-view",
+            "permissions": ["products.list", "products.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/products",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["products.list"]
+              },
+              {
+                "label": "New",
+                "link": "/products/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["products.create"]
+              }
+            ]
           }
         ]
       },

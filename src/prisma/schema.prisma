@@ -767,6 +767,19 @@ model CusPackageStatusLog {
   @@map("cus_package_status_log")
 }
 
+model CusProduct {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  name       String
+  cabys      String
+  price      Float
+  enabled    Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("cus_product")
+}
+
 // Custom ENUMS
 enum Currency {
   CRC

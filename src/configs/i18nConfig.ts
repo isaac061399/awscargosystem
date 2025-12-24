@@ -48,13 +48,16 @@ const i18nConfig = {
     '/[locale]/(dashboard)/money-outflows': ['money-outflows'],
     '/[locale]/(dashboard)/offices': ['offices'],
     '/[locale]/(dashboard)/offices/new': ['offices-edition'],
+    '/[locale]/(dashboard)/offices/edit/[id]': ['offices-edition'],
     '/[locale]/(dashboard)/orders': ['orders'],
     '/[locale]/(dashboard)/orders/new': ['orders-edition'],
     '/[locale]/(dashboard)/orders/edit/[id]': ['orders-edition'],
-    '/[locale]/(dashboard)/offices/edit/[id]': ['offices-edition'],
     '/[locale]/(dashboard)/packages': ['packages'],
     '/[locale]/(dashboard)/packages/view/[id]': ['packages-view'],
-    '/[locale]/(dashboard)/packages-reception': ['packages-reception']
+    '/[locale]/(dashboard)/packages-reception': ['packages-reception'],
+    '/[locale]/(dashboard)/products': ['products'],
+    '/[locale]/(dashboard)/products/new': ['products-edition'],
+    '/[locale]/(dashboard)/products/edit/[id]': ['products-edition']
   }
 };
 
