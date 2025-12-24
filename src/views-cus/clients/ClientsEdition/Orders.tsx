@@ -15,7 +15,7 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { enUS, esES } from '@mui/x-data-grid/locales';
 
 // Helpers Imports
-import { requestGetPackages } from '@/helpers/request';
+import { requestGetOrders } from '@/helpers/request';
 
 // Components Imports
 import FilterSearch from '@/components/data-tables/FilterSearch';
@@ -26,10 +26,10 @@ import { useAdmin } from '@/components/AdminProvider';
 import { hasAllPermissions } from '@/helpers/permissions';
 
 // Utils Imports
-import { generateUrl } from '@libs/utils';
+import { generateUrl, padStartZeros } from '@libs/utils';
 
 const statusColors: any = {
-  PRE_ALERTED: 'warning',
+  PENDING: 'warning',
   ON_THE_WAY: 'primary',
   READY: 'info',
   DELIVERED: 'success'
@@ -40,12 +40,12 @@ const paymentStatusColors: any = {
   PAID: 'success'
 };
 
-const Packages = ({ client }: { client?: any }) => {
+const Orders = ({ client }: { client?: any }) => {
   const { data: admin } = useAdmin();
-  const canView = hasAllPermissions('packages.view', admin.permissions);
+  const canEdit = hasAllPermissions('orders.edit', admin.permissions);
 
   const { t, i18n } = useTranslation();
-  const textT: any = useMemo(() => t('clients-edition:tabs.packages', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('clients-edition:tabs.orders', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
   const dgLocale = i18n.language === 'en' ? enUS : esES;
 
@@ -56,11 +56,11 @@ const Packages = ({ client }: { client?: any }) => {
   const [paymentStatusState, setPaymentStatusState] = useState('');
 
   useEffect(() => {
-    handleFetchPackages();
+    handleFetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationState, statusState, paymentStatusState]);
 
-  const handleFetchPackages = async () => {
+  const handleFetchOrders = async () => {
     // start loading
     setRowsState((prevState) => ({ ...prevState, isLoading: true }));
 
@@ -74,7 +74,7 @@ const Packages = ({ client }: { client?: any }) => {
       client_id: client?.id || 0
     };
 
-    const result = await requestGetPackages(params, i18n.language);
+    const result = await requestGetOrders(params, i18n.language);
 
     if (result.valid) {
       setRowsState((prevState) => ({
@@ -94,7 +94,7 @@ const Packages = ({ client }: { client?: any }) => {
   };
 
   const handleExport = async () => {
-    const exportUrl = generateUrl('/api/packages/export', {
+    const exportUrl = generateUrl('/api/orders/export', {
       s: searchState,
       status: statusState,
       payment_status: paymentStatusState,
@@ -107,23 +107,37 @@ const Packages = ({ client }: { client?: any }) => {
   // data
   const columns: GridColDef[] = [
     {
-      field: 'tracking',
-      headerName: textT?.table?.tracking?.title,
+      field: 'id',
+      headerName: textT?.table?.id?.title,
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          {canView ? (
+          {canEdit ? (
             <Link
-              href={`/packages/view/${params.row.id}`}
+              href={`/orders/edit/${params.row.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-              {params.row.tracking}
+              {`# ${padStartZeros(params.row.id, 4)}`}
             </Link>
           ) : (
-            params.row.tracking
+            `# ${padStartZeros(params.row.id, 4)}`
           )}
+        </div>
+      )
+    },
+    {
+      field: 'number',
+      headerName: textT?.table?.number?.title,
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params: any) => (
+        <div className="h-full inline-flex flex-col justify-center py-2">
+          <span>{params.row.number}</span>
+          <span>
+            <strong>{textT?.table?.number?.products}</strong>: {params.row._count?.products || 0}
+          </span>
         </div>
       )
     },
@@ -133,7 +147,7 @@ const Packages = ({ client }: { client?: any }) => {
       flex: 1,
       minWidth: 150,
       renderCell: (params: any) => {
-        const label = labelsT?.packageStatus?.[params.row.status] || 'Unknown';
+        const label = labelsT?.orderStatus?.[params.row.status] || 'Unknown';
         const status: keyof typeof statusColors = params.row.status as keyof typeof statusColors;
         const color = (statusColors[status] as any) || 'info';
 
@@ -185,9 +199,9 @@ const Packages = ({ client }: { client?: any }) => {
 
   const statusOptions = useMemo(
     () =>
-      Object.keys(labelsT?.packageStatus || {}).map((key) => ({
+      Object.keys(labelsT?.orderStatus || {}).map((key) => ({
         value: key,
-        label: labelsT?.packageStatus?.[key] || key
+        label: labelsT?.orderStatus?.[key] || key
       })),
     [labelsT]
   );
@@ -202,7 +216,7 @@ const Packages = ({ client }: { client?: any }) => {
                 <FilterSearch
                   value={searchState}
                   onChange={(e) => setSearchState(e.target.value)}
-                  onSearch={handleFetchPackages}
+                  onSearch={handleFetchOrders}
                 />
                 <FilterSelect
                   allLabel={textT?.filterStatus}
@@ -261,4 +275,4 @@ const Packages = ({ client }: { client?: any }) => {
   );
 };
 
-export default Packages;
+export default Orders;

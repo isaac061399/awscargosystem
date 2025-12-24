@@ -18,7 +18,8 @@ import TabPanel from '@mui/lab/TabPanel';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const InfoTab = dynamic(() => import('./Info'));
-// const PackagesTab = dynamic(() => import('./Packages'));
+const PackagesTab = dynamic(() => import('./Packages'));
+const OrdersTab = dynamic(() => import('./Orders'));
 
 const tabContentList = (
   poundFee: number,
@@ -26,8 +27,9 @@ const tabContentList = (
   offices: any[],
   client?: any
 ): { [key: string]: ReactElement } => ({
-  info: <InfoTab poundFee={poundFee} provinces={provinces} offices={offices} client={client} />
-  // packages: <PackagesTab client={client} />
+  info: <InfoTab poundFee={poundFee} provinces={provinces} offices={offices} client={client} />,
+  packages: <PackagesTab client={client} />,
+  orders: <OrdersTab client={client} />
 });
 
 const ClientsEdition = ({
@@ -78,14 +80,22 @@ const ClientsEdition = ({
                       iconPosition="start"
                       value="info"
                     />
-                    {/* {client && (
+                    {client && (
                       <Tab
                         label={tabsT?.packages?.title}
-                        icon={<i className="ri-bank-card-line" />}
+                        icon={<i className="ri-box-3-line" />}
                         iconPosition="start"
                         value="packages"
                       />
-                    )} */}
+                    )}
+                    {client && (
+                      <Tab
+                        label={tabsT?.orders?.title}
+                        icon={<i className="ri-shopping-bag-4-line" />}
+                        iconPosition="start"
+                        value="orders"
+                      />
+                    )}
                   </TabList>
                 </Grid>
                 <Grid size={{ xs: 12 }}>

@@ -37,6 +37,10 @@ export const GET = withAuthApi(['packages.list'], async (req) => {
       where['payment_status'] = payment_status;
     }
 
+    if (params.client_id) {
+      where['client_id'] = parseInt(params.client_id);
+    }
+
     // query
     const packages = await prismaRead.cusPackage.findMany({
       take: params.limit ? parseInt(params.limit) : 100,

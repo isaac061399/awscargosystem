@@ -75,8 +75,8 @@ const Orders = () => {
   const [rowsState, setRowsState] = useState({ isLoading: false, data: [], total: 0 });
   const [paginationState, setPaginationState] = useState({ page: 0, pageSize: 10 });
   const [searchState, setSearchState] = useState('');
-  const [paymentStatusState, setPaymentStatusState] = useState('');
   const [statusState, setStatusState] = useState('');
+  const [paymentStatusState, setPaymentStatusState] = useState('');
 
   const [deleteState, setDeleteState] = useState({
     open: false,
@@ -87,7 +87,7 @@ const Orders = () => {
   useEffect(() => {
     handleFetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationState, paymentStatusState, statusState]);
+  }, [paginationState, statusState, paymentStatusState]);
 
   const handleFetchOrders = async () => {
     // start loading

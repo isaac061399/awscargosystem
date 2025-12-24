@@ -118,100 +118,50 @@
         "errorMessage": "Error al guardar el cliente, por favor inténtalo de nuevo"
       }
     },
-    "credits": {
-      "title": "Créditos",
+    "packages": {
+      "title": "Paquetes",
       "text": {
         "btnExport": "Exportar"
       },
       "table": {
-        "beneficiary": {
-          "title": "Beneficiario",
-          "identification": "Identificación",
-          "email": "Correo"
-        },
-        "detail": {
-          "title": "Detalle",
-          "amount": "Monto",
-          "interest": "Interés",
-          "installments": "Cuotas"
-        },
-        "balance": {
-          "title": "Saldo"
-        },
-        "start_date": {
-          "title": "Fecha de Inicio",
-          "dateFormat": "DD/MM/YYYY"
-        },
-        "next_payment": {
-          "title": "Próximo Pago",
-          "dateFormat": "DD/MM/YYYY"
+        "tracking": {
+          "title": "Tracking"
         },
         "status": {
           "title": "Estado"
         },
-        "actions": {
-          "title": "Acciones",
-          "editLabel": "Editar"
+        "payment_status": {
+          "title": "Estado de Pago"
+        },
+        "created_at": {
+          "title": "Fecha de Registro",
+          "dateFormat": "DD/MM/YYYY hh:mm a"
         }
       }
     },
-    "wallet": {
-      "title": "Billetera",
+    "orders": {
+      "title": "Pedidos",
       "text": {
-        "currentBalance": "Saldo Actual",
-        "btnAddBalance": "Agregar Saldo",
-        "btnAdd": "Agregar",
-        "btnContinue": "Continuar",
-        "btnCancel": "Cancelar",
-        "btnExport": "Exportar",
-        "dialogAddBalanceTitle": "Agregar Saldo",
-        "dialogDeleteTitle": "Confirmar Eliminación",
-        "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar la transacción de \"{{ amount }}\"? Esta acción no se puede deshacer."
+        "btnExport": "Exportar"
       },
       "table": {
-        "amount": {
-          "title": "Monto"
+        "id": {
+          "title": "ID"
         },
-        "balance": {
-          "title": "Saldo"
+        "number": {
+          "title": "Número de Pedido",
+          "products": "Productos"
         },
-        "type": {
-          "title": "Tipo"
+        "status": {
+          "title": "Estado"
         },
-        "method": {
-          "title": "Método"
+        "payment_status": {
+          "title": "Estado de Pago"
         },
-        "date": {
-          "title": "Fecha",
-          "dateFormat": "DD/MM/YYYY hh:mm A"
-        },
-        "comment": {
-          "title": "Comentario"
-        },
-        "actions": {
-          "title": "Acciones",
-          "printLabel": "Imprimir Recibo",
-          "deleteLabel": "Eliminar"
+        "created_at": {
+          "title": "Fecha de Registro",
+          "dateFormat": "DD/MM/YYYY hh:mm a"
         }
-      },
-      "form": {
-        "labels": {
-          "amount": "Monto",
-          "method": "Método de pago",
-          "comment": "Comentario"
-        },
-        "placeholders": {
-          "amount": "Ingrese un monto",
-          "method": "Seleccione el método de pago",
-          "comment": "Ingrese un comentario..."
-        },
-        "errors": {
-          "amount": "El monto es requerido",
-          "method": "El método de pago es requerido",
-          "comment": "El comentario es requerido"
-        },
-        "successMessage": "Saldo agregado con éxito",
-        "errorMessage": "Error al agregar el saldo, por favor inténtalo de nuevo"
       }
     }
   }
