@@ -515,13 +515,26 @@ model CusClient {
   created_at                  DateTime           @default(now())
   updated_at                  DateTime           @updatedAt
 
-  office           CusOffice    @relation(fields: [office_id], references: [id], onDelete: Restrict)
-  district         CusDistrict? @relation("district", fields: [district_id], references: [id], onDelete: Restrict)
-  billing_district CusDistrict? @relation("billing_district", fields: [billing_district_id], references: [id], onDelete: Restrict)
+  office           CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
+  district         CusDistrict?          @relation("district", fields: [district_id], references: [id], onDelete: Restrict)
+  billing_district CusDistrict?          @relation("billing_district", fields: [billing_district_id], references: [id], onDelete: Restrict)
   packages         CusPackage[]
   orders           CusOrder[]
+  reset_tokens     CusClientResetToken[]
 
   @@map("cus_client")
+}
+
+model CusClientResetToken {
+  client_id Int
+  token     String
+  type      String   @default("password")
+  expires   DateTime
+
+  client CusClient @relation(fields: [client_id], references: [id], onDelete: Cascade)
+
+  @@id([client_id, token])
+  @@map("cus_client_reset_token")
 }
 
 model CusConfiguration {
