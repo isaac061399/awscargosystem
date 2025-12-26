@@ -496,7 +496,7 @@ model CusClient {
   full_name                   String
   identification_type         IdentificationType
   identification              String
-  email                       String
+  email                       String             @unique
   phone                       String?
   notes                       String?
   district_id                 Int?
