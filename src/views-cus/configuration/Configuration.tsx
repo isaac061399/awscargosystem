@@ -34,6 +34,7 @@ import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
 import { requestEditConfiguration } from '@/helpers/request';
+import { useConfig } from '@/components/ConfigProvider';
 
 // Auth Imports
 import { useAdmin } from '@/components/AdminProvider';
@@ -43,7 +44,8 @@ import { currencies } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const Configuration = ({ configuration }: { configuration?: any }) => {
+const Configuration = () => {
+  const { configuration } = useConfig();
   const { data: admin } = useAdmin();
   const canEdit = hasAllPermissions('configuration.edit', admin.permissions);
 

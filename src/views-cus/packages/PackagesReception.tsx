@@ -46,14 +46,10 @@ import {
   requestPackagesReceptionClient,
   requestPackagesReceptionTracking
 } from '@/helpers/request';
-
-// Auth Imports
-// import { useAdmin } from '@/components/AdminProvider';
-// import { hasAllPermissions } from '@/helpers/permissions';
-
 import { currencies } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
 import { calculateShippingPrice } from '@/helpers/calculations';
+import { useConfig } from '@/components/ConfigProvider';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -104,8 +100,8 @@ const defaultAlertState = { open: false, type: 'success', message: '' };
 // </html>`;
 // };
 
-const PackageReception = ({ offices }: { offices: any[] }) => {
-  // const { data: admin } = useAdmin();
+const PackageReception = () => {
+  const { offices } = useConfig();
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('packages-reception:text', { returnObjects: true, default: {} }), [t]);
@@ -113,8 +109,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-  const [showClientAlert, setShowClientAlert] = useState<boolean>(false);
-  const [showOfficeAlert, setShowOfficeAlert] = useState<boolean>(false);
+  const [errorAlert, setErrorAlert] = useState<any>({ open: false, message: '' });
   const [showClientFields, setShowClientFields] = useState<boolean>(false);
   const [showAllOtherFields, setShowAllOtherFields] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
@@ -138,6 +133,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
     initialValues: useMemo(
       () => ({
         office_id: offices[0]?.id || '',
+        cut_number: '',
         tracking: '',
         package_id: '',
         order_id: '',
@@ -150,6 +146,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       [offices]
     ),
     validationSchema: yup.object({
+      cut_number: yup.string().required(formT?.errors?.cut_number),
       tracking: yup.string().required(formT?.errors?.tracking),
       weight: yup.number().required(formT?.errors?.weight),
       client: yup.object().required(formT?.errors?.client)
@@ -253,8 +250,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       setIsLoading(false);
 
       if (!result.valid) {
-        // set data not found
-        setNoTrackingItem();
+        setErrorAlert({ open: true, message: textT?.trackingAlertMessage });
 
         return;
       }
@@ -293,6 +289,8 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       trackingTimeoutRef.current = setTimeout(() => {
         fetchTrackingInfo(formik.values.tracking);
       }, 500);
+    } else {
+      resetProcess();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.tracking]);
@@ -306,20 +304,13 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
 
       setIsLoading(false);
 
-      if (!result.valid) {
-        setShowClientAlert(true);
+      if (!result.valid || !result.client) {
+        setErrorAlert({ open: true, message: textT?.clientAlertMessage });
 
         return;
       }
 
-      const { client } = result;
-      if (!client) {
-        setShowClientAlert(true);
-
-        return;
-      }
-
-      formik.setFieldValue('client', client);
+      formik.setFieldValue('client', result.client);
 
       setShowAllOtherFields(true);
     };
@@ -340,7 +331,10 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
   useEffect(() => {
     if (formik.values.client) {
       if (formik.values.client.office.id !== formik.values.office_id) {
-        setShowOfficeAlert(true);
+        setErrorAlert({
+          open: true,
+          message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')
+        });
       } else if (weightFieldRef.current) {
         weightFieldRef.current.focus();
       }
@@ -418,9 +412,11 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       selected: { package_id: '', order_id: '', client: null }
     });
 
-    if (trackingFieldRef.current) {
-      trackingFieldRef.current.focus();
-    }
+    setTimeout(() => {
+      if (trackingFieldRef.current) {
+        trackingFieldRef.current.focus();
+      }
+    }, 100);
   };
 
   return (
@@ -441,7 +437,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
                 <Grid container spacing={5}>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <Select
                       options={offices.map((o) => ({ value: o.id, label: o.name }))}
                       required
@@ -456,6 +452,23 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
                       helperText={
                         formik.touched.office_id && formik.errors.office_id ? (formik.errors.office_id as string) : ''
                       }
+                      disabled={formik.isSubmitting || isLoading}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="cut_number"
+                      name="cut_number"
+                      label={formT?.labels?.cut_number}
+                      placeholder={formT?.placeholders?.cut_number}
+                      value={formik.values.cut_number}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.cut_number && formik.errors.cut_number)}
+                      color={Boolean(formik.touched.cut_number && formik.errors.cut_number) ? 'error' : 'primary'}
+                      helperText={formik.touched.cut_number && (formik.errors.cut_number as string)}
                       disabled={formik.isSubmitting || isLoading}
                     />
                   </Grid>
@@ -791,7 +804,7 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
       </Dialog>
 
       <Dialog
-        open={showOfficeAlert}
+        open={errorAlert.open}
         // onClose={() => setShowOfficeAlert(false)}
         aria-labelledby="office-alert-title"
         aria-describedby="office-alert-description">
@@ -800,31 +813,11 @@ const PackageReception = ({ offices }: { offices: any[] }) => {
         </DialogTitle>
         <DialogContent dividers>
           <DialogContentText id="office-alert-description" variant="h3">
-            {textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')}
+            {errorAlert.message}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" color="primary" onClick={() => setShowOfficeAlert(false)}>
-            {textT?.btnClose}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={showClientAlert}
-        // onClose={() => setShowClientAlert(false)}
-        aria-labelledby="client-alert-title"
-        aria-describedby="client-alert-description">
-        <DialogTitle id="client-alert-title" variant="h2">
-          {textT?.alertTitle}
-        </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText id="client-alert-description" variant="h3">
-            {textT?.clientAlertMessage}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="text" color="primary" onClick={() => setShowClientAlert(false)}>
+          <Button variant="text" color="primary" onClick={() => setErrorAlert({ ...errorAlert, open: false })}>
             {textT?.btnClose}
           </Button>
         </DialogActions>

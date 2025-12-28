@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 
 // Next Imports
 import Link from 'next/link';
-// import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 // Form Imports
@@ -35,14 +34,11 @@ import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
 // import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
-
-// Auth Imports
-// import { useAdmin } from '@components/AdminProvider';
-// import { hasAllPermissions } from '@helpers/permissions';
+import { useConfig } from '@/components/ConfigProvider';
 
 import { currencies } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
-import { calculateShippingTotal } from '@/helpers/calculations';
+import { calculateShippingTotal, convertCRC } from '@/helpers/calculations';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -58,10 +54,10 @@ const paymentStatusColors: any = {
   PAID: 'success'
 };
 
-const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any }) => {
-  // const router = useRouter();
-  // const { data: admin } = useAdmin();
-  // const canCreateMedia = hasAllPermissions('media.create', admin.permissions);
+const PackagesView = ({ packageObj }: { packageObj: any }) => {
+  const { configuration } = useConfig();
+  const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
+  const ivaPercentage = configuration?.iva_percentage ?? 0;
 
   const { t } = useTranslation();
   const textT: any = useMemo(() => t('packages-view:text', { returnObjects: true, default: {} }), [t]);
@@ -128,7 +124,11 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
     color: paymentStatusColors[packageObj.payment_status] || 'info'
   };
 
-  const packageTotal = calculateShippingTotal(packageObj.billing_amount, config.iva_percentage);
+  const packageTotal = calculateShippingTotal(packageObj.billing_amount, ivaPercentage);
+  const packageTotalCRC = {
+    subtotal: convertCRC('sell', packageTotal.subtotal, sellingExchangeRate),
+    total: convertCRC('sell', packageTotal.total, sellingExchangeRate)
+  };
 
   return (
     <DashboardLayout>
@@ -166,7 +166,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
               <CardContent>
                 <Grid container spacing={3} alignItems="top">
                   {/* Total */}
-                  <Grid size={{ xs: 12, md: 3 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Stack>
                       <div className="flex items-center gap-1">
                         <Typography variant="overline" color="text.secondary">
@@ -174,6 +174,8 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
                           {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
+                          {' | '}
+                          {formatMoney(packageTotalCRC.subtotal, `${currencies.CRC.symbol} `)}
                         </Typography>
                       </div>
                       <div className="flex items-center gap-1">
@@ -182,13 +184,15 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
                           {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}
+                          {' | '}
+                          {formatMoney(packageTotalCRC.total, `${currencies.CRC.symbol} `)}
                         </Typography>
                       </div>
                     </Stack>
                   </Grid>
 
                   {/* Order status */}
-                  <Grid size={{ xs: 12, md: 3 }}>
+                  <Grid size={{ xs: 12, md: 2 }}>
                     <Stack spacing={1}>
                       <Typography variant="overline" color="text.secondary">
                         {textT?.statusLabel}
@@ -200,7 +204,7 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
                   </Grid>
 
                   {/* Payment status */}
-                  <Grid size={{ xs: 12, md: 3 }}>
+                  <Grid size={{ xs: 12, md: 2 }}>
                     <Stack spacing={1}>
                       <Typography variant="overline" color="text.secondary">
                         {textT?.paymentStatusLabel}
@@ -350,4 +354,4 @@ const OrdersEdition = ({ config, packageObj }: { config: any; packageObj: any })
   );
 };
 
-export default OrdersEdition;
+export default PackagesView;

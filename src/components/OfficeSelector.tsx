@@ -5,15 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { MenuItem, Select, Skeleton, Typography } from '@mui/material';
 
-import { requestGetOfficesNavbar } from '@/helpers/request';
 import { officeCookie } from '@/libs/constants';
 
 import { useAdmin } from './AdminProvider';
-
-interface Office {
-  id: string;
-  name: string;
-}
+import { useConfig } from './ConfigProvider';
 
 const saveCookie = (value: string) => {
   document.cookie = `${officeCookie.name}=${value}; path=/; max-age=${officeCookie.maxAge}`;
@@ -22,24 +17,19 @@ const saveCookie = (value: string) => {
 export default function OfficeSelector() {
   const router = useRouter();
   const { data: admin } = useAdmin();
+  const { offices } = useConfig();
 
   const { t } = useTranslation('common');
   const textT: any = useMemo(() => t('navbar', { returnObjects: true, default: {} }), [t]);
 
   const defaultOfficeId = admin?.office ? String(admin.office.id) : '0';
 
-  const [offices, setOffices] = useState<Office[]>([]);
   const [selectedOffice, setSelectedOffice] = useState<string>(defaultOfficeId);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOffices = async () => {
+    const loadSelectedOffice = async () => {
       try {
-        const response = await requestGetOfficesNavbar();
-        if (response.valid) {
-          setOffices(response.data);
-        }
-
         const savedOffice = document.cookie
           .split('; ')
           .find((row) => row.startsWith(`${officeCookie.name}=`))
@@ -57,7 +47,7 @@ export default function OfficeSelector() {
       }
     };
 
-    fetchOffices();
+    loadSelectedOffice();
   }, [defaultOfficeId]);
 
   const handleOfficeChange = (officeId: string) => {
@@ -80,13 +70,15 @@ export default function OfficeSelector() {
           <i className="ri-building-line" style={{ fontSize: '1.3em' }}></i> {textT.allLabel}
         </Typography>
       </MenuItem>
-      {offices.map((o) => (
-        <MenuItem key={`${o.id}`} value={o.id}>
-          <Typography className="text-text-primary flex items-center gap-2">
-            <i className="ri-building-line" style={{ fontSize: '1.3em' }}></i> {o.name}
-          </Typography>
-        </MenuItem>
-      ))}
+      {offices
+        .filter((o) => o.enabled)
+        .map((o) => (
+          <MenuItem key={`${o.id}`} value={o.id}>
+            <Typography className="text-text-primary flex items-center gap-2">
+              <i className="ri-building-line" style={{ fontSize: '1.3em' }}></i> {o.name}
+            </Typography>
+          </MenuItem>
+        ))}
     </Select>
   );
 }

@@ -9,6 +9,8 @@ import { getServerSession } from 'next-auth';
 
 // Controllers Imports
 import { getAdminSessionData } from '@controllers/Administrator.Controller';
+import { getAllOffices } from '@/controllers/Office.Controller';
+import { getConfiguration } from '@/controllers/Configuration.Controller';
 
 // Type Imports
 import type { ChildrenType } from '@core/types';
@@ -17,6 +19,7 @@ import type { ChildrenType } from '@core/types';
 import Providers from '@components/Providers';
 import SessionProvider from '@components/SessionProvider';
 import AdminProvider from '@components/AdminProvider';
+import ConfigProvider from '@/components/ConfigProvider';
 
 import authOptions from '@libs/auth/authOptions';
 
@@ -30,11 +33,17 @@ const Layout = async ({ children, params }: ChildrenType & { params: Promise<{ l
   const direction = dir(locale);
   const session = await getServerSession(authOptions);
   const adminData = await getAdminSessionData(session?.user?.email);
+  const offices = await getAllOffices();
+  const configuration = await getConfiguration();
 
   return (
     <Providers direction={direction}>
       <SessionProvider session={session}>
-        <AdminProvider admin={adminData}>{children}</AdminProvider>
+        <AdminProvider admin={adminData}>
+          <ConfigProvider offices={offices} configuration={configuration}>
+            {children}
+          </ConfigProvider>
+        </AdminProvider>
       </SessionProvider>
     </Providers>
   );

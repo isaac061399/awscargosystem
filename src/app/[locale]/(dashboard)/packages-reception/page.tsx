@@ -1,6 +1,3 @@
-// Controller Imports
-import { getAllOffices } from '@/controllers/Office.Controller';
-
 // Components Imports
 import PackagesReception from '@/views-cus/packages/PackagesReception';
 
@@ -12,11 +9,9 @@ import TranslationsProvider from '@libs/translate/TranslationProvider';
 const PackagesReceptionPage = withAuthPage(
   ['packages.reception'],
   async ({ params }: { params: Promise<{ locale: string }> }) => {
-    const offices = await getAllOffices();
-
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <PackagesReception offices={offices} />
+        <PackagesReception />
       </TranslationsProvider>
     );
   }

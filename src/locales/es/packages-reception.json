@@ -14,8 +14,9 @@
     "locationTitle": "Ubicación",
     "priceLabel": "Precio",
     "alertTitle": "¡Atención!",
-    "officeAlertMessage": "Paquete pertenece a cliente en {{ office }}",
+    "trackingAlertMessage": "Paquete o pedido ya recibido",
     "clientAlertMessage": "Cliente no encontrado",
+    "officeAlertMessage": "Paquete pertenece a cliente en {{ office }}",
     "selectorDialog": {
       "title": "Seleccione un item del tracking",
       "packagesTitle": "Paquetes",
@@ -33,6 +34,7 @@
   },
   "form": {
     "labels": {
+      "cut_number": "Número de corte",
       "office_id": "Recibiendo en",
       "tracking": "Tracking",
       "box_number": "Número de Casillero",
@@ -41,6 +43,7 @@
       "row": "Fila"
     },
     "placeholders": {
+      "cut_number": "Ingrese el número de corte",
       "tracking": "Ingrese el tracking",
       "box_number": "Buscar por número de casillero",
       "weight": "Ingrese el peso",
@@ -48,6 +51,7 @@
       "row": "Seleccione o ingrese la fila"
     },
     "errors": {
+      "cut_number": "El número de corte es requerido",
       "tracking": "El tracking es requerido",
       "weight": "El peso es requerido",
       "client": "El cliente es requerido"

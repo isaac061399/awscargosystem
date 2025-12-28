@@ -2,7 +2,6 @@
 import { redirect } from 'next/navigation';
 
 // Controller Imports
-import { getConfiguration } from '@/controllers/Configuration.Controller';
 import { getOrder } from '@controllers/Order.Controller';
 
 // Components Imports
@@ -23,11 +22,9 @@ const OrdersEditPage = withAuthPage(
       redirect('/not-found');
     }
 
-    const config = await getConfiguration();
-
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <OrdersEdition config={config} order={order} />
+        <OrdersEdition order={order} />
       </TranslationsProvider>
     );
   }

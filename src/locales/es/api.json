@@ -246,6 +246,7 @@
   },
   "packages-reception": {
     "errors": {
+      "alreadyReceived": "Paquete o pedido ya recibido",
       "packageNotFound": "Paquete no encontrado o ya recibido",
       "orderNotFound": "Pedido no encontrado o ya recibido",
       "clientNotFound": "Cliente no encontrado con el número de casillero proporcionado",

@@ -59,3 +59,25 @@ export const calculateShippingTotal = (amount: number, iva: number) => {
     return result;
   }
 };
+
+export const convertCRC = (type: 'sell' | 'buy', amount: number, rate: number): number => {
+  try {
+    if (isNaN(amount) || isNaN(rate) || amount <= 0 || rate <= 0) {
+      return 0;
+    }
+
+    const convertedAmount = amount * rate;
+
+    if (type === 'buy') {
+      return Math.floor(convertedAmount / 5) * 5;
+    } else {
+      return Math.ceil(convertedAmount / 5) * 5;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating conversion rate: ${error}`);
+
+    return 0;
+  }
+};

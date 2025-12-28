@@ -8,6 +8,7 @@ import ModeDropdown from '@components/layout/shared/ModeDropdown';
 import UserDropdown from '@components/layout/shared/UserDropdown';
 import LangSelector from '@libs/translate/LangSelector';
 import OfficeSelector from '@/components/OfficeSelector';
+import ExchangeComponent from '@/components/ExchangeComponent';
 
 // Util Imports
 
@@ -18,6 +19,7 @@ const NavbarContent = () => {
         <NavToggle />
       </div>
       <div className="flex items-center">
+        <ExchangeComponent />
         <OfficeSelector />
         <LangSelector />
         <ModeDropdown />

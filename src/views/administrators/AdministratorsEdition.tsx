@@ -35,19 +35,13 @@ import Select from '@components/Select';
 
 // Helpers Imports
 import { requestEditAdministrator, requestNewAdministrator } from '@helpers/request';
+import { useConfig } from '@/components/ConfigProvider';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const AdministratorsEdition = ({
-  roles,
-  offices,
-  admin
-}: {
-  roles: { id: number; name: string }[];
-  offices: { id: number; name: string }[];
-  admin?: any;
-}) => {
+const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: string }[]; admin?: any }) => {
   const router = useRouter();
+  const { offices } = useConfig();
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('administrators-edition:text', { returnObjects: true, default: {} }), [t]);

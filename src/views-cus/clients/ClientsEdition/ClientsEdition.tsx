@@ -21,28 +21,13 @@ const InfoTab = dynamic(() => import('./Info'));
 const PackagesTab = dynamic(() => import('./Packages'));
 const OrdersTab = dynamic(() => import('./Orders'));
 
-const tabContentList = (
-  poundFee: number,
-  provinces: any[],
-  offices: any[],
-  client?: any
-): { [key: string]: ReactElement } => ({
-  info: <InfoTab poundFee={poundFee} provinces={provinces} offices={offices} client={client} />,
+const tabContentList = (provinces: any[], client?: any): { [key: string]: ReactElement } => ({
+  info: <InfoTab provinces={provinces} client={client} />,
   packages: <PackagesTab client={client} />,
   orders: <OrdersTab client={client} />
 });
 
-const ClientsEdition = ({
-  poundFee,
-  provinces,
-  offices,
-  client
-}: {
-  poundFee: number;
-  provinces: any[];
-  offices: any[];
-  client?: any;
-}) => {
+const ClientsEdition = ({ provinces, client }: { provinces: any[]; client?: any }) => {
   const { t } = useTranslation();
   const textT: any = useMemo(() => t('clients-edition:text', { returnObjects: true, default: {} }), [t]);
   const tabsT: any = useMemo(() => t('clients-edition:tabs', { returnObjects: true, default: {} }), [t]);
@@ -100,7 +85,7 @@ const ClientsEdition = ({
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <TabPanel value={activeTab} className="p-0">
-                    {tabContentList(poundFee, provinces, offices, client)[activeTab]}
+                    {tabContentList(provinces, client)[activeTab]}
                   </TabPanel>
                 </Grid>
               </Grid>

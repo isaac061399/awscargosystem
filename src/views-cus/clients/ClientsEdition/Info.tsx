@@ -37,6 +37,7 @@ import MoneyField from '@/components/MoneyField';
 // Helpers Imports
 import { requestEditClient, requestNewClient, requestSearchActivityCodesClients } from '@/helpers/request';
 import { getAddressOptions } from '@/helpers/address';
+import { useConfig } from '@/components/ConfigProvider';
 
 // Utility Imports
 import { getTelInputValue } from '@/libs/utils';
@@ -44,18 +45,10 @@ import { currencies, defaultActivityCode } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const Info = ({
-  poundFee,
-  provinces,
-  offices,
-  client
-}: {
-  poundFee: number;
-  provinces: any[];
-  offices: any[];
-  client?: any;
-}) => {
+const Info = ({ provinces, client }: { provinces: any[]; client?: any }) => {
   const router = useRouter();
+  const { offices, configuration } = useConfig();
+  const poundFee = configuration?.pound_fee ?? 0;
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('clients-edition:tabs.info.text', { returnObjects: true, default: {} }), [t]);

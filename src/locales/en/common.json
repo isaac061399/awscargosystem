@@ -6,7 +6,9 @@
   "navbar": {
     "myProfile": "My Profile",
     "logout": "Logout",
-    "allLabel": "All"
+    "allLabel": "All",
+    "sellValue": "Sell",
+    "buyValue": "Buy"
   },
   "sidebar": {
     "menu": [

@@ -45,6 +45,7 @@ import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
 import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
+import { useConfig } from '@/components/ConfigProvider';
 
 // Auth Imports
 // import { useAdmin } from '@components/AdminProvider';
@@ -52,7 +53,7 @@ import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@h
 
 import { currencies, sellersPages } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
-import { getOrderTotal } from '@/helpers/calculations';
+import { convertCRC, getOrderTotal } from '@/helpers/calculations';
 import { OrderStatus, PaymentStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
@@ -81,8 +82,11 @@ const productInitialValues = {
   image_url: ''
 };
 
-const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
+const OrdersEdition = ({ order }: { order?: any }) => {
   const router = useRouter();
+  const { configuration } = useConfig();
+  const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
+  const ivaPercentage = configuration?.iva_percentage ?? 0;
   // const { data: admin } = useAdmin();
   // const canCreateMedia = hasAllPermissions('media.create', admin.permissions);
 
@@ -202,7 +206,11 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
   // const isReady = order ? order.status === ('READY' as OrderStatus) : false;
   // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
 
-  const orderTotal = getOrderTotal(formik.values.products, config.iva_percentage);
+  const orderTotal = getOrderTotal(formik.values.products, ivaPercentage);
+  const orderTotalCRC = {
+    subtotal: convertCRC('sell', orderTotal.subtotal, sellingExchangeRate),
+    total: convertCRC('sell', orderTotal.total, sellingExchangeRate)
+  };
   const paymentStatusChip: any = { label: '', color: 'info' };
   const statusChip: any = { label: '', color: 'info' };
 
@@ -249,7 +257,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
               <CardContent>
                 <Grid container spacing={3} alignItems="top">
                   {/* Total */}
-                  <Grid size={{ xs: 12, md: 3 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Stack>
                       <div className="flex items-center gap-1">
                         <Typography variant="overline" color="text.secondary">
@@ -257,6 +265,8 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
                           {formatMoney(orderTotal.subtotal, `${currencies.USD.symbol} `)}
+                          {' | '}
+                          {formatMoney(orderTotalCRC.subtotal, `${currencies.CRC.symbol} `)}
                         </Typography>
                       </div>
                       <div className="flex items-center gap-1">
@@ -265,6 +275,8 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
                           {formatMoney(orderTotal.total, `${currencies.USD.symbol} `)}
+                          {' | '}
+                          {formatMoney(orderTotalCRC.total, `${currencies.CRC.symbol} `)}
                         </Typography>
                       </div>
                     </Stack>
@@ -272,7 +284,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                   {isEditing && (
                     <>
                       {/* Order status */}
-                      <Grid size={{ xs: 12, md: 3 }}>
+                      <Grid size={{ xs: 12, md: 2 }}>
                         <Stack spacing={1}>
                           <Typography variant="overline" color="text.secondary">
                             {textT?.statusLabel}
@@ -284,7 +296,7 @@ const OrdersEdition = ({ config, order }: { config: any; order?: any }) => {
                       </Grid>
 
                       {/* Payment status */}
-                      <Grid size={{ xs: 12, md: 3 }}>
+                      <Grid size={{ xs: 12, md: 2 }}>
                         <Stack spacing={1}>
                           <Typography variant="overline" color="text.secondary">
                             {textT?.paymentStatusLabel}
@@ -522,6 +534,8 @@ const ProductsAccordionComponent = ({
               };
             }
 
+            const isNew = !Boolean(item.id);
+
             const isPending = item ? item.status === OrderStatus.PENDING : false;
             const isOnTheWay = item ? item.status === OrderStatus.ON_THE_WAY : false;
             const isReady = item ? item.status === OrderStatus.READY : false;
@@ -529,8 +543,8 @@ const ProductsAccordionComponent = ({
 
             const isPaid = item ? item.payment_status === PaymentStatus.PAID : false;
 
-            const canEditInfo = (isPending || isOnTheWay || isReady) && !isDelivered;
-            const canEditPrice = (isPending || isOnTheWay) && !isReady && !isDelivered && !isPaid;
+            const canEditInfo = isNew || ((isPending || isOnTheWay) && !isReady && !isDelivered);
+            const canEditPrice = isNew || ((isPending || isOnTheWay) && !isReady && !isDelivered && !isPaid);
 
             return (
               <Accordion

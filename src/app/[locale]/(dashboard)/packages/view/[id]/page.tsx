@@ -2,7 +2,6 @@
 import { redirect } from 'next/navigation';
 
 // Controller Imports
-import { getConfiguration } from '@/controllers/Configuration.Controller';
 import { getPackage } from '@controllers/Package.Controller';
 
 // Components Imports
@@ -23,11 +22,9 @@ const PackagesViewPage = withAuthPage(
       redirect('/not-found');
     }
 
-    const config = await getConfiguration();
-
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <PackagesView config={config} packageObj={packageObj} />
+        <PackagesView packageObj={packageObj} />
       </TranslationsProvider>
     );
   }

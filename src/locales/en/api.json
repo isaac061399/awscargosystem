@@ -246,6 +246,7 @@
   },
   "packages-reception": {
     "errors": {
+      "alreadyReceived": "Package or order already received",
       "packageNotFound": "Package not found or already received",
       "orderNotFound": "Order not found or already received",
       "clientNotFound": "Client not found with the provided box number",
