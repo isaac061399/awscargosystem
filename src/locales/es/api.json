@@ -184,6 +184,7 @@
       "deleteProduct": "Error al eliminar el producto del pedido, por favor inténtalo de nuevo",
       "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo",
       "productsWithoutTracking": "Existen productos sin número de tracking. Por favor, asegúrate de que todos los productos tengan un número de tracking antes de proceder.",
+      "number": "Este número de pedido ya está asociado a un pedido existente. Por favor, use un número diferente",
       "save": "Error al guardar el pedido, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el pedido, si ya tiene datos asociados, no podrá eliminarlo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
@@ -261,6 +262,12 @@
       "code": "Este código ya está asociado a un producto existente. Por favor, use un código diferente",
       "save": "Error al guardar el producto, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el producto. Si ya tiene datos asociados, no podrá eliminarlo.",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
+  "unowned-packages": {
+    "errors": {
+      "delete": "Error al eliminar el paquete. Si ya tiene datos asociados, no podrá eliminarlo.",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   }

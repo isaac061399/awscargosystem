@@ -649,8 +649,9 @@ model CusOffice {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  clients        CusClient[]
-  administrators Administrator[]
+  clients          CusClient[]
+  administrators   Administrator[]
+  unowned_packages CusUnownedPackage[]
 
   @@map("cus_office")
 }
@@ -813,11 +814,14 @@ model CusProduct {
 
 model CusUnownedPackage {
   id          Int      @id @default(autoincrement())
+  office_id   Int?
   tracking    String   @unique
   description String
   found       Boolean  @default(false)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+
+  office CusOffice? @relation(fields: [office_id], references: [id], onDelete: SetNull)
 
   @@map("cus_unowned_package")
 }

@@ -14,9 +14,20 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
 
   const admin = req.session;
   const data = await req.json();
+  const number = data.number ? `${data.number}`.trim() : '';
 
   try {
     const result = await withTransaction(async (tx) => {
+      // verify code uniqueness
+      const exist = await tx.cusOrder.findFirst({
+        where: { number, id: { not: Number(id) } },
+        select: { id: true }
+      });
+
+      if (exist) {
+        throw new TransactionError(400, textT?.errors?.number);
+      }
+
       // create/update relations
       for (const p of data.products || []) {
         const productData = {
@@ -51,7 +62,7 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
         where: { id: Number(id) },
         data: {
           client_id: data.client_id,
-          number: data.number,
+          number,
           purchase_page: data.purchase_page
         }
       });

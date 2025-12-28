@@ -80,9 +80,20 @@ export const POST = withAuthApi(['orders.create'], async (req) => {
 
   const admin = req.session;
   const data = await req.json();
+  const number = data.number ? `${data.number}`.trim() : '';
 
   try {
     const result = await withTransaction(async (tx) => {
+      // verify code uniqueness
+      const exist = await tx.cusOrder.findFirst({
+        where: { number },
+        select: { id: true }
+      });
+
+      if (exist) {
+        throw new TransactionError(400, textT?.errors?.number);
+      }
+
       // load relations
       const products = data.products?.map((p: any) => ({
         tracking: p.tracking,
@@ -99,7 +110,7 @@ export const POST = withAuthApi(['orders.create'], async (req) => {
       const order = await tx.cusOrder.create({
         data: {
           client_id: data.client_id,
-          number: data.number,
+          number,
           purchase_page: data.purchase_page,
           products: { create: products }
         }

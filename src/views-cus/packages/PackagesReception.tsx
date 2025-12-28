@@ -448,6 +448,7 @@ const PackageReception = () => {
     // save unowned package
     const result = await requestUnownedPackage(
       {
+        office_id: formik.values.office_id,
         tracking: formik.values.tracking,
         description: unownedPackageState.description.trim()
       },

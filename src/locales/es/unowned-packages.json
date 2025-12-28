@@ -1,0 +1,29 @@
+{
+  "text": {
+    "title": "Paquetes Sin Dueño",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el paquete sin dueño \"{{ tracking }}\"? Esta acción no se puede deshacer.",
+    "table": {
+      "tracking": {
+        "title": "Tracking"
+      },
+      "office_id": {
+        "title": "Oficina"
+      },
+      "description": {
+        "title": "Descripción"
+      },
+      "created_at": {
+        "title": "Fecha de Creación",
+        "format": "DD/MM/YYYY hh:mm A"
+      },
+      "actions": {
+        "title": "Acciones",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

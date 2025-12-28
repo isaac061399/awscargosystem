@@ -17,11 +17,12 @@
       "global-settings": "CMS - Global Settings",
       "clients": "Logistics - Clients",
       "configuration": "Configuration - Configuration",
+      "money-outflows": "Cash - Money Outflows",
       "offices": "Configuration - Offices",
       "orders": "Logistics - Orders",
       "packages": "Logistics - Packages",
       "products": "Configuration - Products",
-      "money-outflows": "Cash - Money Outflows"
+      "unowned-packages": "Logistics - Unowned Packages"
     },
     "permissions": {
       "list": "List",

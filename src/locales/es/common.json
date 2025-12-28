@@ -165,6 +165,7 @@
           "orders.list",
           "orders.create",
           "packages.list",
+          "unowned-packages.list",
           "packages.reception"
         ],
         "items": [
@@ -220,6 +221,13 @@
             "externalLink": false,
             "icon": "ri-box-3-line",
             "permissions": ["packages.list"]
+          },
+          {
+            "label": "Paquetes Sin Dueño",
+            "link": "/unowned-packages",
+            "externalLink": false,
+            "icon": "ri-box-3-line",
+            "permissions": ["unowned-packages.list"]
           },
           {
             "label": "Recepción de Paquetes",

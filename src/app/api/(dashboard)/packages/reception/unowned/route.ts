@@ -25,6 +25,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
       // create package
       const result = await tx.cusUnownedPackage.create({
         data: {
+          office_id: parseInt(data.office_id),
           tracking: data.tracking,
           description: data.description
         }
