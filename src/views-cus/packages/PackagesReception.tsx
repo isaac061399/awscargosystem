@@ -44,7 +44,8 @@ import Select from '@/components/Select';
 import {
   requestPackagesReception,
   requestPackagesReceptionClient,
-  requestPackagesReceptionTracking
+  requestPackagesReceptionTracking,
+  requestUnownedPackage
 } from '@/helpers/request';
 import { currencies } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
@@ -109,10 +110,16 @@ const PackageReception = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-  const [errorAlert, setErrorAlert] = useState<any>({ open: false, message: '' });
+  const [errorAlert, setErrorAlert] = useState<any>({ open: false, inputRef: null, message: '' });
   const [showClientFields, setShowClientFields] = useState<boolean>(false);
   const [showAllOtherFields, setShowAllOtherFields] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
+  const [unownedPackageState, setUnownedPackageState] = useState({
+    open: false,
+    loading: false,
+    description: '',
+    descriptionError: ''
+  });
   const [selectorState, setSelectorState] = useState({
     open: false,
     items: { orders: [], packages: [] },
@@ -157,6 +164,7 @@ const PackageReception = () => {
       try {
         const newValues = {
           office_id: values.office_id,
+          cut_number: values.cut_number,
           tracking: values.tracking,
           package_id: values.package_id,
           order_id: values.order_id,
@@ -250,7 +258,7 @@ const PackageReception = () => {
       setIsLoading(false);
 
       if (!result.valid) {
-        setErrorAlert({ open: true, message: textT?.trackingAlertMessage });
+        setErrorAlert({ open: true, inputRef: trackingFieldRef, message: textT?.trackingAlertMessage });
 
         return;
       }
@@ -305,7 +313,7 @@ const PackageReception = () => {
       setIsLoading(false);
 
       if (!result.valid || !result.client) {
-        setErrorAlert({ open: true, message: textT?.clientAlertMessage });
+        setErrorAlert({ open: true, inputRef: boxNumberFieldRef, message: textT?.clientAlertMessage });
 
         return;
       }
@@ -333,6 +341,7 @@ const PackageReception = () => {
       if (formik.values.client.office.id !== formik.values.office_id) {
         setErrorAlert({
           open: true,
+          inputRef: boxNumberFieldRef.current ? boxNumberFieldRef : trackingFieldRef,
           message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')
         });
       } else if (weightFieldRef.current) {
@@ -417,6 +426,46 @@ const PackageReception = () => {
         trackingFieldRef.current.focus();
       }
     }, 100);
+  };
+
+  const handleUnownedPackageOpen = () => {
+    setUnownedPackageState({ open: true, loading: false, description: '', descriptionError: '' });
+  };
+
+  const handleUnownedPackageClose = () => {
+    setUnownedPackageState({ open: false, loading: false, description: '', descriptionError: '' });
+  };
+
+  const handleUnownedPackage = async () => {
+    if (unownedPackageState.description.trim() === '') {
+      setUnownedPackageState({ ...unownedPackageState, descriptionError: textT?.unownedDialog?.descriptionError });
+
+      return;
+    }
+
+    setUnownedPackageState({ ...unownedPackageState, loading: true });
+
+    // save unowned package
+    const result = await requestUnownedPackage(
+      {
+        tracking: formik.values.tracking,
+        description: unownedPackageState.description.trim()
+      },
+      i18n.language
+    );
+
+    if (!result.valid) {
+      setUnownedPackageState({
+        ...unownedPackageState,
+        loading: false,
+        descriptionError: result.message
+      });
+
+      return;
+    }
+
+    handleUnownedPackageClose();
+    resetProcess();
   };
 
   return (
@@ -519,29 +568,38 @@ const PackageReception = () => {
                     </Divider>
                     <Grid container spacing={5}>
                       {formik.values.package_id === '' && formik.values.order_id === '' && (
-                        <Grid size={{ xs: 12, md: 3 }}>
-                          <TextField
-                            inputRef={boxNumberFieldRef}
-                            fullWidth
-                            required
-                            type="text"
-                            id="box_number"
-                            name="box_number"
-                            label={formT?.labels?.box_number}
-                            placeholder={formT?.placeholders?.box_number}
-                            value={formik.values.box_number}
-                            onChange={formik.handleChange}
-                            error={Boolean(formik.touched.box_number && formik.errors.box_number)}
-                            color={Boolean(formik.touched.box_number && formik.errors.box_number) ? 'error' : 'primary'}
-                            helperText={formik.touched.box_number && (formik.errors.box_number as string)}
-                            disabled={formik.isSubmitting || isLoading}
-                            slotProps={{
-                              input: {
-                                endAdornment: isLoading ? <i className="ri-loader-4-line animate-spin" /> : null
+                        <>
+                          <Grid size={{ xs: 12, md: 3 }}>
+                            <TextField
+                              inputRef={boxNumberFieldRef}
+                              fullWidth
+                              required
+                              type="text"
+                              id="box_number"
+                              name="box_number"
+                              label={formT?.labels?.box_number}
+                              placeholder={formT?.placeholders?.box_number}
+                              value={formik.values.box_number}
+                              onChange={formik.handleChange}
+                              error={Boolean(formik.touched.box_number && formik.errors.box_number)}
+                              color={
+                                Boolean(formik.touched.box_number && formik.errors.box_number) ? 'error' : 'primary'
                               }
-                            }}
-                          />
-                        </Grid>
+                              helperText={formik.touched.box_number && (formik.errors.box_number as string)}
+                              disabled={formik.isSubmitting || isLoading}
+                              slotProps={{
+                                input: {
+                                  endAdornment: isLoading ? <i className="ri-loader-4-line animate-spin" /> : null
+                                }
+                              }}
+                            />
+                          </Grid>
+                          <Grid size={{ xs: 12, md: 3 }} className="flex items-center">
+                            <Button variant="text" color="primary" onClick={handleUnownedPackageOpen}>
+                              {textT?.btnUnowned}
+                            </Button>
+                          </Grid>
+                        </>
                       )}
                       <Grid size={{ xs: 12 }}>
                         <Card variant="outlined">
@@ -817,8 +875,57 @@ const PackageReception = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" color="primary" onClick={() => setErrorAlert({ ...errorAlert, open: false })}>
+          <Button
+            variant="text"
+            color="primary"
+            onClick={() => {
+              if (errorAlert.inputRef && errorAlert.inputRef.current) {
+                const inputElement = errorAlert.inputRef.current as HTMLInputElement;
+                setTimeout(() => {
+                  inputElement.focus();
+                }, 500);
+              }
+
+              setErrorAlert({ ...errorAlert, open: false });
+            }}>
             {textT?.btnClose}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={unownedPackageState.open}
+        onClose={handleUnownedPackageClose}
+        aria-labelledby="unowned-dialog-title"
+        aria-describedby="unowned-dialog-description">
+        <DialogTitle id="unowned-dialog-title">{textT?.unownedDialog?.title}</DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            fullWidth
+            required
+            multiline
+            rows={2}
+            type="text"
+            id="unowned-description"
+            name="unowned-description"
+            label={textT?.unownedDialog?.descriptionLabel}
+            placeholder={textT?.unownedDialog?.descriptionPlaceholder}
+            value={unownedPackageState.description}
+            onChange={(e) => setUnownedPackageState({ ...unownedPackageState, description: e.target.value })}
+            error={Boolean(unownedPackageState.descriptionError)}
+            color={Boolean(unownedPackageState.descriptionError) ? 'error' : 'primary'}
+            helperText={unownedPackageState.descriptionError}
+            disabled={unownedPackageState.loading}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" color="secondary" onClick={handleUnownedPackageClose}>
+            {textT?.btnCancel}
+          </Button>
+          <Button variant="text" color="primary" onClick={handleUnownedPackage} disabled={unownedPackageState.loading}>
+            {textT?.btnSave}
           </Button>
         </DialogActions>
       </Dialog>

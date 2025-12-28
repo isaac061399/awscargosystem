@@ -562,6 +562,22 @@ model CusConfiguration {
   @@map("cus_configuration")
 }
 
+model CusCutLog {
+  id         Int      @id @default(autoincrement())
+  package_id Int?
+  order_id   Int?
+  number     String
+  tracking   String
+  weight     Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  package CusPackage? @relation(fields: [package_id], references: [id], onDelete: SetNull)
+  order   CusOrder?   @relation(fields: [order_id], references: [id], onDelete: SetNull)
+
+  @@map("cus_cut_log")
+}
+
 model CusProvince {
   id      Int         @id @default(autoincrement())
   name    String
@@ -654,6 +670,7 @@ model CusOrder {
   packages CusOrderPackage[]
   products CusOrderProduct[]
   logs     CusOrderLog[]
+  cutLogs  CusCutLog[]
 
   @@map("cus_order")
 }
@@ -749,6 +766,7 @@ model CusPackage {
   client      CusClient?            @relation(fields: [client_id], references: [id], onDelete: Restrict)
   logs        CusPackageLog[]
   status_logs CusPackageStatusLog[]
+  cutLogs     CusCutLog[]
 
   @@map("cus_package")
 }
@@ -791,6 +809,17 @@ model CusProduct {
   updated_at DateTime @updatedAt
 
   @@map("cus_product")
+}
+
+model CusUnownedPackage {
+  id          Int      @id @default(autoincrement())
+  tracking    String   @unique
+  description String
+  found       Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("cus_unowned_package")
 }
 
 // Custom ENUMS

@@ -1535,6 +1535,26 @@ export const requestPackagesReception = async (params: any, lang: string) => {
   }
 };
 
+export const requestUnownedPackage = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/packages/reception/unowned`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // products
 
 export const requestGetProducts = async (params: any, lang: string) => {

@@ -246,6 +246,8 @@
   },
   "packages-reception": {
     "errors": {
+      "trackingRegistered": "The tracking number has already been registered",
+      "trackingSave": "Error saving the information, please try again",
       "alreadyReceived": "Package or order already received",
       "packageNotFound": "Package not found or already received",
       "orderNotFound": "Order not found or already received",

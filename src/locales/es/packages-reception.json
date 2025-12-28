@@ -6,6 +6,7 @@
     "btnCancel": "Cancelar",
     "btnClose": "Cerrar",
     "btnSelect": "Seleccionar",
+    "btnUnowned": "Registrar paquete sin dueño",
     "orderLabel": "Pedido",
     "packageLabel": "Paquete existente",
     "newPackageLabel": "Nuevo paquete",
@@ -22,6 +23,13 @@
       "packagesTitle": "Paquetes",
       "ordersTitle": "Pedidos",
       "productsLabel": "producto(s)"
+    },
+    "unownedDialog": {
+      "title": "Registrar paquete sin dueño",
+      "descriptionLabel": "Descipción del paquete",
+      "descriptionPlaceholder": "Ingrese una descripción para el paquete",
+      "descriptionError": "La descripción es requerida",
+      "successMessage": "Datos guardados con éxito"
     },
     "clientCard": {
       "title": "Datos del Cliente",

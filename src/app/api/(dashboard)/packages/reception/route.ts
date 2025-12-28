@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { TransactionError, withTransaction } from '@libs/prisma';
+import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
 import { Prisma } from '@/prisma/generated/client';
 
 import { calculateShippingPrice } from '@/helpers/calculations';
@@ -18,6 +18,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
 
   try {
     // const office_id = data.office_id;
+    const cut_number = data.cut_number ? `${data.cut_number}`.trim() : '';
     const tracking = data.tracking || '';
     const package_id = data.package_id || '';
     const order_id = data.order_id || '';
@@ -33,6 +34,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
         processResult = await savePackageReception(
           tx,
           {
+            cut_number,
             package_id: Number(package_id),
             weight: Number(weight),
             shelf,
@@ -46,6 +48,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
         processResult = await saveOrderReception(
           tx,
           {
+            cut_number,
             order_id: Number(order_id),
             tracking,
             weight: Number(weight),
@@ -60,6 +63,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
         processResult = await saveNewPackageReception(
           tx,
           {
+            cut_number,
             tracking,
             client_id: Number(client_id),
             weight: Number(weight),
@@ -77,6 +81,9 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
     if (!result) {
       throw new TransactionError(400, textT?.errors?.general);
     }
+
+    // mark tracking as found if exists in unowned packages
+    await markTrackingAsFound(tracking);
 
     if (order_id && order_id !== '') {
       // validate order status
@@ -98,6 +105,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
 const savePackageReception = async (
   tx: Prisma.TransactionClient,
   data: {
+    cut_number: string;
     package_id: number;
     weight: number;
     shelf: string;
@@ -106,7 +114,7 @@ const savePackageReception = async (
   admin_id: number,
   textT: any
 ) => {
-  const { package_id, weight, shelf, row } = data;
+  const { cut_number, package_id, weight, shelf, row } = data;
   const ready = shelf !== '' && row !== '';
 
   const entry = await tx.cusPackage.findUnique({
@@ -150,6 +158,16 @@ const savePackageReception = async (
     }
   });
 
+  // save cut number log
+  await tx.cusCutLog.create({
+    data: {
+      package_id: entry.id,
+      number: cut_number,
+      tracking: entry.tracking,
+      weight: weight
+    }
+  });
+
   if (ready) {
     // save status log
     await tx.cusPackageStatusLog.create({
@@ -168,6 +186,7 @@ const savePackageReception = async (
 const saveOrderReception = async (
   tx: Prisma.TransactionClient,
   data: {
+    cut_number: string;
     order_id: number;
     tracking: string;
     weight: number;
@@ -177,7 +196,7 @@ const saveOrderReception = async (
   admin_id: number,
   textT: any
 ) => {
-  const { order_id, tracking, weight, shelf, row } = data;
+  const { cut_number, order_id, tracking, weight, shelf, row } = data;
   const ready = shelf !== '' && row !== '';
 
   const entry = await tx.cusOrder.findUnique({
@@ -248,12 +267,23 @@ const saveOrderReception = async (
     }
   });
 
+  // save cut number log
+  await tx.cusCutLog.create({
+    data: {
+      order_id: entry.id,
+      number: cut_number,
+      tracking: tracking,
+      weight: weight
+    }
+  });
+
   return true;
 };
 
 const saveNewPackageReception = async (
   tx: Prisma.TransactionClient,
   data: {
+    cut_number: string;
     tracking: string;
     client_id: number;
     weight: number;
@@ -263,7 +293,7 @@ const saveNewPackageReception = async (
   admin_id: number,
   textT: any
 ) => {
-  const { tracking, client_id, weight, shelf, row } = data;
+  const { cut_number, tracking, client_id, weight, shelf, row } = data;
   const ready = shelf !== '' && row !== '';
 
   const client = await tx.cusClient.findUnique({
@@ -317,9 +347,42 @@ const saveNewPackageReception = async (
     }
   });
 
+  // save cut number log
+  await tx.cusCutLog.create({
+    data: {
+      package_id: result.id,
+      number: cut_number,
+      tracking: tracking,
+      weight: weight
+    }
+  });
+
   if (ready) {
     // TODO: send notification to client
   }
 
   return true;
+};
+
+const markTrackingAsFound = async (tracking: string) => {
+  try {
+    const entry = await prismaRead.cusUnownedPackage.findUnique({
+      where: { tracking, found: false }
+    });
+
+    if (!entry) {
+      return true;
+    }
+
+    await prismaRead.cusUnownedPackage.update({
+      where: { id: entry.id },
+      data: { found: true }
+    });
+
+    return true;
+  } catch (error) {
+    console.error(`Error marking tracking as found: ${error}`);
+
+    return false;
+  }
 };
