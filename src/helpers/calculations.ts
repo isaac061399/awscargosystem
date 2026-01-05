@@ -25,10 +25,7 @@ export const getOrderTotal = (products: any[], iva: number) => {
 
     result.total = parseFloat((result.subtotal + result.subtotal * (iva / 100)).toFixed(2));
 
-    return {
-      subtotal: result.subtotal.toFixed(2),
-      total: result.total.toFixed(2)
-    };
+    return result;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating order total: ${error}`);
