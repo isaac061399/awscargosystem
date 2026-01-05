@@ -1,7 +1,6 @@
 'use client';
 
 // React Imports
-import { useState } from 'react';
 
 // MUI Imports
 import Card from '@mui/material/Card';
@@ -13,15 +12,10 @@ import Checkbox from '@mui/material/Checkbox';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
+
+import PasswordField from '@/components/PasswordField';
 
 const FormLayoutsAlignment = () => {
-  // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-
-  const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
-
   return (
     <Card>
       <CardHeader title="Form Alignment" />
@@ -35,28 +29,11 @@ const FormLayoutsAlignment = () => {
               <TextField fullWidth label="Username" placeholder="johnDoe " />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField
+              <PasswordField
                 fullWidth
                 label="Password"
                 placeholder="············"
                 id="form-layout-alignment-password"
-                type={isPasswordShown ? 'text' : 'password'}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={(e) => e.preventDefault()}
-                          aria-label="toggle password visibility">
-                          <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }
-                }}
               />
             </Grid>
             <Grid size={{ xs: 12 }} className="pbs-2">

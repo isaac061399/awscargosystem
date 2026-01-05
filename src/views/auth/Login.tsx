@@ -14,10 +14,11 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 // MUI Imports
-import { Button, Card, CardContent, Divider, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import { Button, Card, CardContent, Divider, TextField, Typography } from '@mui/material';
 
 // Component Imports
 import Logo from '@components/layout/shared/Logo';
+import PasswordField from '@/components/PasswordField';
 import LangSelector from '@libs/translate/LangSelector';
 
 // Helpers Imports
@@ -33,12 +34,9 @@ const Login = () => {
   const [is2faChecked, setIs2faChecked] = useState(false);
   const [is2faRequired, setIs2faRequired] = useState(false);
   const [success, setSuccess] = useState('');
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState('');
   const [autoFocusState, setAutoFocusState] = useState({ email: true, password: false, code: false });
-
-  const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
 
   const handleReset2fa = async (e: React.MouseEvent<HTMLAnchorElement>): Promise<void> => {
     e.preventDefault();
@@ -173,11 +171,10 @@ const Login = () => {
                     helperText={formik.touched.email && formik.errors.email}
                     disabled={formik.isSubmitting || isRedirecting}
                   />
-                  <TextField
+                  <PasswordField
                     autoFocus={autoFocusState.password}
                     fullWidth
                     required
-                    type={isPasswordShown ? 'text' : 'password'}
                     label={formT?.labels?.password}
                     id="password"
                     name="password"
@@ -189,22 +186,6 @@ const Login = () => {
                     color={Boolean(formik.touched.password && formik.errors.password) ? 'error' : 'primary'}
                     helperText={formik.touched.password && formik.errors.password}
                     disabled={formik.isSubmitting || isRedirecting}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              size="small"
-                              edge="end"
-                              onClick={handleClickShowPassword}
-                              onMouseDown={(e) => e.preventDefault()}
-                              tabIndex={-1}>
-                              <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }
-                    }}
                   />
                 </>
               ) : (

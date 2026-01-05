@@ -1,7 +1,6 @@
 'use client';
 
 // React Imports
-import { useState } from 'react';
 
 // Next Imports
 import Link from 'next/link';
@@ -14,18 +13,10 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
+
+import PasswordField from '@/components/PasswordField';
 
 const FormLayoutsBasic = () => {
-  // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false);
-
-  const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
-
-  const handleClickShowConfirmPassword = () => setIsConfirmPasswordShown((show) => !show);
-
   return (
     <Card>
       <CardHeader title="Basic" />
@@ -45,55 +36,21 @@ const FormLayoutsBasic = () => {
               />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField
+              <PasswordField
                 fullWidth
                 label="Password"
                 placeholder="············"
                 id="form-layout-basic-password"
-                type={isPasswordShown ? 'text' : 'password'}
                 helperText="Use 8 or more characters with a mix of letters, numbers & symbols"
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={(e) => e.preventDefault()}
-                          aria-label="toggle password visibility">
-                          <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }
-                }}
               />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField
+              <PasswordField
                 fullWidth
                 label="Confirm Password"
                 placeholder="············"
                 id="form-layout-basic-confirm-password"
-                type={isConfirmPasswordShown ? 'text' : 'password'}
                 helperText="Make sure to type the same password as above"
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          onClick={handleClickShowConfirmPassword}
-                          onMouseDown={(e) => e.preventDefault()}
-                          aria-label="toggle confirm password visibility">
-                          <i className={isConfirmPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }
-                }}
               />
             </Grid>
             <Grid size={{ xs: 12 }}>

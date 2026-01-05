@@ -24,8 +24,6 @@ import {
   DialogTitle,
   Divider,
   Grid,
-  IconButton,
-  InputAdornment,
   Menu,
   TextField,
   Typography
@@ -34,6 +32,7 @@ import {
 // Helpers Imports
 import { requestEditPassword, requestGenerate2FA, requestRemove2FA, requestVerify2FA } from '@helpers/request';
 import { useAdmin } from '@components/AdminProvider';
+import PasswordField from '@/components/PasswordField';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -48,10 +47,6 @@ const Security = () => {
 
   // password
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-  const [isPasswordShownDisable, setIsPasswordShownDisable] = useState(false);
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [isNewPasswordShown, setIsNewPasswordShown] = useState(false);
-  const [isConfirmNewPasswordShown, setIsConfirmNewPasswordShown] = useState(false);
 
   // 2fa
   const [alert2faState, setAlert2faState] = useState<any>({ ...defaultAlertState });
@@ -226,9 +221,8 @@ const Security = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Grid container spacing={5}>
                     <Grid size={{ xs: 12 }}>
-                      <TextField
+                      <PasswordField
                         fullWidth
-                        type={isPasswordShown ? 'text' : 'password'}
                         label={formT?.labels?.password}
                         id="password"
                         name="password"
@@ -239,28 +233,11 @@ const Security = () => {
                         color={Boolean(formik.touched.password && formik.errors.password) ? 'error' : 'primary'}
                         helperText={formik.touched.password && formik.errors.password}
                         disabled={formik.isSubmitting}
-                        slotProps={{
-                          input: {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  size="small"
-                                  edge="end"
-                                  onClick={() => setIsPasswordShown((prevState) => !prevState)}
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  tabIndex={-1}>
-                                  <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }
-                        }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
-                      <TextField
+                      <PasswordField
                         fullWidth
-                        type={isNewPasswordShown ? 'text' : 'password'}
                         label={formT?.labels?.new_password}
                         id="new_password"
                         name="new_password"
@@ -271,28 +248,11 @@ const Security = () => {
                         color={Boolean(formik.touched.new_password && formik.errors.new_password) ? 'error' : 'primary'}
                         helperText={formik.touched.new_password && formik.errors.new_password}
                         disabled={formik.isSubmitting}
-                        slotProps={{
-                          input: {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  size="small"
-                                  edge="end"
-                                  onClick={() => setIsNewPasswordShown((prevState) => !prevState)}
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  tabIndex={-1}>
-                                  <i className={isNewPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }
-                        }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
-                      <TextField
+                      <PasswordField
                         fullWidth
-                        type={isConfirmNewPasswordShown ? 'text' : 'password'}
                         label={formT?.labels?.confirmNewPassword}
                         id="confirmNewPassword"
                         name="confirmNewPassword"
@@ -307,22 +267,6 @@ const Security = () => {
                         }
                         helperText={formik.touched.confirmNewPassword && formik.errors.confirmNewPassword}
                         disabled={formik.isSubmitting}
-                        slotProps={{
-                          input: {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  size="small"
-                                  edge="end"
-                                  onClick={() => setIsConfirmNewPasswordShown((prevState) => !prevState)}
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  tabIndex={-1}>
-                                  <i className={isConfirmNewPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }
-                        }}
                       />
                     </Grid>
                     {alertState.open && (
@@ -447,9 +391,8 @@ const Security = () => {
                   <Typography variant="body1" className="mb-3">
                     {textT?.text2fa?.dialogDisable?.text}
                   </Typography>
-                  <TextField
+                  <PasswordField
                     fullWidth
-                    type={isPasswordShown ? 'text' : 'password'}
                     label={form2faDT.labels.password}
                     id="password"
                     name="password"
@@ -460,22 +403,6 @@ const Security = () => {
                     color={Boolean(formik2faD.touched.password && formik2faD.errors.password) ? 'error' : 'primary'}
                     helperText={formik2faD.touched.password && formik2faD.errors.password}
                     disabled={formik2faD.isSubmitting}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              size="small"
-                              edge="end"
-                              onClick={() => setIsPasswordShownDisable((prevState) => !prevState)}
-                              onMouseDown={(e) => e.preventDefault()}
-                              tabIndex={-1}>
-                              <i className={isPasswordShownDisable ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }
-                    }}
                   />
                 </DialogContent>
                 <Divider />

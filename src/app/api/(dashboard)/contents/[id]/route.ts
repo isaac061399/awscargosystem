@@ -88,8 +88,8 @@ export const PUT = withAuthApi(['contents.edit'], async (req, { params }: { para
               }
             }
           },
-          category: data.category_id ? { connect: { id: Number(data.category_id) } } : undefined,
-          page: data.page_id ? { connect: { id: Number(data.page_id) } } : undefined,
+          category: data.category_id ? { connect: { id: Number(data.category_id) } } : { disconnect: true },
+          page: data.page_id ? { connect: { id: Number(data.page_id) } } : { disconnect: true },
           media: { create: media },
           custom_values: { create: customValues }
         }

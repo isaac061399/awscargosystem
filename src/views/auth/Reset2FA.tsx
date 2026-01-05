@@ -12,11 +12,12 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 // MUI Imports
-import { Button, Card, CardContent, Divider, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import { Button, Card, CardContent, Divider, Typography } from '@mui/material';
 
 // Component Imports
 import DirectionalIcon from '@components/DirectionalIcon';
 import Logo from '@components/layout/shared/Logo';
+import PasswordField from '@/components/PasswordField';
 import LangSelector from '@libs/translate/LangSelector';
 
 // Helper Imports
@@ -27,11 +28,8 @@ const Reset2FA = ({ token, userId }: { token: string; userId: string }) => {
   const textT: any = useMemo(() => t('text', { returnObjects: true, default: {} }), [t]);
   const formT: any = useMemo(() => t('form', { returnObjects: true, default: {} }), [t]);
 
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
-
-  const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
 
   const formik = useFormik({
     validateOnChange: false,
@@ -88,10 +86,9 @@ const Reset2FA = ({ token, userId }: { token: string; userId: string }) => {
             <Typography className="mbs-1">{!showSuccess ? textT?.subtitle : textT?.successSubtitle}</Typography>
             {!showSuccess && (
               <form noValidate onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-                <TextField
+                <PasswordField
                   fullWidth
                   required
-                  type={isPasswordShown ? 'text' : 'password'}
                   label={formT?.labels?.password}
                   id="password"
                   name="password"
@@ -103,22 +100,6 @@ const Reset2FA = ({ token, userId }: { token: string; userId: string }) => {
                   color={Boolean(formik.touched.password && formik.errors.password) ? 'error' : 'primary'}
                   helperText={formik.touched.password && formik.errors.password}
                   disabled={formik.isSubmitting}
-                  slotProps={{
-                    input: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            size="small"
-                            edge="end"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={(e) => e.preventDefault()}
-                            tabIndex={-1}>
-                            <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }
-                  }}
                 />
 
                 {error !== '' && (

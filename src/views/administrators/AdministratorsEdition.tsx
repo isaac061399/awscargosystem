@@ -23,7 +23,6 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  InputAdornment,
   Switch,
   TextField,
   Typography
@@ -32,6 +31,7 @@ import {
 // Component Imports
 import DashboardLayout from '@components/layout/DashboardLayout';
 import Select from '@components/Select';
+import PasswordField from '@/components/PasswordField';
 
 // Helpers Imports
 import { requestEditAdministrator, requestNewAdministrator } from '@helpers/request';
@@ -49,8 +49,6 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
 
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false);
 
   let passwordValidation = yup.string();
   let confirmPasswordValidation = yup.string().oneOf([yup.ref('password')], formT?.errors?.confirmPasswordMatch);
@@ -257,10 +255,9 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
                     />
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
-                    <TextField
+                    <PasswordField
                       fullWidth
                       required={!Boolean(admin)}
-                      type={isPasswordShown ? 'text' : 'password'}
                       label={formT?.labels?.password}
                       id="password"
                       name="password"
@@ -271,29 +268,12 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
                       color={Boolean(formik.touched.password && formik.errors.password) ? 'error' : 'primary'}
                       helperText={formik.touched.password && formik.errors.password}
                       disabled={formik.isSubmitting || isRedirecting}
-                      slotProps={{
-                        input: {
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                size="small"
-                                edge="end"
-                                onClick={() => setIsPasswordShown((prevState) => !prevState)}
-                                onMouseDown={(e) => e.preventDefault()}
-                                tabIndex={-1}>
-                                <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                              </IconButton>
-                            </InputAdornment>
-                          )
-                        }
-                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
-                    <TextField
+                    <PasswordField
                       fullWidth
                       required={!Boolean(admin)}
-                      type={isConfirmPasswordShown ? 'text' : 'password'}
                       label={formT?.labels?.confirmPassword}
                       id="confirmPassword"
                       name="confirmPassword"
@@ -306,22 +286,6 @@ const AdministratorsEdition = ({ roles, admin }: { roles: { id: number; name: st
                       }
                       helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                       disabled={formik.isSubmitting || isRedirecting}
-                      slotProps={{
-                        input: {
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                size="small"
-                                edge="end"
-                                onClick={() => setIsConfirmPasswordShown((prevState) => !prevState)}
-                                onMouseDown={(e) => e.preventDefault()}
-                                tabIndex={-1}>
-                                <i className={isConfirmPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                              </IconButton>
-                            </InputAdornment>
-                          )
-                        }
-                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
