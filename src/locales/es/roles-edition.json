@@ -15,9 +15,13 @@
       "menus": "CMS - Menús",
       "pages": "CMS - Páginas",
       "global-settings": "CMS - Configuración Global",
+      "billing": "Caja - Operaciones - Facturación",
+      "cash-control": "Caja - Control - Control de Caja",
+      "cash-registers": "Caja - Control - Registros de Caja",
       "clients": "Logística - Clientes",
       "configuration": "Configuración - Configuración",
-      "money-outflows": "Caja - Salidas de Dinero",
+      "invoices": "Caja - Control - Facturas Emitidas",
+      "money-outflows": "Caja - Operaciones - Salidas de Dinero",
       "offices": "Configuración - Oficinas",
       "orders": "Logística - Pedidos",
       "packages": "Logística - Paquetes",
@@ -31,7 +35,11 @@
       "delete": "Eliminar",
       "send": "Enviar",
       "view": "Ver",
-      "reception": "Recepción"
+      "reception": "Recepción",
+      "close": "Cerrar",
+      "open": "Abrir",
+      "reopen": "Reabrir",
+      "cancel": "Cancelar"
     }
   },
   "form": {

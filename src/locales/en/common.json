@@ -170,21 +170,21 @@
         ],
         "items": [
           {
-            "label": "Clients",
+            "label": "Clientes",
             "link": "",
             "externalLink": false,
             "icon": "ri-group-2-line",
             "permissions": ["clients.list", "clients.create"],
             "subItems": [
               {
-                "label": "List",
+                "label": "Listar",
                 "link": "/clients",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["clients.list"]
               },
               {
-                "label": "New",
+                "label": "Nuevo",
                 "link": "/clients/new",
                 "externalLink": false,
                 "icon": "",
@@ -193,21 +193,21 @@
             ]
           },
           {
-            "label": "Orders",
+            "label": "Pedidos",
             "link": "",
             "externalLink": false,
             "icon": "ri-shopping-bag-4-line",
             "permissions": ["orders.list", "orders.create"],
             "subItems": [
               {
-                "label": "List",
+                "label": "Listar",
                 "link": "/orders",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["orders.list"]
               },
               {
-                "label": "New",
+                "label": "Nuevo",
                 "link": "/orders/new",
                 "externalLink": false,
                 "icon": "",
@@ -217,37 +217,98 @@
           },
           {
             "label": "Packages",
-            "link": "/packages",
+            "link": "",
             "externalLink": false,
             "icon": "ri-box-3-line",
-            "permissions": ["packages.list"]
-          },
-          {
-            "label": "Unowned Packages",
-            "link": "/unowned-packages",
-            "externalLink": false,
-            "icon": "ri-box-3-line",
-            "permissions": ["unowned-packages.list"]
-          },
-          {
-            "label": "Packages Reception",
-            "link": "/packages-reception",
-            "externalLink": false,
-            "icon": "ri-inbox-archive-line",
-            "permissions": ["packages.reception"]
+            "permissions": ["packages.list", "unowned-packages.list", "packages.reception"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.list"]
+              },
+              {
+                "label": "Unowned Packages",
+                "link": "/unowned-packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["unowned-packages.list"]
+              },
+              {
+                "label": "Packages Reception",
+                "link": "/packages-reception",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.reception"]
+              }
+            ]
           }
         ]
       },
       {
-        "sectionTitle": "Cash",
-        "permissions": ["money-outflows.list"],
+        "sectionTitle": "Cash Register",
+        "permissions": ["billing.create", "money-outflows.list"],
         "items": [
           {
-            "label": "Money Outflows",
-            "link": "/money-outflows",
+            "label": "Operations",
+            "link": "",
             "externalLink": false,
-            "icon": "ri-wallet-3-line",
-            "permissions": ["money-outflows.list"]
+            "icon": "ri-hand-coin-line",
+            "permissions": [
+              "billing.create",
+              "money-outflows.list",
+              "cash-control.open",
+              "billing.list",
+              "cash-registers.list"
+            ],
+            "subItems": [
+              {
+                "label": "Billing",
+                "link": "/billing",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["billing.create"]
+              },
+              {
+                "label": "Money Outflows",
+                "link": "/money-outflows",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["money-outflows.list"]
+              }
+            ]
+          },
+          {
+            "label": "Control",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-file-list-3-line",
+            "permissions": ["cash-control.open", "cash-registers.list", "invoices.list"],
+            "subItems": [
+              {
+                "label": "Cash Control",
+                "link": "/cash-control",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["cash-control.open"]
+              },
+              {
+                "label": "Cash Registers",
+                "link": "/cash-registers",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["cash-registers.list"]
+              },
+              {
+                "label": "Issued Invoices",
+                "link": "/invoices",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["invoices.list"]
+              }
+            ]
           }
         ]
       },

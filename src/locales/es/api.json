@@ -247,8 +247,6 @@
   },
   "packages-reception": {
     "errors": {
-      "trackingRegistered": "El tracking ya ha sido registrado",
-      "trackingSave": "Error al guardar la información, por favor inténtalo de nuevo",
       "alreadyReceived": "Paquete o pedido ya recibido",
       "packageNotFound": "Paquete no encontrado o ya recibido",
       "orderNotFound": "Pedido no encontrado o ya recibido",
@@ -267,6 +265,8 @@
   },
   "unowned-packages": {
     "errors": {
+      "tracking": "El tracking ya está registrado",
+      "save": "Error al guardar el paquete. Por favor, inténtalo de nuevo.",
       "delete": "Error al eliminar el paquete. Si ya tiene datos asociados, no podrá eliminarlo.",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }

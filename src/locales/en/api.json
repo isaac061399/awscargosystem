@@ -247,8 +247,6 @@
   },
   "packages-reception": {
     "errors": {
-      "trackingRegistered": "The tracking number has already been registered",
-      "trackingSave": "Error saving the information, please try again",
       "alreadyReceived": "Package or order already received",
       "packageNotFound": "Package not found or already received",
       "orderNotFound": "Order not found or already received",
@@ -267,6 +265,8 @@
   },
   "unowned-packages": {
     "errors": {
+      "tracking": "The tracking is already registered",
+      "save": "Error saving the package. Please try again.",
       "delete": "Error deleting the package. If it already has associated data, you will not be able to delete it.",
       "general": "An error occurred, please try again"
     }

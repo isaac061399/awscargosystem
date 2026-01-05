@@ -1535,26 +1535,6 @@ export const requestPackagesReception = async (params: any, lang: string) => {
   }
 };
 
-export const requestUnownedPackage = async (params: any, lang: string) => {
-  try {
-    const response = await axios.request({
-      method: 'post',
-      url: `/api/packages/reception/unowned`,
-      headers: { ...defaultHeaders, 'Accept-Language': lang },
-      data: params
-    });
-
-    return response.data;
-  } catch (e: any) {
-    // console.error(e);
-    if (e?.response?.data) {
-      return e?.response?.data;
-    }
-
-    return { valid: false };
-  }
-};
-
 // products
 
 export const requestGetProducts = async (params: any, lang: string) => {
@@ -1634,6 +1614,26 @@ export const requestDeleteProduct = async (id: number, lang: string) => {
 };
 
 // unowned packages
+
+export const requestNewUnownedPackage = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/unowned-packages`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
 
 export const requestGetUnownedPackages = async (params: any, lang: string) => {
   try {

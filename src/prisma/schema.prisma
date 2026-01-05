@@ -746,7 +746,7 @@ model CusOrderProductStatusLog {
 
 model CusPackage {
   id                Int           @id @default(autoincrement())
-  client_id         Int?
+  client_id         Int
   tracking          String        @unique
   courier_company   String?
   purchase_page     String?
@@ -764,7 +764,7 @@ model CusPackage {
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
 
-  client      CusClient?            @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  client      CusClient             @relation(fields: [client_id], references: [id], onDelete: Restrict)
   logs        CusPackageLog[]
   status_logs CusPackageStatusLog[]
   cutLogs     CusCutLog[]

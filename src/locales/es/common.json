@@ -217,37 +217,98 @@
           },
           {
             "label": "Paquetes",
-            "link": "/packages",
+            "link": "",
             "externalLink": false,
             "icon": "ri-box-3-line",
-            "permissions": ["packages.list"]
-          },
-          {
-            "label": "Paquetes Sin Dueño",
-            "link": "/unowned-packages",
-            "externalLink": false,
-            "icon": "ri-box-3-line",
-            "permissions": ["unowned-packages.list"]
-          },
-          {
-            "label": "Recepción de Paquetes",
-            "link": "/packages-reception",
-            "externalLink": false,
-            "icon": "ri-inbox-archive-line",
-            "permissions": ["packages.reception"]
+            "permissions": ["packages.list", "unowned-packages.list", "packages.reception"],
+            "subItems": [
+              {
+                "label": "Listar",
+                "link": "/packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.list"]
+              },
+              {
+                "label": "Paquetes Sin Dueño",
+                "link": "/unowned-packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["unowned-packages.list"]
+              },
+              {
+                "label": "Recepción de Paquetes",
+                "link": "/packages-reception",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.reception"]
+              }
+            ]
           }
         ]
       },
       {
         "sectionTitle": "Caja",
-        "permissions": ["money-outflows.list"],
+        "permissions": ["billing.create", "money-outflows.list"],
         "items": [
           {
-            "label": "Salidas de Dinero",
-            "link": "/money-outflows",
+            "label": "Operaciones",
+            "link": "",
             "externalLink": false,
-            "icon": "ri-wallet-3-line",
-            "permissions": ["money-outflows.list"]
+            "icon": "ri-hand-coin-line",
+            "permissions": [
+              "billing.create",
+              "money-outflows.list",
+              "cash-control.open",
+              "billing.list",
+              "cash-registers.list"
+            ],
+            "subItems": [
+              {
+                "label": "Facturación",
+                "link": "/billing",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["billing.create"]
+              },
+              {
+                "label": "Salidas de Dinero",
+                "link": "/money-outflows",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["money-outflows.list"]
+              }
+            ]
+          },
+          {
+            "label": "Control",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-file-list-3-line",
+            "permissions": ["cash-control.open", "cash-registers.list", "invoices.list"],
+            "subItems": [
+              {
+                "label": "Control de Caja",
+                "link": "/cash-control",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["cash-control.open"]
+              },
+              {
+                "label": "Registros de Caja",
+                "link": "/cash-registers",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["cash-registers.list"]
+              },
+              {
+                "label": "Facturas Emitidas",
+                "link": "/invoices",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["invoices.list"]
+              }
+            ]
           }
         ]
       },

@@ -40,12 +40,16 @@ import {
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import Select from '@/components/Select';
 
+// Auth Imports
+import { useAdmin } from '@/components/AdminProvider';
+import { hasAllPermissions } from '@/helpers/permissions';
+
 // Helpers Imports
 import {
+  requestNewUnownedPackage,
   requestPackagesReception,
   requestPackagesReceptionClient,
-  requestPackagesReceptionTracking,
-  requestUnownedPackage
+  requestPackagesReceptionTracking
 } from '@/helpers/request';
 import { currencies } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
@@ -103,6 +107,8 @@ const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const PackageReception = () => {
   const { offices } = useConfig();
+  const { data: admin } = useAdmin();
+  const canCreateUnownedPackages = hasAllPermissions('unowned-packages.create', admin.permissions);
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('packages-reception:text', { returnObjects: true, default: {} }), [t]);
@@ -446,7 +452,7 @@ const PackageReception = () => {
     setUnownedPackageState({ ...unownedPackageState, loading: true });
 
     // save unowned package
-    const result = await requestUnownedPackage(
+    const result = await requestNewUnownedPackage(
       {
         office_id: formik.values.office_id,
         tracking: formik.values.tracking,
@@ -595,11 +601,13 @@ const PackageReception = () => {
                               }}
                             />
                           </Grid>
-                          <Grid size={{ xs: 12, md: 3 }} className="flex items-center">
-                            <Button variant="text" color="primary" onClick={handleUnownedPackageOpen}>
-                              {textT?.btnUnowned}
-                            </Button>
-                          </Grid>
+                          {canCreateUnownedPackages && (
+                            <Grid size={{ xs: 12, md: 3 }} className="flex items-center">
+                              <Button variant="text" color="primary" onClick={handleUnownedPackageOpen}>
+                                {textT?.btnUnowned}
+                              </Button>
+                            </Grid>
+                          )}
                         </>
                       )}
                       <Grid size={{ xs: 12 }}>

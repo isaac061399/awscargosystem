@@ -15,6 +15,9 @@
       "menus": "CMS - Menus",
       "pages": "CMS - Pages",
       "global-settings": "CMS - Global Settings",
+      "billing": "Cash - Billing",
+      "cash-control": "Cash - Cash Control",
+      "cash-registers": "Cash - Cash Registers",
       "clients": "Logistics - Clients",
       "configuration": "Configuration - Configuration",
       "money-outflows": "Cash - Money Outflows",
@@ -31,7 +34,11 @@
       "delete": "Delete",
       "send": "Send",
       "view": "View",
-      "reception": "Reception"
+      "reception": "Reception",
+      "close": "Close",
+      "open": "Open",
+      "reopen": "Reopen",
+      "cancel": "Cancel"
     }
   },
   "form": {
