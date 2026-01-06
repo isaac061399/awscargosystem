@@ -1,0 +1,36 @@
+{
+  "text": {
+    "title": "Registros de Caja",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "table": {
+      "id": {
+        "title": "Número de Registro"
+      },
+      "administrator": {
+        "title": "Administrador",
+        "email": "Correo",
+        "view": "Ver"
+      },
+      "office": {
+        "title": "Oficina"
+      },
+      "open_date": {
+        "title": "Apertura",
+        "dateFormat": "DD/MM/YYYY hh:mm A"
+      },
+      "close_date": {
+        "title": "Cierre",
+        "dateFormat": "DD/MM/YYYY hh:mm A"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "actions": {
+        "title": "Acciones",
+        "viewLabel": "Ver",
+        "printLabel": "Imprimir Recibo"
+      }
+    }
+  }
+}

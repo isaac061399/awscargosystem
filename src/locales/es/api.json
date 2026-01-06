@@ -109,6 +109,18 @@
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
+  "cash-registers": {
+    "errors": {
+      "notOpen": "La caja no está abierta",
+      "notClose": "La caja no está cerrada",
+      "alreadyOpen": "La caja ya se abrió para hoy",
+      "alreadyClosed": "La caja ya está cerrada",
+      "open": "Error al abrir la caja, por favor inténtalo de nuevo",
+      "reopen": "Error al reabrir la caja, por favor inténtalo de nuevo",
+      "invalid": "Registro de caja no válido",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
   "clients": {
     "errors": {
       "email": "Esta dirección de correo electrónico ya está asociada a un cliente existente.",

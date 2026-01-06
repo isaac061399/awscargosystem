@@ -1,129 +1,155 @@
-// import { cookies } from 'next/headers';
-// import { type Moment } from 'moment';
-// import moment from 'moment-timezone';
+import { cookies } from 'next/headers';
+import moment from 'moment-timezone';
 
-// import type {
-//   CashRegisterStatus,
-//   CusPaymentMethod,
-//   paymentMethod,
-//   WalletTransactionType
-// } from '@/prisma/generated/client';
-// import { prismaRead } from '@libs/prisma';
+import { prismaRead } from '@libs/prisma';
+import { CashRegisterStatus } from '@/prisma/generated/enums';
 
 // import { formatMoney } from '@/libs/utils';
 
-// export const getCashRegister = async (
-//   id: number,
-//   validateIfIsClosed: boolean = false,
-//   validateIfIsToday: boolean = false
-// ) => {
-//   try {
-//     const where: any = { id };
+export const getCashRegister = async (
+  id: number,
+  validateIfIsClosed: boolean = false,
+  validateIfIsToday: boolean = false
+) => {
+  try {
+    const where: any = { id };
 
-//     if (validateIfIsClosed) {
-//       where.status = 'CLOSED' as CashRegisterStatus;
-//     }
+    if (validateIfIsClosed) {
+      where.status = CashRegisterStatus.CLOSED;
+    }
 
-//     if (validateIfIsToday) {
-//       const tz = (await cookies()).get('tz')?.value || 'UTC';
-//       const today = moment().tz(tz);
+    if (validateIfIsToday) {
+      const tz = (await cookies()).get('tz')?.value || 'UTC';
+      const today = moment().tz(tz);
 
-//       where.open_date = { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() };
-//     }
+      where.open_date = { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() };
+    }
 
-//     const cashRegister = await prismaRead.cusCashRegister.findUnique({
-//       where,
-//       select: {
-//         id: true,
-//         open_date: true,
-//         close_date: true,
-//         cash_balance: true,
-//         cash_reported: true,
-//         cash_reported_data: true,
-//         cash_amount: true,
-//         sinpe_amount: true,
-//         transfer_amount: true,
-//         card_amount: true,
-//         cash_outflows: true,
-//         sinpe_outflows: true,
-//         transfer_outflows: true,
-//         card_outflows: true,
-//         comment: true,
-//         status: true,
-//         administrator: {
-//           select: {
-//             id: true,
-//             first_name: true,
-//             last_name: true,
-//             full_name: true,
-//             email: true
-//           }
-//         }
-//       }
-//     });
+    const cashRegister = await prismaRead.cusCashRegister.findUnique({
+      where,
+      select: {
+        id: true,
+        open_date: true,
+        close_date: true,
+        comment: true,
+        status: true,
+        administrator: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            full_name: true,
+            email: true
+          }
+        },
+        office: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        lines: {
+          select: {
+            id: true,
+            currency: true,
+            cash_balance: true,
+            cash_reported: true,
+            cash_reported_data: true,
+            cash_in: true,
+            sinpe_in: true,
+            transfer_in: true,
+            card_in: true,
+            cash_out: true,
+            sinpe_out: true,
+            transfer_out: true,
+            card_out: true,
+            cash_change: true,
+            sinpe_change: true,
+            transfer_change: true,
+            card_change: true
+          }
+        }
+      }
+    });
 
-//     if (!cashRegister) {
-//       return;
-//     }
+    if (!cashRegister) {
+      return;
+    }
 
-//     return cashRegister;
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   } catch (e) {
-//     // console.error(`Error: ${e}`);
-//     return;
-//   }
-// };
+    return cashRegister;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    // console.error(`Error: ${e}`);
+    return;
+  }
+};
 
-// export const getCashRegisterAdmin = async (email: string) => {
-//   try {
-//     const tz = (await cookies()).get('tz')?.value || 'UTC';
-//     const today = moment().tz(tz);
+export const getCashRegisterAdmin = async (email: string) => {
+  try {
+    const tz = (await cookies()).get('tz')?.value || 'UTC';
+    const today = moment().tz(tz);
 
-//     const cashRegister = await prismaRead.cusCashRegister.findFirst({
-//       where: {
-//         administrator: { email },
-//         open_date: { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() }
-//       },
-//       select: {
-//         id: true,
-//         open_date: true,
-//         close_date: true,
-//         cash_balance: true,
-//         cash_reported: true,
-//         cash_reported_data: true,
-//         cash_amount: true,
-//         sinpe_amount: true,
-//         transfer_amount: true,
-//         card_amount: true,
-//         cash_outflows: true,
-//         sinpe_outflows: true,
-//         transfer_outflows: true,
-//         card_outflows: true,
-//         comment: true,
-//         status: true,
-//         administrator: {
-//           select: {
-//             id: true,
-//             first_name: true,
-//             last_name: true,
-//             full_name: true,
-//             email: true
-//           }
-//         }
-//       }
-//     });
+    const cashRegister = await prismaRead.cusCashRegister.findFirst({
+      where: {
+        administrator: { email },
+        open_date: { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() }
+      },
+      select: {
+        id: true,
+        open_date: true,
+        close_date: true,
+        comment: true,
+        status: true,
+        administrator: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            full_name: true,
+            email: true
+          }
+        },
+        office: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        lines: {
+          select: {
+            id: true,
+            currency: true,
+            cash_balance: true,
+            cash_reported: true,
+            cash_reported_data: true,
+            cash_in: true,
+            sinpe_in: true,
+            transfer_in: true,
+            card_in: true,
+            cash_out: true,
+            sinpe_out: true,
+            transfer_out: true,
+            card_out: true,
+            cash_change: true,
+            sinpe_change: true,
+            transfer_change: true,
+            card_change: true
+          }
+        }
+      }
+    });
 
-//     if (!cashRegister) {
-//       return;
-//     }
+    if (!cashRegister) {
+      return;
+    }
 
-//     return cashRegister;
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   } catch (e) {
-//     // console.error(`Error: ${e}`);
-//     return;
-//   }
-// };
+    return cashRegister;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    // console.error(`Error: ${e}`);
+    return;
+  }
+};
 
 // export const getCashRegisterData = async (cashRegister: any, closeDate: Moment) => {
 //   try {
@@ -257,21 +283,21 @@
 //   }
 // };
 
-// export const getCashData = (options: { [key: string]: string }, data: { [key: string]: number }) => {
-//   const details = {} as { [key: string]: number };
-//   let total = 0;
+export const getCashData = (options: { [key: string]: string }, data: { [key: string]: number }) => {
+  const details = {} as { [key: string]: number };
+  let total = 0;
 
-//   Object.keys(options).forEach((key) => {
-//     const amount = parseFloat(key);
-//     const cant = data[key] || 0;
+  Object.keys(options).forEach((key) => {
+    const amount = parseFloat(key);
+    const cant = data[key] || 0;
 
-//     details[key] = cant;
+    details[key] = cant;
 
-//     total += amount * cant;
-//   });
+    total += amount * cant;
+  });
 
-//   return { details, total };
-// };
+  return { details, total };
+};
 
 // export const getCashRegisterTicketHtml = async (entry: any) => {
 //   const tz = (await cookies()).get('tz')?.value || 'UTC';
@@ -403,27 +429,27 @@
 //       </html>`;
 // };
 
-// export const isAdminCashRegisterOpen = async (adminId: number) => {
-//   try {
-//     const tz = (await cookies()).get('tz')?.value || 'UTC';
-//     const today = moment().tz(tz);
+export const isAdminCashRegisterOpen = async (adminId: number) => {
+  try {
+    const tz = (await cookies()).get('tz')?.value || 'UTC';
+    const today = moment().tz(tz);
 
-//     const cashRegister = await prismaRead.cusCashRegister.findFirst({
-//       where: {
-//         administrator_id: adminId,
-//         open_date: { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() },
-//         status: 'OPEN' as CashRegisterStatus
-//       }
-//     });
+    const cashRegister = await prismaRead.cusCashRegister.findFirst({
+      where: {
+        administrator_id: adminId,
+        open_date: { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() },
+        status: CashRegisterStatus.OPEN
+      }
+    });
 
-//     if (!cashRegister) {
-//       return false;
-//     }
+    if (!cashRegister) {
+      return false;
+    }
 
-//     return true;
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   } catch (e) {
-//     // console.error(`Error: ${e}`);
-//     return false;
-//   }
-// };
+    return true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    // console.error(`Error: ${e}`);
+    return false;
+  }
+};

@@ -1,5 +1,9 @@
 {
   "labels": {
+    "cashRegisterStatus": {
+      "OPEN": "Abierta",
+      "CLOSED": "Cerrada"
+    },
     "currency": {
       "CRC": "Colones",
       "USD": "Dólares"
@@ -35,6 +39,37 @@
       "ON_THE_WAY": "En Camino",
       "READY": "Listo para Retirar",
       "DELIVERED": "Entregado"
+    }
+  },
+  "money": {
+    "CRC": {
+      "title": "Colones",
+      "money": {
+        "5": "Monedas de ₡ 5",
+        "10": "Monedas de ₡ 10",
+        "25": "Monedas de ₡ 25",
+        "50": "Monedas de ₡ 50",
+        "100": "Monedas de ₡ 100",
+        "500": "Monedas de ₡ 500",
+        "1000": "Billetes de ₡ 1,000",
+        "2000": "Billetes de ₡ 2,000",
+        "5000": "Billetes de ₡ 5,000",
+        "10000": "Billetes de ₡ 10,000",
+        "20000": "Billetes de ₡ 20,000",
+        "50000": "Billetes de ₡ 50,000"
+      }
+    },
+    "USD": {
+      "title": "Dólares",
+      "money": {
+        "1": "Billetes de $ 1",
+        "2": "Billetes de $ 2",
+        "5": "Billetes de $ 5",
+        "10": "Billetes de $ 10",
+        "20": "Billetes de $ 20",
+        "50": "Billetes de $ 50",
+        "100": "Billetes de $ 100"
+      }
     }
   }
 }

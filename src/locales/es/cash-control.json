@@ -1,0 +1,90 @@
+{
+  "text": {
+    "title": "Caja",
+    "btnOpen": "Abrir",
+    "btnClose": "Cerrar",
+    "btnPrint": "Imprimir Recibo",
+    "confirmation": "Confirmación",
+    "cashBalance": "Balance Inicial",
+    "btnView": "Ver",
+    "total": "Total",
+    "dateTimeFormat": "DD/MM/YYYY hh:mm A",
+    "admin": {
+      "title": "Administrador",
+      "name": "Nombre",
+      "email": "Correo"
+    },
+    "result": {
+      "title": "Resultado en Efectivo",
+      "totalReported": "Total reportado",
+      "totalReportedInfo": "Efectivo Reportado - Balance Inicial",
+      "total": "Total en sistema",
+      "totalInfo": "Entradas en Efectivo - Salidas en Efectivo",
+      "difference": "Diferencia"
+    },
+    "detail": {
+      "title": "Detalle de la Caja",
+      "openDate": "Apertura",
+      "closeDate": "Cierre",
+      "cashBalance": "Balance Inicial",
+      "cashReported": "Efectivo Reportado",
+      "cashAmount": "Entradas en Efectivo",
+      "sinpeAmount": "Entradas en SINPE",
+      "transferAmount": "Entradas en Transferencia",
+      "cardAmount": "Entradas en Tarjeta",
+      "cashOutflows": "Salidas en Efectivo",
+      "sinpeOutflows": "Salidas en SINPE",
+      "transferOutflows": "Salidas en Transferencia",
+      "cardOutflows": "Salidas en Tarjeta"
+    },
+    "cashDetail": {
+      "title": "Detalle de Efectivo"
+    },
+    "comment": {
+      "title": "Comentario"
+    }
+  },
+  "formOpen": {
+    "labels": {
+      "office_id": "Oficina",
+      "cash_balance_crc": "Balance inicial (Colones)",
+      "cash_balance_usd": "Balance inicial (Dólares)",
+      "confirmation": "Confimo abrir la caja"
+    },
+    "placeholders": {
+      "office_id": "Seleccione una oficina",
+      "cash_balance_crc": "Ingrese un monto",
+      "cash_balance_usd": "Ingrese un monto",
+      "confirmation": "Seleccione para continuar"
+    },
+    "errors": {
+      "office_id": "La oficina es requerida",
+      "cash_balance_crc": "El balance inicial en colones es requerido",
+      "cash_balance_usd": "El balance inicial en dólares es requerido",
+      "invalidAmount": "Monto inválido",
+      "confirmation": "Debe confirmar para continuar"
+    },
+    "successMessage": "Caja abierta con éxito",
+    "errorMessage": "Error al abrir la caja, por favor inténtalo de nuevo"
+  },
+  "formClose": {
+    "labels": {
+      "amount": "Cantidad",
+      "comment": "Comentario",
+      "confirmation": "Confimo cerrar la caja"
+    },
+    "placeholders": {
+      "amount": "Ingrese una cantidad",
+      "comment": "Ingrese un comentario",
+      "confirmation": "Seleccione para continuar"
+    },
+    "errors": {
+      "amount": "La cantidad es requerida",
+      "comment": "El comentario es requerido",
+      "invalidAmount": "Debe ser una cantidad válida",
+      "confirmation": "Debe confirmar para continuar"
+    },
+    "successMessage": "Caja cerrada con éxito",
+    "errorMessage": "Error al cerrar la caja, por favor inténtalo de nuevo"
+  }
+}

@@ -54,6 +54,7 @@ model Administrator {
   money_outflow_logs CusMoneyOutflowLog[]
   package_logs       CusPackageLog[]
   order_logs         CusOrderLog[]
+  cash_registers     CusCashRegister[]
 
   @@map("auth_administrator")
 }
@@ -489,6 +490,51 @@ enum NotificationTopic {
 
 // Custom
 
+model CusCashRegister {
+  id               Int                @id @default(autoincrement())
+  administrator_id Int
+  office_id        Int
+  open_date        DateTime
+  close_date       DateTime?
+  comment          String?            @db.Text
+  status           CashRegisterStatus @default(OPEN)
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+
+  administrator Administrator         @relation(fields: [administrator_id], references: [id], onDelete: Restrict)
+  office        CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
+  lines         CusCashRegisterLine[]
+
+  @@map("cus_cash_register")
+}
+
+model CusCashRegisterLine {
+  id                 Int      @id @default(autoincrement())
+  cash_register_id   Int
+  currency           Currency @default(CRC)
+  cash_balance       Float
+  cash_reported      Float?
+  cash_reported_data Json?
+  cash_in            Float?
+  sinpe_in           Float?
+  transfer_in        Float?
+  card_in            Float?
+  cash_out           Float?
+  sinpe_out          Float?
+  transfer_out       Float?
+  card_out           Float?
+  cash_change        Float?
+  sinpe_change       Float?
+  transfer_change    Float?
+  card_change        Float?
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  cash_register CusCashRegister @relation(fields: [cash_register_id], references: [id], onDelete: Cascade)
+
+  @@map("cus_cash_register_line")
+}
+
 model CusClient {
   id                          Int                @id @default(autoincrement())
   office_id                   Int
@@ -652,6 +698,7 @@ model CusOffice {
   clients          CusClient[]
   administrators   Administrator[]
   unowned_packages CusUnownedPackage[]
+  cash_registers   CusCashRegister[]
 
   @@map("cus_office")
 }
@@ -827,6 +874,12 @@ model CusUnownedPackage {
 }
 
 // Custom ENUMS
+
+enum CashRegisterStatus {
+  OPEN
+  CLOSED
+}
+
 enum Currency {
   CRC
   USD

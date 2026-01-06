@@ -1,0 +1,55 @@
+{
+  "text": {
+    "title": "Registro de Caja de: {{ name }}",
+    "btnPrint": "Imprimir Recibo",
+    "btnReopen": "Reabrir Caja",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "btnView": "Ver",
+    "dateTimeFormat": "DD/MM/YYYY hh:mm A",
+    "dialogReopenTitle": "Reabrir Caja",
+    "dialogReopenMessage": "¿Está seguro que desea reabrir esta caja? Esto permitirá registrar nuevas transacciones y los datos de cierre se eliminarán.",
+    "admin": {
+      "title": "Administrador",
+      "name": "Nombre",
+      "email": "Correo"
+    },
+    "openResult": {
+      "title": "Caja Abierta",
+      "openDate": "Apertura",
+      "cashBalanceCRC": "Balance Inicial (Colones)",
+      "cashBalanceUSD": "Balance Inicial (Dólares)"
+    },
+    "result": {
+      "title": "Resultado en Efectivo",
+      "totalCashReported": "Total reportado",
+      "totalCashReportedInfo": "Efectivo Reportado - Balance Inicial",
+      "totalCash": "Total en sistema",
+      "totalCashInfo": "Entradas en Efectivo - Salidas en Efectivo",
+      "difference": "Diferencia"
+    },
+    "detail": {
+      "title": "Detalle de la Caja",
+      "openDate": "Apertura",
+      "closeDate": "Cierre",
+      "cashBalance": "Balance Inicial",
+      "cashReported": "Efectivo Reportado",
+      "cashAmount": "Entradas en Efectivo",
+      "sinpeAmount": "Entradas en SINPE",
+      "transferAmount": "Entradas en Transferencia",
+      "cardAmount": "Entradas en Tarjeta",
+      "totalAmount": "Total de Entradas",
+      "cashOutflows": "Salidas en Efectivo",
+      "sinpeOutflows": "Salidas en SINPE",
+      "transferOutflows": "Salidas en Transferencia",
+      "cardOutflows": "Salidas en Tarjeta",
+      "totalOutflows": "Total de Salidas"
+    },
+    "cashDetail": {
+      "title": "Detalle de Efectivo"
+    },
+    "comment": {
+      "title": "Comentario"
+    }
+  }
+}

@@ -109,6 +109,18 @@
       "general": "An error occurred, please try again"
     }
   },
+  "cash-registers": {
+    "errors": {
+      "notOpen": "The cash register is not open",
+      "notClose": "The cash register is not closed",
+      "alreadyOpen": "The cash register has already been opened for today",
+      "alreadyClosed": "The cash register is already closed",
+      "open": "Error opening the cash register, please try again",
+      "reopen": "Error reopening the cash register, please try again",
+      "invalid": "Invalid cash register record",
+      "general": "An error occurred, please try again"
+    }
+  },
   "clients": {
     "errors": {
       "email": "This email address is already associated with an existing client.",
