@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 
-import type { CashRegisterStatus } from '@/prisma/generated/client';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { getCashRegister, getCashRegisterTicketHtml } from '@/controllers/CashRegister.Controller';
-import { generatePdfFromHtml } from '@/helpers/pdf-generator';
+// import { getCashRegister, getCashRegisterTicketHtml } from '@/controllers/CashRegister.Controller';
+// import { generatePdfFromHtml } from '@/helpers/pdf-generator';
 
 export const GET = withAuthApi(
   ['cash-registers.view'],
@@ -15,28 +14,31 @@ export const GET = withAuthApi(
     const textT: any = t('api:cash-registers', { returnObjects: true, default: {} });
 
     try {
-      // validate if register exists for today
-      const entry = await getCashRegister(Number(id));
+      console.log('id', id);
 
-      if (!entry) {
-        return NextResponse.json({ valid: false, message: textT?.errors?.invalid }, { status: 400 });
-      }
+      return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
+      // // validate if register exists for today
+      // const entry = await getCashRegister(Number(id));
 
-      if (entry.status !== ('CLOSED' as CashRegisterStatus)) {
-        return NextResponse.json({ valid: false, message: textT?.errors?.notClose }, { status: 400 });
-      }
+      // if (!entry) {
+      //   return NextResponse.json({ valid: false, message: textT?.errors?.invalid }, { status: 400 });
+      // }
 
-      const ticketHtml = await getCashRegisterTicketHtml(entry);
+      // if (entry.status !== ('CLOSED' as CashRegisterStatus)) {
+      //   return NextResponse.json({ valid: false, message: textT?.errors?.notClose }, { status: 400 });
+      // }
 
-      const pdfBuffer = await generatePdfFromHtml(ticketHtml);
+      // const ticketHtml = await getCashRegisterTicketHtml(entry);
 
-      return new NextResponse(pdfBuffer, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': 'inline; filename="ticket.pdf"'
-        }
-      });
+      // const pdfBuffer = await generatePdfFromHtml(ticketHtml);
+
+      // return new NextResponse(pdfBuffer, {
+      //   status: 200,
+      //   headers: {
+      //     'Content-Type': 'application/pdf',
+      //     'Content-Disposition': 'inline; filename="ticket.pdf"'
+      //   }
+      // });
     } catch (error) {
       console.error(`Error: ${error}`);
 
