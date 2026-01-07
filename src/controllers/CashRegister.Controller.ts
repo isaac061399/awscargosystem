@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
-import moment from 'moment-timezone';
+import moment, { Moment } from 'moment-timezone';
 
 import { prismaRead } from '@libs/prisma';
-import { CashRegisterStatus } from '@/prisma/generated/enums';
+import { CashRegisterStatus, Currency, PaymentMethod } from '@/prisma/generated/enums';
 
 // import { formatMoney } from '@/libs/utils';
 
@@ -151,137 +151,86 @@ export const getCashRegisterAdmin = async (email: string) => {
   }
 };
 
-// export const getCashRegisterData = async (cashRegister: any, closeDate: Moment) => {
-//   try {
-//     const adminId = cashRegister.administrator.id;
-//     const openDate = moment(cashRegister.open_date);
+export const getCashRegisterData = async (currency: Currency, cashRegister: any, closeDate: Moment) => {
+  try {
+    const adminId = cashRegister.administrator.id;
+    const openDate = moment(cashRegister.open_date);
 
-//     let cashAmount = 0;
-//     let sinpeAmount = 0;
-//     let transferAmount = 0;
-//     let cardAmount = 0;
-//     let cashOutflows = 0;
-//     let sinpeOutflows = 0;
-//     let transferOutflows = 0;
-//     let cardOutflows = 0;
+    const cashIn = 0;
+    const sinpeIn = 0;
+    const transferIn = 0;
+    const cardIn = 0;
+    let cashOut = 0;
+    let sinpeOut = 0;
+    let transferOut = 0;
+    let cardOut = 0;
+    const cashChange = 0;
 
-//     // get Payments data
-//     const payments = await prismaRead.cusPayment.findMany({
-//       where: {
-//         administrator_id: adminId,
-//         date: { gte: openDate.toDate(), lte: closeDate.toDate() }
-//       },
-//       select: { id: true, amount: true, method: true }
-//     });
+    // get MoneyOutflows data
+    const moneyOutflows = await prismaRead.cusMoneyOutflow.findMany({
+      where: {
+        cash_register_id: cashRegister.id,
+        administrator_id: adminId,
+        currency: currency,
+        created_at: { gte: openDate.toDate(), lte: closeDate.toDate() }
+      },
+      select: { id: true, amount: true, method: true }
+    });
 
-//     if (payments && payments.length > 0) {
-//       payments.forEach((p) => {
-//         switch (p.method) {
-//           case 'CASH' as CusPaymentMethod:
-//             cashAmount += p.amount;
-//             break;
-//           case 'SINPE' as CusPaymentMethod:
-//             sinpeAmount += p.amount;
-//             break;
-//           case 'TRANSFER' as CusPaymentMethod:
-//             transferAmount += p.amount;
-//             break;
-//           case 'CARD' as CusPaymentMethod:
-//             cardAmount += p.amount;
-//             break;
-//           default:
-//             break;
-//         }
-//       });
-//     }
+    if (moneyOutflows && moneyOutflows.length > 0) {
+      moneyOutflows.forEach((mo) => {
+        switch (mo.method) {
+          case PaymentMethod.CASH:
+            cashOut += mo.amount;
+            break;
+          case PaymentMethod.SINPE:
+            sinpeOut += mo.amount;
+            break;
+          case PaymentMethod.TRANSFER:
+            transferOut += mo.amount;
+            break;
+          case PaymentMethod.CARD:
+            cardOut += mo.amount;
+            break;
+          default:
+            break;
+        }
+      });
+    }
 
-//     // get Wallet data
-//     const walletTransactions = await prismaRead.cusWalletTransaction.findMany({
-//       where: {
-//         administrator_id: adminId,
-//         date: { gte: openDate.toDate(), lte: closeDate.toDate() }
-//       },
-//       select: { id: true, amount: true, type: true, method: true }
-//     });
-
-//     if (walletTransactions && walletTransactions.length > 0) {
-//       walletTransactions.forEach((wt) => {
-//         if (wt.type === ('OUTGOING' as WalletTransactionType)) return;
-
-//         switch (wt.method) {
-//           case 'CASH' as paymentMethod:
-//             cashAmount += wt.amount;
-//             break;
-//           case 'SINPE' as paymentMethod:
-//             sinpeAmount += wt.amount;
-//             break;
-//           case 'TRANSFER' as paymentMethod:
-//             transferAmount += wt.amount;
-//             break;
-//           case 'CARD' as paymentMethod:
-//             cardAmount += wt.amount;
-//             break;
-//           default:
-//             break;
-//         }
-//       });
-//     }
-
-//     // get MoneyOutflows data
-//     const moneyOutflows = await prismaRead.cusMoneyOutflow.findMany({
-//       where: {
-//         administrator_id: adminId,
-//         date: { gte: openDate.toDate(), lte: closeDate.toDate() }
-//       },
-//       select: { id: true, amount: true, method: true }
-//     });
-
-//     if (moneyOutflows && moneyOutflows.length > 0) {
-//       moneyOutflows.forEach((mo) => {
-//         switch (mo.method) {
-//           case 'CASH' as paymentMethod:
-//             cashOutflows += mo.amount;
-//             break;
-//           case 'SINPE' as paymentMethod:
-//             sinpeOutflows += mo.amount;
-//             break;
-//           case 'TRANSFER' as paymentMethod:
-//             transferOutflows += mo.amount;
-//             break;
-//           case 'CARD' as paymentMethod:
-//             cardOutflows += mo.amount;
-//             break;
-//           default:
-//             break;
-//         }
-//       });
-//     }
-
-//     return {
-//       cash_amount: cashAmount,
-//       sinpe_amount: sinpeAmount,
-//       transfer_amount: transferAmount,
-//       card_amount: cardAmount,
-//       cash_outflows: cashOutflows,
-//       sinpe_outflows: sinpeOutflows,
-//       transfer_outflows: transferOutflows,
-//       card_outflows: cardOutflows
-//     };
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   } catch (e) {
-//     // console.error(`Error: ${e}`);
-//     return {
-//       cash_amount: 0,
-//       sinpe_amount: 0,
-//       transfer_amount: 0,
-//       card_amount: 0,
-//       cash_outflows: 0,
-//       sinpe_outflows: 0,
-//       transfer_outflows: 0,
-//       card_outflows: 0
-//     };
-//   }
-// };
+    return {
+      cash_in: cashIn,
+      sinpe_in: sinpeIn,
+      transfer_in: transferIn,
+      card_in: cardIn,
+      cash_out: cashOut,
+      sinpe_out: sinpeOut,
+      transfer_out: transferOut,
+      card_out: cardOut,
+      cash_change: cashChange,
+      sinpe_change: 0,
+      transfer_change: 0,
+      card_change: 0
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    // console.error(`Error: ${e}`);
+    return {
+      cash_in: 0,
+      sinpe_in: 0,
+      transfer_in: 0,
+      card_in: 0,
+      cash_out: 0,
+      sinpe_out: 0,
+      transfer_out: 0,
+      card_out: 0,
+      cash_change: 0,
+      sinpe_change: 0,
+      transfer_change: 0,
+      card_change: 0
+    };
+  }
+};
 
 export const getCashData = (options: { [key: string]: string }, data: { [key: string]: number }) => {
   const details = {} as { [key: string]: number };
@@ -429,7 +378,7 @@ export const getCashData = (options: { [key: string]: string }, data: { [key: st
 //       </html>`;
 // };
 
-export const isAdminCashRegisterOpen = async (adminId: number) => {
+export const getOpenCashRegister = async (adminId: number) => {
   try {
     const tz = (await cookies()).get('tz')?.value || 'UTC';
     const today = moment().tz(tz);
@@ -443,13 +392,13 @@ export const isAdminCashRegisterOpen = async (adminId: number) => {
     });
 
     if (!cashRegister) {
-      return false;
+      return null;
     }
 
-    return true;
+    return cashRegister.id;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     // console.error(`Error: ${e}`);
-    return false;
+    return null;
   }
 };

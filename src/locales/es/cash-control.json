@@ -15,7 +15,7 @@
       "email": "Correo"
     },
     "result": {
-      "title": "Resultado en Efectivo",
+      "title": "Resultado del Efectivo",
       "totalReported": "Total reportado",
       "totalReportedInfo": "Efectivo Reportado - Balance Inicial",
       "total": "Total en sistema",
@@ -28,14 +28,16 @@
       "closeDate": "Cierre",
       "cashBalance": "Balance Inicial",
       "cashReported": "Efectivo Reportado",
-      "cashAmount": "Entradas en Efectivo",
-      "sinpeAmount": "Entradas en SINPE",
-      "transferAmount": "Entradas en Transferencia",
-      "cardAmount": "Entradas en Tarjeta",
-      "cashOutflows": "Salidas en Efectivo",
-      "sinpeOutflows": "Salidas en SINPE",
-      "transferOutflows": "Salidas en Transferencia",
-      "cardOutflows": "Salidas en Tarjeta"
+      "cashIn": "Entradas en Efectivo",
+      "sinpeIn": "Entradas en SINPE",
+      "transferIn": "Entradas en Transferencia",
+      "cardIn": "Entradas en Tarjeta",
+      "totalIn": "Total de Entradas",
+      "cashOut": "Salidas en Efectivo",
+      "sinpeOut": "Salidas en SINPE",
+      "transferOut": "Salidas en Transferencia",
+      "cardOut": "Salidas en Tarjeta",
+      "totalOut": "Total de Salidas"
     },
     "cashDetail": {
       "title": "Detalle de Efectivo"
@@ -76,7 +78,7 @@
     "placeholders": {
       "amount": "Ingrese una cantidad",
       "comment": "Ingrese un comentario",
-      "confirmation": "Seleccione para continuar"
+      "confirmation": "Confirme para continuar"
     },
     "errors": {
       "amount": "La cantidad es requerida",

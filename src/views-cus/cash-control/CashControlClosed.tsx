@@ -14,6 +14,7 @@ import { Button, Card, CardContent, CardHeader, Divider, Grid, Tooltip, Typograp
 
 // Utils Imports
 import { formatMoney } from '@libs/utils';
+import { currencies } from '@/libs/constants';
 
 const getCashDetail = (options: { [key: string]: string }, data: { [key: string]: number }) => {
   const detail = [] as { title: string; value: number }[];
@@ -27,38 +28,49 @@ const getCashDetail = (options: { [key: string]: string }, data: { [key: string]
 
 const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
   const { t } = useTranslation();
-  const textT: any = useMemo(() => t('cash:text', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('cash-control:text', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
+  const moneyT: any = useMemo(() => t('constants:money', { returnObjects: true, default: {} }), [t]);
 
-  const handlePrintTicket = async () => {
-    const pdfUrl = `/api/cash-registers/today-ticket`;
-    const win = window.open(pdfUrl, '_blank');
+  const lines: { [key: string]: any } = {};
+  cashRegister.lines.forEach((line: any) => {
+    lines[line.currency] = line;
+  });
 
-    if (win) {
-      // Auto print when the new tab loads
-      win.onload = () => {
-        win.print();
-      };
-    }
-  };
+  const totalInCRC = lines.CRC.cash_in + lines.CRC.sinpe_in + lines.CRC.transfer_in + lines.CRC.card_in;
+  const totalOutCRC = lines.CRC.cash_out + lines.CRC.sinpe_out + lines.CRC.transfer_out + lines.CRC.card_out;
 
-  const totalReported = cashRegister.cash_reported - cashRegister.cash_balance;
-  const total = cashRegister.cash_amount - cashRegister.cash_outflows;
-  const totalDifference = totalReported - total;
-  let resultIcon = 'checkbox-circle-fill';
-  let resultColor = 'success';
+  const totalInUSD = lines.USD.cash_in + lines.USD.sinpe_in + lines.USD.transfer_in + lines.USD.card_in;
+  const totalOutUSD = lines.USD.cash_out + lines.USD.sinpe_out + lines.USD.transfer_out + lines.USD.card_out;
 
-  if (totalDifference < 0) {
-    resultIcon = 'arrow-down-circle-fill';
-    resultColor = 'error';
-  } else if (totalDifference > 0) {
-    resultIcon = 'arrow-up-circle-fill';
-    resultColor = 'warning';
-  }
+  const totalReportedCRC = lines.CRC.cash_reported - lines.CRC.cash_balance;
+  const totalCRC = lines.CRC.cash_in - lines.CRC.cash_out;
+  const totalDifferenceCRC = totalReportedCRC - Math.abs(totalCRC);
 
-  const cashDetail = getCashDetail(
-    labelsT?.cashMoney || {},
-    cashRegister?.cash_reported_data ? JSON.parse(cashRegister.cash_reported_data) : {}
+  const totalReportedUSD = lines.USD.cash_reported - lines.USD.cash_balance;
+  const totalUSD = lines.USD.cash_in - lines.USD.cash_out;
+  const totalDifferenceUSD = totalReportedUSD - Math.abs(totalUSD);
+
+  const [resultIconCRC, resultColorCRC] =
+    totalDifferenceCRC < 0
+      ? ['arrow-down-circle-fill', 'error']
+      : totalDifferenceCRC > 0
+        ? ['arrow-up-circle-fill', 'warning']
+        : ['checkbox-circle-fill', 'success'];
+  const [resultIconUSD, resultColorUSD] =
+    totalDifferenceUSD < 0
+      ? ['arrow-down-circle-fill', 'error']
+      : totalDifferenceUSD > 0
+        ? ['arrow-up-circle-fill', 'warning']
+        : ['checkbox-circle-fill', 'success'];
+
+  const cashDetailCRC = getCashDetail(
+    moneyT?.CRC || {},
+    lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
+  );
+  const cashDetailUSD = getCashDetail(
+    moneyT?.USD || {},
+    lines.USD?.cash_reported_data ? JSON.parse(lines.USD.cash_reported_data) : {}
   );
 
   return (
@@ -95,43 +107,64 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
       <Grid size={{ xs: 12, md: 6, lg: 4 }}>
         <Card variant="outlined" className="h-full shadow">
           <CardHeader
-            title={textT?.result?.title}
+            title={`${textT?.result?.title} (${labelsT?.currency?.CRC})`}
             sx={{ py: 2 }}
-            action={<i className={`ri-${resultIcon} text-${resultColor}`} />}
+            action={<i className={`ri-${resultIconCRC} text-${resultColorCRC}`} />}
           />
 
           <Divider />
 
           <CardContent>
             <Typography variant="body1" className="flex items-center gap-1">
-              <strong>{textT?.result?.totalReported}:</strong> {formatMoney(totalReported)}
+              <strong>{textT?.result?.totalReported}:</strong>{' '}
+              {formatMoney(totalReportedCRC, `${currencies.CRC.symbol} `)}
               <Tooltip title={textT?.result?.totalReportedInfo} placement="top">
                 <i className="ri-information-fill text-primary" />
               </Tooltip>
             </Typography>
             <Typography variant="body1" className="flex items-center gap-1">
-              <strong>{textT?.result?.total}:</strong> {formatMoney(total)}
+              <strong>{textT?.result?.total}:</strong> {formatMoney(totalCRC, `${currencies.CRC.symbol} `)}
               <Tooltip title={textT?.result?.totalInfo} placement="top">
                 <i className="ri-information-fill text-primary" />
               </Tooltip>
             </Typography>
             <Typography variant="body1">
-              <strong>{textT?.result?.difference}:</strong> {formatMoney(totalDifference)}
+              <strong>{textT?.result?.difference}:</strong>{' '}
+              {formatMoney(totalDifferenceCRC, `${currencies.CRC.symbol} `)}
             </Typography>
           </CardContent>
         </Card>
       </Grid>
       <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-        <div className="flex flex-col items-center justify-center gap-2 h-full">
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            startIcon={<i className="ri-printer-line" />}
-            onClick={handlePrintTicket}>
-            {textT?.btnPrint}
-          </Button>
-        </div>
+        <Card variant="outlined" className="h-full shadow">
+          <CardHeader
+            title={`${textT?.result?.title} (${labelsT?.currency?.USD})`}
+            sx={{ py: 2 }}
+            action={<i className={`ri-${resultIconUSD} text-${resultColorUSD}`} />}
+          />
+
+          <Divider />
+
+          <CardContent>
+            <Typography variant="body1" className="flex items-center gap-1">
+              <strong>{textT?.result?.totalReported}:</strong>{' '}
+              {formatMoney(totalReportedUSD, `${currencies.USD.symbol} `)}
+              <Tooltip title={textT?.result?.totalReportedInfo} placement="top">
+                <i className="ri-information-fill text-primary" />
+              </Tooltip>
+            </Typography>
+            <Typography variant="body1" className="flex items-center gap-1">
+              <strong>{textT?.result?.total}:</strong> {formatMoney(totalUSD, `${currencies.USD.symbol} `)}
+              <Tooltip title={textT?.result?.totalInfo} placement="top">
+                <i className="ri-information-fill text-primary" />
+              </Tooltip>
+            </Typography>
+            <Typography variant="body1">
+              <strong>{textT?.result?.difference}:</strong>{' '}
+              {formatMoney(totalDifferenceUSD, `${currencies.USD.symbol} `)}
+            </Typography>
+          </CardContent>
+        </Card>
       </Grid>
       <Grid size={{ xs: 12, md: 6, lg: 6 }}>
         <Card variant="outlined" className="h-full shadow">
@@ -147,36 +180,80 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
               <strong>{textT?.detail?.closeDate}:</strong>{' '}
               {moment(cashRegister.close_date).format(textT?.dateTimeFormat)}
             </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.cashBalance}:</strong> {formatMoney(cashRegister.cash_balance)}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.cashReported}:</strong> {formatMoney(cashRegister.cash_reported)}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.cashAmount}:</strong> {formatMoney(cashRegister.cash_amount)}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.sinpeAmount}:</strong> {formatMoney(cashRegister.sinpe_amount)}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.transferAmount}:</strong> {formatMoney(cashRegister.transfer_amount)}
-            </Typography>
-            {/* <Typography variant="body1">
-              <strong>{textT?.detail?.cardAmount}:</strong> {formatMoney(cashRegister.card_amount)}
-            </Typography> */}
-            <Typography variant="body1">
-              <strong>{textT?.detail?.cashOutflows}:</strong> {formatMoney(cashRegister.cash_outflows)}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.sinpeOutflows}:</strong> {formatMoney(cashRegister.sinpe_outflows)}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{textT?.detail?.transferOutflows}:</strong> {formatMoney(cashRegister.transfer_outflows)}
-            </Typography>
-            {/* <Typography variant="body1">
-              <strong>{textT?.detail?.cardOutflows}:</strong> {formatMoney(cashRegister.card_outflows)}
-            </Typography> */}
+
+            <Divider className="my-2" />
+
+            <DualCurrencyRow
+              label=""
+              crc={<strong>{labelsT?.currency?.CRC}</strong>}
+              usd={<strong>{labelsT?.currency?.USD}</strong>}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.cashBalance}
+              crc={formatMoney(lines.CRC.cash_balance, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.cash_balance, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.cashReported}
+              crc={formatMoney(lines.CRC.cash_reported, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.cash_reported, `${currencies.USD.symbol} `)}
+            />
+
+            <Divider className="my-2" />
+
+            <DualCurrencyRow
+              label={textT?.detail?.cashIn}
+              crc={formatMoney(lines.CRC.cash_in, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.cash_in, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.sinpeIn}
+              crc={formatMoney(lines.CRC.sinpe_in, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.sinpe_in, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.transferIn}
+              crc={formatMoney(lines.CRC.transfer_in, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.transfer_in, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.cardIn}
+              crc={formatMoney(lines.CRC.card_in, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.card_in, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.totalIn}
+              crc={formatMoney(totalInCRC, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(totalInUSD, `${currencies.USD.symbol} `)}
+            />
+
+            <Divider className="my-2" />
+
+            <DualCurrencyRow
+              label={textT?.detail?.cashOut}
+              crc={formatMoney(lines.CRC.cash_out, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.cash_out, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.sinpeOut}
+              crc={formatMoney(lines.CRC.sinpe_out, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.sinpe_out, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.transferOut}
+              crc={formatMoney(lines.CRC.transfer_out, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.transfer_out, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.cardOut}
+              crc={formatMoney(lines.CRC.card_out, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(lines.USD.card_out, `${currencies.USD.symbol} `)}
+            />
+            <DualCurrencyRow
+              label={textT?.detail?.totalOut}
+              crc={formatMoney(totalOutCRC, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(totalOutUSD, `${currencies.USD.symbol} `)}
+            />
           </CardContent>
         </Card>
       </Grid>
@@ -187,11 +264,34 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
           <Divider />
 
           <CardContent>
-            {cashDetail.map((item, i) => (
-              <Typography variant="body1" key={i}>
-                <strong>{item.title}:</strong> {item.value}
-              </Typography>
-            ))}
+            <div className="grid grid-cols-[1fr_auto_1fr] gap-3">
+              {/* CRC */}
+              <div>
+                <Typography variant="body1" className="font-bold mb-2">
+                  {labelsT?.currency?.CRC}
+                </Typography>
+                {cashDetailCRC.map((item, i) => (
+                  <Typography variant="body1" key={i}>
+                    <strong>{item.title}:</strong> {item.value}
+                  </Typography>
+                ))}
+              </div>
+
+              {/* Vertical divider */}
+              <Divider orientation="vertical" flexItem />
+
+              {/* USD */}
+              <div>
+                <Typography variant="body1" className="font-bold mb-2">
+                  {labelsT?.currency?.USD}
+                </Typography>
+                {cashDetailUSD.map((item, i) => (
+                  <Typography variant="body1" key={i}>
+                    <strong>{item.title}:</strong> {item.value}
+                  </Typography>
+                ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </Grid>
@@ -207,6 +307,33 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
         </Card>
       </Grid>
     </Grid>
+  );
+};
+
+const DualCurrencyRow = ({ label, crc, usd }: { label: string; crc: React.ReactNode; usd: React.ReactNode }) => {
+  return (
+    <div className="grid grid-cols-[2fr_auto_1fr_auto_1fr] items-center gap-3">
+      {/* Label */}
+      <Typography variant="body1" className="font-bold">
+        {label}
+      </Typography>
+
+      {/* Vertical divider */}
+      <Divider orientation="vertical" flexItem />
+
+      {/* CRC */}
+      <Typography variant="body1" className="tabular-nums">
+        {crc}
+      </Typography>
+
+      {/* Vertical divider */}
+      <Divider orientation="vertical" flexItem />
+
+      {/* USD */}
+      <Typography variant="body1" className="tabular-nums">
+        {usd}
+      </Typography>
+    </div>
   );
 };
 

@@ -117,6 +117,7 @@
       "alreadyClosed": "The cash register is already closed",
       "open": "Error opening the cash register, please try again",
       "reopen": "Error reopening the cash register, please try again",
+      "close": "Error closing the cash register, please try again",
       "invalid": "Invalid cash register record",
       "general": "An error occurred, please try again"
     }
@@ -176,6 +177,7 @@
         "id": "ID",
         "administrator_name": "Administrator Name",
         "administrator_email": "Administrator Email",
+        "office": "Office",
         "currency": "Currency",
         "amount": "Amount",
         "description": "Description",

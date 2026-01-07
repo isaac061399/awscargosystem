@@ -14,6 +14,9 @@
         "title": "Autor",
         "email": "Correo"
       },
+      "office": {
+        "title": "Oficina"
+      },
       "amount": {
         "title": "Monto"
       },

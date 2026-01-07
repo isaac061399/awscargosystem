@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { TransactionError, withTransaction } from '@libs/prisma';
-// import { isAdminCashRegisterOpen } from '@/controllers/CashRegister.Controller';
+import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 
 export const DELETE = withAuthApi(
   ['money-outflows.delete'],
@@ -17,11 +17,11 @@ export const DELETE = withAuthApi(
 
     try {
       // validate if admin has open cash register
-      // const isCashOpen = await isAdminCashRegisterOpen(admin.id);
+      const cashRegisterId = await getOpenCashRegister(admin.id);
 
-      // if (!isCashOpen) {
-      //   return NextResponse.json({ valid: false, message: textT?.errors?.noOpenCash }, { status: 400 });
-      // }
+      if (!cashRegisterId) {
+        return NextResponse.json({ valid: false, message: textT?.errors?.noOpenCash }, { status: 400 });
+      }
 
       await withTransaction(async (tx) => {
         // get money outflow

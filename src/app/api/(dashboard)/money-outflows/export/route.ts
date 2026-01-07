@@ -46,6 +46,17 @@ export const GET = withAuthApi(['money-outflows.list'], async (req) => {
             full_name: true,
             email: true
           }
+        },
+        cash_register: {
+          select: {
+            id: true,
+            office: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
+          }
         }
       }
     });
@@ -80,8 +91,9 @@ const formatEntries = async (headers: any, labelsT: any, transactions: any[]) =>
     data: transactions.map((t) => {
       return {
         [headers.id]: t.id,
-        [headers.administrator_name]: t.administrator.full_name,
-        [headers.administrator_email]: t.administrator.email,
+        [headers.administrator_name]: t.administrator?.full_name,
+        [headers.administrator_email]: t.administrator?.email,
+        [headers.office]: t.cash_register?.office?.name,
         [headers.currency]: labelsT?.currency[t.currency],
         [headers.amount]: t.amount,
         [headers.description]: t.description,

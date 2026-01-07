@@ -1,6 +1,6 @@
 {
   "text": {
-    "title": "Registro de Caja de: {{ name }}",
+    "title": "Registro de Caja {{ id }}",
     "btnPrint": "Imprimir Recibo",
     "btnReopen": "Reabrir Caja",
     "btnContinue": "Continuar",
@@ -21,11 +21,11 @@
       "cashBalanceUSD": "Balance Inicial (Dólares)"
     },
     "result": {
-      "title": "Resultado en Efectivo",
-      "totalCashReported": "Total reportado",
-      "totalCashReportedInfo": "Efectivo Reportado - Balance Inicial",
-      "totalCash": "Total en sistema",
-      "totalCashInfo": "Entradas en Efectivo - Salidas en Efectivo",
+      "title": "Resultado del Efectivo",
+      "totalReported": "Total reportado",
+      "totalReportedInfo": "Efectivo Reportado - Balance Inicial",
+      "total": "Total en sistema",
+      "totalInfo": "Entradas en Efectivo - Salidas en Efectivo",
       "difference": "Diferencia"
     },
     "detail": {
@@ -34,16 +34,16 @@
       "closeDate": "Cierre",
       "cashBalance": "Balance Inicial",
       "cashReported": "Efectivo Reportado",
-      "cashAmount": "Entradas en Efectivo",
-      "sinpeAmount": "Entradas en SINPE",
-      "transferAmount": "Entradas en Transferencia",
-      "cardAmount": "Entradas en Tarjeta",
-      "totalAmount": "Total de Entradas",
-      "cashOutflows": "Salidas en Efectivo",
-      "sinpeOutflows": "Salidas en SINPE",
-      "transferOutflows": "Salidas en Transferencia",
-      "cardOutflows": "Salidas en Tarjeta",
-      "totalOutflows": "Total de Salidas"
+      "cashIn": "Entradas en Efectivo",
+      "sinpeIn": "Entradas en SINPE",
+      "transferIn": "Entradas en Transferencia",
+      "cardIn": "Entradas en Tarjeta",
+      "totalIn": "Total de Entradas",
+      "cashOut": "Salidas en Efectivo",
+      "sinpeOut": "Salidas en SINPE",
+      "transferOut": "Salidas en Transferencia",
+      "cardOut": "Salidas en Tarjeta",
+      "totalOut": "Total de Salidas"
     },
     "cashDetail": {
       "title": "Detalle de Efectivo"

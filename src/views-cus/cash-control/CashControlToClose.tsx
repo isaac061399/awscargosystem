@@ -84,8 +84,8 @@ const CashToClose = ({
 
   const formCloseConfig = useMemo(
     () => ({
-      CRC: getFormCloseConfig(moneyT?.CRC?.money || {}, formT?.errors?.amount, formT?.errors?.invalidAmount),
-      USD: getFormCloseConfig(moneyT?.USD?.money || {}, formT?.errors?.amount, formT?.errors?.invalidAmount)
+      CRC: getFormCloseConfig(moneyT?.CRC || {}, formT?.errors?.amount, formT?.errors?.invalidAmount),
+      USD: getFormCloseConfig(moneyT?.USD || {}, formT?.errors?.amount, formT?.errors?.invalidAmount)
     }),
     [moneyT, formT]
   );
@@ -261,7 +261,7 @@ const CashToClose = ({
                 error={Boolean(formik.touched.comment && formik.errors.comment)}
                 color={Boolean(formik.touched.comment && formik.errors.comment) ? 'error' : 'primary'}
                 helperText={formik.touched.comment && (formik.errors.comment as string)}
-                disabled={formik.isSubmitting}
+                disabled={formik.isSubmitting || isLoading}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 12 }}>

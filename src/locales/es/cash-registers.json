@@ -5,7 +5,7 @@
     "btnCancel": "Cancelar",
     "table": {
       "id": {
-        "title": "Número de Registro"
+        "title": "Número"
       },
       "administrator": {
         "title": "Administrador",

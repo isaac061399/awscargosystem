@@ -501,9 +501,10 @@ model CusCashRegister {
   created_at       DateTime           @default(now())
   updated_at       DateTime           @updatedAt
 
-  administrator Administrator         @relation(fields: [administrator_id], references: [id], onDelete: Restrict)
-  office        CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
-  lines         CusCashRegisterLine[]
+  administrator  Administrator         @relation(fields: [administrator_id], references: [id], onDelete: Restrict)
+  office         CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
+  lines          CusCashRegisterLine[]
+  money_outflows CusMoneyOutflow[]
 
   @@map("cus_cash_register")
 }
@@ -658,6 +659,7 @@ model CusDistrict {
 model CusMoneyOutflow {
   id               Int           @id @default(autoincrement())
   administrator_id Int?
+  cash_register_id Int?
   currency         Currency      @default(CRC)
   amount           Float
   description      String        @db.Text
@@ -666,6 +668,7 @@ model CusMoneyOutflow {
   updated_at       DateTime      @updatedAt
 
   administrator Administrator?       @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
+  cash_register CusCashRegister?     @relation(fields: [cash_register_id], references: [id], onDelete: SetNull)
   logs          CusMoneyOutflowLog[]
 
   @@map("cus_money_outflow")

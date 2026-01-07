@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // MUI Imports
-import { Alert, Card, CardContent, CardHeader, Divider, Grid, Typography } from '@mui/material';
+import { Alert, Button, Card, CardContent, CardHeader, Divider, Grid, Typography } from '@mui/material';
 
 // Component Imports
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -29,6 +29,18 @@ const CashControl = ({ cashRegister }: { cashRegister?: any }) => {
   const isReadyToClose = cashRegister && cashRegister.status === CashRegisterStatus.OPEN;
   const isClosed = cashRegister && cashRegister.status === CashRegisterStatus.CLOSED;
 
+  const handlePrintTicket = async () => {
+    const pdfUrl = `/api/cash-registers/today-ticket`;
+    const win = window.open(pdfUrl, '_blank');
+
+    if (win) {
+      // Auto print when the new tab loads
+      win.onload = () => {
+        win.print();
+      };
+    }
+  };
+
   return (
     <DashboardLayout>
       <Grid container spacing={6}>
@@ -37,7 +49,17 @@ const CashControl = ({ cashRegister }: { cashRegister?: any }) => {
             <Typography variant="h3" className="flex items-center gap-1">
               {textT?.title}
             </Typography>
-            <div className="flex items-center gap-2"></div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                size="small"
+                variant="contained"
+                color="primary"
+                startIcon={<i className="ri-printer-line" />}
+                onClick={handlePrintTicket}>
+                {textT?.btnPrint}
+              </Button>
+            </div>
           </div>
           <Divider />
         </Grid>

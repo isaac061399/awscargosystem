@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
-// import { isAdminCashRegisterOpen } from '@/controllers/CashRegister.Controller';
+import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 
 export const GET = withAuthApi(['money-outflows.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -20,6 +20,7 @@ export const GET = withAuthApi(['money-outflows.list'], async (req) => {
       where['OR'] = [
         { administrator: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
         { administrator: { email: { contains: search.trim(), mode: 'insensitive' } } },
+        { cash_register: { office: { name: { contains: search.trim(), mode: 'insensitive' } } } },
         { description: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
@@ -44,6 +45,17 @@ export const GET = withAuthApi(['money-outflows.list'], async (req) => {
             last_name: true,
             full_name: true,
             email: true
+          }
+        },
+        cash_register: {
+          select: {
+            id: true,
+            office: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
           }
         }
       }
@@ -73,16 +85,17 @@ export const POST = withAuthApi(['money-outflows.create'], async (req) => {
 
   try {
     // validate if admin has open cash register
-    // const isCashOpen = await isAdminCashRegisterOpen(admin.id);
+    const cashRegisterId = await getOpenCashRegister(admin.id);
 
-    // if (!isCashOpen) {
-    //   return NextResponse.json({ valid: false, message: textT?.errors?.noOpenCash }, { status: 400 });
-    // }
+    if (!cashRegisterId) {
+      return NextResponse.json({ valid: false, message: textT?.errors?.noOpenCash }, { status: 400 });
+    }
 
     const result = await withTransaction(async (tx) => {
       const moneyOutflow = await tx.cusMoneyOutflow.create({
         data: {
           administrator_id: admin.id,
+          cash_register_id: cashRegisterId,
           currency: data.currency,
           amount: parseFloat(data.amount),
           description: data.description,

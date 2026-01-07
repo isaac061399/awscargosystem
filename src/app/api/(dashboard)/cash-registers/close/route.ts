@@ -1,63 +1,104 @@
 import { NextResponse } from 'next/server';
 import moment from 'moment';
 
-import type { CashRegisterStatus } from '@/prisma/generated/client';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { prismaWrite } from '@libs/prisma';
+import { TransactionError, withTransaction } from '@libs/prisma';
 import { getCashData, getCashRegisterAdmin, getCashRegisterData } from '@/controllers/CashRegister.Controller';
+import { CashRegisterStatus, Currency } from '@/prisma/generated/enums';
 
-export const POST = withAuthApi(['cash.close'], async (req) => {
+export const POST = withAuthApi(['cash-control.close'], async (req) => {
   const { t } = await initTranslationsApi(req, ['constants']);
   const textT: any = t('api:cash-registers', { returnObjects: true, default: {} });
-  const labelsT: any = t('constants:labels', { returnObjects: true, default: {} });
+  const moneyT: any = t('constants:money', { returnObjects: true, default: {} });
 
   const admin = req.session;
   const data = await req.json();
 
   try {
-    // validate if register exists for today
-    const entry = await getCashRegisterAdmin(admin.email);
+    await withTransaction(async (tx) => {
+      // validate if register exists for today
+      const entry = await getCashRegisterAdmin(admin.email);
 
-    if (!entry) {
-      return NextResponse.json({ valid: false, message: textT?.errors?.notOpen }, { status: 400 });
-    }
-
-    if (entry.status === ('CLOSED' as CashRegisterStatus)) {
-      return NextResponse.json({ valid: false, message: textT?.errors?.alreadyClosed }, { status: 400 });
-    }
-
-    const closeDate = moment();
-    const closeData = await getCashRegisterData(entry, closeDate);
-    const cashData = getCashData(labelsT?.cashMoney || {}, data.cash || {});
-
-    const result = await prismaWrite.cusCashRegister.update({
-      where: { id: entry.id },
-      data: {
-        administrator_id: admin.id,
-        close_date: closeDate.toDate(),
-        cash_reported: cashData.total,
-        cash_reported_data: JSON.stringify(cashData.details),
-        cash_amount: closeData.cash_amount,
-        sinpe_amount: closeData.sinpe_amount,
-        transfer_amount: closeData.transfer_amount,
-        card_amount: closeData.card_amount,
-        cash_outflows: closeData.cash_outflows,
-        sinpe_outflows: closeData.sinpe_outflows,
-        transfer_outflows: closeData.transfer_outflows,
-        card_outflows: closeData.card_outflows,
-        comment: data.comment || '',
-        status: 'CLOSED' as CashRegisterStatus
+      if (!entry) {
+        throw new TransactionError(400, textT?.errors?.notOpen);
       }
-    });
 
-    if (!result) {
-      return NextResponse.json({ valid: false, message: textT?.errors?.open }, { status: 400 });
-    }
+      if (entry.status === CashRegisterStatus.CLOSED) {
+        throw new TransactionError(400, textT?.errors?.alreadyClosed);
+      }
+
+      const closeDate = moment();
+      const closeDataCRC = await getCashRegisterData(Currency.CRC, entry, closeDate);
+      const closeDataUSD = await getCashRegisterData(Currency.USD, entry, closeDate);
+      const cashDataCRC = getCashData(moneyT?.CRC || {}, data.crc || {});
+      const cashDataUSD = getCashData(moneyT?.USD || {}, data.usd || {});
+
+      const cashRegister = await tx.cusCashRegister.update({
+        where: { id: entry.id },
+        data: {
+          close_date: closeDate.toDate(),
+          comment: data.comment || '',
+          status: CashRegisterStatus.CLOSED,
+          lines: {
+            updateMany: [
+              {
+                where: { currency: Currency.CRC },
+                data: {
+                  cash_reported: cashDataCRC.total,
+                  cash_reported_data: JSON.stringify(cashDataCRC.details),
+                  cash_in: closeDataCRC.cash_in,
+                  sinpe_in: closeDataCRC.sinpe_in,
+                  transfer_in: closeDataCRC.transfer_in,
+                  card_in: closeDataCRC.card_in,
+                  cash_out: closeDataCRC.cash_out,
+                  sinpe_out: closeDataCRC.sinpe_out,
+                  transfer_out: closeDataCRC.transfer_out,
+                  card_out: closeDataCRC.card_out,
+                  cash_change: closeDataCRC.cash_change,
+                  sinpe_change: closeDataCRC.sinpe_change,
+                  transfer_change: closeDataCRC.transfer_change,
+                  card_change: closeDataCRC.card_change
+                }
+              },
+              {
+                where: { currency: Currency.USD },
+                data: {
+                  cash_reported: cashDataUSD.total,
+                  cash_reported_data: JSON.stringify(cashDataUSD.details),
+                  cash_in: closeDataUSD.cash_in,
+                  sinpe_in: closeDataUSD.sinpe_in,
+                  transfer_in: closeDataUSD.transfer_in,
+                  card_in: closeDataUSD.card_in,
+                  cash_out: closeDataUSD.cash_out,
+                  sinpe_out: closeDataUSD.sinpe_out,
+                  transfer_out: closeDataUSD.transfer_out,
+                  card_out: closeDataUSD.card_out,
+                  cash_change: closeDataUSD.cash_change,
+                  sinpe_change: closeDataUSD.sinpe_change,
+                  transfer_change: closeDataUSD.transfer_change,
+                  card_change: closeDataUSD.card_change
+                }
+              }
+            ]
+          }
+        }
+      });
+
+      if (!cashRegister) {
+        throw new TransactionError(400, textT?.errors?.close);
+      }
+
+      return cashRegister;
+    });
 
     return NextResponse.json({ valid: true }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
+
+    if (error instanceof TransactionError) {
+      return NextResponse.json({ valid: false, message: error.message }, { status: error.status });
+    }
 
     return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
   }

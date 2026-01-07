@@ -117,6 +117,7 @@
       "alreadyClosed": "La caja ya está cerrada",
       "open": "Error al abrir la caja, por favor inténtalo de nuevo",
       "reopen": "Error al reabrir la caja, por favor inténtalo de nuevo",
+      "close": "Error al cerrar la caja, por favor inténtalo de nuevo",
       "invalid": "Registro de caja no válido",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
@@ -176,6 +177,7 @@
         "id": "ID",
         "administrator_name": "Nombre del Administrador",
         "administrator_email": "Correo del Administrador",
+        "office": "Oficina",
         "currency": "Moneda",
         "amount": "Monto",
         "description": "Descripción",

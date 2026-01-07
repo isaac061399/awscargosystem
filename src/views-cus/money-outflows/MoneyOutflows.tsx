@@ -220,11 +220,20 @@ const MoneyOutflows = () => {
       minWidth: 300,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          <span>{params.row.administrator.full_name}</span>
+          <span>{params.row.administrator?.full_name}</span>
           <span>
-            <strong>{textT?.table?.administrator?.email}</strong>: {params.row.administrator.email}
+            <strong>{textT?.table?.administrator?.email}</strong>: {params.row.administrator?.email}
           </span>
         </div>
+      )
+    },
+    {
+      field: 'cash_register',
+      headerName: textT?.table?.office?.title,
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params: any) => (
+        <div className="h-full inline-flex flex-col justify-center py-2">{params.row.cash_register?.office?.name}</div>
       )
     },
     {
@@ -242,7 +251,7 @@ const MoneyOutflows = () => {
       field: 'description',
       headerName: textT?.table?.description?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 300,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">{params.row.description}</div>
       )
@@ -262,7 +271,7 @@ const MoneyOutflows = () => {
       field: 'created_at',
       headerName: textT?.table?.created_at?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           {moment(params.row.created_at).format(textT?.table?.created_at?.dateFormat)}

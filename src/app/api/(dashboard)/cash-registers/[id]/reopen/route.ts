@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 
-import { Prisma } from '@/prisma/generated/client';
-import type { CashRegisterStatus } from '@/prisma/generated/client';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { prismaWrite } from '@libs/prisma';
+import { TransactionError, withTransaction } from '@libs/prisma';
 import { getCashRegister } from '@/controllers/CashRegister.Controller';
+import { CashRegisterStatus, Currency } from '@/prisma/generated/enums';
+import { Prisma } from '@/prisma/generated/client';
 
 export const PUT = withAuthApi(
   ['cash-registers.reopen'],
@@ -16,38 +16,79 @@ export const PUT = withAuthApi(
     const textT: any = t('api:cash-registers', { returnObjects: true, default: {} });
 
     try {
-      // validate if register exists and can be opened
-      const entry = await getCashRegister(Number(id), true, true);
+      await withTransaction(async (tx) => {
+        // validate if register exists and can be opened
+        const entry = await getCashRegister(Number(id), true, true);
 
-      if (!entry) {
-        return NextResponse.json({ valid: false, message: textT?.errors?.invalid }, { status: 400 });
-      }
-
-      const result = await prismaWrite.cusCashRegister.update({
-        where: { id: entry.id },
-        data: {
-          close_date: null,
-          cash_reported: null,
-          cash_reported_data: Prisma.DbNull,
-          cash_amount: null,
-          sinpe_amount: null,
-          transfer_amount: null,
-          card_amount: null,
-          cash_outflows: null,
-          sinpe_outflows: null,
-          transfer_outflows: null,
-          card_outflows: null,
-          status: 'OPEN' as CashRegisterStatus
+        if (!entry) {
+          throw new TransactionError(400, textT?.errors?.invalid);
         }
-      });
 
-      if (!result) {
-        return NextResponse.json({ valid: false, message: textT?.errors?.reopen }, { status: 400 });
-      }
+        const cashRegister = await tx.cusCashRegister.update({
+          where: { id: entry.id },
+          data: {
+            close_date: null,
+            comment: null,
+            status: CashRegisterStatus.OPEN,
+            lines: {
+              updateMany: [
+                {
+                  where: { currency: Currency.CRC },
+                  data: {
+                    cash_reported: null,
+                    cash_reported_data: Prisma.DbNull,
+                    cash_in: null,
+                    sinpe_in: null,
+                    transfer_in: null,
+                    card_in: null,
+                    cash_out: null,
+                    sinpe_out: null,
+                    transfer_out: null,
+                    card_out: null,
+                    cash_change: null,
+                    sinpe_change: null,
+                    transfer_change: null,
+                    card_change: null
+                  }
+                },
+                {
+                  where: { currency: Currency.USD },
+                  data: {
+                    cash_reported: null,
+                    cash_reported_data: Prisma.DbNull,
+                    cash_in: null,
+                    sinpe_in: null,
+                    transfer_in: null,
+                    card_in: null,
+                    cash_out: null,
+                    sinpe_out: null,
+                    transfer_out: null,
+                    card_out: null,
+                    cash_change: null,
+                    sinpe_change: null,
+                    transfer_change: null,
+                    card_change: null
+                  }
+                }
+              ]
+            }
+          }
+        });
+
+        if (!cashRegister) {
+          throw new TransactionError(400, textT?.errors?.reopen);
+        }
+
+        return cashRegister;
+      });
 
       return NextResponse.json({ valid: true }, { status: 200 });
     } catch (error) {
       console.error(`Error: ${error}`);
+
+      if (error instanceof TransactionError) {
+        return NextResponse.json({ valid: false, message: error.message }, { status: error.status });
+      }
 
       return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
     }
