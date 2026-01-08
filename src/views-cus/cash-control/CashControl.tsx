@@ -19,7 +19,7 @@ import { CashRegisterStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const CashControl = ({ cashRegister }: { cashRegister?: any }) => {
+const CashControl = ({ cashRegister, redirect }: { cashRegister?: any; redirect?: string }) => {
   const { t } = useTranslation();
   const textT: any = useMemo(() => t('cash-control:text', { returnObjects: true, default: {} }), [t]);
 
@@ -69,7 +69,7 @@ const CashControl = ({ cashRegister }: { cashRegister?: any }) => {
 
             <CardContent>
               {isReadyToOpen ? (
-                <CashControlToOpen setAlertState={setAlertState} />
+                <CashControlToOpen setAlertState={setAlertState} redirect={redirect} />
               ) : isReadyToClose ? (
                 <CashControlToClose cashRegister={cashRegister} setAlertState={setAlertState} />
               ) : isClosed ? (

@@ -14,13 +14,13 @@ import authOptions from '@libs/auth/authOptions';
 
 const CashControlPage = withAuthPage(
   ['cash-control.open', 'cash-control.close'],
-  async ({ params }: { params: Promise<{ locale: string }> }) => {
+  async ({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ r?: string }> }) => {
     const session = await getServerSession(authOptions);
     const cashRegister = await getCashRegisterAdmin(session?.user?.email || '');
 
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <CashControl cashRegister={cashRegister} />
+        <CashControl cashRegister={cashRegister} redirect={(await searchParams).r} />
       </TranslationsProvider>
     );
   }

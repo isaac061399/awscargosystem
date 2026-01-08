@@ -1,0 +1,23 @@
+{
+  "text": {
+    "title": "Faturación",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "btnSave": "Guardar",
+    "btnCancel": "Cancelar",
+    "btnClose": "Cerrar",
+    "btnCloseCash": "Cerrar caja"
+  },
+  "form": {
+    "labels": {
+      "client": "Cliente"
+    },
+    "placeholders": {
+      "client": "Buscar por nombre, casillero, identificación o correo electrónico"
+    },
+    "errors": {
+      "client": "El cliente es requerido"
+    },
+    "successMessage": "Datos guardados con éxito",
+    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
+  }
+}

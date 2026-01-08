@@ -30,7 +30,13 @@ import { currencies } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const CashToOpen = ({ setAlertState }: { setAlertState: React.Dispatch<React.SetStateAction<any>> }) => {
+const CashToOpen = ({
+  setAlertState,
+  redirect
+}: {
+  setAlertState: React.Dispatch<React.SetStateAction<any>>;
+  redirect?: string;
+}) => {
   const { data: admin } = useAdmin();
   const canOpen = hasAllPermissions('cash-control.open', admin.permissions);
   const canSelectOffice = admin.office === null;
@@ -82,6 +88,10 @@ const CashToOpen = ({ setAlertState }: { setAlertState: React.Dispatch<React.Set
         }
 
         router.refresh();
+
+        if (redirect) {
+          router.push(`/${redirect}`);
+        }
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {

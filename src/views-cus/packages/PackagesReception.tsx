@@ -231,9 +231,11 @@ const PackageReception = () => {
 
   // focus tracking field on mount
   useEffect(() => {
-    if (trackingFieldRef.current) {
-      trackingFieldRef.current.focus();
-    }
+    const timer = setTimeout(() => {
+      trackingFieldRef.current?.focus();
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // focus box number field when showClientFields is true

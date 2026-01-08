@@ -1028,6 +1028,27 @@ export const requestEditUser = async (id: number, params: any, lang: string) => 
 
 /* ******************* Custom Entities ******************* */
 
+// billing
+
+export const requestGetBillingLines = async (clientId: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: `/api/billing/lines/${clientId}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // cash registers
 
 export const requestGetCashRegisters = async (params: any, lang: string) => {

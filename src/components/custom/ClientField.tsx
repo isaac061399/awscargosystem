@@ -4,6 +4,7 @@ import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import { requestSearchClients } from '@/helpers/request';
 
 type ClientFieldProps = {
+  inputRef?: React.Ref<any>;
   language: string;
   initialOptions: any[];
   isOptionEqualToValue: (option: any, value: any) => boolean;
@@ -22,6 +23,7 @@ type ClientFieldProps = {
 };
 
 const ClientField = ({
+  inputRef,
   language,
   initialOptions,
   isOptionEqualToValue,
@@ -86,6 +88,7 @@ const ClientField = ({
       renderInput={(params) => (
         <TextField
           {...params}
+          inputRef={inputRef}
           id={id}
           name={name}
           label={label}
