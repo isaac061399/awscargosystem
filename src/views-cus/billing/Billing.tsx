@@ -439,7 +439,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   return (
     <DashboardLayout>
       <form noValidate onSubmit={formik.handleSubmit}>
-        <Grid container spacing={6}>
+        <Grid container spacing={5} className="mb-5">
           <Grid size={{ xs: 12 }}>
             <div className="flex items-center justify-between mb-3">
               <Typography variant="h3" className="flex items-center gap-1">
@@ -449,19 +449,22 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             </div>
             <Divider />
           </Grid>
-          <Grid size={{ xs: 12 }}>
-            {!cashRegister && (
+          {!cashRegister && (
+            <Grid size={{ xs: 12 }}>
               <Alert severity="info">
-                La caja aún no ha sido abierta para el día de hoy. Por favor, abra la caja para poder registrar
-                facturas.
+                {textT?.cashRegisterAlert}
                 <Link href="/cash-control?r=billing" className="underline ml-2">
-                  Abrir caja
+                  {textT?.cashRegisterAlertBtn}
                 </Link>
               </Alert>
-            )}
+            </Grid>
+          )}
 
-            {alertState.open && <Alert severity={alertState.type}>{alertState.message}</Alert>}
-          </Grid>
+          {alertState.open && (
+            <Grid size={{ xs: 12 }}>
+              <Alert severity={alertState.type}>{alertState.message}</Alert>
+            </Grid>
+          )}
         </Grid>
 
         <Stack spacing={2}>
@@ -537,7 +540,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 />
                 <Divider />
                 <CardContent>
-                  <Box className="h-105">
+                  <Box className="h-115">
                     <DataGrid
                       loading={isLoading}
                       rows={billableLines}
@@ -586,7 +589,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                       </Button>
                     </Stack>
 
-                    <Box className="h-90">
+                    <Box className="h-100">
                       <DataGrid
                         rows={selectedLines}
                         columns={selectedCols}
@@ -643,17 +646,27 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                         <Button
                           variant="contained"
                           disabled={
-                            formik.isSubmitting || isLoading || !formik.values.client || selectedLines.length === 0
+                            formik.isSubmitting ||
+                            isLoading ||
+                            !formik.values.client ||
+                            !cashRegister ||
+                            selectedLines.length === 0
                           }
                           fullWidth>
                           {textT?.cards?.totals?.btnSubmit}
                         </Button>
                       </Stack>
 
-                      {!formik.values.client && (
+                      {!cashRegister ? (
                         <Typography variant="caption" color="text.secondary">
-                          {textT?.cards?.totals?.noClientSelected}
+                          {textT?.cards?.totals?.noCashRegisterOpen}
                         </Typography>
+                      ) : (
+                        !formik.values.client && (
+                          <Typography variant="caption" color="text.secondary">
+                            {textT?.cards?.totals?.noClientSelected}
+                          </Typography>
+                        )
                       )}
                     </Stack>
                   </CardContent>

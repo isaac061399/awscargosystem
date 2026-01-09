@@ -7,6 +7,8 @@
     "btnAdd": "Agregar",
     "loading": "Cargando...",
     "noOptions": "No hay opciones disponibles",
+    "cashRegisterAlert": "La caja aún no ha sido abierta para el día de hoy. Por favor, abra la caja para poder registrar facturas.",
+    "cashRegisterAlertBtn": "Abrir caja",
     "cards": {
       "client": {
         "title": "Cliente",
@@ -35,6 +37,7 @@
         "taxes": "IVA",
         "total": "Total",
         "btnSubmit": "Facturar",
+        "noCashRegisterOpen": "Abra la caja para habilitar la facturación.",
         "noClientSelected": "Seleccione un cliente para habilitar la facturación."
       }
     },
