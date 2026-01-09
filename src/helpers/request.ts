@@ -1715,6 +1715,26 @@ export const requestDeleteProduct = async (id: number, lang: string) => {
   }
 };
 
+export const requestSearchProducts = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/products/search',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // unowned packages
 
 export const requestNewUnownedPackage = async (params: any, lang: string) => {

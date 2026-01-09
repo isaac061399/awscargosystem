@@ -4,8 +4,92 @@
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "btnSave": "Guardar",
     "btnCancel": "Cancelar",
-    "btnClose": "Cerrar",
-    "btnCloseCash": "Cerrar caja"
+    "btnAdd": "Agregar",
+    "loading": "Cargando...",
+    "noOptions": "No hay opciones disponibles",
+    "cards": {
+      "client": {
+        "title": "Cliente",
+        "subtitle": "Busque y seleccione un cliente para cargar paquetes/pedidos listos para retirar/facturar.",
+        "noClientSelected": "Seleccione un cliente para cargar las líneas disponibles.",
+        "clientSelected": "Cliente seleccionado"
+      },
+      "info": {
+        "title": "Información de la Facturación",
+        "subtitle": "Revise y edite la información de la facturación antes de guardarla."
+      },
+      "billableLines": {
+        "title": "Líneas Facturables",
+        "subtitle": "Estos son los paquetes/pedidos encontrados para el cliente. Seleccione/deseleccione lo que desea facturar."
+      },
+      "selectedLines": {
+        "title": "Líneas Seleccionadas para Facturar",
+        "subtitle": "Estas son las líneas que se facturarán al cliente. Puede agregar líneas personalizadas o productos adicionales.",
+        "btnAddCustomLines": "Agregar Línea Personalizada",
+        "btnAddProduct": "Agregar Producto"
+      },
+      "totals": {
+        "title": "Totales de la Facturación",
+        "subtitle": "Revise los totales de la facturación antes de guardarla.",
+        "subtotal": "Subtotal",
+        "taxes": "IVA",
+        "total": "Total",
+        "btnSubmit": "Facturar",
+        "noClientSelected": "Seleccione un cliente para habilitar la facturación."
+      }
+    },
+    "lineTypes": {
+      "package": "Paquete",
+      "order_product": "Pedido",
+      "custom": "Línea Personalizada",
+      "product": "Producto"
+    },
+    "billableLinesTable": {
+      "type": {
+        "title": "Tipo",
+        "tooltip": "Ver más información"
+      },
+      "tracking": {
+        "title": "Tracking"
+      },
+      "description": {
+        "title": "Descripción"
+      },
+      "amount": {
+        "title": "Monto"
+      },
+      "location": {
+        "title": "Ubicación",
+        "format": "Estante {{ shelf }}, Fila {{ row }}",
+        "noLocation": "Sin ubicación"
+      }
+    },
+    "selectedLinesTable": {
+      "type": {
+        "title": "Tipo"
+      },
+      "ref": {
+        "title": "Ref"
+      },
+      "description": {
+        "title": "Descripción"
+      },
+      "quantity": {
+        "title": "Cant"
+      },
+      "unit_price": {
+        "title": "Precio Unitario"
+      },
+      "total": {
+        "title": "Total"
+      }
+    },
+    "dialogCustomLine": {
+      "title": "Agregar Línea Personalizada a la Facturación"
+    },
+    "dialogProduct": {
+      "title": "Agregar Producto a la Facturación"
+    }
   },
   "form": {
     "labels": {
@@ -19,5 +103,48 @@
     },
     "successMessage": "Datos guardados con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
+  },
+  "formCustomLine": {
+    "labels": {
+      "code": "Código",
+      "description": "Descripción",
+      "quantity": "Cantidad",
+      "currency": "Moneda",
+      "unit_price": "Precio Unitario"
+    },
+    "placeholders": {
+      "code": "Ingrese el código",
+      "description": "Ingrese la descripción",
+      "quantity": "Ingrese la cantidad",
+      "currency": "Seleccione la moneda",
+      "unit_price": "Ingrese el precio unitario"
+    },
+    "errors": {
+      "code": "El código es requerido",
+      "description": "La descripción es requerida",
+      "quantity": "La cantidad es requerida",
+      "quantityInteger": "La cantidad debe ser un número entero",
+      "quantityMinimum": "La cantidad debe ser al menos 1",
+      "currency": "La moneda es requerida",
+      "unit_price": "El precio unitario es requerido"
+    },
+    "errorMessage": "Error al agregar la línea personalizada, por favor inténtalo de nuevo"
+  },
+  "formProduct": {
+    "labels": {
+      "product": "Producto",
+      "quantity": "Cantidad"
+    },
+    "placeholders": {
+      "product": "Buscar por código o nombre",
+      "quantity": "Ingrese la cantidad"
+    },
+    "errors": {
+      "product": "El producto es requerido",
+      "quantity": "La cantidad es requerida",
+      "quantityInteger": "La cantidad debe ser un número entero",
+      "quantityMinimum": "La cantidad debe ser al menos 1"
+    },
+    "errorMessage": "Error al agregar el producto, por favor inténtalo de nuevo"
   }
 }

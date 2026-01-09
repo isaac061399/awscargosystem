@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 
-import { requestSearchClients } from '@/helpers/request';
+import { requestSearchProducts } from '@/helpers/request';
+import { formatMoney } from '@/libs/utils';
+import { currencies } from '@/libs/constants';
 
-type ClientFieldProps = {
+type ProductFieldProps = {
   inputRef?: React.Ref<any>;
   initialOptions: any[];
   isOptionEqualToValue: (option: any, value: any) => boolean;
@@ -21,7 +23,7 @@ type ClientFieldProps = {
   disabled?: boolean;
 };
 
-const ClientField = ({
+const ProductField = ({
   inputRef,
   initialOptions,
   isOptionEqualToValue,
@@ -37,13 +39,13 @@ const ClientField = ({
   color,
   helperText,
   disabled
-}: ClientFieldProps) => {
+}: ProductFieldProps) => {
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<any[]>(initialOptions ?? []);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchClients = async (search: string) => {
+  const fetchProducts = async (search: string) => {
     if (!search.trim()) {
       setOptions([]);
 
@@ -57,7 +59,7 @@ const ClientField = ({
     timeoutRef.current = setTimeout(async () => {
       setLoading(true);
 
-      const result = await requestSearchClients({ search }, 'es');
+      const result = await requestSearchProducts({ search }, 'es');
 
       setOptions(result.valid ? result.data : []);
 
@@ -73,7 +75,7 @@ const ClientField = ({
       getOptionLabel={(option) => formatOption(option)}
       onInputChange={(event, value, reason) => {
         if (['input', 'clear'].includes(reason)) {
-          fetchClients(value);
+          fetchProducts(value);
         }
       }}
       onChange={(event, value) => {
@@ -113,29 +115,7 @@ const ClientField = ({
 };
 
 const formatOption = (option: any) => {
-  const extras = [];
-
-  if (option.office) {
-    extras.push(option.office.name);
-  }
-
-  if (option.box_number) {
-    extras.push(option.box_number);
-  }
-
-  if (option.identification) {
-    extras.push(option.identification);
-  }
-
-  if (option.email) {
-    extras.push(option.email);
-  }
-
-  if (extras.length === 0) {
-    return `${option.full_name}`;
-  }
-
-  return `${option.full_name} (${extras.join(' - ')})`;
+  return `${option.name} (${option.code} - ${formatMoney(option.price, `${currencies.CRC.symbol} `)})`;
 };
 
-export default ClientField;
+export default ProductField;

@@ -14,7 +14,6 @@ import * as yup from 'yup';
 // MUI Imports
 import {
   Alert,
-  Autocomplete,
   Box,
   Button,
   Card,
@@ -24,142 +23,66 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Divider,
   Grid,
   IconButton,
-  InputAdornment,
-  List,
-  ListItemButton,
-  ListItemText,
-  ListSubheader,
-  Radio,
   Stack,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material';
-import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { enUS, esES } from '@mui/x-data-grid/locales';
 
 // Component Imports
-import AddIcon from '@mui/icons-material/Add';
-import LocalMallIcon from '@mui/icons-material/LocalMall';
-
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import ClientField from '@/components/custom/ClientField';
-
-// Auth Imports
-import { useAdmin } from '@/components/AdminProvider';
-import { hasAllPermissions } from '@/helpers/permissions';
+import ProductField from '@/components/custom/ProductField';
+import Select from '@/components/Select';
+import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import {
-  requestGetBillingLines,
-  requestNewUnownedPackage,
-  requestPackagesReception,
-  requestPackagesReceptionClient,
-  requestPackagesReceptionTracking
-} from '@/helpers/request';
+import { requestGetBillingLines, requestPackagesReception } from '@/helpers/request';
 import { currencies } from '@/libs/constants';
-import { formatMoney, padStartZeros } from '@/libs/utils';
-import { calculateShippingPrice } from '@/helpers/calculations';
+import { formatMoney } from '@/libs/utils';
+import { BillingLine, calculateBillingTotal } from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
 import { Currency } from '@/prisma/generated/enums';
 
-/** ---------- Types ---------- */
-type SelectedItem = {
-  id: string;
-  type: 'package' | 'order_product' | 'custom' | 'product';
-  ref: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  currency: Currency;
-  total: number;
-};
-
 /** ------- Default States ------- */
 const defaultAlertState = { open: false, type: 'success', message: '' };
-const defaultCustomDraft: SelectedItem = {
-  id: '',
-  type: 'custom',
-  ref: '',
-  description: '',
-  quantity: 1,
-  unit_price: 0,
-  currency: Currency.CRC,
-  total: 0
-};
-
-// test
 
 /** ---------- Utils ---------- */
-function money(amount: number, currency: Currency) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'CRC' ? 0 : 2
-  }).format(amount);
-}
-
 function lineTotal(quantity: number, unit_price: number) {
   return (quantity || 0) * (unit_price || 0);
 }
 
-/**
- * Convert amount in `from` currency to `to` currency using fxRate:
- * fxRate = CRC per 1 USD (common in CR).
- */
-function convert(amount: number, from: Currency, to: Currency, fxRateCRCPerUSD: number) {
-  if (from === to) return amount;
-  if (from === 'USD' && to === 'CRC') return amount * fxRateCRCPerUSD;
-  if (from === 'CRC' && to === 'USD') return fxRateCRCPerUSD ? amount / fxRateCRCPerUSD : 0;
-
-  return amount;
-}
-
-/** ---------- Mock API placeholders (replace with your real calls) ---------- */
-async function apiSearchProducts(q: string): Promise<Product[]> {
-  // TODO: call your API
-  await new Promise((r) => setTimeout(r, 200));
-  const all: Product[] = [
-    { id: 'prd1', sku: 'PKG-INS', name: 'Package Insurance', price: 3, currency: 'USD' },
-    { id: 'prd2', sku: 'WRAP', name: 'Wrapping Service', price: 1500, currency: 'CRC' },
-    { id: 'prd3', sku: 'DHL-FEE', name: 'DHL Handling Fee', price: 2, currency: 'USD' }
-  ];
-  if (!q.trim()) return all.slice(0, 10);
-
-  return all.filter((p) => (p.sku + ' ' + p.name).toLowerCase().includes(q.toLowerCase()));
-}
-
 const Billing = ({ cashRegister }: { cashRegister?: any }) => {
-  const { offices, configuration } = useConfig();
-  const { data: admin } = useAdmin();
+  const { configuration } = useConfig();
+  const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
+  const ivaPercentage = configuration?.iva_percentage ?? 0;
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('billing:text', { returnObjects: true, default: {} }), [t]);
   const formT: any = useMemo(() => t('billing:form', { returnObjects: true, default: {} }), [t]);
+  const formCustomLineT: any = useMemo(() => t('billing:formCustomLine', { returnObjects: true, default: {} }), [t]);
+  const formProductT: any = useMemo(() => t('billing:formProduct', { returnObjects: true, default: {} }), [t]);
+  const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
   const dgLocale = i18n.language === 'en' ? enUS : esES;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
   const [billableLines, setBillableLines] = useState<any[]>([]);
   const [billableLinesSelected, setBillableLinesSelected] = useState<any[]>([]);
-  const [selectedLines, setSelectedLines] = useState<SelectedItem[]>([]);
+  const [selectedLines, setSelectedLines] = useState<BillingLine[]>([]);
 
   // FX: CRC per 1 USD
   const [fxRate, setFxRate] = useState<number>(520);
 
-  // Custom line dialog
+  // Billing lines dialogs
   const [customOpen, setCustomOpen] = useState(false);
-  const [customDraft, setCustomDraft] = useState<SelectedItem>(defaultCustomDraft);
-
-  // Product dialog
   const [productOpen, setProductOpen] = useState(false);
-  const [productQuery, setProductQuery] = useState('');
-  const [productResults, setProductResults] = useState<any[]>([]);
-  const [productQty, setProductQty] = useState<number>(1);
 
   const clientFieldRef = useRef<HTMLInputElement>(null);
 
@@ -169,18 +92,9 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     enableReinitialize: true,
     initialValues: useMemo(
       () => ({
-        office_id: offices[0]?.id || '',
-        cut_number: '',
-        tracking: '',
-        package_id: '',
-        order_id: '',
-        box_number: '',
-        client: null as any,
-        weight: '',
-        shelf: '',
-        row: ''
+        client: null as any
       }),
-      [offices]
+      []
     ),
     validationSchema: yup.object({
       client: yup.object().required(formT?.errors?.client)
@@ -214,6 +128,118 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }
   });
 
+  const formikCustomLine = useFormik({
+    validateOnChange: false,
+    validateOnBlur: false,
+    enableReinitialize: true,
+    initialValues: useMemo(
+      () => ({
+        code: '',
+        description: '',
+        quantity: 1,
+        currency: Currency.CRC,
+        unit_price: 0
+      }),
+      []
+    ),
+    validationSchema: yup.object({
+      code: yup.string().required(formCustomLineT?.errors?.code),
+      description: yup.string().required(formCustomLineT?.errors?.description),
+      quantity: yup
+        .number()
+        .integer(formCustomLineT?.errors?.quantityInteger)
+        .required(formCustomLineT?.errors?.quantity)
+        .min(1, formCustomLineT?.errors?.quantityMinimum),
+      currency: yup.string().required(formCustomLineT?.errors?.currency),
+      unit_price: yup.number().required(formCustomLineT?.errors?.unit_price)
+    }),
+    onSubmit: async (values) => {
+      setAlertState({ ...defaultAlertState });
+
+      try {
+        const line: BillingLine = {
+          id: `custom-${Date.now()}`,
+          type: 'custom',
+          refObj: null,
+          ref: values.code,
+          description: values.description,
+          quantity: values.quantity,
+          unit_price: values.unit_price,
+          currency: values.currency,
+          total: lineTotal(values.quantity, values.unit_price)
+        };
+        setSelectedLines((prev) => [...prev, line]);
+
+        setCustomOpen(false);
+        setTimeout(() => {
+          formikCustomLine.resetForm();
+        }, 500);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        // console.error(error);
+        setAlertState({ open: true, type: 'error', message: formCustomLineT?.errorMessage });
+        setTimeout(() => {
+          setAlertState({ ...defaultAlertState });
+        }, 5000);
+
+        return;
+      }
+    }
+  });
+
+  const formikProduct = useFormik({
+    validateOnChange: false,
+    validateOnBlur: false,
+    enableReinitialize: true,
+    initialValues: useMemo(
+      () => ({
+        product: null as any,
+        quantity: 1
+      }),
+      []
+    ),
+    validationSchema: yup.object({
+      product: yup.object().required(formProductT?.errors?.product),
+      quantity: yup
+        .number()
+        .integer(formProductT?.errors?.quantityInteger)
+        .required(formProductT?.errors?.quantity)
+        .min(1, formProductT?.errors?.quantityMinimum)
+    }),
+    onSubmit: async (values) => {
+      setAlertState({ ...defaultAlertState });
+
+      try {
+        const line: BillingLine = {
+          id: `product-${values.product.id}-${Date.now()}`,
+          type: 'product',
+          refObj: values.product,
+          ref: values.product.code,
+          description: values.product.name,
+          quantity: values.quantity,
+          unit_price: values.product.price,
+          currency: Currency.CRC,
+          total: lineTotal(values.quantity, values.product.price)
+        };
+        setSelectedLines((prev) => [...prev, line]);
+
+        setProductOpen(false);
+        setTimeout(() => {
+          formikProduct.resetForm();
+        }, 500);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        // console.error(error);
+        setAlertState({ open: true, type: 'error', message: formProductT?.errorMessage });
+        setTimeout(() => {
+          setAlertState({ ...defaultAlertState });
+        }, 5000);
+
+        return;
+      }
+    }
+  });
+
   // focus client field on mount
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -223,6 +249,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  // load billable lines when client changes
   useEffect(() => {
     if (formik.values.client) {
       const fetchLinesData = async () => {
@@ -232,17 +259,53 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
         setIsLoading(false);
         setBillableLines(result.lines || []);
+        setBillableLinesSelected(result.lines || []);
       };
 
       fetchLinesData();
     } else {
       setBillableLines([]);
+      setBillableLinesSelected([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.client]);
 
+  // update selectedLines when billableLinesSelected changes
+  useEffect(() => {
+    setSelectedLines((prev) => {
+      // keep any previously added custom/product lines
+      const extras = prev.filter((x) => x.type !== 'package' && x.type !== 'order_product');
+
+      // build selected base billable lines
+      const selected: BillingLine[] = billableLinesSelected.map((line) => ({
+        id: line.id,
+        type: line.type,
+        refObj: line.type === 'package' ? line.package : line.order_product,
+        ref: line.tracking,
+        description: line.description,
+        quantity: 1,
+        unit_price: line.billing_amount,
+        currency: Currency.USD,
+        total: line.billing_amount
+      }));
+
+      return [...selected, ...extras];
+    });
+  }, [billableLinesSelected, billableLines]);
+
+  const removeSelectedLine = (id: string) => {
+    // If it’s a base billable line, unselect it from ToBill
+    if (billableLines.some((b) => b.id === id)) {
+      setBillableLinesSelected((prev) => prev.filter((x) => x.id !== id));
+
+      return;
+    }
+
+    // If it’s an extra line (custom/product), remove from selectedLines
+    setSelectedLines((prev) => prev.filter((x) => x.id !== id));
+  };
+
   const resetProcess = () => {
-    setShowAllOtherFields(false);
     formik.resetForm();
 
     setTimeout(() => {
@@ -252,72 +315,68 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }, 100);
   };
 
-  // test
-  /** --- when selection changes, build "Selected/Billed lines" --- */
-  useEffect(() => {
-    const selected = billableLines.filter((b) => billableLinesSelected.includes(b.id));
-    setSelectedLines((prev) => {
-      // keep any previously added custom/product lines
-      const extras = prev.filter((x) => x.type !== 'package' && x.type !== 'order_product');
+  const openCustomLineDialog = () => {
+    formikCustomLine.resetForm();
+    setCustomOpen(true);
+  };
 
-      return [...selected, ...extras];
-    });
-  }, [billableLinesSelected, billableLines]);
+  const openProductDialog = () => {
+    formikProduct.resetForm();
+    setProductOpen(true);
+  };
 
-  function removeSelectedLine(id: string) {
-    // If it’s a base billable line, unselect it from ToBill
-    if (billableLines.some((b) => b.id === id)) {
-      setBillableLinesSelected((prev) => prev.filter((x) => x !== id));
+  /** --- Totals --- */
+  const totals = useMemo(() => {
+    const result = calculateBillingTotal(selectedLines, sellingExchangeRate, ivaPercentage);
 
-      return;
-    }
-
-    // If it’s an extra line (custom/product), remove from selectedLines
-    setSelectedLines((prev) => prev.filter((x) => x.id !== id));
-  }
-
-  /** --- totals --- */
-  const subtotalUSD = useMemo(() => {
-    const sum = selectedLines.reduce((acc, line) => acc + convert(lineTotal(line), line.currency, 'USD', fxRate), 0);
-
-    return sum;
-  }, [selectedLines, fxRate]);
-
-  const subtotalCRC = useMemo(() => {
-    const sum = selectedLines.reduce((acc, line) => acc + convert(lineTotal(line), line.currency, 'CRC', fxRate), 0);
-
-    return sum;
-  }, [selectedLines, fxRate]);
-
-  // You can add taxes/discounts here later
-  const totalUSD = subtotalUSD;
-  const totalCRC = subtotalCRC;
+    return result;
+  }, [selectedLines, sellingExchangeRate, ivaPercentage]);
 
   /** --- grids --- */
   const billableCols: GridColDef[] = [
     {
       field: 'type',
-      headerName: 'Tipo',
+      headerName: textT?.billableLinesTable?.type?.title,
       width: 120,
-      renderCell: (params) => <Chip size="small" label={params.value} />
+      renderCell: (params) => {
+        const href =
+          params.row.type === 'package'
+            ? '/packages/view/' + params.row.package.id
+            : '/orders/edit/' + params.row.order_product.order.id;
+
+        return (
+          <Chip
+            size="small"
+            label={
+              <Tooltip title={textT?.billableLinesTable?.type?.tooltip} placement="top">
+                <Link href={href} target="_blank" className="flex items-center gap-1">
+                  {textT?.lineTypes?.[params.value]} <i className="ri-information-line text-lg"></i>
+                </Link>
+              </Tooltip>
+            }
+          />
+        );
+      }
     },
-    { field: 'tracking', headerName: 'Tracking', width: 200 },
-    { field: 'description', headerName: 'Descripción', flex: 1, minWidth: 250 },
+    { field: 'tracking', headerName: textT?.billableLinesTable?.tracking?.title, width: 200 },
+    { field: 'description', headerName: textT?.billableLinesTable?.description?.title, flex: 1, minWidth: 250 },
     {
       field: 'billing_amount',
-      headerName: 'Monto',
+      headerName: textT?.billableLinesTable?.amount?.title,
       width: 120,
       valueGetter: (value, row) => formatMoney(row.billing_amount, `${currencies.USD.symbol}`),
       sortable: false
     },
     {
       field: 'location_shelf',
-      headerName: 'Ubicación',
+      headerName: textT?.billableLinesTable?.location?.title,
       width: 200,
       renderCell: (params) =>
         params.row.location_shelf && params.row.location_row
-          ? `Estante ${params.row.location_shelf} - Fila ${params.row.location_row}`
-          : 'Pendiente',
+          ? textT?.billableLinesTable?.location?.format
+              .replace('{{ shelf }}', params.row.location_shelf)
+              .replace('{{ row }}', params.row.location_row)
+          : textT?.billableLinesTable?.location?.noLocation,
       sortable: false
     }
   ];
@@ -325,23 +384,23 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const selectedCols: GridColDef[] = [
     {
       field: 'type',
-      headerName: 'Tipo',
+      headerName: textT?.selectedLinesTable?.type?.title,
       width: 120,
-      renderCell: (p) => <Chip size="small" label={p.value} />
+      renderCell: (params) => <Chip size="small" label={textT?.lineTypes?.[params.value]} />
     },
-    { field: 'ref', headerName: 'Ref', width: 200 },
-    { field: 'description', headerName: 'Descripción', flex: 1, minWidth: 250 },
-    { field: 'quantity', headerName: 'Cant', width: 80, type: 'number' },
+    { field: 'ref', headerName: textT?.selectedLinesTable?.ref?.title, width: 200 },
+    { field: 'description', headerName: textT?.selectedLinesTable?.description?.title, flex: 1, minWidth: 250 },
+    { field: 'quantity', headerName: textT?.selectedLinesTable?.quantity?.title, width: 80, type: 'number' },
     {
       field: 'unit_price',
-      headerName: 'Precio Unitario',
+      headerName: textT?.selectedLinesTable?.unit_price?.title,
       width: 120,
       valueGetter: (value, row) => formatMoney(row.unit_price, `${currencies[row.currency].symbol} `),
       sortable: false
     },
     {
       field: 'total',
-      headerName: 'Total',
+      headerName: textT?.selectedLinesTable?.total?.title,
       width: 120,
       valueGetter: (value, row) => formatMoney(row.total, `${currencies[row.currency].symbol} `),
       sortable: false
@@ -359,52 +418,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       )
     }
   ];
-
-  /** --- custom line handling --- */
-  const openCustom = () => {
-    setCustomDraft(defaultCustomDraft);
-    setCustomOpen(true);
-  };
-
-  function addCustomLine() {
-    const id = `custom_${Date.now()}`;
-    const line: SelectedItem = { ...customDraft, id };
-    if (!line.description.trim()) return;
-    setSelectedLines((prev) => [...prev, line]);
-    setCustomOpen(false);
-  }
-
-  /** --- product handling --- */
-  useEffect(() => {
-    let active = true;
-    const t = setTimeout(async () => {
-      if (!productOpen) return;
-      const res = await apiSearchProducts(productQuery);
-      if (active) setProductResults(res);
-    }, 250);
-
-    return () => {
-      active = false;
-      clearTimeout(t);
-    };
-  }, [productQuery, productOpen]);
-
-  function addProductAsLine(p: any) {
-    const line: SelectedItem = {
-      id: `product-${p.id}-${Date.now()}`,
-      type: 'product',
-      ref: p.code,
-      description: p.name,
-      quantity: productQty || 1,
-      unit_price: p.price,
-      currency: Currency.CRC,
-      total: lineTotal(productQty || 1, p.price)
-    };
-    setSelectedLines((prev) => [...prev, line]);
-    setProductOpen(false);
-    setProductQuery('');
-    setProductQty(1);
-  }
 
   return (
     <DashboardLayout>
@@ -440,16 +453,15 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
                 <CardHeader
-                  title="Cliente"
-                  subheader="Busque y seleccione un cliente para cargar paquetes/pedidos listos para retirar/facturar."
+                  title={textT?.cards?.client?.title}
+                  subheader={textT?.cards?.client?.subtitle}
                   avatar={<i className="ri-user-search-line"></i>}
                 />
                 <Divider />
                 <CardContent>
-                  <Stack spacing={1}>
+                  <Stack spacing={5}>
                     <ClientField
                       inputRef={clientFieldRef}
-                      language={i18n.language}
                       initialOptions={[]}
                       isOptionEqualToValue={(option, v) => option.id === v.id}
                       loadingText={textT?.loading}
@@ -470,13 +482,14 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
                     {formik.values.client ? (
                       <Alert severity="success">
-                        Cliente seleccionado:{' '}
+                        {textT?.cards?.client?.clientSelected}
+                        {': '}
                         <b>
                           {formik.values.client.full_name} - {formik.values.client.box_number}
                         </b>
                       </Alert>
                     ) : (
-                      <Alert severity="info">Seleccione un cliente para cargar las líneas disponibles.</Alert>
+                      <Alert severity="info">{textT?.cards?.client?.noClientSelected}</Alert>
                     )}
                   </Stack>
                 </CardContent>
@@ -485,8 +498,8 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
                 <CardHeader
-                  title="Información de facturación"
-                  subheader="Seleccione los datos necesarios para facturar."
+                  title={textT?.cards?.info?.title}
+                  subheader={textT?.cards?.info?.subtitle}
                   avatar={<i className="ri-file-info-line"></i>}
                 />
                 <Divider />
@@ -509,8 +522,8 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
                 <CardHeader
-                  title="Líneas a facturar"
-                  subheader="Estos son los paquetes/pedidos encontrados para el cliente. Seleccione/deseleccione lo que desea facturar."
+                  title={textT?.cards?.billableLines?.title}
+                  subheader={textT?.cards?.billableLines?.subtitle}
                 />
                 <Divider />
                 <CardContent>
@@ -521,13 +534,21 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                       columns={billableCols}
                       checkboxSelection
                       disableRowSelectionOnClick
-                      // rowSelectionModel={{type: 'include', ids: billableLinesSelected}}
-                      // onRowSelectionModelChange={(m) => setToBillSelection(m)}
-                      pagination
-                      pageSizeOptions={[5, 10, 25]}
-                      initialState={{
-                        pagination: { paginationModel: { pageSize: 10, page: 0 } }
+                      disableRowSelectionExcludeModel
+                      rowSelectionModel={{
+                        type: 'include',
+                        ids: new Set(billableLinesSelected.map((line) => line.id))
                       }}
+                      onRowSelectionModelChange={(m) => {
+                        const linesSelected = billableLines.filter((b) => Array.from(m.ids).includes(b.id));
+                        setBillableLinesSelected(linesSelected);
+                      }}
+                      hideFooterPagination
+                      // pagination
+                      // pageSizeOptions={[5, 10, 25]}
+                      // initialState={{
+                      //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
+                      // }}
                       localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
                     />
                   </Box>
@@ -538,17 +559,20 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               <Stack spacing={2} className="h-full">
                 <Card>
                   <CardHeader
-                    title="Selected / billed lines"
-                    subheader="Add extras (custom lines or products) and review before finalizing."
+                    title={textT?.cards?.selectedLines?.title}
+                    subheader={textT?.cards?.selectedLines?.subtitle}
                   />
                   <Divider />
                   <CardContent>
                     <Stack direction="row" spacing={1} className="mb-3">
-                      <Button variant="contained" startIcon={<AddIcon />} onClick={openCustom}>
-                        Add custom line
+                      <Button
+                        variant="contained"
+                        startIcon={<i className="ri-add-large-line" />}
+                        onClick={openCustomLineDialog}>
+                        {textT?.cards?.selectedLines?.btnAddCustomLines}
                       </Button>
-                      <Button variant="outlined" startIcon={<LocalMallIcon />} onClick={() => setProductOpen(true)}>
-                        Add product
+                      <Button variant="outlined" startIcon={<i className="ri-list-view" />} onClick={openProductDialog}>
+                        {textT?.cards?.selectedLines?.btnAddProduct}
                       </Button>
                     </Stack>
 
@@ -558,11 +582,12 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                         columns={selectedCols}
                         checkboxSelection={false}
                         disableRowSelectionOnClick
-                        pagination
-                        pageSizeOptions={[5, 10, 25]}
-                        initialState={{
-                          pagination: { paginationModel: { pageSize: 10, page: 0 } }
-                        }}
+                        hideFooterPagination
+                        // pagination
+                        // pageSizeOptions={[5, 10, 25]}
+                        // initialState={{
+                        //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
+                        // }}
                         localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
                       />
                     </Box>
@@ -570,42 +595,54 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 </Card>
 
                 <Card>
-                  <CardHeader title="Totals" subheader="Shown in USD and CRC" />
+                  <CardHeader title={textT?.cards?.totals?.title} subheader={textT?.cards?.totals?.subtitle} />
                   <Divider />
                   <CardContent>
                     <Stack spacing={1}>
-                      <Row label="Subtotal (USD)" value={money(subtotalUSD, 'USD')} />
-                      <Row label="Subtotal (CRC)" value={money(subtotalCRC, 'CRC')} />
+                      <Row
+                        label={`${textT?.cards?.totals?.subtotal} (${Currency.CRC})`}
+                        value={formatMoney(totals[Currency.CRC].subtotal, `${currencies.CRC.symbol} `)}
+                      />
+                      <Row
+                        label={`${textT?.cards?.totals?.subtotal} (${Currency.USD})`}
+                        value={formatMoney(totals[Currency.USD].subtotal, `${currencies.USD.symbol} `)}
+                      />
                       <Divider className="my-2" />
-                      <Row label="Total (USD)" value={money(totalUSD, 'USD')} strong />
-                      <Row label="Total (CRC)" value={money(totalCRC, 'CRC')} strong />
-
+                      <Row
+                        label={`${textT?.cards?.totals?.taxes} (${Currency.CRC})`}
+                        value={formatMoney(totals[Currency.CRC].taxes, `${currencies.CRC.symbol} `)}
+                        strong
+                      />
+                      <Row
+                        label={`${textT?.cards?.totals?.taxes} (${Currency.USD})`}
+                        value={formatMoney(totals[Currency.USD].taxes, `${currencies.USD.symbol} `)}
+                        strong
+                      />
+                      <Divider className="my-2" />
+                      <Row
+                        label={`${textT?.cards?.totals?.total} (${Currency.CRC})`}
+                        value={formatMoney(totals[Currency.CRC].total, `${currencies.CRC.symbol} `)}
+                        strong
+                      />
+                      <Row
+                        label={`${textT?.cards?.totals?.total} (${Currency.USD})`}
+                        value={formatMoney(totals[Currency.USD].total, `${currencies.USD.symbol} `)}
+                        strong
+                      />
                       <Stack direction="row" spacing={1} className="pt-3">
                         <Button
                           variant="contained"
                           disabled={
                             formik.isSubmitting || isLoading || !formik.values.client || selectedLines.length === 0
                           }
-                          onClick={() => {
-                            // TODO: submit invoice / create billing transaction
-                            // You likely want to send:
-                            // - clientId
-                            // - selectedLines
-                            // - fxRate
-                            console.log('Submit billing', {
-                              clientId: formik.values.client?.id,
-                              selectedLines,
-                              fxRate
-                            });
-                          }}
                           fullWidth>
-                          Create invoice / Bill now
+                          {textT?.cards?.totals?.btnSubmit}
                         </Button>
                       </Stack>
 
                       {!formik.values.client && (
                         <Typography variant="caption" color="text.secondary">
-                          Select a client to enable billing.
+                          {textT?.cards?.totals?.noClientSelected}
                         </Typography>
                       )}
                     </Stack>
@@ -618,95 +655,180 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       </form>
 
       {/* Custom line dialog */}
-      <Dialog open={customOpen} onClose={() => setCustomOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add custom line</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} className="pt-2">
+      <Dialog
+        open={customOpen}
+        onClose={() => setCustomOpen(false)}
+        aria-labelledby="dialog-custom-line-title"
+        maxWidth="sm"
+        fullWidth>
+        <form noValidate onSubmit={formikCustomLine.handleSubmit}>
+          <DialogTitle id="dialog-custom-line-title">{textT?.dialogCustomLine?.title}</DialogTitle>
+          <DialogContent dividers className="flex flex-col gap-6">
             <TextField
-              label="Description"
-              value={customDraft.description}
-              onChange={(e) => setCustomDraft((p) => ({ ...p, description: e.target.value }))}
               fullWidth
+              required
+              type="text"
+              id="code"
+              name="code"
+              label={formCustomLineT?.labels?.code}
+              placeholder={formCustomLineT?.placeholders?.code}
+              value={formikCustomLine.values.code}
+              onChange={formikCustomLine.handleChange}
+              error={Boolean(formikCustomLine.touched.code && formikCustomLine.errors.code)}
+              color={Boolean(formikCustomLine.touched.code && formikCustomLine.errors.code) ? 'error' : 'primary'}
+              helperText={formikCustomLine.touched.code && (formikCustomLine.errors.code as string)}
+              disabled={formikCustomLine.isSubmitting}
             />
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label="Qty"
-                type="number"
-                value={customDraft.qty}
-                onChange={(e) => setCustomDraft((p) => ({ ...p, qty: Number(e.target.value) }))}
-                fullWidth
-              />
-              <TextField
-                label="Unit price"
-                type="number"
-                value={customDraft.unitPrice}
-                onChange={(e) => setCustomDraft((p) => ({ ...p, unitPrice: Number(e.target.value) }))}
-                fullWidth
-              />
-              <TextField
-                label="Currency"
-                value={customDraft.currency}
-                onChange={(e) => setCustomDraft((p) => ({ ...p, currency: e.target.value as Currency }))}
-                fullWidth
-                select
-                SelectProps={{ native: true }}>
-                <option value="USD">USD</option>
-                <option value="CRC">CRC</option>
-              </TextField>
-            </Stack>
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCustomOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={addCustomLine} disabled={!customDraft.description.trim()}>
-            Add
-          </Button>
-        </DialogActions>
+            <TextField
+              fullWidth
+              required
+              type="text"
+              id="description"
+              name="description"
+              label={formCustomLineT?.labels?.description}
+              placeholder={formCustomLineT?.placeholders?.description}
+              value={formikCustomLine.values.description}
+              onChange={formikCustomLine.handleChange}
+              error={Boolean(formikCustomLine.touched.description && formikCustomLine.errors.description)}
+              color={
+                Boolean(formikCustomLine.touched.description && formikCustomLine.errors.description)
+                  ? 'error'
+                  : 'primary'
+              }
+              helperText={formikCustomLine.touched.description && (formikCustomLine.errors.description as string)}
+              disabled={formikCustomLine.isSubmitting}
+            />
+            <TextField
+              fullWidth
+              required
+              type="number"
+              id="quantity"
+              name="quantity"
+              label={formCustomLineT?.labels?.quantity}
+              placeholder={formCustomLineT?.placeholders?.quantity}
+              value={formikCustomLine.values.quantity}
+              onChange={formikCustomLine.handleChange}
+              error={Boolean(formikCustomLine.touched.quantity && formikCustomLine.errors.quantity)}
+              color={
+                Boolean(formikCustomLine.touched.quantity && formikCustomLine.errors.quantity) ? 'error' : 'primary'
+              }
+              helperText={formikCustomLine.touched.quantity && (formikCustomLine.errors.quantity as string)}
+              disabled={formikCustomLine.isSubmitting}
+            />
+            <Select
+              options={Object.keys(labelsT?.currency).map((value) => ({
+                value,
+                label: labelsT?.currency[value]
+              }))}
+              fullWidth
+              required
+              id="currency"
+              name="currency"
+              label={formCustomLineT?.labels?.currency}
+              placeholder={formCustomLineT?.placeholders?.currency}
+              value={formikCustomLine.values.currency}
+              onChange={formikCustomLine.handleChange}
+              error={Boolean(formikCustomLine.touched.currency && formikCustomLine.errors.currency)}
+              color={
+                Boolean(formikCustomLine.touched.currency && formikCustomLine.errors.currency) ? 'error' : 'primary'
+              }
+              helperText={formikCustomLine.touched.currency && (formikCustomLine.errors.currency as string)}
+              disabled={formikCustomLine.isSubmitting}
+            />
+            <MoneyField
+              fullWidth
+              required
+              type="text"
+              decimalScale={2}
+              decimalSeparator="."
+              thousandSeparator=","
+              prefix={`${currencies[formikCustomLine.values.currency]?.symbol || ''} `}
+              id="unit_price"
+              name="unit_price"
+              label={formCustomLineT?.labels?.unit_price}
+              placeholder={formCustomLineT?.placeholders?.unit_price}
+              value={formikCustomLine.values.unit_price}
+              onChange={formikCustomLine.handleChange}
+              error={Boolean(formikCustomLine.touched.unit_price && formikCustomLine.errors.unit_price)}
+              color={
+                Boolean(formikCustomLine.touched.unit_price && formikCustomLine.errors.unit_price) ? 'error' : 'primary'
+              }
+              helperText={formikCustomLine.touched.unit_price && (formikCustomLine.errors.unit_price as string)}
+              disabled={formikCustomLine.isSubmitting}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="text"
+              color="secondary"
+              onClick={() => setCustomOpen(false)}
+              disabled={formikCustomLine.isSubmitting}>
+              {textT?.btnCancel}
+            </Button>
+            <Button type="submit" variant="text" color="primary" loading={formikCustomLine.isSubmitting}>
+              {textT?.btnAdd}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
 
       {/* Product dialog */}
-      <Dialog open={productOpen} onClose={() => setProductOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Select product</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} className="pt-2">
+      <Dialog
+        open={productOpen}
+        onClose={() => setProductOpen(false)}
+        aria-labelledby="dialog-product-title"
+        maxWidth="sm"
+        fullWidth>
+        <form noValidate onSubmit={formikProduct.handleSubmit}>
+          <DialogTitle id="dialog-product-title">{textT?.dialogProduct?.title}</DialogTitle>
+          <DialogContent dividers className="flex flex-col gap-6">
+            <ProductField
+              initialOptions={[]}
+              isOptionEqualToValue={(option, v) => option.id === v.id}
+              loadingText={textT?.loading}
+              noOptionsText={textT?.noOptions}
+              value={formikProduct.values.product}
+              onChange={(value) => {
+                formikProduct.setFieldValue('product', value || null);
+              }}
+              id="product"
+              name="product"
+              label={formProductT?.labels?.product}
+              placeholder={formProductT?.placeholders?.product}
+              error={Boolean(formikProduct.touched.product && formikProduct.errors.product)}
+              color={Boolean(formikProduct.touched.product && formikProduct.errors.product) ? 'error' : 'primary'}
+              helperText={formikProduct.touched.product && (formikProduct.errors.product as string)}
+              disabled={formikProduct.isSubmitting || isLoading}
+            />
             <TextField
-              label="Search products"
-              value={productQuery}
-              onChange={(e) => setProductQuery(e.target.value)}
               fullWidth
-            />
-            <TextField
-              label="Qty"
+              required
               type="number"
-              value={productQty}
-              onChange={(e) => setProductQty(Number(e.target.value))}
-              className="max-w-[160px]"
+              id="quantity"
+              name="quantity"
+              label={formProductT?.labels?.quantity}
+              placeholder={formProductT?.placeholders?.quantity}
+              value={formikProduct.values.quantity}
+              onChange={formikProduct.handleChange}
+              error={Boolean(formikProduct.touched.quantity && formikProduct.errors.quantity)}
+              color={Boolean(formikProduct.touched.quantity && formikProduct.errors.quantity) ? 'error' : 'primary'}
+              helperText={formikProduct.touched.quantity && (formikProduct.errors.quantity as string)}
+              disabled={formikProduct.isSubmitting}
             />
-
-            <Box className="rounded-xl border border-slate-200">
-              {productResults.map((p) => (
-                <button
-                  key={p.id}
-                  className="w-full text-left px-3 py-3 hover:bg-slate-50 flex items-center justify-between"
-                  onClick={() => addProductAsLine(p)}>
-                  <div>
-                    <div className="font-medium">
-                      {p.sku} — {p.name}
-                    </div>
-                    <div className="text-sm text-slate-500">{money(p.price, p.currency)}</div>
-                  </div>
-                  <Chip size="small" label="Add" />
-                </button>
-              ))}
-              {productResults.length === 0 && (
-                <div className="px-3 py-4 text-sm text-slate-500">No products found.</div>
-              )}
-            </Box>
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setProductOpen(false)}>Close</Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="text"
+              color="secondary"
+              onClick={() => setProductOpen(false)}
+              disabled={formikProduct.isSubmitting}>
+              {textT?.btnCancel}
+            </Button>
+            <Button type="submit" variant="text" color="primary" loading={formikProduct.isSubmitting}>
+              {textT?.btnAdd}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </DashboardLayout>
   );

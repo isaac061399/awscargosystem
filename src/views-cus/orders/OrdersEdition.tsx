@@ -208,8 +208,8 @@ const OrdersEdition = ({ order }: { order?: any }) => {
 
   const orderTotal = getOrderTotal(formik.values.products, ivaPercentage);
   const orderTotalCRC = {
-    subtotal: convertCRC('sell', orderTotal.subtotal, sellingExchangeRate),
-    total: convertCRC('sell', orderTotal.total, sellingExchangeRate)
+    subtotal: convertCRC(orderTotal.subtotal, sellingExchangeRate),
+    total: convertCRC(orderTotal.total, sellingExchangeRate)
   };
   const paymentStatusChip: any = { label: '', color: 'info' };
   const statusChip: any = { label: '', color: 'info' };
@@ -316,7 +316,6 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 8 }}>
                     <ClientField
-                      language={i18n.language}
                       initialOptions={order ? [order.client] : []}
                       isOptionEqualToValue={(option, v) => option.id === v.id}
                       loadingText={textT?.loading}

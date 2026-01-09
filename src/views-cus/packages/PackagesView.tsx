@@ -38,7 +38,7 @@ import { useConfig } from '@/components/ConfigProvider';
 
 import { currencies } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
-import { calculateShippingTotal, convertCRC } from '@/helpers/calculations';
+import { calculateTaxes, convertCRC } from '@/helpers/calculations';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -124,10 +124,10 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
     color: paymentStatusColors[packageObj.payment_status] || 'info'
   };
 
-  const packageTotal = calculateShippingTotal(packageObj.billing_amount, ivaPercentage);
+  const packageTotal = calculateTaxes(packageObj.billing_amount, ivaPercentage);
   const packageTotalCRC = {
-    subtotal: convertCRC('sell', packageTotal.subtotal, sellingExchangeRate),
-    total: convertCRC('sell', packageTotal.total, sellingExchangeRate)
+    subtotal: convertCRC(packageTotal.subtotal, sellingExchangeRate),
+    total: convertCRC(packageTotal.total, sellingExchangeRate)
   };
 
   return (

@@ -4,43 +4,43 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead } from '@libs/prisma';
 
-import { clientSelectSchema } from '@/controllers/Client.Controller';
-import { ClientStatus } from '@/prisma/generated/enums';
-
-export const GET = withAuthApi(['clients.list'], async (req) => {
+export const GET = withAuthApi(['products.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:clients', { returnObjects: true, default: {} });
+  const textT: any = t('api:products', { returnObjects: true, default: {} });
 
   const params = Object.fromEntries(req.nextUrl.searchParams.entries());
 
   try {
     // filters
-    const where: any = { status: { not: ClientStatus.INACTIVE } };
+    const where: any = { enabled: true };
     const search = params.search || '';
 
     if (search !== '') {
       where['OR'] = [
-        { box_number: { contains: search.trim(), mode: 'insensitive' } },
-        { full_name: { contains: search.trim(), mode: 'insensitive' } },
-        { identification: { contains: search.trim(), mode: 'insensitive' } },
-        { email: { contains: search.trim(), mode: 'insensitive' } }
+        { code: { contains: search.trim(), mode: 'insensitive' } },
+        { name: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
 
     // query
-    const clients = await prismaRead.cusClient.findMany({
+    const products = await prismaRead.cusProduct.findMany({
       take: params.limit ? parseInt(params.limit) : 10,
       skip: 0,
       where,
       orderBy: [{ id: 'asc' }],
-      select: clientSelectSchema
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        price: true
+      }
     });
 
-    if (!clients) {
+    if (!products) {
       return NextResponse.json({ valid: true, data: [] }, { status: 200 });
     }
 
-    return NextResponse.json({ valid: true, data: clients }, { status: 200 });
+    return NextResponse.json({ valid: true, data: products }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
 

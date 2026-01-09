@@ -1,3 +1,17 @@
+import { Currency } from '@/prisma/generated/enums';
+
+export type BillingLine = {
+  id: string;
+  type: 'package' | 'order_product' | 'custom' | 'product';
+  refObj: any | null;
+  ref: string;
+  description: string;
+  quantity: number;
+  unit_price: number;
+  currency: Currency;
+  total: number;
+};
+
 export const getOrderProductPrice = (product: any) => {
   try {
     const price = product.price && !isNaN(product.price) ? parseFloat(product.price) : 0;
@@ -34,7 +48,7 @@ export const getOrderTotal = (products: any[], iva: number) => {
   }
 };
 
-export const calculateShippingPrice = (weight: string, poundFee: number): number => {
+export const calculateShippingPrice = (weight: string, poundFee: number) => {
   try {
     if (isNaN(parseFloat(weight)) || isNaN(poundFee) || parseFloat(weight) <= 0 || poundFee <= 0) {
       return 0;
@@ -51,15 +65,17 @@ export const calculateShippingPrice = (weight: string, poundFee: number): number
   }
 };
 
-export const calculateShippingTotal = (amount: number, iva: number) => {
-  const result = { subtotal: 0, total: 0 };
+export const calculateTaxes = (amount: number, taxPercentage: number) => {
+  const result = { subtotal: 0, taxes: 0, total: 0 };
 
   try {
     result.subtotal = amount;
-    result.total = result.subtotal + result.subtotal * (iva / 100);
+    result.taxes = result.subtotal * (taxPercentage / 100);
+    result.total = result.subtotal + result.taxes;
 
     return {
       subtotal: parseFloat(result.subtotal.toFixed(2)),
+      taxes: parseFloat(result.taxes.toFixed(2)),
       total: parseFloat(result.total.toFixed(2))
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,24 +86,76 @@ export const calculateShippingTotal = (amount: number, iva: number) => {
   }
 };
 
-export const convertCRC = (type: 'sell' | 'buy', amount: number, rate: number): number => {
+export const calculateBillingTotal = (lines: BillingLine[], conversionRate: number, taxPercentage: number) => {
+  let amountCRC = 0;
+  let amountUSD = 0;
+
   try {
-    if (isNaN(amount) || isNaN(rate) || amount <= 0 || rate <= 0) {
+    lines.forEach((line) => {
+      if (line.currency === Currency.CRC) {
+        amountCRC += line.total;
+        amountUSD += convertUSD(line.total, conversionRate);
+      } else if (line.currency === Currency.USD) {
+        amountUSD += line.total;
+        amountCRC += convertCRC(line.total, conversionRate);
+      }
+    });
+
+    const totalsCRC = calculateTaxes(amountCRC, taxPercentage);
+    const totalsUSD = calculateTaxes(amountUSD, taxPercentage);
+
+    return {
+      [Currency.CRC]: totalsCRC,
+      [Currency.USD]: totalsUSD
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating billing total: ${error}`);
+
+    return {
+      [Currency.CRC]: { subtotal: 0, taxes: 0, total: 0 },
+      [Currency.USD]: { subtotal: 0, taxes: 0, total: 0 }
+    };
+  }
+};
+
+export const convertCRC = (amount: number, conversionRate: number): number => {
+  try {
+    if (isNaN(amount) || isNaN(conversionRate) || amount <= 0 || conversionRate <= 0) {
       return 0;
     }
 
-    const convertedAmount = amount * rate;
-
-    if (type === 'buy') {
-      return Math.floor(convertedAmount / 5) * 5;
-    } else {
-      return Math.ceil(convertedAmount / 5) * 5;
-    }
+    return amount * conversionRate;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating conversion rate: ${error}`);
 
     return 0;
+  }
+};
+
+export const convertUSD = (amount: number, rate: number): number => {
+  try {
+    if (isNaN(amount) || isNaN(rate) || amount <= 0 || rate <= 0) {
+      return 0;
+    }
+
+    const convertedAmount = amount / rate;
+
+    return parseFloat(convertedAmount.toFixed(2));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating conversion rate: ${error}`);
+
+    return 0;
+  }
+};
+
+export const roundCRC = (type: 'sell' | 'buy', amount: number): number => {
+  if (type === 'buy') {
+    return Math.floor(amount / 5) * 5;
+  } else {
+    return Math.ceil(amount / 5) * 5;
   }
 };
