@@ -241,18 +241,18 @@ const PackageReception = () => {
   // focus box number field when showClientFields is true
   useEffect(() => {
     if (showClientFields) {
-      if (boxNumberFieldRef.current) {
-        boxNumberFieldRef.current.focus();
-      }
+      setTimeout(() => {
+        boxNumberFieldRef.current?.focus();
+      }, 0);
     }
   }, [showClientFields]);
 
   // focus weight field when showAllOtherFields is true
   useEffect(() => {
     if (showAllOtherFields) {
-      if (weightFieldRef.current) {
-        weightFieldRef.current.focus();
-      }
+      setTimeout(() => {
+        weightFieldRef.current?.focus();
+      }, 0);
     }
   }, [showAllOtherFields]);
 
@@ -352,8 +352,10 @@ const PackageReception = () => {
           inputRef: boxNumberFieldRef.current ? boxNumberFieldRef : trackingFieldRef,
           message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')
         });
-      } else if (weightFieldRef.current) {
-        weightFieldRef.current.focus();
+      } else {
+        setTimeout(() => {
+          weightFieldRef.current?.focus();
+        }, 0);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -400,9 +402,7 @@ const PackageReception = () => {
     // show the client fields and focus box number field
     setShowClientFields(true);
     setTimeout(() => {
-      if (boxNumberFieldRef.current) {
-        boxNumberFieldRef.current.focus();
-      }
+      boxNumberFieldRef.current?.focus();
     }, 100);
 
     // hide the rest of the fields
@@ -430,9 +430,7 @@ const PackageReception = () => {
     });
 
     setTimeout(() => {
-      if (trackingFieldRef.current) {
-        trackingFieldRef.current.focus();
-      }
+      trackingFieldRef.current?.focus();
     }, 100);
   };
 

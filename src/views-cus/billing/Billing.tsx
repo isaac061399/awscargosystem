@@ -77,14 +77,13 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const [billableLinesSelected, setBillableLinesSelected] = useState<any[]>([]);
   const [selectedLines, setSelectedLines] = useState<BillingLine[]>([]);
 
-  // FX: CRC per 1 USD
-  const [fxRate, setFxRate] = useState<number>(520);
-
   // Billing lines dialogs
   const [customOpen, setCustomOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
 
   const clientFieldRef = useRef<HTMLInputElement>(null);
+  const productFieldRef = useRef<HTMLInputElement>(null);
+  const customLineCodeFieldRef = useRef<HTMLInputElement>(null);
 
   const formik = useFormik({
     validateOnChange: false,
@@ -248,6 +247,24 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // focus custom line code field when custom line dialog opens
+  useEffect(() => {
+    if (customOpen) {
+      setTimeout(() => {
+        customLineCodeFieldRef.current?.focus();
+      }, 0);
+    }
+  }, [customOpen]);
+
+  // focus product field when product dialog opens
+  useEffect(() => {
+    if (productOpen) {
+      setTimeout(() => {
+        productFieldRef.current?.focus();
+      }, 0);
+    }
+  }, [productOpen]);
 
   // load billable lines when client changes
   useEffect(() => {
@@ -504,14 +521,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 />
                 <Divider />
                 <CardContent>
-                  <Stack spacing={2}>
-                    <TextField
-                      label="FX rate (CRC / USD)"
-                      type="number"
-                      value={fxRate}
-                      onChange={(e) => setFxRate(Number(e.target.value))}
-                    />
-                  </Stack>
+                  <Stack spacing={5}></Stack>
                 </CardContent>
               </Card>
             </Grid>
@@ -665,6 +675,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
           <DialogTitle id="dialog-custom-line-title">{textT?.dialogCustomLine?.title}</DialogTitle>
           <DialogContent dividers className="flex flex-col gap-6">
             <TextField
+              inputRef={customLineCodeFieldRef}
               fullWidth
               required
               type="text"
@@ -783,6 +794,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
           <DialogTitle id="dialog-product-title">{textT?.dialogProduct?.title}</DialogTitle>
           <DialogContent dividers className="flex flex-col gap-6">
             <ProductField
+              inputRef={productFieldRef}
               initialOptions={[]}
               isOptionEqualToValue={(option, v) => option.id === v.id}
               loadingText={textT?.loading}
