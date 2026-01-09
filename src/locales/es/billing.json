@@ -30,7 +30,7 @@
       },
       "totals": {
         "title": "Totales de la Facturación",
-        "subtitle": "Revise los totales de la facturación antes de guardarla.",
+        "subtitle": "Revise los totales antes de facturar.",
         "subtotal": "Subtotal",
         "taxes": "IVA",
         "total": "Total",
