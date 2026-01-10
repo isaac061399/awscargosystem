@@ -14,7 +14,8 @@
         "title": "Cliente",
         "subtitle": "Busque y seleccione un cliente para cargar paquetes/pedidos listos para retirar/facturar.",
         "noClientSelected": "Seleccione un cliente para cargar las líneas disponibles.",
-        "clientSelected": "Cliente seleccionado"
+        "clientSelected": "Cliente seleccionado: ",
+        "clientSelectedLink": "Ver cliente"
       },
       "info": {
         "title": "Información de la Facturación",
@@ -35,7 +36,11 @@
         "subtitle": "Revise los totales antes de facturar.",
         "subtotal": "Subtotal",
         "taxes": "IVA",
-        "total": "Total",
+        "total": "Total"
+      },
+      "payment": {
+        "title": "Información de Pago",
+        "subtitle": "Ingrese los datos requeridos para el pago.",
         "btnSubmit": "Facturar",
         "noCashRegisterOpen": "Abra la caja para habilitar la facturación.",
         "noClientSelected": "Seleccione un cliente para habilitar la facturación."
@@ -96,13 +101,32 @@
   },
   "form": {
     "labels": {
-      "client": "Cliente"
+      "client": "Cliente",
+      "invoice_type": "Tipo de factura",
+      "invoice_payment_condition": "Condición de pago",
+      "payment_method": "Método de pago",
+      "payment_currency": "Moneda",
+      "payment_ref": "Referencia de pago",
+      "payment_amount": "Monto recibido"
     },
     "placeholders": {
-      "client": "Buscar por nombre, casillero, identificación o correo electrónico"
+      "client": "Buscar por nombre, casillero, identificación o correo electrónico",
+      "invoice_type": "Seleccione una opción",
+      "invoice_payment_condition": "Seleccione una opción",
+      "payment_method": "Seleccione una opción",
+      "payment_currency": "Seleccione una opción",
+      "payment_ref": "Ingrese la referencia de pago",
+      "payment_amount": "Ingrese el monto recibido"
     },
     "errors": {
-      "client": "El cliente es requerido"
+      "client": "El cliente es requerido",
+      "invoice_type": "El tipo de factura es requerido",
+      "invoice_payment_condition": "La condición de pago es requerida",
+      "payment_method": "El método de pago es requerido",
+      "payment_currency": "La moneda es requerida",
+      "payment_ref": "La referencia de pago es requerida",
+      "payment_amount": "El monto recibido es requerido",
+      "payment_amount_min": "El monto recibido debe ser al menos igual al total de la factura"
     },
     "successMessage": "Datos guardados con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"

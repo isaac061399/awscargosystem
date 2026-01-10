@@ -14,6 +14,21 @@
       "DIMEX": "DIMEX",
       "PASSPORT": "Pasaporte"
     },
+    "invoiceType": {
+      "TICKET": "Tiquete",
+      "ELECTRONIC": "Electrónica"
+    },
+    "invoicePaymentCondition": {
+      "CASH": "Contado",
+      "CREDIT_6": "Crédito 6 días",
+      "CREDIT_8": "Crédito 8 días",
+      "CREDIT_16": "Crédito 16 días",
+      "CREDIT_25": "Crédito 25 días",
+      "CREDIT_30": "Crédito 30 días",
+      "CREDIT_45": "Crédito 45 días",
+      "CREDIT_60": "Crédito 60 días",
+      "CREDIT_90": "Crédito 90 días"
+    },
     "clientStatus": {
       "ACTIVE": "Activo",
       "INACTIVE": "Inactivo"

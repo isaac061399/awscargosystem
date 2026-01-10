@@ -895,6 +895,23 @@ enum IdentificationType {
   PASSPORT
 }
 
+enum InvoiceType {
+  TICKET
+  ELECTRONIC
+}
+
+enum InvoicePaymentCondition {
+ CASH
+ CREDIT_6
+ CREDIT_8
+ CREDIT_16
+ CREDIT_25
+ CREDIT_30
+ CREDIT_45
+ CREDIT_60
+ CREDIT_90
+}
+
 enum ClientStatus {
   ACTIVE
   INACTIVE

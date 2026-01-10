@@ -109,6 +109,12 @@
       "general": "An error occurred, please try again"
     }
   },
+  "billing": {
+    "errors": {
+      "save": "Error saving the invoice, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
   "cash-registers": {
     "errors": {
       "notOpen": "The cash register is not open",

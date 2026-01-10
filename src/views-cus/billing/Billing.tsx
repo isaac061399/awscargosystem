@@ -43,12 +43,12 @@ import Select from '@/components/Select';
 import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import { requestGetBillingLines, requestPackagesReception } from '@/helpers/request';
+import { requestGetBillingLines } from '@/helpers/request';
 import { currencies } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
 import { BillingLine, calculateBillingTotal } from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
-import { Currency } from '@/prisma/generated/enums';
+import { Currency, PaymentMethod } from '@/prisma/generated/enums';
 
 /** ------- Default States ------- */
 const defaultAlertState = { open: false, type: 'success', message: '' };
@@ -76,6 +76,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const [billableLines, setBillableLines] = useState<any[]>([]);
   const [billableLinesSelected, setBillableLinesSelected] = useState<any[]>([]);
   const [selectedLines, setSelectedLines] = useState<BillingLine[]>([]);
+  const [totals, setTotals] = useState<any>(calculateBillingTotal(selectedLines, sellingExchangeRate, ivaPercentage));
 
   // Billing lines dialogs
   const [customOpen, setCustomOpen] = useState(false);
@@ -91,33 +92,65 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     enableReinitialize: true,
     initialValues: useMemo(
       () => ({
-        client: null as any
+        client: null as any,
+        invoice_type: Object.keys(labelsT?.invoiceType)[0] || '',
+        invoice_payment_condition: Object.keys(labelsT?.invoicePaymentCondition)[0] || '',
+        payment_currency: Object.keys(labelsT?.currency)[0] || '',
+        payment_method: Object.keys(labelsT?.paymentMethod)[0] || '',
+        payment_ref: '',
+        payment_amount: 0
       }),
-      []
+      [labelsT]
     ),
     validationSchema: yup.object({
-      client: yup.object().required(formT?.errors?.client)
+      client: yup.object().required(formT?.errors?.client),
+      invoice_type: yup.string().required(formT?.errors?.invoice_type),
+      invoice_payment_condition: yup.string().required(formT?.errors?.invoice_payment_condition),
+      payment_currency: yup.string().required(formT?.errors?.payment_currency),
+      payment_method: yup.string().required(formT?.errors?.payment_method),
+      payment_ref: yup.string().when('payment_method', {
+        is: PaymentMethod.CASH,
+        then: (schema) => schema.notRequired(),
+        otherwise: (schema) => schema.required(formT?.errors?.payment_ref)
+      }),
+      payment_amount: yup.number().when('payment_method', {
+        is: PaymentMethod.CASH,
+        then: (schema) => schema.required(formT?.errors?.payment_amount),
+        otherwise: (schema) => schema.notRequired()
+      })
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
 
+      // validate amount vrs total if payment method is cash
+      if (
+        values.payment_method === PaymentMethod.CASH &&
+        values.payment_amount < totals[values.payment_currency].total
+      ) {
+        formik.setFieldError('payment_amount', formT?.errors?.payment_amount_min);
+
+        return;
+      }
+
       try {
-        const newValues = {
-          client_id: values.client.id
-        };
+        // const newValues = {
+        //   client_id: values.client.id,
+        //   invoice_type: values.invoice_type,
+        //   invoice_payment_condition: values.invoice_payment_condition
+        // };
 
-        const result = await requestPackagesReception(newValues, i18n.language);
+        // const result = await requestPackagesReception(newValues, i18n.language);
 
-        if (!result.valid) {
-          return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
-        }
+        // if (!result.valid) {
+        //   return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
+        // }
 
         setAlertState({ open: true, type: 'success', message: formT?.successMessage });
         setTimeout(() => {
           setAlertState({ ...defaultAlertState });
         }, 5000);
 
-        resetProcess();
+        // TODO: open success dialog with option to print invoice and view change if cash
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
@@ -310,6 +343,12 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     });
   }, [billableLinesSelected, billableLines]);
 
+  // update totals when selectedLines changes
+  useEffect(() => {
+    const result = calculateBillingTotal(selectedLines, sellingExchangeRate, ivaPercentage);
+    setTotals(result);
+  }, [selectedLines, sellingExchangeRate, ivaPercentage]);
+
   const removeSelectedLine = (id: string) => {
     // If it’s a base billable line, unselect it from ToBill
     if (billableLines.some((b) => b.id === id)) {
@@ -322,16 +361,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     setSelectedLines((prev) => prev.filter((x) => x.id !== id));
   };
 
-  const resetProcess = () => {
-    formik.resetForm();
-
-    setTimeout(() => {
-      if (clientFieldRef.current) {
-        clientFieldRef.current.focus();
-      }
-    }, 100);
-  };
-
   const openCustomLineDialog = () => {
     formikCustomLine.resetForm();
     setCustomOpen(true);
@@ -341,13 +370,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     formikProduct.resetForm();
     setProductOpen(true);
   };
-
-  /** --- Totals --- */
-  const totals = useMemo(() => {
-    const result = calculateBillingTotal(selectedLines, sellingExchangeRate, ivaPercentage);
-
-    return result;
-  }, [selectedLines, sellingExchangeRate, ivaPercentage]);
 
   /** --- grids --- */
   const billableCols: GridColDef[] = [
@@ -436,6 +458,8 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }
   ];
 
+  console.log(formik.errors);
+
   return (
     <DashboardLayout>
       <form noValidate onSubmit={formik.handleSubmit}>
@@ -472,11 +496,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
           <Grid container spacing={2} className="items-stretch">
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
-                <CardHeader
-                  title={textT?.cards?.client?.title}
-                  subheader={textT?.cards?.client?.subtitle}
-                  avatar={<i className="ri-user-search-line"></i>}
-                />
+                <CardHeader title={textT?.cards?.client?.title} subheader={textT?.cards?.client?.subtitle} />
                 <Divider />
                 <CardContent>
                   <Stack spacing={5}>
@@ -503,10 +523,13 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                     {formik.values.client ? (
                       <Alert severity="success">
                         {textT?.cards?.client?.clientSelected}
-                        {': '}
                         <b>
                           {formik.values.client.full_name} - {formik.values.client.box_number}
                         </b>
+                        <br />
+                        <Link href={`/clients/edit/${formik.values.client.id}`} target="_blank" className="underline">
+                          {textT?.cards?.client?.clientSelectedLink}
+                        </Link>
                       </Alert>
                     ) : (
                       <Alert severity="info">{textT?.cards?.client?.noClientSelected}</Alert>
@@ -517,20 +540,61 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
-                <CardHeader
-                  title={textT?.cards?.info?.title}
-                  subheader={textT?.cards?.info?.subtitle}
-                  avatar={<i className="ri-file-info-line"></i>}
-                />
+                <CardHeader title={textT?.cards?.info?.title} subheader={textT?.cards?.info?.subtitle} />
                 <Divider />
                 <CardContent>
-                  <Stack spacing={5}></Stack>
+                  <Stack spacing={5}>
+                    <Select
+                      options={Object.keys(labelsT?.invoiceType).map((value) => ({
+                        value,
+                        label: labelsT?.invoiceType[value]
+                      }))}
+                      fullWidth
+                      required
+                      id="invoice_type"
+                      name="invoice_type"
+                      label={formT?.labels?.invoice_type}
+                      placeholder={formT?.placeholders?.invoice_type}
+                      value={formik.values.invoice_type}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.invoice_type && formik.errors.invoice_type)}
+                      color={Boolean(formik.touched.invoice_type && formik.errors.invoice_type) ? 'error' : 'primary'}
+                      helperText={formik.touched.invoice_type && (formik.errors.invoice_type as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                    <Select
+                      options={Object.keys(labelsT?.invoicePaymentCondition).map((value) => ({
+                        value,
+                        label: labelsT?.invoicePaymentCondition[value]
+                      }))}
+                      fullWidth
+                      required
+                      id="invoice_payment_condition"
+                      name="invoice_payment_condition"
+                      label={formT?.labels?.invoice_payment_condition}
+                      placeholder={formT?.placeholders?.invoice_payment_condition}
+                      value={formik.values.invoice_payment_condition}
+                      onChange={formik.handleChange}
+                      error={Boolean(
+                        formik.touched.invoice_payment_condition && formik.errors.invoice_payment_condition
+                      )}
+                      color={
+                        Boolean(formik.touched.invoice_payment_condition && formik.errors.invoice_payment_condition)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.invoice_payment_condition && (formik.errors.invoice_payment_condition as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Stack>
                 </CardContent>
               </Card>
             </Grid>
           </Grid>
 
-          {/* Main content: left = To bill, right = Selected lines + Totals */}
+          {/* Middle row: left = To bill, right = Selected lines */}
           <Grid container spacing={2} className="items-stretch">
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
@@ -540,7 +604,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 />
                 <Divider />
                 <CardContent>
-                  <Box className="h-115">
+                  <Box className="h-117">
                     <DataGrid
                       loading={isLoading}
                       rows={billableLines}
@@ -569,109 +633,214 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               </Card>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-              <Stack spacing={2} className="h-full">
-                <Card>
-                  <CardHeader
-                    title={textT?.cards?.selectedLines?.title}
-                    subheader={textT?.cards?.selectedLines?.subtitle}
-                  />
-                  <Divider />
-                  <CardContent>
-                    <Stack direction="row" spacing={1} className="mb-3">
-                      <Button
-                        variant="contained"
-                        startIcon={<i className="ri-add-large-line" />}
-                        onClick={openCustomLineDialog}>
-                        {textT?.cards?.selectedLines?.btnAddCustomLines}
-                      </Button>
-                      <Button variant="outlined" startIcon={<i className="ri-list-view" />} onClick={openProductDialog}>
-                        {textT?.cards?.selectedLines?.btnAddProduct}
-                      </Button>
-                    </Stack>
+              <Card className="h-full">
+                <CardHeader
+                  title={textT?.cards?.selectedLines?.title}
+                  subheader={textT?.cards?.selectedLines?.subtitle}
+                />
+                <Divider />
+                <CardContent>
+                  <Stack direction="row" spacing={1} className="mb-3">
+                    <Button
+                      variant="contained"
+                      startIcon={<i className="ri-add-large-line" />}
+                      onClick={openCustomLineDialog}>
+                      {textT?.cards?.selectedLines?.btnAddCustomLines}
+                    </Button>
+                    <Button variant="outlined" startIcon={<i className="ri-list-view" />} onClick={openProductDialog}>
+                      {textT?.cards?.selectedLines?.btnAddProduct}
+                    </Button>
+                  </Stack>
 
-                    <Box className="h-100">
-                      <DataGrid
-                        rows={selectedLines}
-                        columns={selectedCols}
-                        checkboxSelection={false}
-                        disableRowSelectionOnClick
-                        hideFooterPagination
-                        // pagination
-                        // pageSizeOptions={[5, 10, 25]}
-                        // initialState={{
-                        //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
-                        // }}
-                        localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
-                      />
-                    </Box>
-                  </CardContent>
-                </Card>
+                  <Box className="h-105">
+                    <DataGrid
+                      rows={selectedLines}
+                      columns={selectedCols}
+                      checkboxSelection={false}
+                      disableRowSelectionOnClick
+                      hideFooterPagination
+                      // pagination
+                      // pageSizeOptions={[5, 10, 25]}
+                      // initialState={{
+                      //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
+                      // }}
+                      localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
+                    />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
-                <Card>
-                  <CardHeader title={textT?.cards?.totals?.title} subheader={textT?.cards?.totals?.subtitle} />
-                  <Divider />
-                  <CardContent>
-                    <Stack spacing={1}>
-                      <Row
-                        label={`${textT?.cards?.totals?.subtotal} (${Currency.CRC})`}
-                        value={formatMoney(totals[Currency.CRC].subtotal, `${currencies.CRC.symbol} `)}
-                      />
-                      <Row
-                        label={`${textT?.cards?.totals?.subtotal} (${Currency.USD})`}
-                        value={formatMoney(totals[Currency.USD].subtotal, `${currencies.USD.symbol} `)}
-                      />
-                      <Divider className="my-2" />
-                      <Row
-                        label={`${textT?.cards?.totals?.taxes} (${Currency.CRC})`}
-                        value={formatMoney(totals[Currency.CRC].taxes, `${currencies.CRC.symbol} `)}
-                        strong
-                      />
-                      <Row
-                        label={`${textT?.cards?.totals?.taxes} (${Currency.USD})`}
-                        value={formatMoney(totals[Currency.USD].taxes, `${currencies.USD.symbol} `)}
-                        strong
-                      />
-                      <Divider className="my-2" />
-                      <Row
-                        label={`${textT?.cards?.totals?.total} (${Currency.CRC})`}
-                        value={formatMoney(totals[Currency.CRC].total, `${currencies.CRC.symbol} `)}
-                        strong
-                      />
-                      <Row
-                        label={`${textT?.cards?.totals?.total} (${Currency.USD})`}
-                        value={formatMoney(totals[Currency.USD].total, `${currencies.USD.symbol} `)}
-                        strong
-                      />
-                      <Stack direction="row" spacing={1} className="pt-3">
-                        <Button
-                          variant="contained"
-                          disabled={
-                            formik.isSubmitting ||
-                            isLoading ||
-                            !formik.values.client ||
-                            !cashRegister ||
-                            selectedLines.length === 0
+          {/* Bottom row: left = Totals, right = Payment info */}
+          <Grid container spacing={2} className="items-stretch">
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card className="h-full">
+                <CardHeader title={textT?.cards?.totals?.title} subheader={textT?.cards?.totals?.subtitle} />
+                <Divider />
+                <CardContent>
+                  <Stack spacing={1}>
+                    <Row
+                      label={`${textT?.cards?.totals?.subtotal} (${Currency.CRC})`}
+                      value={formatMoney(totals[Currency.CRC].subtotal, `${currencies.CRC.symbol} `)}
+                    />
+                    <Row
+                      label={`${textT?.cards?.totals?.subtotal} (${Currency.USD})`}
+                      value={formatMoney(totals[Currency.USD].subtotal, `${currencies.USD.symbol} `)}
+                    />
+                    <Divider className="my-2" />
+                    <Row
+                      label={`${textT?.cards?.totals?.taxes} (${Currency.CRC})`}
+                      value={formatMoney(totals[Currency.CRC].taxes, `${currencies.CRC.symbol} `)}
+                      strong
+                    />
+                    <Row
+                      label={`${textT?.cards?.totals?.taxes} (${Currency.USD})`}
+                      value={formatMoney(totals[Currency.USD].taxes, `${currencies.USD.symbol} `)}
+                      strong
+                    />
+                    <Divider className="my-2" />
+                    <Row
+                      label={`${textT?.cards?.totals?.total} (${Currency.CRC})`}
+                      value={formatMoney(totals[Currency.CRC].total, `${currencies.CRC.symbol} `)}
+                      strong
+                    />
+                    <Row
+                      label={`${textT?.cards?.totals?.total} (${Currency.USD})`}
+                      value={formatMoney(totals[Currency.USD].total, `${currencies.USD.symbol} `)}
+                      strong
+                    />
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card className="h-full">
+                <CardHeader title={textT?.cards?.payment?.title} subheader={textT?.cards?.payment?.subtitle} />
+                <Divider />
+                <CardContent>
+                  <Stack spacing={5}>
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Select
+                          options={Object.keys(labelsT?.paymentMethod).map((value) => ({
+                            value,
+                            label: labelsT?.paymentMethod[value]
+                          }))}
+                          fullWidth
+                          required
+                          id="payment_method"
+                          name="payment_method"
+                          label={formT?.labels?.payment_method}
+                          placeholder={formT?.placeholders?.payment_method}
+                          value={formik.values.payment_method}
+                          onChange={formik.handleChange}
+                          error={Boolean(formik.touched.payment_method && formik.errors.payment_method)}
+                          color={
+                            Boolean(formik.touched.payment_method && formik.errors.payment_method) ? 'error' : 'primary'
                           }
-                          fullWidth>
-                          {textT?.cards?.totals?.btnSubmit}
-                        </Button>
-                      </Stack>
+                          helperText={formik.touched.payment_method && (formik.errors.payment_method as string)}
+                          disabled={formik.isSubmitting || isLoading}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Select
+                          options={Object.keys(labelsT?.currency).map((value) => ({
+                            value,
+                            label: labelsT?.currency[value]
+                          }))}
+                          fullWidth
+                          required
+                          id="payment_currency"
+                          name="payment_currency"
+                          label={formT?.labels?.payment_currency}
+                          placeholder={formT?.placeholders?.payment_currency}
+                          value={formik.values.payment_currency}
+                          onChange={formik.handleChange}
+                          error={Boolean(formik.touched.payment_currency && formik.errors.payment_currency)}
+                          color={
+                            Boolean(formik.touched.payment_currency && formik.errors.payment_currency)
+                              ? 'error'
+                              : 'primary'
+                          }
+                          helperText={formik.touched.payment_currency && (formik.errors.payment_currency as string)}
+                          disabled={formik.isSubmitting || isLoading}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        {formik.values.payment_method !== PaymentMethod.CASH ? (
+                          <TextField
+                            fullWidth
+                            required
+                            type="text"
+                            id="payment_ref"
+                            name="payment_ref"
+                            label={formT?.labels?.payment_ref}
+                            placeholder={formT?.placeholders?.payment_ref}
+                            value={formik.values.payment_ref}
+                            onChange={formik.handleChange}
+                            error={Boolean(formik.touched.payment_ref && formik.errors.payment_ref)}
+                            color={
+                              Boolean(formik.touched.payment_ref && formik.errors.payment_ref) ? 'error' : 'primary'
+                            }
+                            helperText={formik.touched.payment_ref && (formik.errors.payment_ref as string)}
+                            disabled={formik.isSubmitting || isLoading}
+                          />
+                        ) : (
+                          <MoneyField
+                            fullWidth
+                            required
+                            type="text"
+                            decimalScale={2}
+                            decimalSeparator="."
+                            thousandSeparator=","
+                            prefix={`${currencies[formik.values.payment_currency]?.symbol || ''} `}
+                            id="payment_amount"
+                            name="payment_amount"
+                            label={formT?.labels?.payment_amount}
+                            placeholder={formT?.placeholders?.payment_amount}
+                            value={formik.values.payment_amount}
+                            onChange={formik.handleChange}
+                            error={Boolean(formik.touched.payment_amount && formik.errors.payment_amount)}
+                            color={
+                              Boolean(formik.touched.payment_amount && formik.errors.payment_amount)
+                                ? 'error'
+                                : 'primary'
+                            }
+                            helperText={formik.touched.payment_amount && (formik.errors.payment_amount as string)}
+                            disabled={formik.isSubmitting || isLoading}
+                          />
+                        )}
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 12 }}>
+                        <Stack direction="column" spacing={1}>
+                          <Button
+                            fullWidth
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            loading={formik.isSubmitting || isLoading}
+                            disabled={!formik.values.client || !cashRegister || selectedLines.length === 0}>
+                            {textT?.cards?.payment?.btnSubmit}
+                          </Button>
 
-                      {!cashRegister ? (
-                        <Typography variant="caption" color="text.secondary">
-                          {textT?.cards?.totals?.noCashRegisterOpen}
-                        </Typography>
-                      ) : (
-                        !formik.values.client && (
-                          <Typography variant="caption" color="text.secondary">
-                            {textT?.cards?.totals?.noClientSelected}
-                          </Typography>
-                        )
-                      )}
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Stack>
+                          {!cashRegister ? (
+                            <Typography variant="caption" color="text.secondary">
+                              {textT?.cards?.payment?.noCashRegisterOpen}
+                            </Typography>
+                          ) : (
+                            !formik.values.client && (
+                              <Typography variant="caption" color="text.secondary">
+                                {textT?.cards?.payment?.noClientSelected}
+                              </Typography>
+                            )
+                          )}
+                        </Stack>
+                      </Grid>
+                    </Grid>
+                  </Stack>
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
         </Stack>

@@ -109,6 +109,12 @@
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
+  "billing": {
+    "errors": {
+      "save": "Error al guardar la factura, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
   "cash-registers": {
     "errors": {
       "notOpen": "La caja no está abierta",
