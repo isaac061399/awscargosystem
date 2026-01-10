@@ -901,15 +901,15 @@ enum InvoiceType {
 }
 
 enum InvoicePaymentCondition {
- CASH
- CREDIT_6
- CREDIT_8
- CREDIT_16
- CREDIT_25
- CREDIT_30
- CREDIT_45
- CREDIT_60
- CREDIT_90
+  CASH
+  CREDIT_6
+  CREDIT_8
+  CREDIT_16
+  CREDIT_25
+  CREDIT_30
+  CREDIT_45
+  CREDIT_60
+  CREDIT_90
 }
 
 enum ClientStatus {
