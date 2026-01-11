@@ -155,7 +155,7 @@ const Clients = () => {
       field: 'box_number',
       headerName: textT?.table?.box_number?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 100,
       renderCell: (params) =>
         canEdit ? (
           <Link
@@ -168,16 +168,23 @@ const Clients = () => {
         )
     },
     {
+      field: 'office',
+      headerName: textT?.table?.office?.title,
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params: any) => `${params.row.office?.name || ''}`
+    },
+    {
       field: 'full_name',
       headerName: textT?.table?.full_name?.title,
       flex: 1,
-      minWidth: 200
+      minWidth: 250
     },
     {
       field: 'identification',
       headerName: textT?.table?.identification?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 250,
       renderCell: (params: any) =>
         `${labelsT?.identificationType?.[params.row.identification_type]}: ${params.row.identification}`
     },
@@ -185,13 +192,13 @@ const Clients = () => {
       field: 'email',
       headerName: textT?.table?.email?.title,
       flex: 1,
-      minWidth: 200
+      minWidth: 250
     },
     {
       field: 'status',
       headerName: textT?.table?.status?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 100,
       renderCell: (params: any) => {
         const label = labelsT?.clientStatus?.[params.row.status] || 'Unknown';
         const status: keyof typeof statusColors = params.row.status as keyof typeof statusColors;

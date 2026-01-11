@@ -85,9 +85,9 @@ export const POST = withAuthApi(['money-outflows.create'], async (req) => {
 
   try {
     // validate if admin has open cash register
-    const cashRegisterId = await getOpenCashRegister(admin.id);
+    const cashRegister = await getOpenCashRegister(admin.id);
 
-    if (!cashRegisterId) {
+    if (!cashRegister) {
       return NextResponse.json({ valid: false, message: textT?.errors?.noOpenCash }, { status: 400 });
     }
 
@@ -95,7 +95,7 @@ export const POST = withAuthApi(['money-outflows.create'], async (req) => {
       const moneyOutflow = await tx.cusMoneyOutflow.create({
         data: {
           administrator_id: admin.id,
-          cash_register_id: cashRegisterId,
+          cash_register_id: cashRegister.id,
           currency: data.currency,
           amount: parseFloat(data.amount),
           description: data.description,

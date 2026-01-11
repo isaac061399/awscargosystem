@@ -139,7 +139,7 @@
     "export": {
       "id": "ID",
       "office": "Office",
-      "box_number": "Locker Number",
+      "box_number": "Mailbox",
       "full_name": "Name",
       "identification_type": "Identification Type",
       "identification": "Identification",

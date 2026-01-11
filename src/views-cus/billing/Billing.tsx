@@ -501,6 +501,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 <CardContent>
                   <Stack spacing={5}>
                     <ClientField
+                      isBilling
                       inputRef={clientFieldRef}
                       initialOptions={[]}
                       isOptionEqualToValue={(option, v) => option.id === v.id}

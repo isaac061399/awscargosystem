@@ -4,6 +4,7 @@ import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import { requestSearchClients } from '@/helpers/request';
 
 type ClientFieldProps = {
+  isBilling?: boolean;
   inputRef?: React.Ref<any>;
   initialOptions: any[];
   isOptionEqualToValue: (option: any, value: any) => boolean;
@@ -22,6 +23,7 @@ type ClientFieldProps = {
 };
 
 const ClientField = ({
+  isBilling,
   inputRef,
   initialOptions,
   isOptionEqualToValue,
@@ -57,7 +59,7 @@ const ClientField = ({
     timeoutRef.current = setTimeout(async () => {
       setLoading(true);
 
-      const result = await requestSearchClients({ search }, 'es');
+      const result = await requestSearchClients({ search, is_billing: isBilling }, 'es');
 
       setOptions(result.valid ? result.data : []);
 

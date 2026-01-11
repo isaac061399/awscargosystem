@@ -45,7 +45,7 @@
       "cut_number": "Número de corte",
       "office_id": "Recibiendo en",
       "tracking": "Tracking",
-      "box_number": "Número de Casillero",
+      "box_number": "Casillero",
       "weight": "Peso (libras)",
       "shelf": "Estante",
       "row": "Fila"
@@ -53,7 +53,7 @@
     "placeholders": {
       "cut_number": "Ingrese el número de corte",
       "tracking": "Ingrese el tracking",
-      "box_number": "Buscar por número de casillero",
+      "box_number": "Buscar por casillero",
       "weight": "Ingrese el peso",
       "shelf": "Seleccione o ingrese el estante",
       "row": "Seleccione o ingrese la fila"

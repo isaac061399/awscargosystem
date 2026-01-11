@@ -9,7 +9,10 @@
     "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el cliente \"{{ full_name }}\"? Esta acción no se puede deshacer.",
     "table": {
       "box_number": {
-        "title": "Número de Casillero"
+        "title": "Casillero"
+      },
+      "office": {
+        "title": "Oficina"
       },
       "full_name": {
         "title": "Nombre"

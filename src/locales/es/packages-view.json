@@ -11,7 +11,7 @@
     "dateLabel": "Registrado el",
     "clientInfo": {
       "title": "Información del Cliente",
-      "boxNumber": "Número de Casillero",
+      "boxNumber": "Casillero",
       "name": "Nombre",
       "identification": "Identificación",
       "email": "Correo Electrónico",

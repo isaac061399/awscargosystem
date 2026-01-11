@@ -139,7 +139,7 @@
     "export": {
       "id": "ID",
       "office": "Oficina",
-      "box_number": "Número de Casillero",
+      "box_number": "Casillero",
       "full_name": "Nombre",
       "identification_type": "Tipo de Identificación",
       "identification": "Identificación",
@@ -212,7 +212,7 @@
     "export": {
       "id": "ID",
       "client_office": "Oficina del Cliente",
-      "client_box_number": "Número de Casillero del Cliente",
+      "client_box_number": "Casillero del Cliente",
       "client_full_name": "Nombre del Cliente",
       "client_identification": "Identificación del Cliente",
       "client_email": "Correo Electrónico del Cliente",
@@ -245,7 +245,7 @@
     "export": {
       "id": "ID",
       "client_office": "Oficina del Cliente",
-      "client_box_number": "Número de Casillero del Cliente",
+      "client_box_number": "Casillero del Cliente",
       "client_full_name": "Nombre del Cliente",
       "client_identification": "Identificación del Cliente",
       "client_email": "Correo Electrónico del Cliente",
@@ -270,7 +270,7 @@
       "alreadyReceived": "Paquete o pedido ya recibido",
       "packageNotFound": "Paquete no encontrado o ya recibido",
       "orderNotFound": "Pedido no encontrado o ya recibido",
-      "clientNotFound": "Cliente no encontrado con el número de casillero proporcionado",
+      "clientNotFound": "Cliente no encontrado con el casillero proporcionado",
       "save": "Error al guardar la información, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo",
       "general": "Se produjo un error, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo"
     }

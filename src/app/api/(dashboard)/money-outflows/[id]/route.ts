@@ -17,9 +17,9 @@ export const DELETE = withAuthApi(
 
     try {
       // validate if admin has open cash register
-      const cashRegisterId = await getOpenCashRegister(admin.id);
+      const cashRegister = await getOpenCashRegister(admin.id);
 
-      if (!cashRegisterId) {
+      if (!cashRegister) {
         return NextResponse.json({ valid: false, message: textT?.errors?.noOpenCash }, { status: 400 });
       }
 

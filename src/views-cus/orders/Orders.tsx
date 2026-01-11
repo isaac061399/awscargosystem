@@ -168,7 +168,7 @@ const Orders = () => {
       field: 'id',
       headerName: textT?.table?.id?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 100,
       renderCell: (params) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           {canEdit ? (
@@ -187,7 +187,7 @@ const Orders = () => {
       field: 'number',
       headerName: textT?.table?.number?.title,
       flex: 1,
-      minWidth: 150,
+      minWidth: 200,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           <span>{params.row.number}</span>
@@ -210,7 +210,7 @@ const Orders = () => {
       field: 'client',
       headerName: textT?.table?.client?.title,
       flex: 1,
-      minWidth: 300,
+      minWidth: 250,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           <span>
@@ -265,7 +265,7 @@ const Orders = () => {
       field: 'created_at',
       headerName: textT?.table?.created_at?.title,
       flex: 1,
-      minWidth: 150,
+      minWidth: 200,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           {moment(params.row.created_at).format(textT?.table?.created_at?.dateFormat)}
@@ -276,8 +276,6 @@ const Orders = () => {
       field: '',
       type: 'actions',
       headerName: textT?.table?.actions?.title,
-      flex: 1,
-      minWidth: 200,
       headerAlign: 'center',
       renderCell: (params: any) => {
         return (

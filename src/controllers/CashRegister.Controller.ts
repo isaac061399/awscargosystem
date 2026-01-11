@@ -395,7 +395,7 @@ export const getOpenCashRegister = async (adminId: number) => {
       return null;
     }
 
-    return cashRegister.id;
+    return { id: cashRegister.id, office_id: cashRegister.office_id };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     // console.error(`Error: ${e}`);

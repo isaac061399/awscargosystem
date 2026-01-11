@@ -43,7 +43,8 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
         identification: true,
         email: true,
         status: true,
-        created_at: true
+        created_at: true,
+        office: { select: { id: true, name: true } }
       }
     });
 
