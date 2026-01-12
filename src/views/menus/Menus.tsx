@@ -201,8 +201,6 @@ const Menus = () => {
       field: '',
       type: 'actions',
       headerName: textT?.table?.actions?.title,
-      flex: 1,
-      minWidth: 200,
       headerAlign: 'center',
       renderCell: (params: any) => {
         return (
