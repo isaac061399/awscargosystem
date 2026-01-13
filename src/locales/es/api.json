@@ -139,7 +139,7 @@
     "export": {
       "id": "ID",
       "office": "Oficina",
-      "box_number": "Casillero",
+      "mailbox": "Casillero",
       "full_name": "Nombre",
       "identification_type": "Tipo de Identificación",
       "identification": "Identificación",
@@ -212,7 +212,7 @@
     "export": {
       "id": "ID",
       "client_office": "Oficina del Cliente",
-      "client_box_number": "Casillero del Cliente",
+      "client_mailbox": "Casillero del Cliente",
       "client_full_name": "Nombre del Cliente",
       "client_identification": "Identificación del Cliente",
       "client_email": "Correo Electrónico del Cliente",
@@ -245,7 +245,7 @@
     "export": {
       "id": "ID",
       "client_office": "Oficina del Cliente",
-      "client_box_number": "Casillero del Cliente",
+      "client_mailbox": "Casillero del Cliente",
       "client_full_name": "Nombre del Cliente",
       "client_identification": "Identificación del Cliente",
       "client_email": "Correo Electrónico del Cliente",

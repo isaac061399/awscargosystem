@@ -9,6 +9,7 @@ export const getProduct = async (id: number) => {
         code: true,
         name: true,
         cabys: true,
+        currency: true,
         price: true,
         enabled: true
       }

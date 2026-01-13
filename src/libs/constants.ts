@@ -27,7 +27,7 @@ export const currencies: Record<string, { symbol: string; name: string }> = {
 
 export const defaultConfigId = 1;
 
-export const boxNumberPrefix = 'AWS-';
+export const mailboxPrefix = 'AWS-';
 
 export const defaultActivityCode = '00';
 

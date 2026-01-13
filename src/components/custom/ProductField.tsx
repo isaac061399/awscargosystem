@@ -115,7 +115,7 @@ const ProductField = ({
 };
 
 const formatOption = (option: any) => {
-  return `${option.name} (${option.code} - ${formatMoney(option.price, `${currencies.CRC.symbol} `)})`;
+  return `${option.name} (${option.code} - ${formatMoney(option.price, `${currencies[option.currency].symbol} `)})`;
 };
 
 export default ProductField;

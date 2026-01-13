@@ -44,7 +44,7 @@ export const PUT = withAuthApi(['clients.edit'], async (req, { params }: { param
         where: { id: Number(id) },
         data: {
           office_id: data.office_id,
-          // box_number: data.box_number,
+          // mailbox: data.mailbox,
           full_name: data.full_name,
           identification_type: data.identification_type,
           identification,

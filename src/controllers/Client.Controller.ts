@@ -1,4 +1,4 @@
-import { boxNumberPrefix } from '@/libs/constants';
+import { mailboxPrefix } from '@/libs/constants';
 import { prismaRead } from '@libs/prisma';
 
 export const getClient = async (id: number) => {
@@ -8,7 +8,7 @@ export const getClient = async (id: number) => {
       select: {
         id: true,
         office_id: true,
-        box_number: true,
+        mailbox: true,
         full_name: true,
         identification_type: true,
         identification: true,
@@ -77,13 +77,13 @@ export const getClient = async (id: number) => {
   }
 };
 
-export const getBoxNumber = (id: number) => {
-  return `${boxNumberPrefix}${id.toString().padStart(3, '0')}`;
+export const getMailbox = (id: number) => {
+  return `${mailboxPrefix}${id.toString().padStart(3, '0')}`;
 };
 
 export const clientSelectSchema = {
   id: true,
-  box_number: true,
+  mailbox: true,
   full_name: true,
   identification_type: true,
   identification: true,

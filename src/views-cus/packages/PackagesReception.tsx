@@ -134,8 +134,8 @@ const PackageReception = () => {
 
   const trackingFieldRef = useRef<HTMLInputElement>(null);
   const trackingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const boxNumberFieldRef = useRef<HTMLInputElement>(null);
-  const boxNumberTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const mailboxFieldRef = useRef<HTMLInputElement>(null);
+  const mailboxTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const weightFieldRef = useRef<HTMLInputElement>(null);
   const weightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -150,7 +150,7 @@ const PackageReception = () => {
         tracking: '',
         package_id: '',
         order_id: '',
-        box_number: '',
+        mailbox: '',
         client: null as any,
         weight: '',
         shelf: '',
@@ -196,7 +196,7 @@ const PackageReception = () => {
         // const subtitle = `${textT?.title || 'Package Reception'} - ${officeName}`;
         // const ticketLines: TicketLine[] = [
         //   { label: formT?.labels?.tracking || 'Tracking', value: values.tracking },
-        //   { label: formT?.labels?.box_number || 'Box', value: formik.values.client?.box_number || values.box_number },
+        //   { label: formT?.labels?.mailbox || 'Mailbox', value: formik.values.client?.mailbox || values.mailbox },
         //   { label: formT?.labels?.weight || 'Weight', value: values.weight?.toString() || '' },
         //   {
         //     label: textT?.priceLabel || 'Price',
@@ -238,11 +238,11 @@ const PackageReception = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // focus box number field when showClientFields is true
+  // focus mailbox field when showClientFields is true
   useEffect(() => {
     if (showClientFields) {
       setTimeout(() => {
-        boxNumberFieldRef.current?.focus();
+        mailboxFieldRef.current?.focus();
       }, 0);
     }
   }, [showClientFields]);
@@ -311,17 +311,17 @@ const PackageReception = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.tracking]);
 
-  // box number field change effect
+  // mailbox field change effect
   useEffect(() => {
-    const fetchClientInfo = async (boxNumber: string) => {
+    const fetchClientInfo = async (mailbox: string) => {
       setIsLoading(true);
 
-      const result = await requestPackagesReceptionClient(boxNumber, i18n.language);
+      const result = await requestPackagesReceptionClient(mailbox, i18n.language);
 
       setIsLoading(false);
 
       if (!result.valid || !result.client) {
-        setErrorAlert({ open: true, inputRef: boxNumberFieldRef, message: textT?.clientAlertMessage });
+        setErrorAlert({ open: true, inputRef: mailboxFieldRef, message: textT?.clientAlertMessage });
 
         return;
       }
@@ -331,17 +331,17 @@ const PackageReception = () => {
       setShowAllOtherFields(true);
     };
 
-    if (formik.values.box_number && formik.values.box_number.length > 0) {
-      if (boxNumberTimeoutRef.current) {
-        clearTimeout(boxNumberTimeoutRef.current);
+    if (formik.values.mailbox && formik.values.mailbox.length > 0) {
+      if (mailboxTimeoutRef.current) {
+        clearTimeout(mailboxTimeoutRef.current);
       }
 
-      boxNumberTimeoutRef.current = setTimeout(() => {
-        fetchClientInfo(formik.values.box_number);
+      mailboxTimeoutRef.current = setTimeout(() => {
+        fetchClientInfo(formik.values.mailbox);
       }, 500);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.box_number]);
+  }, [formik.values.mailbox]);
 
   // validate same office for client
   useEffect(() => {
@@ -349,7 +349,7 @@ const PackageReception = () => {
       if (formik.values.client.office.id !== formik.values.office_id) {
         setErrorAlert({
           open: true,
-          inputRef: boxNumberFieldRef.current ? boxNumberFieldRef : trackingFieldRef,
+          inputRef: mailboxFieldRef.current ? mailboxFieldRef : trackingFieldRef,
           message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')
         });
       } else {
@@ -399,10 +399,10 @@ const PackageReception = () => {
     formik.setFieldValue('order_id', '');
     formik.setFieldValue('client', null);
 
-    // show the client fields and focus box number field
+    // show the client fields and focus mailbox field
     setShowClientFields(true);
     setTimeout(() => {
-      boxNumberFieldRef.current?.focus();
+      mailboxFieldRef.current?.focus();
     }, 100);
 
     // hide the rest of the fields
@@ -415,7 +415,7 @@ const PackageReception = () => {
       tracking: '',
       package_id: '',
       order_id: '',
-      box_number: '',
+      mailbox: '',
       client: null,
       weight: ''
     });
@@ -578,21 +578,19 @@ const PackageReception = () => {
                         <>
                           <Grid size={{ xs: 12, md: 3 }}>
                             <TextField
-                              inputRef={boxNumberFieldRef}
+                              inputRef={mailboxFieldRef}
                               fullWidth
                               required
                               type="text"
-                              id="box_number"
-                              name="box_number"
-                              label={formT?.labels?.box_number}
-                              placeholder={formT?.placeholders?.box_number}
-                              value={formik.values.box_number}
+                              id="mailbox"
+                              name="mailbox"
+                              label={formT?.labels?.mailbox}
+                              placeholder={formT?.placeholders?.mailbox}
+                              value={formik.values.mailbox}
                               onChange={formik.handleChange}
-                              error={Boolean(formik.touched.box_number && formik.errors.box_number)}
-                              color={
-                                Boolean(formik.touched.box_number && formik.errors.box_number) ? 'error' : 'primary'
-                              }
-                              helperText={formik.touched.box_number && (formik.errors.box_number as string)}
+                              error={Boolean(formik.touched.mailbox && formik.errors.mailbox)}
+                              color={Boolean(formik.touched.mailbox && formik.errors.mailbox) ? 'error' : 'primary'}
+                              helperText={formik.touched.mailbox && (formik.errors.mailbox as string)}
                               disabled={formik.isSubmitting || isLoading}
                               slotProps={{
                                 input: {
@@ -619,7 +617,7 @@ const PackageReception = () => {
 
                               {formik.values.client && (
                                 <Chip
-                                  label={`${textT?.clientCard?.boxNumber} ${formik.values.client?.box_number} - ${formik.values.client?.office?.name}`}
+                                  label={`${textT?.clientCard?.mailbox} ${formik.values.client?.mailbox} - ${formik.values.client?.office?.name}`}
                                   color="primary"
                                   size="small"
                                 />
@@ -802,7 +800,7 @@ const PackageReception = () => {
                     <Radio checked={selectorState.selected.package_id === p.id} tabIndex={-1} disableRipple />
                     <ListItemText
                       primary={
-                        <Typography variant="h5">{`${p.client.box_number} - ${p.client.full_name} - ${p.client.office.name}`}</Typography>
+                        <Typography variant="h5">{`${p.client.mailbox} - ${p.client.full_name} - ${p.client.office.name}`}</Typography>
                       }
                     />
                   </ListItemButton>
@@ -836,7 +834,7 @@ const PackageReception = () => {
                     <Radio checked={selectorState.selected.order_id === o.id} tabIndex={-1} disableRipple />
                     <ListItemText
                       primary={
-                        <Typography variant="h5">{`${o.client.box_number} - ${o.client.full_name} - ${o.client.office.name}`}</Typography>
+                        <Typography variant="h5">{`${o.client.mailbox} - ${o.client.full_name} - ${o.client.office.name}`}</Typography>
                       }
                       secondary={
                         <Typography variant="body1">{`# ${padStartZeros(o.id, 4)} - ${o.products.length} ${textT?.selectorDialog?.productsLabel}`}</Typography>

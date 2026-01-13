@@ -34,6 +34,7 @@ export const GET = withAuthApi(['products.list'], async (req) => {
         code: true,
         name: true,
         cabys: true,
+        currency: true,
         price: true,
         enabled: true
       }
@@ -78,6 +79,7 @@ export const POST = withAuthApi(['products.create'], async (req) => {
           code: data.code,
           name: data.name,
           cabys: data.cabys,
+          currency: data.currency,
           price: parseFloat(data.price),
           enabled: data.enabled
         }

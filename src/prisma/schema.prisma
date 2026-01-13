@@ -539,7 +539,7 @@ model CusCashRegisterLine {
 model CusClient {
   id                          Int                @id @default(autoincrement())
   office_id                   Int
-  box_number                  String?            @unique
+  mailbox                     String?            @unique
   full_name                   String
   identification_type         IdentificationType
   identification              String
@@ -854,6 +854,7 @@ model CusProduct {
   code       String   @unique
   name       String
   cabys      String
+  currency   Currency @default(CRC)
   price      Float
   enabled    Boolean  @default(true)
   created_at DateTime @default(now())

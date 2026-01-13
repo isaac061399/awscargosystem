@@ -27,7 +27,7 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
       where['OR'] = [
         { number: { contains: search, mode: 'insensitive' } },
         { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { box_number: { contains: search, mode: 'insensitive' } } },
+        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
         { client: { identification: { contains: search, mode: 'insensitive' } } },
         { client: { email: { contains: search, mode: 'insensitive' } } }
       ];
@@ -107,7 +107,7 @@ const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
         return {
           [headers.id]: padStartZeros(o.id, 4),
           [headers.client_office]: o.client?.office?.name || '',
-          [headers.client_box_number]: o.client?.box_number || '',
+          [headers.client_mailbox]: o.client?.mailbox || '',
           [headers.client_full_name]: o.client?.full_name || '',
           [headers.client_identification]: o.client?.identification || '',
           [headers.client_email]: o.client?.email || '',

@@ -61,12 +61,13 @@ function lineTotal(quantity: number, unit_price: number) {
 const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
+  const buyingExchangeRate = configuration?.buying_exchange_rate ?? 0;
   const ivaPercentage = configuration?.iva_percentage ?? 0;
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('billing:text', { returnObjects: true, default: {} }), [t]);
   const formT: any = useMemo(() => t('billing:form', { returnObjects: true, default: {} }), [t]);
-  const formCustomLineT: any = useMemo(() => t('billing:formCustomLine', { returnObjects: true, default: {} }), [t]);
+  // const formCustomLineT: any = useMemo(() => t('billing:formCustomLine', { returnObjects: true, default: {} }), [t]);
   const formProductT: any = useMemo(() => t('billing:formProduct', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
   const dgLocale = i18n.language === 'en' ? enUS : esES;
@@ -76,15 +77,17 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const [billableLines, setBillableLines] = useState<any[]>([]);
   const [billableLinesSelected, setBillableLinesSelected] = useState<any[]>([]);
   const [selectedLines, setSelectedLines] = useState<BillingLine[]>([]);
-  const [totals, setTotals] = useState<any>(calculateBillingTotal(selectedLines, sellingExchangeRate, ivaPercentage));
+  const [totals, setTotals] = useState<any>(
+    calculateBillingTotal(selectedLines, sellingExchangeRate, buyingExchangeRate, ivaPercentage)
+  );
 
   // Billing lines dialogs
-  const [customOpen, setCustomOpen] = useState(false);
+  // const [customOpen, setCustomOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
 
   const clientFieldRef = useRef<HTMLInputElement>(null);
   const productFieldRef = useRef<HTMLInputElement>(null);
-  const customLineCodeFieldRef = useRef<HTMLInputElement>(null);
+  // const customLineCodeFieldRef = useRef<HTMLInputElement>(null);
 
   const formik = useFormik({
     validateOnChange: false,
@@ -166,64 +169,64 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }
   });
 
-  const formikCustomLine = useFormik({
-    validateOnChange: false,
-    validateOnBlur: false,
-    enableReinitialize: true,
-    initialValues: useMemo(
-      () => ({
-        code: '',
-        description: '',
-        quantity: 1,
-        currency: Currency.CRC,
-        unit_price: 0
-      }),
-      []
-    ),
-    validationSchema: yup.object({
-      code: yup.string().required(formCustomLineT?.errors?.code),
-      description: yup.string().required(formCustomLineT?.errors?.description),
-      quantity: yup
-        .number()
-        .integer(formCustomLineT?.errors?.quantityInteger)
-        .required(formCustomLineT?.errors?.quantity)
-        .min(1, formCustomLineT?.errors?.quantityMinimum),
-      currency: yup.string().required(formCustomLineT?.errors?.currency),
-      unit_price: yup.number().required(formCustomLineT?.errors?.unit_price)
-    }),
-    onSubmit: async (values) => {
-      setAlertState({ ...defaultAlertState });
+  // const formikCustomLine = useFormik({
+  //   validateOnChange: false,
+  //   validateOnBlur: false,
+  //   enableReinitialize: true,
+  //   initialValues: useMemo(
+  //     () => ({
+  //       code: '',
+  //       description: '',
+  //       quantity: 1,
+  //       currency: Currency.CRC,
+  //       unit_price: 0
+  //     }),
+  //     []
+  //   ),
+  //   validationSchema: yup.object({
+  //     code: yup.string().required(formCustomLineT?.errors?.code),
+  //     description: yup.string().required(formCustomLineT?.errors?.description),
+  //     quantity: yup
+  //       .number()
+  //       .integer(formCustomLineT?.errors?.quantityInteger)
+  //       .required(formCustomLineT?.errors?.quantity)
+  //       .min(1, formCustomLineT?.errors?.quantityMinimum),
+  //     currency: yup.string().required(formCustomLineT?.errors?.currency),
+  //     unit_price: yup.number().required(formCustomLineT?.errors?.unit_price)
+  //   }),
+  //   onSubmit: async (values) => {
+  //     setAlertState({ ...defaultAlertState });
 
-      try {
-        const line: BillingLine = {
-          id: `custom-${Date.now()}`,
-          type: 'custom',
-          refObj: null,
-          ref: values.code,
-          description: values.description,
-          quantity: values.quantity,
-          unit_price: values.unit_price,
-          currency: values.currency,
-          total: lineTotal(values.quantity, values.unit_price)
-        };
-        setSelectedLines((prev) => [...prev, line]);
+  //     try {
+  //       const line: BillingLine = {
+  //         id: `custom-${Date.now()}`,
+  //         type: 'custom',
+  //         refObj: null,
+  //         ref: values.code,
+  //         description: values.description,
+  //         quantity: values.quantity,
+  //         unit_price: values.unit_price,
+  //         currency: values.currency,
+  //         total: lineTotal(values.quantity, values.unit_price)
+  //       };
+  //       setSelectedLines((prev) => [...prev, line]);
 
-        setCustomOpen(false);
-        setTimeout(() => {
-          formikCustomLine.resetForm();
-        }, 500);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        // console.error(error);
-        setAlertState({ open: true, type: 'error', message: formCustomLineT?.errorMessage });
-        setTimeout(() => {
-          setAlertState({ ...defaultAlertState });
-        }, 5000);
+  //       setCustomOpen(false);
+  //       setTimeout(() => {
+  //         formikCustomLine.resetForm();
+  //       }, 500);
+  //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //     } catch (error) {
+  //       // console.error(error);
+  //       setAlertState({ open: true, type: 'error', message: formCustomLineT?.errorMessage });
+  //       setTimeout(() => {
+  //         setAlertState({ ...defaultAlertState });
+  //       }, 5000);
 
-        return;
-      }
-    }
-  });
+  //       return;
+  //     }
+  //   }
+  // });
 
   const formikProduct = useFormik({
     validateOnChange: false,
@@ -256,7 +259,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
           description: values.product.name,
           quantity: values.quantity,
           unit_price: values.product.price,
-          currency: Currency.CRC,
+          currency: values.product.currency,
           total: lineTotal(values.quantity, values.product.price)
         };
         setSelectedLines((prev) => [...prev, line]);
@@ -288,13 +291,13 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   }, []);
 
   // focus custom line code field when custom line dialog opens
-  useEffect(() => {
-    if (customOpen) {
-      setTimeout(() => {
-        customLineCodeFieldRef.current?.focus();
-      }, 0);
-    }
-  }, [customOpen]);
+  // useEffect(() => {
+  //   if (customOpen) {
+  //     setTimeout(() => {
+  //       customLineCodeFieldRef.current?.focus();
+  //     }, 0);
+  //   }
+  // }, [customOpen]);
 
   // focus product field when product dialog opens
   useEffect(() => {
@@ -351,9 +354,9 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
   // update totals when selectedLines changes
   useEffect(() => {
-    const result = calculateBillingTotal(selectedLines, sellingExchangeRate, ivaPercentage);
+    const result = calculateBillingTotal(selectedLines, sellingExchangeRate, buyingExchangeRate, ivaPercentage);
     setTotals(result);
-  }, [selectedLines, sellingExchangeRate, ivaPercentage]);
+  }, [selectedLines, sellingExchangeRate, buyingExchangeRate, ivaPercentage]);
 
   const removeSelectedLine = (id: string) => {
     // If it’s a base billable line, unselect it from ToBill
@@ -367,10 +370,10 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     setSelectedLines((prev) => prev.filter((x) => x.id !== id));
   };
 
-  const openCustomLineDialog = () => {
-    formikCustomLine.resetForm();
-    setCustomOpen(true);
-  };
+  // const openCustomLineDialog = () => {
+  //   formikCustomLine.resetForm();
+  //   setCustomOpen(true);
+  // };
 
   const openProductDialog = () => {
     formikProduct.resetForm();
@@ -464,8 +467,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }
   ];
 
-  console.log(formik.errors);
-
   return (
     <DashboardLayout>
       <form noValidate onSubmit={formik.handleSubmit}>
@@ -531,7 +532,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                       <Alert severity="success">
                         {textT?.cards?.client?.clientSelected}
                         <b>
-                          {formik.values.client.full_name} - {formik.values.client.box_number}
+                          {formik.values.client.full_name} - {formik.values.client.mailbox}
                         </b>
                         <br />
                         <Link href={`/clients/edit/${formik.values.client.id}`} target="_blank" className="underline">
@@ -651,10 +652,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                     <Button
                       variant="contained"
                       startIcon={<i className="ri-add-large-line" />}
-                      onClick={openCustomLineDialog}>
-                      {textT?.cards?.selectedLines?.btnAddCustomLines}
-                    </Button>
-                    <Button variant="outlined" startIcon={<i className="ri-list-view" />} onClick={openProductDialog}>
+                      onClick={openProductDialog}>
                       {textT?.cards?.selectedLines?.btnAddProduct}
                     </Button>
                   </Stack>
@@ -880,7 +878,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       </form>
 
       {/* Custom line dialog */}
-      <Dialog
+      {/* <Dialog
         open={customOpen}
         onClose={() => setCustomOpen(false)}
         aria-labelledby="dialog-custom-line-title"
@@ -996,7 +994,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             </Button>
           </DialogActions>
         </form>
-      </Dialog>
+      </Dialog> */}
 
       {/* Product dialog */}
       <Dialog

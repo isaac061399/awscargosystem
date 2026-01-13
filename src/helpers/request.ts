@@ -1585,11 +1585,11 @@ export const requestPackagesReceptionTracking = async (tracking: string, lang: s
   }
 };
 
-export const requestPackagesReceptionClient = async (boxNumber: string, lang: string) => {
+export const requestPackagesReceptionClient = async (mailbox: string, lang: string) => {
   try {
     const response = await axios.request({
       method: 'get',
-      url: `/api/packages/reception/client/${boxNumber}`,
+      url: `/api/packages/reception/client/${mailbox}`,
       headers: { ...defaultHeaders, 'Accept-Language': lang }
     });
 

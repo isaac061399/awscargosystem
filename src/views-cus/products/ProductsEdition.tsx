@@ -31,6 +31,7 @@ import {
 // Component Imports
 import DashboardLayout from '@components/layout/DashboardLayout';
 import MoneyField from '@/components/MoneyField';
+import Select from '@/components/Select';
 
 // Helpers Imports
 import { requestEditProduct, requestNewProduct } from '@helpers/request';
@@ -44,6 +45,7 @@ const ProductsEdition = ({ product }: { product?: any }) => {
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('products-edition:text', { returnObjects: true, default: {} }), [t]);
   const formT: any = useMemo(() => t('products-edition:form', { returnObjects: true, default: {} }), [t]);
+  const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
@@ -53,18 +55,20 @@ const ProductsEdition = ({ product }: { product?: any }) => {
     validateOnBlur: false,
     initialValues: useMemo(
       () => ({
-        code: product ? `${product.code}` : '',
-        name: product ? `${product.name}` : '',
-        cabys: product ? `${product.cabys}` : '',
-        price: product ? `${product.price}` : '',
+        code: product ? product.code : '',
+        name: product ? product.name : '',
+        cabys: product ? product.cabys : '',
+        currency: product ? product.currency : Object.keys(labelsT?.currency)[0] || '',
+        price: product ? product.price : '',
         enabled: product ? product.enabled : true
       }),
-      [product]
+      [product, labelsT]
     ),
     validationSchema: yup.object({
       code: yup.string().required(formT?.errors?.code),
       name: yup.string().required(formT?.errors?.name),
       cabys: yup.string().required(formT?.errors?.cabys),
+      currency: yup.string().required(formT?.errors?.currency),
       price: yup.number().typeError(formT?.errors?.invalidAmount).required(formT?.errors?.price),
       enabled: yup.boolean()
     }),
@@ -144,7 +148,7 @@ const ProductsEdition = ({ product }: { product?: any }) => {
                       onChange={formik.handleChange}
                       error={Boolean(formik.touched.code && formik.errors.code)}
                       color={Boolean(formik.touched.code && formik.errors.code) ? 'error' : 'primary'}
-                      helperText={formik.touched.code && formik.errors.code}
+                      helperText={formik.touched.code && (formik.errors.code as string)}
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
@@ -161,7 +165,7 @@ const ProductsEdition = ({ product }: { product?: any }) => {
                       onChange={formik.handleChange}
                       error={Boolean(formik.touched.name && formik.errors.name)}
                       color={Boolean(formik.touched.name && formik.errors.name) ? 'error' : 'primary'}
-                      helperText={formik.touched.name && formik.errors.name}
+                      helperText={formik.touched.name && (formik.errors.name as string)}
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
@@ -178,7 +182,27 @@ const ProductsEdition = ({ product }: { product?: any }) => {
                       onChange={formik.handleChange}
                       error={Boolean(formik.touched.cabys && formik.errors.cabys)}
                       color={Boolean(formik.touched.cabys && formik.errors.cabys) ? 'error' : 'primary'}
-                      helperText={formik.touched.cabys && formik.errors.cabys}
+                      helperText={formik.touched.cabys && (formik.errors.cabys as string)}
+                      disabled={formik.isSubmitting || isRedirecting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <Select
+                      options={Object.keys(labelsT?.currency).map((value) => ({
+                        value,
+                        label: labelsT?.currency[value]
+                      }))}
+                      fullWidth
+                      required
+                      id="currency"
+                      name="currency"
+                      label={formT?.labels?.currency}
+                      placeholder={formT?.placeholders?.currency}
+                      value={formik.values.currency}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.currency && formik.errors.currency)}
+                      color={Boolean(formik.touched.currency && formik.errors.currency) ? 'error' : 'primary'}
+                      helperText={formik.touched.currency && (formik.errors.currency as string)}
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
@@ -190,7 +214,7 @@ const ProductsEdition = ({ product }: { product?: any }) => {
                       decimalScale={2}
                       decimalSeparator="."
                       thousandSeparator=","
-                      prefix={`${currencies.CRC.symbol} `}
+                      prefix={`${currencies[formik.values.currency]?.symbol || ''} `}
                       id="price"
                       name="price"
                       label={formT?.labels?.price}

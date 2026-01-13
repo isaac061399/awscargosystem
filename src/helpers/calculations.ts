@@ -98,23 +98,33 @@ export const calculateTaxes = (amount: number, taxPercentage: number) => {
   }
 };
 
-export const calculateBillingTotal = (lines: BillingLine[], conversionRate: number, taxPercentage: number) => {
+export const calculateBillingTotal = (
+  lines: BillingLine[],
+  sellingConversionRate: number,
+  buyingConversionRate: number,
+  taxPercentage: number
+) => {
   let amountCRC = 0;
   let amountUSD = 0;
 
   try {
+    // calculate subtotals
     lines.forEach((line) => {
       if (line.currency === Currency.CRC) {
         amountCRC += line.total;
-        amountUSD += convertUSD(line.total, conversionRate);
+        amountUSD += convertUSD(line.total, buyingConversionRate);
       } else if (line.currency === Currency.USD) {
         amountUSD += line.total;
-        amountCRC += convertCRC(line.total, conversionRate);
+        amountCRC += convertCRC(line.total, sellingConversionRate);
       }
     });
 
+    // calculate taxes and totals
     const totalsCRC = calculateTaxes(amountCRC, taxPercentage);
     const totalsUSD = calculateTaxes(amountUSD, taxPercentage);
+
+    // round CRC totals
+    totalsCRC.total = roundCRC(totalsCRC.total);
 
     return {
       [Currency.CRC]: totalsCRC,

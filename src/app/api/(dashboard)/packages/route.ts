@@ -23,7 +23,7 @@ export const GET = withAuthApi(['packages.list'], async (req) => {
       where['OR'] = [
         { tracking: { contains: search, mode: 'insensitive' } },
         { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { box_number: { contains: search, mode: 'insensitive' } } },
+        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
         { client: { identification: { contains: search, mode: 'insensitive' } } },
         { client: { email: { contains: search, mode: 'insensitive' } } }
       ];

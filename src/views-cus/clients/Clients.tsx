@@ -152,8 +152,8 @@ const Clients = () => {
   // data
   const columns: GridColDef[] = [
     {
-      field: 'box_number',
-      headerName: textT?.table?.box_number?.title,
+      field: 'mailbox',
+      headerName: textT?.table?.mailbox?.title,
       flex: 1,
       minWidth: 100,
       renderCell: (params) =>
@@ -161,10 +161,10 @@ const Clients = () => {
           <Link
             href={`/clients/edit/${params.row.id}`}
             className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-            {params.row.box_number}
+            {params.row.mailbox}
           </Link>
         ) : (
-          params.row.box_number
+          params.row.mailbox
         )
     },
     {

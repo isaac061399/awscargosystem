@@ -9,6 +9,7 @@
       "code": "Código",
       "name": "Nombre",
       "cabys": "CAByS",
+      "currency": "Moneda",
       "price": "Precio",
       "enabled": "Activo"
     },
@@ -16,6 +17,7 @@
       "code": "Ingrese un código",
       "name": "Ingrese un nombre",
       "cabys": "Ingrese el CAByS",
+      "currency": "Seleccione la moneda",
       "price": "Ingrese el precio",
       "enabled": ""
     },
@@ -23,6 +25,7 @@
       "code": "El código es requerido",
       "name": "El nombre es requerido",
       "cabys": "El CAByS es requerido",
+      "currency": "La moneda es requerida",
       "price": "El precio es requerido",
       "enabled": "",
       "invalidAmount": "El monto ingresado no es válido"

@@ -31,6 +31,7 @@ export const PUT = withAuthApi(['products.edit'], async (req, { params }: { para
           code: data.code,
           name: data.name,
           cabys: data.cabys,
+          currency: data.currency,
           price: parseFloat(data.price),
           enabled: data.enabled
         }

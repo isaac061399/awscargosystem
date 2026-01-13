@@ -139,7 +139,7 @@
     "export": {
       "id": "ID",
       "office": "Office",
-      "box_number": "Mailbox",
+      "mailbox": "Mailbox",
       "full_name": "Name",
       "identification_type": "Identification Type",
       "identification": "Identification",
@@ -212,7 +212,7 @@
     "export": {
       "id": "ID",
       "client_office": "Client Office",
-      "client_box_number": "Client Locker Number",
+      "client_mailbox": "Client Locker Number",
       "client_full_name": "Client Name",
       "client_identification": "Client Identification",
       "client_email": "Client Email",
@@ -245,7 +245,7 @@
     "export": {
       "id": "ID",
       "client_office": "Client Office",
-      "client_box_number": "Client Locker Number",
+      "client_mailbox": "Client Locker Number",
       "client_full_name": "Client Name",
       "client_identification": "Client Identification",
       "client_email": "Client Email",
@@ -270,7 +270,7 @@
       "alreadyReceived": "Package or order already received",
       "packageNotFound": "Package not found or already received",
       "orderNotFound": "Order not found or already received",
-      "clientNotFound": "Client not found with the provided box number",
+      "clientNotFound": "Client not found with the provided mailbox",
       "save": "Error saving the information, it is possible that the package has already been received, please try again",
       "general": "An error occurred, it is possible that the package has already been received, please try again"
     }

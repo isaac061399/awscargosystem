@@ -39,7 +39,7 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
       select: {
         id: true,
         office_id: true,
-        box_number: true,
+        mailbox: true,
         full_name: true,
         identification_type: true,
         identification: true,
@@ -126,7 +126,7 @@ const formatEntries = async (headers: any, labelsT: any, clients: any[]) => {
       return {
         [headers.id]: c.id,
         [headers.office]: c.office.name,
-        [headers.box_number]: c.box_number,
+        [headers.mailbox]: c.mailbox,
         [headers.full_name]: c.full_name,
         [headers.identification_type]: labelsT?.identificationType[c.identification_type],
         [headers.identification]: c.identification,

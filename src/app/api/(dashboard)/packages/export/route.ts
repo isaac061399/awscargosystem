@@ -26,7 +26,7 @@ export const GET = withAuthApi(['packages.list'], async (req) => {
       where['OR'] = [
         { number: { contains: search, mode: 'insensitive' } },
         { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { box_number: { contains: search, mode: 'insensitive' } } },
+        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
         { client: { identification: { contains: search, mode: 'insensitive' } } },
         { client: { email: { contains: search, mode: 'insensitive' } } }
       ];
@@ -99,7 +99,7 @@ const formatEntries = async (headers: any, labelsT: any, packages: any[]) => {
       return {
         [headers.id]: p.id,
         [headers.client_office]: p.client?.office?.name || '',
-        [headers.client_box_number]: p.client?.box_number || '',
+        [headers.client_mailbox]: p.client?.mailbox || '',
         [headers.client_full_name]: p.client?.full_name || '',
         [headers.client_identification]: p.client?.identification || '',
         [headers.client_email]: p.client?.email || '',

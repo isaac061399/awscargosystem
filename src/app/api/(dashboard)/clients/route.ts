@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
-import { getBoxNumber } from '@/controllers/Client.Controller';
+import { getMailbox } from '@/controllers/Client.Controller';
 
 export const GET = withAuthApi(['clients.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -37,7 +37,7 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
       orderBy: [{ id: 'desc' }],
       select: {
         id: true,
-        box_number: true,
+        mailbox: true,
         full_name: true,
         identification_type: true,
         identification: true,
@@ -112,7 +112,7 @@ export const POST = withAuthApi(['clients.create'], async (req) => {
       const client = await tx.cusClient.create({
         data: {
           office_id: data.office_id,
-          // box_number: data.box_number,
+          // mailbox: data.mailbox,
           full_name: data.full_name,
           identification_type: data.identification_type,
           identification,
@@ -139,11 +139,11 @@ export const POST = withAuthApi(['clients.create'], async (req) => {
         throw new TransactionError(400, textT?.errors?.save);
       }
 
-      const boxNumber = getBoxNumber(client.id);
+      const mailbox = getMailbox(client.id);
 
       await tx.cusClient.update({
         where: { id: client.id },
-        data: { box_number: boxNumber }
+        data: { mailbox: mailbox }
       });
 
       return client;

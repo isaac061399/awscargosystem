@@ -33,7 +33,7 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
 
     if (search !== '') {
       where['OR'] = [
-        { box_number: { contains: search.trim(), mode: 'insensitive' } },
+        { mailbox: { contains: search.trim(), mode: 'insensitive' } },
         { full_name: { contains: search.trim(), mode: 'insensitive' } },
         { identification: { contains: search.trim(), mode: 'insensitive' } },
         { email: { contains: search.trim(), mode: 'insensitive' } }

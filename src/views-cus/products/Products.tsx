@@ -166,7 +166,7 @@ const Products = () => {
       headerName: textT?.table?.price?.title,
       flex: 1,
       minWidth: 200,
-      valueFormatter: (value) => formatMoney(value, `${currencies.CRC.symbol} `)
+      valueFormatter: (value, row) => formatMoney(value, `${currencies[row.currency]?.symbol || ''} `)
     },
     {
       field: 'enabled',

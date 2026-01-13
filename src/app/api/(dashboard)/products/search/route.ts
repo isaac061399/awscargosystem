@@ -32,6 +32,7 @@ export const GET = withAuthApi(['products.list'], async (req) => {
         id: true,
         code: true,
         name: true,
+        currency: true,
         price: true
       }
     });
