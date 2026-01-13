@@ -53,7 +53,7 @@ import { useConfig } from '@/components/ConfigProvider';
 
 import { currencies, sellersPages } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
-import { convertCRC, getOrderTotal } from '@/helpers/calculations';
+import { getOrderTotal } from '@/helpers/calculations';
 import { OrderStatus, PaymentStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
@@ -206,11 +206,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
   // const isReady = order ? order.status === ('READY' as OrderStatus) : false;
   // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
 
-  const orderTotal = getOrderTotal(formik.values.products, ivaPercentage);
-  const orderTotalCRC = {
-    subtotal: convertCRC(orderTotal.subtotal, sellingExchangeRate),
-    total: convertCRC(orderTotal.total, sellingExchangeRate)
-  };
+  const orderTotal = getOrderTotal(formik.values.products, sellingExchangeRate, ivaPercentage);
   const paymentStatusChip: any = { label: '', color: 'info' };
   const statusChip: any = { label: '', color: 'info' };
 
@@ -264,9 +260,9 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                           {textT?.subtotalLabel}:
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(orderTotal.subtotal, `${currencies.USD.symbol} `)}
+                          {formatMoney(orderTotal.usd.subtotal, `${currencies.USD.symbol} `)}
                           {' | '}
-                          {formatMoney(orderTotalCRC.subtotal, `${currencies.CRC.symbol} `)}
+                          {formatMoney(orderTotal.crc.subtotal, `${currencies.CRC.symbol} `)}
                         </Typography>
                       </div>
                       <div className="flex items-center gap-1">
@@ -274,9 +270,9 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                           {textT?.totalLabel}:
                         </Typography>
                         <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(orderTotal.total, `${currencies.USD.symbol} `)}
+                          {formatMoney(orderTotal.usd.total, `${currencies.USD.symbol} `)}
                           {' | '}
-                          {formatMoney(orderTotalCRC.total, `${currencies.CRC.symbol} `)}
+                          {formatMoney(orderTotal.crc.total, `${currencies.CRC.symbol} `)}
                         </Typography>
                       </div>
                     </Stack>
@@ -404,6 +400,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                       isLoading={isRedirecting}
                       isEditing={isEditing}
                       language={i18n.language}
+                      orderTotal={orderTotal}
                     />
                   </Grid>
                 </Grid>
@@ -450,7 +447,8 @@ const ProductsAccordionComponent = ({
   labelsT,
   isLoading,
   isEditing,
-  language
+  language,
+  orderTotal
 }: {
   formik: any;
   textT: any;
@@ -459,6 +457,10 @@ const ProductsAccordionComponent = ({
   isLoading: boolean;
   isEditing: boolean;
   language: string;
+  orderTotal: {
+    usd: { subtotal: number; total: number; items: { subtotal: number; total: number }[] };
+    crc: { subtotal: number; total: number; items: { subtotal: number; total: number }[] };
+  };
 }) => {
   const [expanded, setExpanded] = useState<string | false>(false);
   const [deleteState, setDeleteState] = useState({ open: false, loading: false, index: null, id: null, name: '' });
@@ -561,28 +563,48 @@ const ProductsAccordionComponent = ({
                     flexDirection: 'row-reverse',
                     color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
                   }}>
-                  <div className="flex items-center w-full justify-between">
-                    <div className="flex items-center gap-1">
-                      <Typography component="span">
-                        {item.name}
-                        {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
-                      </Typography>
-                      {statusChip && (
-                        <Chip
-                          variant="outlined"
-                          label={`${textT?.statusLabel}: ${statusChip.label}`}
-                          color={statusChip.color}
-                          size="small"
-                        />
-                      )}
-                      {paymentStatusChip && (
-                        <Chip
-                          variant="outlined"
-                          label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
-                          color={paymentStatusChip.color}
-                          size="small"
-                        />
-                      )}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-5">
+                        <Typography component="span">
+                          {item.name}
+                          {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
+                        </Typography>
+                        {statusChip && (
+                          <Chip
+                            variant="outlined"
+                            label={`${textT?.statusLabel}: ${statusChip.label}`}
+                            color={statusChip.color}
+                            size="small"
+                          />
+                        )}
+                        {paymentStatusChip && (
+                          <Chip
+                            variant="outlined"
+                            label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
+                            color={paymentStatusChip.color}
+                            size="small"
+                          />
+                        )}
+                      </div>
+                      <div className="flex items-center gap-5">
+                        <div className="flex items-center gap-1">
+                          <Typography variant="body2">{textT?.subtotalLabel}:</Typography>
+                          <Typography variant="body2">
+                            {formatMoney(orderTotal.usd.items[index].subtotal, `${currencies.USD.symbol} `)}
+                            {' | '}
+                            {formatMoney(orderTotal.crc.items[index].subtotal, `${currencies.CRC.symbol} `)}
+                          </Typography>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Typography variant="body2">{textT?.totalLabel}:</Typography>
+                          <Typography variant="body2">
+                            {formatMoney(orderTotal.usd.items[index].total, `${currencies.USD.symbol} `)}
+                            {' | '}
+                            {formatMoney(orderTotal.crc.items[index].total, `${currencies.CRC.symbol} `)}
+                          </Typography>
+                        </div>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <IconButton

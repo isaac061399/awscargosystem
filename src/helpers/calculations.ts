@@ -27,17 +27,29 @@ export const getOrderProductPrice = (product: any) => {
   }
 };
 
-export const getOrderTotal = (products: any[], iva: number) => {
-  const result = { subtotal: 0, total: 0 };
+export const getOrderTotal = (products: any[], conversionRate: number, taxPercentage: number) => {
+  const result = {
+    usd: { subtotal: 0, total: 0, items: [] as { subtotal: number; total: number }[] },
+    crc: { subtotal: 0, total: 0, items: [] as { subtotal: number; total: number }[] }
+  };
 
   try {
     products.forEach((product: any) => {
       const price = getOrderProductPrice(product);
+      const priceTotal = parseFloat((price + price * (taxPercentage / 100)).toFixed(2));
 
-      result.subtotal += price;
+      result.usd.items.push({ subtotal: price, total: priceTotal });
+      result.usd.subtotal += price;
+
+      const priceCRC = convertCRC(price, conversionRate);
+      const priceTotalCRC = parseFloat((priceCRC + priceCRC * (taxPercentage / 100)).toFixed(2));
+
+      result.crc.items.push({ subtotal: priceCRC, total: priceTotalCRC });
+      result.crc.subtotal += priceCRC;
     });
 
-    result.total = parseFloat((result.subtotal + result.subtotal * (iva / 100)).toFixed(2));
+    result.usd.total = parseFloat((result.usd.subtotal + result.usd.subtotal * (taxPercentage / 100)).toFixed(2));
+    result.crc.total = parseFloat((result.crc.subtotal + result.crc.subtotal * (taxPercentage / 100)).toFixed(2));
 
     return result;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -152,10 +164,8 @@ export const convertUSD = (amount: number, rate: number): number => {
   }
 };
 
-export const roundCRC = (type: 'sell' | 'buy', amount: number): number => {
-  if (type === 'buy') {
-    return Math.floor(amount / 5) * 5;
-  } else {
-    return Math.ceil(amount / 5) * 5;
-  }
+export const roundCRC = (amount: number): number => {
+  const newAmount = Math.round(amount);
+
+  return Math.round(newAmount / 5) * 5;
 };

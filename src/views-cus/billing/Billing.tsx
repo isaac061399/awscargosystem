@@ -44,7 +44,7 @@ import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
 import { requestGetBillingLines } from '@/helpers/request';
-import { currencies } from '@/libs/constants';
+import { bankAccounts, currencies } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
 import { BillingLine, calculateBillingTotal } from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
@@ -98,6 +98,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
         payment_currency: Object.keys(labelsT?.currency)[0] || '',
         payment_method: Object.keys(labelsT?.paymentMethod)[0] || '',
         payment_ref: '',
+        payment_ref_bank: Object.keys(bankAccounts)[0],
         payment_amount: 0
       }),
       [labelsT]
@@ -112,6 +113,11 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
         is: PaymentMethod.CASH,
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.required(formT?.errors?.payment_ref)
+      }),
+      payment_ref_bank: yup.string().when('payment_method', {
+        is: PaymentMethod.TRANSFER,
+        then: (schema) => schema.required(formT?.errors?.payment_ref_bank),
+        otherwise: (schema) => schema.notRequired()
       }),
       payment_amount: yup.number().when('payment_method', {
         is: PaymentMethod.CASH,
@@ -398,14 +404,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       }
     },
     { field: 'tracking', headerName: textT?.billableLinesTable?.tracking?.title, width: 200 },
-    { field: 'description', headerName: textT?.billableLinesTable?.description?.title, flex: 1, minWidth: 250 },
-    {
-      field: 'billing_amount',
-      headerName: textT?.billableLinesTable?.amount?.title,
-      width: 120,
-      valueGetter: (value, row) => formatMoney(row.billing_amount, `${currencies.USD.symbol}`),
-      sortable: false
-    },
     {
       field: 'location_shelf',
       headerName: textT?.billableLinesTable?.location?.title,
@@ -417,7 +415,15 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               .replace('{{ row }}', params.row.location_row)
           : textT?.billableLinesTable?.location?.noLocation,
       sortable: false
-    }
+    },
+    {
+      field: 'billing_amount',
+      headerName: textT?.billableLinesTable?.amount?.title,
+      width: 120,
+      valueGetter: (value, row) => formatMoney(row.billing_amount, `${currencies.USD.symbol}`),
+      sortable: false
+    },
+    { field: 'description', headerName: textT?.billableLinesTable?.description?.title, flex: 1, minWidth: 250 }
   ];
 
   const selectedCols: GridColDef[] = [
@@ -813,6 +819,32 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                           />
                         )}
                       </Grid>
+                      {formik.values.payment_method === PaymentMethod.TRANSFER && (
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <Select
+                            options={Object.keys(bankAccounts).map((value) => ({
+                              value,
+                              label: bankAccounts[value as keyof typeof bankAccounts]
+                            }))}
+                            fullWidth
+                            required
+                            id="payment_ref_bank"
+                            name="payment_ref_bank"
+                            label={formT?.labels?.payment_ref_bank}
+                            placeholder={formT?.placeholders?.payment_ref_bank}
+                            value={formik.values.payment_ref_bank}
+                            onChange={formik.handleChange}
+                            error={Boolean(formik.touched.payment_ref_bank && formik.errors.payment_ref_bank)}
+                            color={
+                              Boolean(formik.touched.payment_ref_bank && formik.errors.payment_ref_bank)
+                                ? 'error'
+                                : 'primary'
+                            }
+                            helperText={formik.touched.payment_ref_bank && (formik.errors.payment_ref_bank as string)}
+                            disabled={formik.isSubmitting || isLoading}
+                          />
+                        </Grid>
+                      )}
                       <Grid size={{ xs: 12, sm: 12 }}>
                         <Stack direction="column" spacing={1}>
                           <Button

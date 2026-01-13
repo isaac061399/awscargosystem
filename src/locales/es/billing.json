@@ -107,6 +107,7 @@
       "payment_method": "Método de pago",
       "payment_currency": "Moneda",
       "payment_ref": "Referencia de pago",
+      "payment_ref_bank": "Cuenta bancaria",
       "payment_amount": "Monto recibido"
     },
     "placeholders": {
@@ -116,6 +117,7 @@
       "payment_method": "Seleccione una opción",
       "payment_currency": "Seleccione una opción",
       "payment_ref": "Ingrese la referencia de pago",
+      "payment_ref_bank": "Seleccione la cuenta bancaria",
       "payment_amount": "Ingrese el monto recibido"
     },
     "errors": {
@@ -125,6 +127,7 @@
       "payment_method": "El método de pago es requerido",
       "payment_currency": "La moneda es requerida",
       "payment_ref": "La referencia de pago es requerida",
+      "payment_ref_bank": "La cuenta bancaria es requerida",
       "payment_amount": "El monto recibido es requerido",
       "payment_amount_min": "El monto recibido debe ser al menos igual al total de la factura"
     },

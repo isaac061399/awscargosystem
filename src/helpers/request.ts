@@ -1333,22 +1333,6 @@ export const requestDeleteMoneyOutflow = async (id: number, lang: string) => {
 
 // offices
 
-export const requestGetOfficesNavbar = async () => {
-  try {
-    const response = await axios.request({
-      method: 'get',
-      url: '/api/offices/navbar',
-      headers: { ...defaultHeaders }
-    });
-
-    return response.data;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e: any) {
-    // console.error(e);
-    return { valid: false };
-  }
-};
-
 export const requestGetOffices = async (params: any, lang: string) => {
   try {
     const response = await axios.request({

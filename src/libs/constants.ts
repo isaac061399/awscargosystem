@@ -31,11 +31,11 @@ export const boxNumberPrefix = 'AWS-';
 
 export const defaultActivityCode = '00';
 
-export const officeCookie = { name: 'office', maxAge: 60 * 60 * 24 * 365 };
-
 export const additionalExchangeRate = 6;
 
 export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein', 'Target'];
+
+export const bankAccounts = { BAC: 'BAC Credomatic', BN: 'Banco Nacional' };
 
 // App Constants
 
