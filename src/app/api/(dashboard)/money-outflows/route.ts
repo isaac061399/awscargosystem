@@ -16,7 +16,7 @@ export const GET = withAuthApi(['money-outflows.list'], async (req) => {
     const where: any = {};
     const search = params.s || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
         { administrator: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
         { administrator: { email: { contains: search.trim(), mode: 'insensitive' } } },

@@ -256,7 +256,7 @@ const Info = ({ provinces, client }: { provinces: any[]; client?: any }) => {
           <div>
             {client && (
               <Typography variant="h4">
-                {textT?.mailboxLabel}: {client.mailbox}
+                {textT?.mailboxLabel}: {`${client.office?.mailbox_prefix}${client.id}`}
               </Typography>
             )}
           </div>

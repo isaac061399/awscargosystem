@@ -152,7 +152,7 @@ const Clients = () => {
   // data
   const columns: GridColDef[] = [
     {
-      field: 'mailbox',
+      field: 'id',
       headerName: textT?.table?.mailbox?.title,
       flex: 1,
       minWidth: 100,
@@ -161,10 +161,10 @@ const Clients = () => {
           <Link
             href={`/clients/edit/${params.row.id}`}
             className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-            {params.row.mailbox}
+            {`${params.row.office?.mailbox_prefix}${params.row.id}`}
           </Link>
         ) : (
-          params.row.mailbox
+          `${params.row.office?.mailbox_prefix}${params.row.id}`
         )
     },
     {

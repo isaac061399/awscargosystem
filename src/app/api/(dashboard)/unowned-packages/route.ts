@@ -15,10 +15,10 @@ export const GET = withAuthApi(['unowned-packages.list'], async (req) => {
     const where: any = { found: false };
     const search = params.s || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { tracking: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
+        { tracking: { contains: search.trim(), mode: 'insensitive' } },
+        { description: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
 

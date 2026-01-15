@@ -10,6 +10,9 @@
       "name": {
         "title": "Nombre"
       },
+      "mailbox_prefix": {
+        "title": "Prefijo de Casillero"
+      },
       "enabled": {
         "title": "Estado",
         "active": "Activa",

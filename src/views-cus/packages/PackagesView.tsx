@@ -249,7 +249,10 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                       <CardHeader title={textT?.clientInfo?.title} />
                       <CardContent>
                         <Stack spacing={1.25}>
-                          <InfoRow label={textT?.clientInfo?.mailbox} value={packageObj.client?.mailbox} />
+                          <InfoRow
+                            label={textT?.clientInfo?.mailbox}
+                            value={`${packageObj.client?.office?.mailbox_prefix}${packageObj.client?.id}`}
+                          />
                           <Divider />
                           <InfoRow label={textT?.clientInfo?.name} value={packageObj.client?.full_name} />
                           <InfoRow

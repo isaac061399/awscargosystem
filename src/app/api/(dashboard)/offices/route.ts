@@ -15,8 +15,11 @@ export const GET = withAuthApi(['offices.list'], async (req) => {
     const where: any = {};
     const search = params.s || '';
 
-    if (search !== '') {
-      where['OR'] = [{ name: { contains: search, mode: 'insensitive' } }];
+    if (search.trim() !== '') {
+      where['OR'] = [
+        { name: { contains: search.trim(), mode: 'insensitive' } },
+        { mailbox_prefix: { contains: search.trim(), mode: 'insensitive' } }
+      ];
     }
 
     // query
@@ -28,6 +31,7 @@ export const GET = withAuthApi(['offices.list'], async (req) => {
       select: {
         id: true,
         name: true,
+        mailbox_prefix: true,
         enabled: true
       }
     });
@@ -57,10 +61,11 @@ export const POST = withAuthApi(['offices.create'], async (req) => {
     const result = await withTransaction(async (tx) => {
       const office = await tx.cusOffice.create({
         data: {
-          name: data?.name,
-          shelves: data?.shelves,
-          rows: data?.rows,
-          enabled: data?.enabled
+          name: data.name,
+          mailbox_prefix: data.mailbox_prefix,
+          shelves: data.shelves,
+          rows: data.rows,
+          enabled: data.enabled
         }
       });
 

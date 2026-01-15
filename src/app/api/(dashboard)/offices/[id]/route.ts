@@ -18,10 +18,11 @@ export const PUT = withAuthApi(['offices.edit'], async (req, { params }: { param
       const office = await tx.cusOffice.update({
         where: { id: Number(id) },
         data: {
-          name: data?.name,
-          shelves: data?.shelves,
-          rows: data?.rows,
-          enabled: data?.enabled
+          name: data.name,
+          mailbox_prefix: data.mailbox_prefix,
+          shelves: data.shelves,
+          rows: data.rows,
+          enabled: data.enabled
         }
       });
 

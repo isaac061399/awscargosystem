@@ -15,11 +15,11 @@ export const GET = withAuthApi(['products.list'], async (req) => {
     const where: any = {};
     const search = params.s || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { code: { contains: search, mode: 'insensitive' } },
-        { name: { contains: search, mode: 'insensitive' } },
-        { cabys: { contains: search, mode: 'insensitive' } }
+        { code: { contains: search.trim(), mode: 'insensitive' } },
+        { name: { contains: search.trim(), mode: 'insensitive' } },
+        { cabys: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
 

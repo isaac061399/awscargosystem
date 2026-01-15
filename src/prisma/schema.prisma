@@ -690,13 +690,14 @@ model CusMoneyOutflowLog {
 }
 
 model CusOffice {
-  id         Int      @id @default(autoincrement())
-  name       String
-  shelves    String?
-  rows       String?
-  enabled    Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  name           String
+  mailbox_prefix String
+  shelves        String?
+  rows           String?
+  enabled        Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   clients          CusClient[]
   administrators   Administrator[]

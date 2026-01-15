@@ -18,8 +18,8 @@ export const GET = withAuthApi(['media.list'], async (req) => {
     const where: any = {};
     const search = params.s || '';
 
-    if (search !== '') {
-      where['OR'] = [{ name: { contains: search, mode: 'insensitive' } }];
+    if (search.trim() !== '') {
+      where['OR'] = [{ name: { contains: search.trim(), mode: 'insensitive' } }];
     }
 
     // query

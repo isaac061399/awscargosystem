@@ -21,10 +21,10 @@ export const GET = withAuthApi(['menus.list'], async (req) => {
       where.locale = locale;
     }
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { slug: { contains: search, mode: 'insensitive' } },
-        { name: { contains: search, mode: 'insensitive' } }
+        { slug: { contains: search.trim(), mode: 'insensitive' } },
+        { name: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
 

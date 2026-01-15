@@ -148,6 +148,12 @@ const Offices = () => {
         )
     },
     {
+      field: 'mailbox_prefix',
+      headerName: textT?.table?.mailbox_prefix?.title,
+      flex: 1,
+      minWidth: 100
+    },
+    {
       field: 'enabled',
       headerName: textT?.table?.enabled?.title,
       flex: 1,

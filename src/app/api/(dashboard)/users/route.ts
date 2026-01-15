@@ -15,10 +15,10 @@ export const GET = withAuthApi(['users.list'], async (req) => {
     const where: any = {};
     const search = params.s || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { name: { contains: search.trim(), mode: 'insensitive' } },
+        { email: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
 

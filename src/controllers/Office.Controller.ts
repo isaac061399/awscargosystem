@@ -3,7 +3,7 @@ import { prismaRead } from '@libs/prisma';
 export const getAllOffices = async () => {
   try {
     const offices = await prismaRead.cusOffice.findMany({
-      select: { id: true, name: true, shelves: true, rows: true, enabled: true }
+      select: { id: true, name: true, mailbox_prefix: true, shelves: true, rows: true, enabled: true }
     });
 
     return offices || [];
@@ -21,6 +21,7 @@ export const getOffice = async (id: number) => {
       select: {
         id: true,
         name: true,
+        mailbox_prefix: true,
         shelves: true,
         rows: true,
         enabled: true

@@ -15,7 +15,7 @@ export const GET = withAuthApi(['products.list'], async (req) => {
     const where: any = { enabled: true };
     const search = params.search || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
         { code: { contains: search.trim(), mode: 'insensitive' } },
         { name: { contains: search.trim(), mode: 'insensitive' } }

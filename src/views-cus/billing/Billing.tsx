@@ -532,7 +532,9 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                       <Alert severity="success">
                         {textT?.cards?.client?.clientSelected}
                         <b>
-                          {formik.values.client.full_name} - {formik.values.client.mailbox}
+                          {formik.values.client.full_name}
+                          {' - '}
+                          {`${formik.values.client.office?.mailbox_prefix}${formik.values.client.id}`}
                         </b>
                         <br />
                         <Link href={`/clients/edit/${formik.values.client.id}`} target="_blank" className="underline">

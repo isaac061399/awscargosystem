@@ -16,7 +16,7 @@ export const GET = withAuthApi(['administrators.list'], async (req) => {
     const where: any = {};
     const search = params.s || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
         { full_name: { contains: search.trim(), mode: 'insensitive' } },
         { email: { contains: search.trim(), mode: 'insensitive' } },

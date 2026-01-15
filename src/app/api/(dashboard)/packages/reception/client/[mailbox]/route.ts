@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError } from '@libs/prisma';
-import { mailboxPrefix } from '@/libs/constants';
 
 import { clientSelectSchema } from '@/controllers/Client.Controller';
 
@@ -16,10 +15,8 @@ export const GET = withAuthApi(
     const textT: any = t('api:packages-reception', { returnObjects: true, default: {} });
 
     try {
-      const searchMailbox = mailbox.startsWith(mailboxPrefix) ? mailbox : `${mailboxPrefix}${mailbox}`;
-
       const client = await prismaRead.cusClient.findUnique({
-        where: { mailbox: searchMailbox },
+        where: { id: parseInt(mailbox.trim()) },
         select: { ...clientSelectSchema, pound_fee: true }
       });
 

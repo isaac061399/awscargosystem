@@ -119,10 +119,7 @@ const formatOption = (option: any) => {
 
   if (option.office) {
     extras.push(option.office.name);
-  }
-
-  if (option.mailbox) {
-    extras.push(option.mailbox);
+    extras.push(`${option.office.mailbox_prefix}${option.id}`);
   }
 
   if (option.identification) {

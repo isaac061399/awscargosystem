@@ -19,14 +19,14 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
     const status = params.status || '';
     const payment_status = params.payment_status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { number: { contains: search, mode: 'insensitive' } },
-        { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
-        { client: { identification: { contains: search, mode: 'insensitive' } } },
-        { client: { email: { contains: search, mode: 'insensitive' } } },
-        { products: { some: { tracking: { contains: search, mode: 'insensitive' } } } }
+        { number: { contains: search.trim(), mode: 'insensitive' } },
+        { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { id: parseInt(search.trim()) } },
+        { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { email: { contains: search.trim(), mode: 'insensitive' } } },
+        { products: { some: { tracking: { contains: search.trim(), mode: 'insensitive' } } } }
       ];
     }
 

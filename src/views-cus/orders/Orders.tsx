@@ -215,7 +215,7 @@ const Orders = () => {
         <div className="h-full inline-flex flex-col justify-center py-2">
           <span>
             <strong>
-              {params.row.client?.mailbox} - {params.row.client?.full_name}
+              {`${params.row.client?.office?.mailbox_prefix}${params.row.client?.id}`} | {params.row.client?.full_name}
             </strong>
           </span>
           <span>

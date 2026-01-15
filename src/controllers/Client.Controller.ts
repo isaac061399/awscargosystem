@@ -8,7 +8,7 @@ export const getClient = async (id: number) => {
       select: {
         id: true,
         office_id: true,
-        mailbox: true,
+        // mailbox: true,
         full_name: true,
         identification_type: true,
         identification: true,
@@ -29,7 +29,8 @@ export const getClient = async (id: number) => {
         office: {
           select: {
             id: true,
-            name: true
+            name: true,
+            mailbox_prefix: true
           }
         },
         district: {
@@ -83,10 +84,9 @@ export const getMailbox = (id: number) => {
 
 export const clientSelectSchema = {
   id: true,
-  mailbox: true,
   full_name: true,
   identification_type: true,
   identification: true,
   email: true,
-  office: { select: { id: true, name: true } }
+  office: { select: { id: true, name: true, mailbox_prefix: true } }
 };

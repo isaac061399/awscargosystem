@@ -20,8 +20,9 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
     const search = params.s || '';
     const status = params.status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
+        { id: parseInt(search.trim()) },
         { full_name: { contains: search.trim(), mode: 'insensitive' } },
         { identification: { contains: search.trim(), mode: 'insensitive' } },
         { email: { contains: search.trim(), mode: 'insensitive' } }
@@ -39,7 +40,7 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
       select: {
         id: true,
         office_id: true,
-        mailbox: true,
+        // mailbox: true,
         full_name: true,
         identification_type: true,
         identification: true,
@@ -59,7 +60,8 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
         office: {
           select: {
             id: true,
-            name: true
+            name: true,
+            mailbox_prefix: true
           }
         },
         district: {
@@ -126,7 +128,7 @@ const formatEntries = async (headers: any, labelsT: any, clients: any[]) => {
       return {
         [headers.id]: c.id,
         [headers.office]: c.office.name,
-        [headers.mailbox]: c.mailbox,
+        [headers.mailbox]: `${c.office.mailbox_prefix}${c.id}`,
         [headers.full_name]: c.full_name,
         [headers.identification_type]: labelsT?.identificationType[c.identification_type],
         [headers.identification]: c.identification,

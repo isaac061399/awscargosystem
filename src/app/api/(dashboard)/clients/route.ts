@@ -17,8 +17,9 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
     const search = params.s || '';
     const status = params.status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
+        { id: parseInt(search.trim()) },
         { full_name: { contains: search.trim(), mode: 'insensitive' } },
         { identification: { contains: search.trim(), mode: 'insensitive' } },
         { email: { contains: search.trim(), mode: 'insensitive' } }
@@ -37,14 +38,14 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
       orderBy: [{ id: 'desc' }],
       select: {
         id: true,
-        mailbox: true,
+        // mailbox: true,
         full_name: true,
         identification_type: true,
         identification: true,
         email: true,
         status: true,
         created_at: true,
-        office: { select: { id: true, name: true } }
+        office: { select: { id: true, name: true, mailbox_prefix: true } }
       }
     });
 

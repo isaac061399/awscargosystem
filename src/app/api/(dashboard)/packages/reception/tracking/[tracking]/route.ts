@@ -18,10 +18,12 @@ export const GET = withAuthApi(
     const { t } = await initTranslationsApi(req);
     const textT: any = t('api:packages-reception', { returnObjects: true, default: {} });
 
+    const trackingTrimmed = tracking.trim();
+
     try {
       // 1) Find receivable packages with that tracking number
       const packages = await prismaRead.cusPackage.findMany({
-        where: { tracking, status: { notIn: [...PACKAGE_RECEIVED] } },
+        where: { tracking: trackingTrimmed, status: { notIn: [...PACKAGE_RECEIVED] } },
         select: {
           id: true,
           client: { select: { ...clientSelectSchema, pound_fee: true } }
@@ -31,7 +33,7 @@ export const GET = withAuthApi(
       // 2) Find receivable orders with that tracking number
       const orders = await prismaRead.cusOrder.findMany({
         where: {
-          products: { some: { tracking, status: { notIn: [...ORDER_RECEIVED] } } },
+          products: { some: { tracking: trackingTrimmed, status: { notIn: [...ORDER_RECEIVED] } } },
           status: { notIn: [...ORDER_RECEIVED] }
         },
         select: {

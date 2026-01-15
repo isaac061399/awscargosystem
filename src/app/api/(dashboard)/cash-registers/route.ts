@@ -16,7 +16,7 @@ export const GET = withAuthApi(['cash-registers.list'], async (req) => {
     const search = params.s || '';
     const status = params.status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
         { administrator: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
         { administrator: { email: { contains: search.trim(), mode: 'insensitive' } } },

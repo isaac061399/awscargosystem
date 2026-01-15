@@ -22,12 +22,12 @@ export const GET = withAuthApi(['contents.list'], async (req) => {
       where.locale = locale;
     }
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { slug: { contains: search, mode: 'insensitive' } },
-        { title: { contains: search, mode: 'insensitive' } },
-        { category: { name: { contains: search, mode: 'insensitive' } } },
-        { page: { name: { contains: search, mode: 'insensitive' } } }
+        { slug: { contains: search.trim(), mode: 'insensitive' } },
+        { title: { contains: search.trim(), mode: 'insensitive' } },
+        { category: { name: { contains: search.trim(), mode: 'insensitive' } } },
+        { page: { name: { contains: search.trim(), mode: 'insensitive' } } }
       ];
     }
 

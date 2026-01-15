@@ -617,7 +617,7 @@ const PackageReception = () => {
 
                               {formik.values.client && (
                                 <Chip
-                                  label={`${textT?.clientCard?.mailbox} ${formik.values.client?.mailbox} - ${formik.values.client?.office?.name}`}
+                                  label={`${textT?.clientCard?.mailbox} ${formik.values.client?.office?.mailbox_prefix}${formik.values.client?.id} | ${formik.values.client?.office?.name}`}
                                   color="primary"
                                   size="small"
                                 />

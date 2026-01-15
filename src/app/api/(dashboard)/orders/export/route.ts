@@ -23,13 +23,13 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
     const status = params.status || '';
     const payment_status = params.payment_status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { number: { contains: search, mode: 'insensitive' } },
-        { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
-        { client: { identification: { contains: search, mode: 'insensitive' } } },
-        { client: { email: { contains: search, mode: 'insensitive' } } }
+        { number: { contains: search.trim(), mode: 'insensitive' } },
+        { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { id: parseInt(search.trim()) } },
+        { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
       ];
     }
 
@@ -106,11 +106,11 @@ const formatEntries = async (headers: any, labelsT: any, orders: any[]) => {
       return o.products.map((p: any) => {
         return {
           [headers.id]: padStartZeros(o.id, 4),
-          [headers.client_office]: o.client?.office?.name || '',
-          [headers.client_mailbox]: o.client?.mailbox || '',
-          [headers.client_full_name]: o.client?.full_name || '',
-          [headers.client_identification]: o.client?.identification || '',
-          [headers.client_email]: o.client?.email || '',
+          [headers.client_office]: o.client?.office?.name,
+          [headers.client_mailbox]: `${o.client?.office?.mailbox_prefix}${o.client?.id}`,
+          [headers.client_full_name]: o.client?.full_name,
+          [headers.client_identification]: o.client?.identification,
+          [headers.client_email]: o.client?.email,
           [headers.number]: o.number,
           [headers.purchase_page]: o.purchase_page,
           [headers.payment_status]: labelsT?.paymentStatus[o.payment_status],

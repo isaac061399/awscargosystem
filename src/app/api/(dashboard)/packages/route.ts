@@ -19,13 +19,13 @@ export const GET = withAuthApi(['packages.list'], async (req) => {
     const status = params.status || '';
     const payment_status = params.payment_status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { tracking: { contains: search, mode: 'insensitive' } },
-        { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
-        { client: { identification: { contains: search, mode: 'insensitive' } } },
-        { client: { email: { contains: search, mode: 'insensitive' } } }
+        { tracking: { contains: search.trim(), mode: 'insensitive' } },
+        { client: { id: parseInt(search.trim()) } },
+        { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
       ];
     }
 

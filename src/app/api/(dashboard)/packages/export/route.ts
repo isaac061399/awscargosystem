@@ -22,13 +22,13 @@ export const GET = withAuthApi(['packages.list'], async (req) => {
     const status = params.status || '';
     const payment_status = params.payment_status || '';
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { number: { contains: search, mode: 'insensitive' } },
-        { client: { full_name: { contains: search, mode: 'insensitive' } } },
-        { client: { mailbox: { contains: search, mode: 'insensitive' } } },
-        { client: { identification: { contains: search, mode: 'insensitive' } } },
-        { client: { email: { contains: search, mode: 'insensitive' } } }
+        { number: { contains: search.trim(), mode: 'insensitive' } },
+        { client: { id: parseInt(search.trim()) } },
+        { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
       ];
     }
 
@@ -98,11 +98,11 @@ const formatEntries = async (headers: any, labelsT: any, packages: any[]) => {
     data: packages.map((p: any) => {
       return {
         [headers.id]: p.id,
-        [headers.client_office]: p.client?.office?.name || '',
-        [headers.client_mailbox]: p.client?.mailbox || '',
-        [headers.client_full_name]: p.client?.full_name || '',
-        [headers.client_identification]: p.client?.identification || '',
-        [headers.client_email]: p.client?.email || '',
+        [headers.client_office]: p.client?.office?.name,
+        [headers.client_mailbox]: `${p.client?.office?.mailbox_prefix}${p.client?.id}`,
+        [headers.client_full_name]: p.client?.full_name,
+        [headers.client_identification]: p.client?.identification,
+        [headers.client_email]: p.client?.email,
         [headers.tracking]: p.tracking,
         [headers.courier_company]: p.courier_company,
         [headers.purchase_page]: p.purchase_page,

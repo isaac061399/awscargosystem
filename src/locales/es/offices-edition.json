@@ -7,18 +7,21 @@
   "form": {
     "labels": {
       "name": "Nombre",
+      "mailbox_prefix": "Prefijo de casillero",
       "shelves": "Estantes",
       "rows": "Filas",
       "enabled": "Activa"
     },
     "placeholders": {
       "name": "Ingrese un nombre",
+      "mailbox_prefix": "Ingrese un prefijo de casillero",
       "shelves": "Escriba y presione enter para agregar estantes",
       "rows": "Escriba y presione enter para agregar filas",
       "enabled": ""
     },
     "errors": {
       "name": "El nombre es requerido",
+      "mailbox_prefix": "El prefijo de casillero es requerido",
       "shelves": "Los estantes son requeridos",
       "rows": "Las filas son requeridas",
       "enabled": ""

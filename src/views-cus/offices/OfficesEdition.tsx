@@ -52,7 +52,8 @@ const OfficesEdition = ({ office }: { office?: any }) => {
     validateOnBlur: false,
     initialValues: useMemo(
       () => ({
-        name: office ? `${office.name}` : '',
+        name: office ? office.name : '',
+        mailbox_prefix: office ? office.mailbox_prefix : '',
         shelves: office ? `${office.shelves}`.split(',') : [],
         rows: office ? `${office.rows}`.split(',') : [],
         enabled: office ? office.enabled : true
@@ -61,6 +62,7 @@ const OfficesEdition = ({ office }: { office?: any }) => {
     ),
     validationSchema: yup.object({
       name: yup.string().required(formT?.errors?.name),
+      mailbox_prefix: yup.string().required(formT?.errors?.mailbox_prefix),
       shelves: yup.array().min(1, formT?.errors?.shelves).required(formT?.errors?.shelves),
       rows: yup.array().min(1, formT?.errors?.rows).required(formT?.errors?.rows),
       enabled: yup.boolean()
@@ -147,7 +149,26 @@ const OfficesEdition = ({ office }: { office?: any }) => {
                       onChange={formik.handleChange}
                       error={Boolean(formik.touched.name && formik.errors.name)}
                       color={Boolean(formik.touched.name && formik.errors.name) ? 'error' : 'primary'}
-                      helperText={formik.touched.name && formik.errors.name}
+                      helperText={formik.touched.name && (formik.errors.name as string)}
+                      disabled={formik.isSubmitting || isRedirecting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="mailbox_prefix"
+                      name="mailbox_prefix"
+                      label={formT?.labels?.mailbox_prefix}
+                      placeholder={formT?.placeholders?.mailbox_prefix}
+                      value={formik.values.mailbox_prefix}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.mailbox_prefix && formik.errors.mailbox_prefix)}
+                      color={
+                        Boolean(formik.touched.mailbox_prefix && formik.errors.mailbox_prefix) ? 'error' : 'primary'
+                      }
+                      helperText={formik.touched.mailbox_prefix && (formik.errors.mailbox_prefix as string)}
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>

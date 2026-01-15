@@ -31,9 +31,9 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
       where.office_id = cashRegister.office_id;
     }
 
-    if (search !== '') {
+    if (search.trim() !== '') {
       where['OR'] = [
-        { mailbox: { contains: search.trim(), mode: 'insensitive' } },
+        { id: parseInt(search.trim()) },
         { full_name: { contains: search.trim(), mode: 'insensitive' } },
         { identification: { contains: search.trim(), mode: 'insensitive' } },
         { email: { contains: search.trim(), mode: 'insensitive' } }
