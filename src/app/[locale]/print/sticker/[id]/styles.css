@@ -1,0 +1,32 @@
+:root {
+  --label-width-mm: 50mm;
+  --label-height-mm: 30mm;
+}
+@page {
+  size: var(--label-width-mm) var(--label-height-mm);
+  margin: 0;
+}
+.label {
+  width: var(--label-width-mm);
+  height: var(--label-height-mm);
+  padding: 2.5mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5mm;
+}
+.name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.sku {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.price {
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 1mm;
+}
