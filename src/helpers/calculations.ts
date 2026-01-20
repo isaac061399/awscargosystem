@@ -1,4 +1,4 @@
-import { Currency } from '@/prisma/generated/enums';
+import { Currency, PaymentMethod } from '@/prisma/generated/enums';
 
 export type BillingLine = {
   id: string;
@@ -10,6 +10,15 @@ export type BillingLine = {
   unit_price: number;
   currency: Currency;
   total: number;
+};
+
+export type PaymentLine = {
+  id: string;
+  currency: Currency;
+  method: PaymentMethod;
+  ref?: string;
+  ref_bank?: string;
+  amount: number;
 };
 
 export const getOrderProductPrice = (product: any) => {
@@ -137,6 +146,40 @@ export const calculateBillingTotal = (
     return {
       [Currency.CRC]: { subtotal: 0, taxes: 0, total: 0 },
       [Currency.USD]: { subtotal: 0, taxes: 0, total: 0 }
+    };
+  }
+};
+
+export const calculateBillingPaidAmount = (paymentLines: PaymentLine[], sellingConversionRate: number) => {
+  let paidAmountCRC = 0;
+  let paidAmountUSD = 0;
+
+  try {
+    // calculate paid amounts
+    paymentLines.forEach((payment) => {
+      if (payment.currency === Currency.CRC) {
+        paidAmountCRC += payment.amount;
+        paidAmountUSD += convertUSD(payment.amount, sellingConversionRate);
+      } else if (payment.currency === Currency.USD) {
+        paidAmountUSD += payment.amount;
+        paidAmountCRC += convertCRC(payment.amount, sellingConversionRate);
+      }
+    });
+
+    // round CRC totals
+    paidAmountCRC = roundCRC(paidAmountCRC);
+
+    return {
+      [Currency.CRC]: paidAmountCRC,
+      [Currency.USD]: paidAmountUSD
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating billing total: ${error}`);
+
+    return {
+      [Currency.CRC]: 0,
+      [Currency.USD]: 0
     };
   }
 };

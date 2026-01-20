@@ -36,14 +36,17 @@
         "subtitle": "Revise los totales antes de facturar.",
         "subtotal": "Subtotal",
         "taxes": "IVA",
-        "total": "Total"
+        "total": "Total",
+        "paid": "Pagado",
+        "debt": "Deuda"
       },
       "payment": {
         "title": "Información de Pago",
         "subtitle": "Ingrese los datos requeridos para el pago.",
         "btnSubmit": "Facturar",
         "noCashRegisterOpen": "Abra la caja para habilitar la facturación.",
-        "noClientSelected": "Seleccione un cliente para habilitar la facturación."
+        "noClientSelected": "Seleccione un cliente para habilitar la facturación.",
+        "btnAddPayment": "Agregar Pago"
       }
     },
     "lineTypes": {
@@ -92,47 +95,46 @@
         "title": "Total"
       }
     },
+    "paymentLinesTable": {
+      "method": {
+        "title": "Método"
+      },
+      "amount": {
+        "title": "Monto"
+      },
+      "ref": {
+        "title": "Referencia"
+      }
+    },
     "dialogCustomLine": {
       "title": "Agregar Línea Personalizada a la Facturación"
     },
     "dialogProduct": {
       "title": "Agregar Producto a la Facturación"
+    },
+    "dialogPayment": {
+      "title": "Agregar Información de Pago a la Facturación"
     }
   },
   "form": {
     "labels": {
       "client": "Cliente",
       "invoice_type": "Tipo de factura",
-      "invoice_payment_condition": "Condición de pago",
-      "payment_method": "Método de pago",
-      "payment_currency": "Moneda",
-      "payment_ref": "Referencia de pago",
-      "payment_ref_bank": "Cuenta bancaria",
-      "payment_amount": "Monto recibido"
+      "invoice_payment_condition": "Condición de pago"
     },
     "placeholders": {
       "client": "Buscar por nombre, casillero, identificación o correo electrónico",
       "invoice_type": "Seleccione una opción",
-      "invoice_payment_condition": "Seleccione una opción",
-      "payment_method": "Seleccione una opción",
-      "payment_currency": "Seleccione una opción",
-      "payment_ref": "Ingrese la referencia de pago",
-      "payment_ref_bank": "Seleccione la cuenta bancaria",
-      "payment_amount": "Ingrese el monto recibido"
+      "invoice_payment_condition": "Seleccione una opción"
     },
     "errors": {
       "client": "El cliente es requerido",
       "invoice_type": "El tipo de factura es requerido",
-      "invoice_payment_condition": "La condición de pago es requerida",
-      "payment_method": "El método de pago es requerido",
-      "payment_currency": "La moneda es requerida",
-      "payment_ref": "La referencia de pago es requerida",
-      "payment_ref_bank": "La cuenta bancaria es requerida",
-      "payment_amount": "El monto recibido es requerido",
-      "payment_amount_min": "El monto recibido debe ser al menos igual al total de la factura"
+      "invoice_payment_condition": "La condición de pago es requerida"
     },
     "successMessage": "Datos guardados con éxito",
-    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
+    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo",
+    "amountErrorMessage": "El monto pagado debe ser al menos igual al total de la factura"
   },
   "formCustomLine": {
     "labels": {
@@ -176,5 +178,29 @@
       "quantityMinimum": "La cantidad debe ser al menos 1"
     },
     "errorMessage": "Error al agregar el producto, por favor inténtalo de nuevo"
+  },
+  "formPayment": {
+    "labels": {
+      "currency": "Moneda",
+      "method": "Método de pago",
+      "ref": "Referencia de pago",
+      "ref_bank": "Cuenta bancaria",
+      "amount": "Monto recibido"
+    },
+    "placeholders": {
+      "currency": "Seleccione una opción",
+      "method": "Seleccione una opción",
+      "ref": "Ingrese la referencia de pago",
+      "ref_bank": "Seleccione la cuenta bancaria",
+      "amount": "Ingrese el monto recibido"
+    },
+    "errors": {
+      "currency": "La moneda es requerida",
+      "method": "El método de pago es requerido",
+      "ref": "La referencia de pago es requerida",
+      "ref_bank": "La cuenta bancaria es requerida",
+      "amount": "El monto recibido es requerido"
+    },
+    "errorMessage": "Error al agregar la información de pago, por favor inténtalo de nuevo"
   }
 }
