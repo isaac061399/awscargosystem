@@ -39,6 +39,7 @@ import { requestDeleteOffice, requestGetOffices } from '@helpers/request';
 // Auth Imports
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
+import { padStartZeros } from '@/libs/utils';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -132,20 +133,26 @@ const Offices = () => {
   // data
   const columns: GridColDef[] = [
     {
-      field: 'name',
-      headerName: textT?.table?.name?.title,
+      field: 'id',
+      headerName: 'ID',
       flex: 1,
-      minWidth: 200,
+      minWidth: 100,
       renderCell: (params) =>
         canEdit ? (
           <Link
             href={`/offices/edit/${params.row.id}`}
             className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-            {params.row.name}
+            {padStartZeros(params.row.id, 3)}
           </Link>
         ) : (
-          params.row.name
+          padStartZeros(params.row.id, 3)
         )
+    },
+    {
+      field: 'name',
+      headerName: textT?.table?.name?.title,
+      flex: 1,
+      minWidth: 200
     },
     {
       field: 'mailbox_prefix',

@@ -22,7 +22,10 @@ export const getConfiguration = async () => {
         maritime_address_city: true,
         maritime_address_state: true,
         maritime_address_postal_code: true,
-        maritime_address_phone: true
+        maritime_address_phone: true,
+        billing_name: true,
+        billing_identification: true,
+        billing_activity_code: true
       }
     });
 
@@ -57,7 +60,10 @@ export const saveConfiguration = async (data: any) => {
       maritime_address_city: data.maritime_address_city || '',
       maritime_address_state: data.maritime_address_state || '',
       maritime_address_postal_code: data.maritime_address_postal_code || '',
-      maritime_address_phone: data.maritime_address_phone || ''
+      maritime_address_phone: data.maritime_address_phone || '',
+      billing_name: data.billing_name || '',
+      billing_identification: data.billing_identification || '',
+      billing_activity_code: data.billing_activity_code || ''
     };
 
     const result = await prismaWrite.cusConfiguration.upsert({

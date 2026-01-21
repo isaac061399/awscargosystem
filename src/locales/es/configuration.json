@@ -4,6 +4,7 @@
     "generalTitle": "Configuración General",
     "airAddressTitle": "Configuración de Dirección Aerea",
     "maritimeAddressTitle": "Configuración de Dirección Marítima",
+    "billingTitle": "Configuración de Facturación",
     "lastExchangeRateUpdate": "Última actualización automática del tipo de cambio",
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "btnSave": "Guardar"
@@ -27,7 +28,11 @@
       "maritime_address_city": "Ciudad",
       "maritime_address_state": "Estado",
       "maritime_address_postal_code": "Código Postal",
-      "maritime_address_phone": "Teléfono"
+      "maritime_address_phone": "Teléfono",
+
+      "billing_name": "Nombre de la compañia",
+      "billing_identification": "Identificación de la compañia",
+      "billing_activity_code": "Código de actividad de la compañia"
     },
     "placeholders": {
       "pound_fee": "Ingrese un valor en dólares",
@@ -47,7 +52,11 @@
       "maritime_address_city": "Ingrese un valor",
       "maritime_address_state": "Ingrese un valor",
       "maritime_address_postal_code": "Ingrese un valor",
-      "maritime_address_phone": "Ingrese un valor"
+      "maritime_address_phone": "Ingrese un valor",
+
+      "billing_name": "Ingrese el nombre de la compañia",
+      "billing_identification": "Ingrese la identificación de la compañia",
+      "billing_activity_code": "Ingrese el código de actividad de la compañia"
     },
     "errors": {
       "invalidType": "Tipo inválido",
@@ -68,7 +77,11 @@
       "maritime_address_city": "Campo requerido",
       "maritime_address_state": "Campo requerido",
       "maritime_address_postal_code": "Campo requerido",
-      "maritime_address_phone": "Campo requerido"
+      "maritime_address_phone": "Campo requerido",
+
+      "billing_name": "Campo requerido",
+      "billing_identification": "Campo requerido",
+      "billing_activity_code": "Campo requerido"
     },
     "successMessage": "Configuración guardada con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"

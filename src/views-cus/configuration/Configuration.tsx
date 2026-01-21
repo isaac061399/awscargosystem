@@ -77,7 +77,11 @@ const Configuration = () => {
         maritime_address_city: configuration ? configuration.maritime_address_city : '',
         maritime_address_state: configuration ? configuration.maritime_address_state : '',
         maritime_address_postal_code: configuration ? configuration.maritime_address_postal_code : '',
-        maritime_address_phone: configuration ? configuration.maritime_address_phone : ''
+        maritime_address_phone: configuration ? configuration.maritime_address_phone : '',
+
+        billing_name: configuration ? configuration.billing_name : '',
+        billing_identification: configuration ? configuration.billing_identification : '',
+        billing_activity_code: configuration ? configuration.billing_activity_code : ''
       }),
       [configuration]
     ),
@@ -99,7 +103,11 @@ const Configuration = () => {
       maritime_address_city: yup.string().required(formT?.errors?.maritime_address_city),
       maritime_address_state: yup.string().required(formT?.errors?.maritime_address_state),
       maritime_address_postal_code: yup.string().required(formT?.errors?.maritime_address_postal_code),
-      maritime_address_phone: yup.string().required(formT?.errors?.maritime_address_phone)
+      maritime_address_phone: yup.string().required(formT?.errors?.maritime_address_phone),
+
+      billing_name: yup.string().required(formT?.errors?.billing_name),
+      billing_identification: yup.string().required(formT?.errors?.billing_identification),
+      billing_activity_code: yup.string().required(formT?.errors?.billing_activity_code)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
@@ -551,6 +559,76 @@ const Configuration = () => {
                       }
                       helperText={
                         formik.touched.maritime_address_phone && (formik.errors.maritime_address_phone as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+              <CardContent>
+                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h5">{textT?.billingTitle}</Typography>
+                </Divider>
+                <Grid container spacing={5}>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="billing_name"
+                      name="billing_name"
+                      label={formT?.labels?.billing_name}
+                      placeholder={formT?.placeholders?.billing_name}
+                      value={formik.values.billing_name}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_name && formik.errors.billing_name)}
+                      color={Boolean(formik.touched.billing_name && formik.errors.billing_name) ? 'error' : 'primary'}
+                      helperText={formik.touched.billing_name && (formik.errors.billing_name as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="billing_identification"
+                      name="billing_identification"
+                      label={formT?.labels?.billing_identification}
+                      placeholder={formT?.placeholders?.billing_identification}
+                      value={formik.values.billing_identification}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_identification && formik.errors.billing_identification)}
+                      color={
+                        Boolean(formik.touched.billing_identification && formik.errors.billing_identification)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.billing_identification && (formik.errors.billing_identification as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="billing_activity_code"
+                      name="billing_activity_code"
+                      label={formT?.labels?.billing_activity_code}
+                      placeholder={formT?.placeholders?.billing_activity_code}
+                      value={formik.values.billing_activity_code}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_activity_code && formik.errors.billing_activity_code)}
+                      color={
+                        Boolean(formik.touched.billing_activity_code && formik.errors.billing_activity_code)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.billing_activity_code && (formik.errors.billing_activity_code as string)
                       }
                       disabled={formik.isSubmitting}
                     />

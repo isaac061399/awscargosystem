@@ -603,6 +603,9 @@ model CusConfiguration {
   maritime_address_state       String?
   maritime_address_postal_code String?
   maritime_address_phone       String?
+  billing_name                 String
+  billing_identification       String
+  billing_activity_code        String
   created_at                   DateTime @default(now())
   updated_at                   DateTime @updatedAt
 
