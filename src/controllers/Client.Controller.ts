@@ -1,4 +1,5 @@
 import { mailboxPrefix } from '@/libs/constants';
+import { CusClient } from '@/prisma/generated/client';
 import { prismaRead } from '@libs/prisma';
 
 export const getClient = async (id: number) => {
@@ -80,6 +81,23 @@ export const getClient = async (id: number) => {
 
 export const getMailbox = (id: number) => {
   return `${mailboxPrefix}${id.toString().padStart(3, '0')}`;
+};
+
+export const isValidBillingInformation = (client: CusClient) => {
+  if (!client.billing_full_name || client.billing_full_name.trim() === '') {
+    return false;
+  }
+  if (!client.billing_identification || client.billing_identification.trim() === '') {
+    return false;
+  }
+  if (!client.billing_email || client.billing_email.trim() === '') {
+    return false;
+  }
+  if (!client.billing_activity_code || client.billing_activity_code.trim() === '') {
+    return false;
+  }
+
+  return true;
 };
 
 export const clientSelectSchema = {

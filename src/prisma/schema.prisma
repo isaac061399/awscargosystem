@@ -55,6 +55,7 @@ model Administrator {
   package_logs       CusPackageLog[]
   order_logs         CusOrderLog[]
   cash_registers     CusCashRegister[]
+  cancelled_invoices CusInvoice[]
 
   @@map("auth_administrator")
 }
@@ -505,6 +506,7 @@ model CusCashRegister {
   office         CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
   lines          CusCashRegisterLine[]
   money_outflows CusMoneyOutflow[]
+  invoices       CusInvoice[]
 
   @@map("cus_cash_register")
 }
@@ -568,6 +570,7 @@ model CusClient {
   packages         CusPackage[]
   orders           CusOrder[]
   reset_tokens     CusClientResetToken[]
+  invoices         CusInvoice[]
 
   @@map("cus_client")
 }
@@ -659,10 +662,81 @@ model CusDistrict {
   @@map("cus_district")
 }
 
+model CusInvoice {
+  id                    Int                     @id @default(autoincrement())
+  cash_register_id      Int
+  client_id             Int
+  number                String
+  consecutive           String
+  type                  InvoiceType
+  payment_condition     InvoicePaymentCondition
+  iva_percentage        Float                   @default(0)
+  selling_exchange_rate Float                   @default(0)
+  buying_exchange_rate  Float                   @default(0)
+  currency              Currency
+  payment_method        PaymentMethod
+  subtotal              Float
+  tax                   Float
+  total                 Float
+  cash_change           Float
+  status                InvoiceStatus
+  cancelled_by_id       Int?
+  cancelled_at          DateTime?
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @updatedAt
+
+  cash_register    CusCashRegister     @relation(fields: [cash_register_id], references: [id], onDelete: Restrict)
+  client           CusClient           @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  cancelled_by     Administrator?      @relation(fields: [cancelled_by_id], references: [id], onDelete: SetNull)
+  invoice_lines    CusInvoiceLine[]
+  invoice_payments CusInvoicePayment[]
+
+  @@map("cus_invoice")
+}
+
+model CusInvoiceLine {
+  id                       Int            @id @default(autoincrement())
+  invoice_id               Int
+  package_id               Int?
+  order_product_id         Int?
+  product_id               Int?
+  package_prev_state       PackageStatus?
+  order_product_prev_state OrderStatus?
+  currency                 Currency
+  quantity                 Float
+  unit_price               Float
+  total                    Float
+  created_at               DateTime       @default(now())
+  updated_at               DateTime       @updatedAt
+
+  invoice       CusInvoice       @relation(fields: [invoice_id], references: [id], onDelete: Restrict)
+  package       CusPackage?      @relation(fields: [package_id], references: [id], onDelete: Restrict)
+  order_product CusOrderProduct? @relation(fields: [order_product_id], references: [id], onDelete: Restrict)
+  product       CusProduct?      @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@map("cus_invoice_line")
+}
+
+model CusInvoicePayment {
+  id             Int           @id @default(autoincrement())
+  invoice_id     Int
+  currency       Currency
+  payment_method PaymentMethod
+  ref            String
+  ref_bank       String
+  amount         Float
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  invoice CusInvoice @relation(fields: [invoice_id], references: [id], onDelete: Restrict)
+
+  @@map("cus_invoice_payment")
+}
+
 model CusMoneyOutflow {
   id               Int           @id @default(autoincrement())
   administrator_id Int?
-  cash_register_id Int?
+  cash_register_id Int
   currency         Currency      @default(CRC)
   amount           Float
   description      String        @db.Text
@@ -671,7 +745,7 @@ model CusMoneyOutflow {
   updated_at       DateTime      @updatedAt
 
   administrator Administrator?       @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
-  cash_register CusCashRegister?     @relation(fields: [cash_register_id], references: [id], onDelete: SetNull)
+  cash_register CusCashRegister      @relation(fields: [cash_register_id], references: [id], onDelete: Restrict)
   logs          CusMoneyOutflowLog[]
 
   @@map("cus_money_outflow")
@@ -725,7 +799,7 @@ model CusOrder {
   packages CusOrderPackage[]
   products CusOrderProduct[]
   logs     CusOrderLog[]
-  cutLogs  CusCutLog[]
+  cut_logs CusCutLog[]
 
   @@map("cus_order")
 }
@@ -780,8 +854,9 @@ model CusOrderProduct {
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
 
-  order       CusOrder                   @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  status_logs CusOrderProductStatusLog[]
+  order         CusOrder                   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  status_logs   CusOrderProductStatusLog[]
+  invoice_lines CusInvoiceLine[]
 
   @@map("cus_order_product")
 }
@@ -818,10 +893,11 @@ model CusPackage {
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
 
-  client      CusClient             @relation(fields: [client_id], references: [id], onDelete: Restrict)
-  logs        CusPackageLog[]
-  status_logs CusPackageStatusLog[]
-  cutLogs     CusCutLog[]
+  client        CusClient             @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  logs          CusPackageLog[]
+  status_logs   CusPackageStatusLog[]
+  cut_logs      CusCutLog[]
+  invoice_lines CusInvoiceLine[]
 
   @@map("cus_package")
 }
@@ -864,6 +940,8 @@ model CusProduct {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  invoice_lines CusInvoiceLine[]
+
   @@map("cus_product")
 }
 
@@ -893,6 +971,11 @@ enum Currency {
   USD
 }
 
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
 enum IdentificationType {
   PHYSICAL
   LEGAL
@@ -917,9 +1000,10 @@ enum InvoicePaymentCondition {
   CREDIT_90
 }
 
-enum ClientStatus {
-  ACTIVE
-  INACTIVE
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELED
 }
 
 enum OrderStatus {

@@ -111,6 +111,7 @@
   },
   "billing": {
     "errors": {
+      "noOpenCash": "There is no open cash register. Transactions cannot be processed.",
       "save": "Error saving the invoice, please try again",
       "general": "An error occurred, please try again"
     }

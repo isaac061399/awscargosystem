@@ -43,10 +43,16 @@ import Select from '@/components/Select';
 import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import { requestGetBillingLines } from '@/helpers/request';
+import { requestGetBillingLines, requestNewInvoice } from '@/helpers/request';
 import { bankAccounts, currencies } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
-import { BillingLine, calculateBillingPaidAmount, calculateBillingTotal, PaymentLine } from '@/helpers/calculations';
+import {
+  BillingLine,
+  calculateBillingChangeAmount,
+  calculateBillingPaidAmount,
+  calculateBillingTotal,
+  PaymentLine
+} from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
 import { Currency, PaymentMethod } from '@/prisma/generated/enums';
 
@@ -80,9 +86,11 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const [selectedLines, setSelectedLines] = useState<BillingLine[]>([]);
   const [paymentLines, setPaymentLines] = useState<PaymentLine[]>([]);
   const [totals, setTotals] = useState<any>(
-    calculateBillingTotal(selectedLines, sellingExchangeRate, buyingExchangeRate, ivaPercentage)
+    calculateBillingTotal(selectedLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate, ivaPercentage)
   );
-  const [paidAmounts, setPaidAmounts] = useState<any>(calculateBillingPaidAmount(paymentLines, sellingExchangeRate));
+  const [paidAmount, setPaidAmount] = useState<any>(
+    calculateBillingPaidAmount(paymentLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate)
+  );
 
   // Billing lines dialogs
   // const [customOpen, setCustomOpen] = useState(false);
@@ -102,14 +110,16 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       () => ({
         client: null as any,
         invoice_type: Object.keys(labelsT?.invoiceType)[0] || '',
-        invoice_payment_condition: Object.keys(labelsT?.invoicePaymentCondition)[0] || ''
+        invoice_payment_condition: Object.keys(labelsT?.invoicePaymentCondition)[0] || '',
+        invoice_currency: Currency.CRC
       }),
       [labelsT]
     ),
     validationSchema: yup.object({
       client: yup.object().required(formT?.errors?.client),
       invoice_type: yup.string().required(formT?.errors?.invoice_type),
-      invoice_payment_condition: yup.string().required(formT?.errors?.invoice_payment_condition)
+      invoice_payment_condition: yup.string().required(formT?.errors?.invoice_payment_condition),
+      invoice_currency: yup.string().required(formT?.errors?.invoice_currency)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
@@ -117,7 +127,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       console.log(values);
 
       // validate amount vrs total if payment method is cash
-      if (paidAmounts[Currency.CRC] < totals[Currency.CRC].total) {
+      if (paidAmount < totals.total) {
         setAlertState({ open: true, type: 'error', message: formT?.amountErrorMessage });
         setTimeout(() => {
           setAlertState({ ...defaultAlertState });
@@ -127,17 +137,31 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       }
 
       try {
-        // const newValues = {
-        //   client_id: values.client.id,
-        //   invoice_type: values.invoice_type,
-        //   invoice_payment_condition: values.invoice_payment_condition
-        // };
+        const newValues = {
+          client_id: values.client.id,
+          type: values.invoice_type,
+          payment_condition: values.invoice_payment_condition,
+          currency: values.invoice_currency,
+          lines: selectedLines.map((line) => ({
+            package_id: line.type === 'package' ? line.refObj.id : null,
+            order_product_id: line.type === 'order_product' ? line.refObj.id : null,
+            product_id: line.type === 'product' ? line.refObj.id : null,
+            quantity: line.quantity
+          })),
+          payments: paymentLines.map((line) => ({
+            currency: line.currency,
+            method: line.method,
+            ref: line.ref,
+            ref_bank: line.ref_bank,
+            amount: line.amount
+          }))
+        };
 
-        // const result = await requestPackagesReception(newValues, i18n.language);
+        const result = await requestNewInvoice(newValues, i18n.language);
 
-        // if (!result.valid) {
-        //   return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
-        // }
+        if (!result.valid) {
+          return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
+        }
 
         setAlertState({ open: true, type: 'success', message: formT?.successMessage });
         setTimeout(() => {
@@ -272,7 +296,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     enableReinitialize: true,
     initialValues: useMemo(
       () => ({
-        currency: Object.keys(labelsT?.currency)[0] || '',
+        currency: Currency.CRC,
         method: Object.keys(labelsT?.paymentMethod)[0] || '',
         ref: '',
         ref_bank: Object.keys(bankAccounts)[0],
@@ -408,23 +432,35 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
   // update totals when selectedLines changes
   useEffect(() => {
-    const result = calculateBillingTotal(selectedLines, sellingExchangeRate, buyingExchangeRate, ivaPercentage);
+    const result = calculateBillingTotal(
+      selectedLines,
+      formik.values.invoice_currency,
+      sellingExchangeRate,
+      buyingExchangeRate,
+      ivaPercentage
+    );
     setTotals(result);
-  }, [selectedLines, sellingExchangeRate, buyingExchangeRate, ivaPercentage]);
+  }, [selectedLines, formik.values.invoice_currency, sellingExchangeRate, buyingExchangeRate, ivaPercentage]);
 
-  // update paid amounts when paymentLines changes
+  // update paid amount when paymentLines changes
   useEffect(() => {
-    const result = calculateBillingPaidAmount(paymentLines, sellingExchangeRate);
-    setPaidAmounts(result);
-  }, [paymentLines, sellingExchangeRate]);
+    const result = calculateBillingPaidAmount(
+      paymentLines,
+      formik.values.invoice_currency,
+      sellingExchangeRate,
+      buyingExchangeRate
+    );
+    setPaidAmount(result);
+  }, [paymentLines, formik.values.invoice_currency, sellingExchangeRate, buyingExchangeRate]);
 
   // update payment amount value when dialog opens or currency changes
   useEffect(() => {
     if (!paymentOpen) return;
 
-    const totalToPay = totals[formikPayment.values.currency].total - paidAmounts[formikPayment.values.currency];
-    if (totalToPay > 0) {
+    const totalToPay = totals.total - paidAmount;
+    if (totalToPay >= 0) {
       formikPayment.setFieldValue('amount', totalToPay);
+      formikPayment.setFieldValue('currency', formik.values.invoice_currency);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentOpen, formikPayment.values.currency]);
@@ -458,7 +494,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
   const openPaymentDialog = () => {
     formikPayment.resetForm();
-    formikPayment.setFieldValue('amount', totals[Currency.CRC].total);
     setPaymentOpen(true);
   };
 
@@ -615,6 +650,15 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       )
     }
   ];
+
+  /** --- vars --- */
+  const missingAmount = totals.total - paidAmount >= 0 ? totals.total - paidAmount : 0;
+  const changeAmountCRC = calculateBillingChangeAmount(
+    paidAmount,
+    totals.total,
+    formik.values.invoice_currency,
+    buyingExchangeRate
+  );
 
   return (
     <DashboardLayout>
@@ -831,63 +875,59 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 <CardHeader title={textT?.cards?.totals?.title} subheader={textT?.cards?.totals?.subtitle} />
                 <Divider />
                 <CardContent>
+                  <div className="mb-3">
+                    <Select
+                      options={Object.keys(labelsT?.currency).map((value) => ({
+                        value,
+                        label: labelsT?.currency[value]
+                      }))}
+                      fullWidth
+                      required
+                      id="invoice_currency"
+                      name="invoice_currency"
+                      label={formT?.labels?.invoice_currency}
+                      // placeholder={formT?.placeholders?.invoice_currency}
+                      value={formik.values.invoice_currency}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.invoice_currency && formik.errors.invoice_currency)}
+                      color={
+                        Boolean(formik.touched.invoice_currency && formik.errors.invoice_currency) ? 'error' : 'primary'
+                      }
+                      helperText={formik.touched.invoice_currency && (formik.errors.invoice_currency as string)}
+                      disabled={formik.isSubmitting || isLoading}
+                    />
+                  </div>
                   <Stack spacing={1}>
+                    <Divider className="my-2" />
                     <Row
-                      label={`${textT?.cards?.totals?.subtotal} (${Currency.CRC})`}
-                      value={formatMoney(totals[Currency.CRC].subtotal, `${currencies.CRC.symbol} `)}
-                    />
-                    <Row
-                      label={`${textT?.cards?.totals?.subtotal} (${Currency.USD})`}
-                      value={formatMoney(totals[Currency.USD].subtotal, `${currencies.USD.symbol} `)}
+                      label={`${textT?.cards?.totals?.subtotal}`}
+                      value={formatMoney(totals.subtotal, `${currencies[formik.values.invoice_currency].symbol} `)}
                     />
                     <Divider className="my-2" />
                     <Row
-                      label={`${textT?.cards?.totals?.taxes} (${Currency.CRC})`}
-                      value={formatMoney(totals[Currency.CRC].taxes, `${currencies.CRC.symbol} `)}
-                      strong
-                    />
-                    <Row
-                      label={`${textT?.cards?.totals?.taxes} (${Currency.USD})`}
-                      value={formatMoney(totals[Currency.USD].taxes, `${currencies.USD.symbol} `)}
-                      strong
+                      label={`${textT?.cards?.totals?.taxes}`}
+                      value={formatMoney(totals.taxes, `${currencies[formik.values.invoice_currency].symbol} `)}
                     />
                     <Divider className="my-2" />
                     <Row
-                      label={`${textT?.cards?.totals?.total} (${Currency.CRC})`}
-                      value={formatMoney(totals[Currency.CRC].total, `${currencies.CRC.symbol} `)}
-                      strong
-                    />
-                    <Row
-                      label={`${textT?.cards?.totals?.total} (${Currency.USD})`}
-                      value={formatMoney(totals[Currency.USD].total, `${currencies.USD.symbol} `)}
+                      label={`${textT?.cards?.totals?.total}`}
+                      value={formatMoney(totals.total, `${currencies[formik.values.invoice_currency].symbol} `)}
                       strong
                     />
                     <Divider className="my-2" sx={{ borderWidth: 1, backgroundColor: 'primary.main' }} />
                     <Row
-                      label={`${textT?.cards?.totals?.paid} (${Currency.CRC})`}
-                      value={formatMoney(paidAmounts[Currency.CRC], `${currencies.CRC.symbol} `)}
-                      strong
-                    />
-                    <Row
-                      label={`${textT?.cards?.totals?.paid} (${Currency.USD})`}
-                      value={formatMoney(paidAmounts[Currency.USD], `${currencies.USD.symbol} `)}
-                      strong
+                      label={`${textT?.cards?.totals?.paid}`}
+                      value={formatMoney(paidAmount, `${currencies[formik.values.invoice_currency].symbol} `)}
                     />
                     <Divider className="my-2" />
                     <Row
-                      label={`${textT?.cards?.totals?.debt} (${Currency.CRC})`}
-                      value={formatMoney(
-                        totals[Currency.CRC].total - paidAmounts[Currency.CRC],
-                        `${currencies.CRC.symbol} `
-                      )}
-                      strong
+                      label={`${textT?.cards?.totals?.missing}`}
+                      value={formatMoney(missingAmount, `${currencies[formik.values.invoice_currency].symbol} `)}
                     />
+                    <Divider className="my-2" />
                     <Row
-                      label={`${textT?.cards?.totals?.debt} (${Currency.USD})`}
-                      value={formatMoney(
-                        totals[Currency.USD].total - paidAmounts[Currency.USD],
-                        `${currencies.USD.symbol} `
-                      )}
+                      label={`${textT?.cards?.totals?.change}`}
+                      value={formatMoney(changeAmountCRC, `${currencies[Currency.CRC].symbol} `)}
                       strong
                     />
                   </Stack>
@@ -1040,7 +1080,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               id="currency"
               name="currency"
               label={formCustomLineT?.labels?.currency}
-              placeholder={formCustomLineT?.placeholders?.currency}
+              // placeholder={formCustomLineT?.placeholders?.currency}
               value={formikCustomLine.values.currency}
               onChange={formikCustomLine.handleChange}
               error={Boolean(formikCustomLine.touched.currency && formikCustomLine.errors.currency)}
@@ -1167,7 +1207,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               id="currency"
               name="currency"
               label={formPaymentT?.labels?.currency}
-              placeholder={formPaymentT?.placeholders?.currency}
+              // placeholder={formPaymentT?.placeholders?.currency}
               value={formikPayment.values.currency}
               onChange={formikPayment.handleChange}
               error={Boolean(formikPayment.touched.currency && formikPayment.errors.currency)}

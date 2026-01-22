@@ -38,7 +38,8 @@
         "taxes": "IVA",
         "total": "Total",
         "paid": "Pagado",
-        "debt": "Deuda"
+        "missing": "Faltante",
+        "change": "Vuelto"
       },
       "payment": {
         "title": "Información de Pago",
@@ -120,17 +121,20 @@
     "labels": {
       "client": "Cliente",
       "invoice_type": "Tipo de factura",
-      "invoice_payment_condition": "Condición de pago"
+      "invoice_payment_condition": "Condición de pago",
+      "invoice_currency": "Moneda"
     },
     "placeholders": {
       "client": "Buscar por nombre, casillero, identificación o correo electrónico",
       "invoice_type": "Seleccione una opción",
-      "invoice_payment_condition": "Seleccione una opción"
+      "invoice_payment_condition": "Seleccione una opción",
+      "invoice_currency": "Seleccione una opción"
     },
     "errors": {
       "client": "El cliente es requerido",
       "invoice_type": "El tipo de factura es requerido",
-      "invoice_payment_condition": "La condición de pago es requerida"
+      "invoice_payment_condition": "La condición de pago es requerida",
+      "invoice_currency": "La moneda es requerida"
     },
     "successMessage": "Datos guardados con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo",

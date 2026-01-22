@@ -109,78 +109,108 @@ export const calculateTaxes = (amount: number, taxPercentage: number) => {
 
 export const calculateBillingTotal = (
   lines: BillingLine[],
+  baseCurrency: Currency,
   sellingConversionRate: number,
   buyingConversionRate: number,
   taxPercentage: number
 ) => {
-  let amountCRC = 0;
-  let amountUSD = 0;
+  let amount = 0;
 
   try {
     // calculate subtotals
     lines.forEach((line) => {
-      if (line.currency === Currency.CRC) {
-        amountCRC += line.total;
-        amountUSD += convertUSD(line.total, buyingConversionRate);
-      } else if (line.currency === Currency.USD) {
-        amountUSD += line.total;
-        amountCRC += convertCRC(line.total, sellingConversionRate);
+      if (line.currency === baseCurrency) {
+        amount += line.total;
+      } else if (line.currency !== baseCurrency) {
+        if (baseCurrency === Currency.CRC) {
+          amount += convertCRC(line.total, sellingConversionRate);
+        } else if (baseCurrency === Currency.USD) {
+          amount += convertUSD(line.total, buyingConversionRate);
+        }
       }
     });
 
     // calculate taxes and totals
-    const totalsCRC = calculateTaxes(amountCRC, taxPercentage);
-    const totalsUSD = calculateTaxes(amountUSD, taxPercentage);
+    const totals = calculateTaxes(amount, taxPercentage);
 
     // round CRC totals
-    totalsCRC.total = roundCRC(totalsCRC.total);
+    if (baseCurrency === Currency.CRC) {
+      totals.total = roundCRC(totals.total);
+    }
 
-    return {
-      [Currency.CRC]: totalsCRC,
-      [Currency.USD]: totalsUSD
-    };
+    return totals;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating billing total: ${error}`);
 
-    return {
-      [Currency.CRC]: { subtotal: 0, taxes: 0, total: 0 },
-      [Currency.USD]: { subtotal: 0, taxes: 0, total: 0 }
-    };
+    return { subtotal: 0, taxes: 0, total: 0 };
   }
 };
 
-export const calculateBillingPaidAmount = (paymentLines: PaymentLine[], sellingConversionRate: number) => {
-  let paidAmountCRC = 0;
-  let paidAmountUSD = 0;
+export const calculateBillingPaidAmount = (
+  paymentLines: PaymentLine[],
+  baseCurrency: Currency,
+  sellingConversionRate: number,
+  buyingConversionRate: number
+) => {
+  let paidAmount = 0;
 
   try {
     // calculate paid amounts
     paymentLines.forEach((payment) => {
-      if (payment.currency === Currency.CRC) {
-        paidAmountCRC += payment.amount;
-        paidAmountUSD += convertUSD(payment.amount, sellingConversionRate);
-      } else if (payment.currency === Currency.USD) {
-        paidAmountUSD += payment.amount;
-        paidAmountCRC += convertCRC(payment.amount, sellingConversionRate);
+      if (payment.currency === baseCurrency) {
+        paidAmount += payment.amount;
+      } else if (payment.currency !== baseCurrency) {
+        if (baseCurrency === Currency.CRC) {
+          paidAmount += convertCRC(payment.amount, buyingConversionRate);
+        } else if (baseCurrency === Currency.USD) {
+          paidAmount += convertUSD(payment.amount, sellingConversionRate);
+        }
       }
     });
 
     // round CRC totals
-    paidAmountCRC = roundCRC(paidAmountCRC);
+    if (baseCurrency === Currency.CRC) {
+      paidAmount = roundCRC(paidAmount);
+    }
 
-    return {
-      [Currency.CRC]: paidAmountCRC,
-      [Currency.USD]: paidAmountUSD
-    };
+    return paidAmount;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating billing total: ${error}`);
 
-    return {
-      [Currency.CRC]: 0,
-      [Currency.USD]: 0
-    };
+    return 0;
+  }
+};
+
+export const calculateBillingChangeAmount = (
+  paidAmount: number,
+  billingTotal: number,
+  baseCurrency: Currency,
+  buyingConversionRate: number
+) => {
+  let changeAmount = 0;
+
+  try {
+    changeAmount = paidAmount - billingTotal;
+
+    console.log('Change amount before conversion:', changeAmount);
+
+    if (changeAmount < 0) {
+      return 0;
+    }
+
+    if (baseCurrency === Currency.USD) {
+      changeAmount = convertCRC(changeAmount, buyingConversionRate);
+      changeAmount = roundCRC(changeAmount);
+    }
+
+    return changeAmount;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating billing change amount: ${error}`);
+
+    return 0;
   }
 };
 

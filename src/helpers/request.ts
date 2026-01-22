@@ -1270,6 +1270,65 @@ export const requestEditConfiguration = async (params: any, lang: string) => {
   }
 };
 
+// invoices
+
+export const requestGetInvoices = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/invoices',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestNewInvoice = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/invoices`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestCancelInvoice = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'put',
+      url: `/api/invoices/cancel/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // money outflows
 
 export const requestGetMoneyOutflows = async (params: any, lang: string) => {
