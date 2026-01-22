@@ -6,7 +6,7 @@ import { Currency } from '@/prisma/generated/enums';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 import { isValidBillingInformation } from '@/controllers/Client.Controller';
-import { validateLines, validatePayments } from '@/controllers/Invoice.Controller';
+import { getMostValuablePayment, validateLines, validatePayments } from '@/controllers/Invoice.Controller';
 import { getConfiguration } from '@/controllers/Configuration.Controller';
 import {
   calculateBillingChangeAmount,
@@ -159,47 +159,32 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
       configuration.selling_exchange_rate,
       configuration.buying_exchange_rate
     );
-    const changeAmountCRC = calculateBillingChangeAmount(
-      paidAmount,
-      totals.total,
-      baseCurrency,
-      configuration.buying_exchange_rate
-    );
     if (paidAmount < totals.total) {
       return NextResponse.json({ valid: false, message: textT?.errors?.notEnoughPaidAmount }, { status: 400 });
     }
 
     // create invoice and send to easytax service
     const result = await withTransaction(async (tx) => {
+      // generate invoice variables
+      const changeAmountCRC = calculateBillingChangeAmount(
+        paidAmount,
+        totals.total,
+        baseCurrency,
+        configuration.buying_exchange_rate
+      );
+
+      const mostValuablePayment = getMostValuablePayment(paymentsData || [], configuration.buying_exchange_rate);
+
       // create invoice with lines and payments
       // change packages and order products payment status to PAID and delivered if applies
       // send invoice to easytax service
-      // const moneyOutflow = await tx.cusMoneyOutflow.create({
-      //   data: {
-      //     administrator_id: admin.id,
-      //     cash_register_id: cashRegister.id,
-      //     currency: data.currency,
-      //     amount: parseFloat(data.amount),
-      //     description: data.description,
-      //     method: data.method
-      //   }
-      // });
-      // if (!moneyOutflow) {
-      //   throw new TransactionError(400, textT?.errors?.save);
-      // }
-      // // save log
-      // await tx.cusMoneyOutflowLog.create({
-      //   data: {
-      //     money_outflow_id: moneyOutflow.id,
-      //     administrator_id: admin.id,
-      //     action: 'money-outflow.create',
-      //     data: JSON.stringify(moneyOutflow)
-      //   }
-      // });
-      // return moneyOutflow;
+
+      console.log({ tx, mostValuablePayment }); // prevent eslint errors
+
+      return { id: 1, change: changeAmountCRC };
     });
 
-    return NextResponse.json({ valid: true, id: result.id, change: changeAmountCRC }, { status: 200 });
+    return NextResponse.json({ valid: true, ...result }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
 

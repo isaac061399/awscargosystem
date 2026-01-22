@@ -1,5 +1,5 @@
 import { Currency, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
-import { BillingLine, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
+import { BillingLine, convertCRC, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
 import { prismaRead } from '@/libs/prisma';
 
 export const validateLines = async (
@@ -133,4 +133,22 @@ export const validatePayments = (payments: any[]): { valid: boolean; data?: Paym
     data: errors.length === 0 ? data : undefined,
     errors: errors.length > 0 ? errors : undefined
   };
+};
+
+export const getMostValuablePayment = (payments: PaymentLine[], buyingConversionRate: number): PaymentLine => {
+  const baseCurrency = Currency.CRC;
+  let mostValuable = payments[0];
+  let mostValuableAmount = 0;
+
+  payments.forEach((payment) => {
+    const amount =
+      payment.currency === baseCurrency ? payment.amount : convertCRC(payment.amount, buyingConversionRate);
+
+    if (amount > mostValuableAmount) {
+      mostValuable = payment;
+      mostValuableAmount = amount;
+    }
+  });
+
+  return mostValuable;
 };
