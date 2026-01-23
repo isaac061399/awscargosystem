@@ -94,7 +94,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const [paidAmount, setPaidAmount] = useState<any>(
     calculateBillingPaidAmount(paymentLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate)
   );
-  const [successState, setSuccessState] = useState({ open: true, id: 1 as number | null, changeAmountCRC: 0 });
+  const [successState, setSuccessState] = useState({ open: false, id: 0, changeAmountCRC: 0 });
 
   // Billing lines dialogs
   // const [customOpen, setCustomOpen] = useState(false);
