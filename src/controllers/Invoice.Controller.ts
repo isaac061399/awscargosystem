@@ -1,6 +1,50 @@
 import { Currency, OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
 import { BillingLine, convertCRC, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
 import { prismaRead, Tx } from '@/libs/prisma';
+import { clientSelectSchema } from './Client.Controller';
+
+export const getInvoice = async (id: number) => {
+  try {
+    const invoice = await prismaRead.cusInvoice.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        consecutive: true,
+        numeric_key: true,
+        type: true,
+        payment_condition: true,
+        iva_percentage: true,
+        selling_exchange_rate: true,
+        buying_exchange_rate: true,
+        currency: true,
+        payment_method: true,
+        subtotal: true,
+        tax: true,
+        total: true,
+        cash_change: true,
+        status: true,
+        created_at: true,
+        cash_register: {
+          select: {
+            id: true,
+            office: { select: { id: true, name: true } }
+          }
+        },
+        client: { select: clientSelectSchema }
+      }
+    });
+
+    if (!invoice) {
+      return;
+    }
+
+    return invoice;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    // console.error(`Error: ${e}`);
+    return;
+  }
+};
 
 export const validateLines = async (
   lines: any[]

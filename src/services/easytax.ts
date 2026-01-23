@@ -108,7 +108,7 @@ const formatGenerateDocumentParams = (data: GenerateDocumentData) => {
     condicion_pago: conditionMap[data.condition],
     moneda: currencyMap[data.currency],
     // tipo_cambio: 1, // no enviar para que se use el del día
-    // total_gravado: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios gravados)
+    total_gravado: data.total.subtotal,
     // total_exento: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
     // total_exonerado: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
     // total_descuento: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)

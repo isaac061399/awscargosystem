@@ -178,6 +178,12 @@
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
+  "invoices": {
+    "errors": {
+      "save": "Error al guardar la factura, por favor inténtalo de nuevo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
   "money-outflows": {
     "errors": {
       "noOpenCash": "No hay una caja abierta. No se pueden procesar transacciones.",

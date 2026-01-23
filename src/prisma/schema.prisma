@@ -609,7 +609,11 @@ model CusConfiguration {
   maritime_address_phone       String?
   billing_name                 String
   billing_identification       String
+  billing_email                String
+  billing_phone                String
+  billing_address              String
   billing_activity_code        String
+  billing_cabys_default        String
   created_at                   DateTime @default(now())
   updated_at                   DateTime @updatedAt
 
@@ -667,8 +671,8 @@ model CusInvoice {
   id                    Int                     @id @default(autoincrement())
   cash_register_id      Int
   client_id             Int
-  number                String
   consecutive           String
+  numeric_key           String
   type                  InvoiceType
   payment_condition     InvoicePaymentCondition
   iva_percentage        Float                   @default(0)

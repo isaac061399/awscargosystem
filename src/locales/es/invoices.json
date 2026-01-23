@@ -1,0 +1,34 @@
+{
+  "text": {
+    "title": "Facturas Emitidas",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "btnExport": "Exportar",
+    "filterStatus": "Filtrar por Estado",
+    "table": {
+      "consecutive": {
+        "title": "Consecutivo"
+      },
+      "office": {
+        "title": "Oficina"
+      },
+      "client": {
+        "title": "Cliente",
+        "identification": "Identificación",
+        "email": "Correo"
+      },
+      "type": {
+        "title": "Info",
+        "type": "Tipo",
+        "paymentCondition": "Condición de Pago"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "created_at": {
+        "title": "Fecha de Registro",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      }
+    }
+  }
+}

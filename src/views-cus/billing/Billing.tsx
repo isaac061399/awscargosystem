@@ -4,7 +4,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 // Next Imports
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -66,8 +65,6 @@ function lineTotal(quantity: number, unit_price: number) {
 }
 
 const Billing = ({ cashRegister }: { cashRegister?: any }) => {
-  const router = useRouter();
-
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
   const buyingExchangeRate = configuration?.buying_exchange_rate ?? 0;
@@ -127,8 +124,6 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
-
-      console.log(values);
 
       // validate amount vrs total if payment method is cash
       if (paidAmount < totals.total) {
@@ -504,8 +499,9 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
   const handleCloseSuccess = () => {
     setSuccessState({ ...successState, open: false });
-    formik.resetForm();
-    router.refresh();
+
+    // reset process
+    window.location.href = window.location.pathname;
   };
 
   /** --- grids --- */
@@ -566,10 +562,10 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
 
   const selectedCols: GridColDef[] = [
     {
-      field: 'type',
+      field: 'refObj',
       headerName: textT?.selectedLinesTable?.type?.title,
       width: 120,
-      renderCell: (params) => <Chip size="small" label={textT?.lineTypes?.[params.value]} />,
+      renderCell: (params) => <Chip size="small" label={textT?.lineTypes?.[params.value.type]} />,
       sortable: false
     },
     { field: 'ref', headerName: textT?.selectedLinesTable?.ref?.title, width: 200, sortable: false },
@@ -1333,7 +1329,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             </Typography>
             <Stack direction="column" spacing={2}>
               {successState.id && (
-                <Button variant="contained" color="primary" href={`/print/invoices/${successState.id}`} target="_blank">
+                <Button variant="contained" color="primary" href={`/print/invoice/${successState.id}`} target="_blank">
                   {textT?.dialogSuccess?.printInvoice}
                 </Button>
               )}

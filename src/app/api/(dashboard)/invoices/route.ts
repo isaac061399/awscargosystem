@@ -5,7 +5,7 @@ import { initTranslationsApi } from '@libs/translate/functions';
 import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType } from '@/prisma/generated/enums';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
-import { isValidBillingInformation } from '@/controllers/Client.Controller';
+import { clientSelectSchema, isValidBillingInformation } from '@/controllers/Client.Controller';
 import {
   getMostValuablePayment,
   updateLineReferences,
@@ -24,68 +24,64 @@ export const GET = withAuthApi(['invoices.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
   const textT: any = t('api:invoices', { returnObjects: true, default: {} });
 
-  // const params = Object.fromEntries(req.nextUrl.searchParams.entries());
+  const params = Object.fromEntries(req.nextUrl.searchParams.entries());
 
   try {
-    // // filters
-    // const where: any = {};
-    // const search = params.s || '';
+    // filters
+    const where: any = {};
+    const search = params.s || '';
+    const status = params.status || '';
 
-    // if (search.trim() !== '') {
-    //   where['OR'] = [
-    //     { administrator: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
-    //     { administrator: { email: { contains: search.trim(), mode: 'insensitive' } } },
-    //     { cash_register: { office: { name: { contains: search.trim(), mode: 'insensitive' } } } },
-    //     { description: { contains: search.trim(), mode: 'insensitive' } }
-    //   ];
-    // }
+    if (search.trim() !== '') {
+      where['OR'] = [
+        { number: { contains: search.trim(), mode: 'insensitive' } },
+        { consecutive: { contains: search.trim(), mode: 'insensitive' } },
+        { client: { id: parseInt(search.trim()) } },
+        { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
+        { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
+      ];
+    }
 
-    // // query
-    // const moneyOutflows = await prismaRead.cusMoneyOutflow.findMany({
-    //   take: params.limit ? parseInt(params.limit) : 100,
-    //   skip: params.offset ? parseInt(params.offset) : 0,
-    //   where,
-    //   orderBy: [{ id: 'desc' }],
-    //   select: {
-    //     id: true,
-    //     currency: true,
-    //     amount: true,
-    //     description: true,
-    //     method: true,
-    //     created_at: true,
-    //     administrator: {
-    //       select: {
-    //         id: true,
-    //         first_name: true,
-    //         last_name: true,
-    //         full_name: true,
-    //         email: true
-    //       }
-    //     },
-    //     cash_register: {
-    //       select: {
-    //         id: true,
-    //         office: {
-    //           select: {
-    //             id: true,
-    //             name: true
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // });
+    if (status !== '') {
+      where['status'] = status;
+    }
 
-    // if (!moneyOutflows) {
-    //   return NextResponse.json({ valid: true, data: [], pagination: { total: 0, count: 0 } }, { status: 200 });
-    // }
+    if (params.client_id) {
+      where['client_id'] = parseInt(params.client_id);
+    }
 
-    // const total = await prismaRead.cusMoneyOutflow.count({ where });
-    // const pagination = { total: total || 0, count: moneyOutflows?.length || 0 };
+    // query
+    const invoices = await prismaRead.cusInvoice.findMany({
+      take: params.limit ? parseInt(params.limit) : 100,
+      skip: params.offset ? parseInt(params.offset) : 0,
+      where,
+      orderBy: [{ id: 'desc' }],
+      select: {
+        id: true,
+        consecutive: true,
+        type: true,
+        payment_condition: true,
+        status: true,
+        created_at: true,
+        cash_register: {
+          select: {
+            id: true,
+            office: { select: { id: true, name: true } }
+          }
+        },
+        client: { select: clientSelectSchema }
+      }
+    });
 
-    // return NextResponse.json({ valid: true, data: moneyOutflows, pagination }, { status: 200 });
+    if (!invoices) {
+      return NextResponse.json({ valid: true, data: [], pagination: { total: 0, count: 0 } }, { status: 200 });
+    }
 
-    return NextResponse.json({ valid: true, data: [], pagination: { total: 0, count: 0 } }, { status: 200 });
+    const total = await prismaRead.cusInvoice.count({ where });
+    const pagination = { total: total || 0, count: invoices?.length || 0 };
+
+    return NextResponse.json({ valid: true, data: invoices, pagination }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
 
@@ -101,6 +97,13 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
   const data = await req.json();
 
   try {
+    const clientId = parseInt(data.client_id);
+    const invoiceType = data.type as InvoiceType;
+    const paymentCondition = data.payment_condition as InvoicePaymentCondition;
+    const baseCurrency = data.currency as Currency;
+    const lines = data.lines;
+    const payments = data.payments;
+
     // validate if admin has open cash register
     const cashRegister = await getOpenCashRegister(admin.id);
     if (!cashRegister) {
@@ -108,7 +111,6 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     }
 
     // validate currency
-    const baseCurrency = data.currency as Currency;
     if (!Object.values(Currency).includes(baseCurrency)) {
       return NextResponse.json({ valid: false, message: textT?.errors?.invalidCurrency }, { status: 400 });
     }
@@ -121,7 +123,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
 
     // validate client and billing information
     const client = await prismaRead.cusClient.findUnique({
-      where: { id: parseInt(data.clientId), office_id: cashRegister.office_id }
+      where: { id: clientId, office_id: cashRegister.office_id }
     });
     if (!client) {
       return NextResponse.json({ valid: false, message: textT?.errors?.noClient }, { status: 400 });
@@ -131,7 +133,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     }
 
     // validate lines
-    const { valid: linesValid, data: linesData, errors: linesErrors } = await validateLines(data.lines);
+    const { valid: linesValid, data: linesData, errors: linesErrors } = await validateLines(lines);
     if (!linesValid) {
       return NextResponse.json(
         { valid: false, message: textT?.errors?.linesError?.replace('{{ errors }}', linesErrors?.join(', ') || '') },
@@ -140,7 +142,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     }
 
     // validate payments
-    const { valid: paymentsValid, data: paymentsData, errors: paymentsErrors } = validatePayments(data.payments);
+    const { valid: paymentsValid, data: paymentsData, errors: paymentsErrors } = validatePayments(payments);
     if (!paymentsValid) {
       return NextResponse.json(
         {
@@ -179,16 +181,14 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
         configuration.buying_exchange_rate
       );
       const mostValuablePayment = getMostValuablePayment(paymentsData || [], configuration.buying_exchange_rate);
-      const invoiceType = data.invoice_type as InvoiceType;
-      const paymentCondition = data.invoice_payment_condition as InvoicePaymentCondition;
 
       // 2: create invoice with lines and payments
       const invoice = await tx.cusInvoice.create({
         data: {
           cash_register_id: cashRegister.id,
           client_id: client.id,
-          number: '', // to be generated
-          consecutive: '', // to be generated
+          consecutive: `${Date.now()}`, // TODO: to be generated
+          numeric_key: `${Date.now()}`, // TODO: to be generated
           type: invoiceType,
           payment_condition: paymentCondition,
           iva_percentage: configuration.iva_percentage,

@@ -1,0 +1,42 @@
+{
+  "text": {
+    "title": "Paquete: ",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "subtotalLabel": "Subtotal",
+    "totalLabel": "Total",
+    "statusLabel": "Estado",
+    "paymentStatusLabel": "Estado de Pago",
+    "btnSave": "Guardar",
+    "trackingLabel": "Tracking",
+    "dateLabel": "Registrado el",
+    "clientInfo": {
+      "title": "Información del Cliente",
+      "mailbox": "Casillero",
+      "name": "Nombre",
+      "identification": "Identificación",
+      "email": "Correo Electrónico",
+      "office": "Oficina",
+      "profile": "Perfil",
+      "viewClient": "Ver Cliente"
+    },
+    "packageInfo": {
+      "title": "Información del Paquete",
+      "courierCompany": "Compañía de Mensajería",
+      "purchasePage": "Página de Compra",
+      "price": "Precio",
+      "description": "Descripción"
+    },
+    "billingInfo": {
+      "title": "Facturación",
+      "weight": "Peso (libras)",
+      "poundFee": "Tarifa por Libra",
+      "subtotal": "Subtotal",
+      "total": "Total"
+    },
+    "locationInfo": {
+      "title": "Ubicación",
+      "shelf": "Estante",
+      "row": "Fila"
+    }
+  }
+}

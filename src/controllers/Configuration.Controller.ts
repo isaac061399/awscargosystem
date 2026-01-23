@@ -25,7 +25,11 @@ export const getConfiguration = async () => {
         maritime_address_phone: true,
         billing_name: true,
         billing_identification: true,
-        billing_activity_code: true
+        billing_email: true,
+        billing_phone: true,
+        billing_address: true,
+        billing_activity_code: true,
+        billing_cabys_default: true
       }
     });
 
@@ -63,7 +67,11 @@ export const saveConfiguration = async (data: any) => {
       maritime_address_phone: data.maritime_address_phone || '',
       billing_name: data.billing_name || '',
       billing_identification: data.billing_identification || '',
-      billing_activity_code: data.billing_activity_code || ''
+      billing_email: data.billing_email || '',
+      billing_phone: data.billing_phone || '',
+      billing_address: data.billing_address || '',
+      billing_activity_code: data.billing_activity_code || '',
+      billing_cabys_default: data.billing_cabys_default || ''
     };
 
     const result = await prismaWrite.cusConfiguration.upsert({

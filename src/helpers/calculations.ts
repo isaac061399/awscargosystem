@@ -197,8 +197,6 @@ export const calculateBillingChangeAmount = (
   try {
     changeAmount = paidAmount - billingTotal;
 
-    console.log('Change amount before conversion:', changeAmount);
-
     if (changeAmount < 0) {
       return 0;
     }

@@ -105,13 +105,19 @@ export const validateOrderStatus = async (id: number, tx?: Tx) => {
       return false;
     }
 
+    const allProductsHaveSamePaymentStatus = order.products.every(
+      (product) => product.payment_status === order.products[0].payment_status
+    );
     const allProductsHaveSameStatus = order.products.every((product) => product.status === order.products[0].status);
 
-    if (allProductsHaveSameStatus) {
-      const newStatus = order.products[0].status;
+    if (allProductsHaveSamePaymentStatus || allProductsHaveSameStatus) {
       await prismaInstanceWrite.cusOrder.update({
         where: { id },
-        data: { status: newStatus, status_date: new Date() }
+        data: {
+          payment_status: allProductsHaveSamePaymentStatus ? order.products[0].payment_status : undefined,
+          status: allProductsHaveSameStatus ? order.products[0].status : undefined,
+          status_date: allProductsHaveSameStatus ? new Date() : undefined
+        }
       });
 
       return true;

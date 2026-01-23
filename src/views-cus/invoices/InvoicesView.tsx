@@ -43,25 +43,19 @@ import { calculateTaxes, convertCRC } from '@/helpers/calculations';
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const statusColors: any = {
-  PRE_ALERTED: 'warning',
-  ON_THE_WAY: 'primary',
-  READY: 'info',
-  DELIVERED: 'success'
-};
-
-const paymentStatusColors: any = {
   PENDING: 'warning',
-  PAID: 'success'
+  PAID: 'success',
+  CANCELED: 'error'
 };
 
-const PackagesView = ({ packageObj }: { packageObj: any }) => {
+const InvoicesView = ({ invoice }: { invoice: any }) => {
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
   const ivaPercentage = configuration?.iva_percentage ?? 0;
 
   const { t } = useTranslation();
-  const textT: any = useMemo(() => t('packages-view:text', { returnObjects: true, default: {} }), [t]);
-  // const formT: any = useMemo(() => t('packages-view:form', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('invoices-view:text', { returnObjects: true, default: {} }), [t]);
+  // const formT: any = useMemo(() => t('invoices-view:form', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
@@ -72,9 +66,9 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
     enableReinitialize: true,
     initialValues: useMemo(
       () => ({
-        notes: packageObj ? packageObj.notes : null
+        notes: invoice ? invoice.notes : null
       }),
-      [packageObj]
+      [invoice]
     ),
     validationSchema: yup.object({
       notes: yup.string()
@@ -103,7 +97,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
       //   } else {
       //     setIsRedirecting(true);
       //     setTimeout(() => {
-      //       router.push(`/packages/edit/${result.id}`);
+      //       router.push(`/invoices/edit/${result.id}`);
       //     }, 2000);
       //   }
       //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -115,19 +109,8 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
   });
 
   const statusChip: any = {
-    label: labelsT?.packageStatus?.[packageObj.status] || 'Unknown',
-    color: statusColors[packageObj.status] || 'info'
-  };
-
-  const paymentStatusChip: any = {
-    label: labelsT?.paymentStatus?.[packageObj.payment_status] || 'Unknown',
-    color: paymentStatusColors[packageObj.payment_status] || 'info'
-  };
-
-  const packageTotal = calculateTaxes(packageObj.billing_amount, ivaPercentage);
-  const packageTotalCRC = {
-    subtotal: convertCRC(packageTotal.subtotal, sellingExchangeRate),
-    total: convertCRC(packageTotal.total, sellingExchangeRate)
+    label: labelsT?.invoiceStatus?.[invoice.status] || 'Unknown',
+    color: statusColors[invoice.status] || 'info'
   };
 
   return (
@@ -138,10 +121,10 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
             <div className="flex flex-col sm:flex-row sm:justify-between justify-start items-center gap-3 mb-3">
               <div className="flex items-center gap-2">
                 <Typography variant="h3" className="flex items-center gap-1">
-                  <IconButton className="p-1" color="default" LinkComponent={Link} href="/packages">
+                  <IconButton className="p-1" color="default" LinkComponent={Link} href="/invoices">
                     <i className="ri-arrow-left-s-line text-4xl" />
                   </IconButton>
-                  {`${textT?.title} ${packageObj.tracking}`}
+                  {`${textT?.title} ${invoice.tracking}`}
                 </Typography>
               </div>
 
@@ -166,32 +149,9 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
               <CardContent>
                 <Grid container spacing={3} alignItems="top">
                   {/* Total */}
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Stack>
-                      <div className="flex items-center gap-1">
-                        <Typography variant="overline" color="text.secondary">
-                          {textT?.subtotalLabel}:
-                        </Typography>
-                        <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
-                          {' | '}
-                          {formatMoney(packageTotalCRC.subtotal, `${currencies.CRC.symbol} `)}
-                        </Typography>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Typography variant="overline" color="text.secondary">
-                          {textT?.totalLabel}:
-                        </Typography>
-                        <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}
-                          {' | '}
-                          {formatMoney(packageTotalCRC.total, `${currencies.CRC.symbol} `)}
-                        </Typography>
-                      </div>
-                    </Stack>
-                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}></Grid>
 
-                  {/* Package status */}
+                  {/* Invoice status */}
                   <Grid size={{ xs: 12, md: 2 }}>
                     <Stack spacing={1}>
                       <Typography variant="overline" color="text.secondary">
@@ -199,18 +159,6 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                       </Typography>
                       <Stack direction="row" alignItems="center" spacing={1.5}>
                         <Chip label={statusChip.label} color={statusChip.color} size="small" />
-                      </Stack>
-                    </Stack>
-                  </Grid>
-
-                  {/* Payment status */}
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <Stack spacing={1}>
-                      <Typography variant="overline" color="text.secondary">
-                        {textT?.paymentStatusLabel}
-                      </Typography>
-                      <Stack direction="row" alignItems="center" spacing={1.5}>
-                        <Chip label={paymentStatusChip.label} color={paymentStatusChip.color} size="small" />
                       </Stack>
                     </Stack>
                   </Grid>
@@ -228,7 +176,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                   sx={{ mb: 2 }}>
                   <Box>
                     <Typography variant="h5" fontWeight={700}>
-                      {textT?.trackingLabel}: {packageObj.tracking}
+                      {textT?.trackingLabel}: {invoice.tracking}
                     </Typography>
                   </Box>
 
@@ -236,7 +184,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                     <Chip
                       size="small"
                       variant="outlined"
-                      label={`${textT?.dateLabel}: ${moment(packageObj.created_at).format(textT?.dateFormat)}`}
+                      label={`${textT?.dateLabel}: ${moment(invoice.created_at).format(textT?.dateFormat)}`}
                     />
                   </Stack>
                 </Stack>
@@ -251,25 +199,19 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                         <Stack spacing={1.25}>
                           <InfoRow
                             label={textT?.clientInfo?.mailbox}
-                            value={`${packageObj.client?.office?.mailbox_prefix}${packageObj.client?.id}`}
+                            value={`${invoice.client?.office?.mailbox_prefix}${invoice.client?.id}`}
                           />
                           <Divider />
-                          <InfoRow label={textT?.clientInfo?.name} value={packageObj.client?.full_name} />
-                          <InfoRow
-                            label={textT?.clientInfo?.identification}
-                            value={packageObj.client?.identification}
-                          />
-                          <InfoRow label={textT?.clientInfo?.email} value={packageObj.client?.email} />
-                          <InfoRow label={textT?.clientInfo?.office} value={packageObj.client?.office?.name} />
+                          <InfoRow label={textT?.clientInfo?.name} value={invoice.client?.full_name} />
+                          <InfoRow label={textT?.clientInfo?.identification} value={invoice.client?.identification} />
+                          <InfoRow label={textT?.clientInfo?.email} value={invoice.client?.email} />
+                          <InfoRow label={textT?.clientInfo?.office} value={invoice.client?.office?.name} />
                           <Divider />
                           <InfoRow
                             label={textT?.clientInfo?.profile}
                             value={
-                              packageObj.client?.id ? (
-                                <Link
-                                  href={`/clients/edit/${packageObj.client.id}`}
-                                  target="_blank"
-                                  className="underline">
+                              invoice.client?.id ? (
+                                <Link href={`/clients/edit/${invoice.client.id}`} target="_blank" className="underline">
                                   {textT?.clientInfo?.viewClient}
                                 </Link>
                               ) : (
@@ -282,20 +224,17 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                     </Card>
                   </Grid>
 
-                  {/* Package Info */}
+                  {/* Invoice Info */}
                   <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
                     <Card sx={{ flexGrow: 1 }}>
-                      <CardHeader title={textT?.packageInfo?.title} />
+                      <CardHeader title={textT?.invoiceInfo?.title} />
                       <CardContent>
                         <Stack spacing={1.25}>
-                          <InfoRow
-                            label={textT?.packageInfo?.courierCompany}
-                            value={packageObj.courier_company ?? '—'}
-                          />
-                          <InfoRow label={textT?.packageInfo?.purchasePage} value={packageObj.purchase_page ?? '—'} />
-                          <InfoRow label={textT?.packageInfo?.price} value={packageObj.price} />
+                          <InfoRow label={textT?.invoiceInfo?.courierCompany} value={invoice.courier_company ?? '—'} />
+                          <InfoRow label={textT?.invoiceInfo?.purchasePage} value={invoice.purchase_page ?? '—'} />
+                          <InfoRow label={textT?.invoiceInfo?.price} value={invoice.price} />
                           <Divider />
-                          <InfoRow label={textT?.packageInfo?.description} value={packageObj.description ?? '—'} />
+                          <InfoRow label={textT?.invoiceInfo?.description} value={invoice.description ?? '—'} />
                         </Stack>
                       </CardContent>
                     </Card>
@@ -307,17 +246,17 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                       <CardHeader title={textT?.billingInfo?.title} />
                       <CardContent>
                         <Stack spacing={1.25}>
-                          <InfoRow label={textT?.billingInfo?.weight} value={packageObj.billing_weight} />
+                          <InfoRow label={textT?.billingInfo?.weight} value={invoice.billing_weight} />
                           <InfoRow
                             label={textT?.billingInfo?.poundFee}
-                            value={formatMoney(packageObj.billing_pound_fee, `${currencies.USD.symbol} `)}
+                            value={formatMoney(invoice.billing_pound_fee, `${currencies.USD.symbol} `)}
                           />
                           <Divider />
                           <InfoRow
                             label={textT?.billingInfo?.subtotal}
                             value={
                               <Typography component="span" fontWeight={600}>
-                                {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
+                                {/* {formatMoney(invoiceTotal.subtotal, `${currencies.USD.symbol} `)} */}
                               </Typography>
                             }
                           />
@@ -325,7 +264,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                             label={textT?.billingInfo?.total}
                             value={
                               <Typography component="span" fontWeight={600}>
-                                {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}
+                                {/* {formatMoney(invoiceTotal.total, `${currencies.USD.symbol} `)} */}
                               </Typography>
                             }
                           />
@@ -340,8 +279,8 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                       <CardHeader title={textT?.locationInfo?.title} />
                       <CardContent>
                         <Stack spacing={1.25}>
-                          <InfoRow label={textT?.locationInfo?.shelf} value={packageObj.location_shelf} />
-                          <InfoRow label={textT?.locationInfo?.row} value={packageObj.location_row} />
+                          <InfoRow label={textT?.locationInfo?.shelf} value={invoice.location_shelf} />
+                          <InfoRow label={textT?.locationInfo?.row} value={invoice.location_row} />
                           <Divider />
                         </Stack>
                       </CardContent>
@@ -357,4 +296,4 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
   );
 };
 
-export default PackagesView;
+export default InvoicesView;

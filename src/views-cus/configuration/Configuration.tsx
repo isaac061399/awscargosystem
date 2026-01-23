@@ -25,6 +25,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import { MuiTelInput } from 'mui-tel-input';
 
 import moment from 'moment';
 
@@ -41,6 +42,7 @@ import { useAdmin } from '@/components/AdminProvider';
 import { hasAllPermissions } from '@/helpers/permissions';
 
 import { currencies } from '@/libs/constants';
+import { getTelInputValue } from '@/libs/utils';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -81,7 +83,11 @@ const Configuration = () => {
 
         billing_name: configuration ? configuration.billing_name : '',
         billing_identification: configuration ? configuration.billing_identification : '',
-        billing_activity_code: configuration ? configuration.billing_activity_code : ''
+        billing_email: configuration ? configuration.billing_email : '',
+        billing_phone: configuration ? configuration.billing_phone : '',
+        billing_address: configuration ? configuration.billing_address : '',
+        billing_activity_code: configuration ? configuration.billing_activity_code : '',
+        billing_cabys_default: configuration ? configuration.billing_cabys_default : ''
       }),
       [configuration]
     ),
@@ -107,13 +113,19 @@ const Configuration = () => {
 
       billing_name: yup.string().required(formT?.errors?.billing_name),
       billing_identification: yup.string().required(formT?.errors?.billing_identification),
-      billing_activity_code: yup.string().required(formT?.errors?.billing_activity_code)
+      billing_email: yup.string().required(formT?.errors?.billing_email).email(formT?.errors?.billing_email),
+      billing_phone: yup.string().required(formT?.errors?.billing_phone),
+      billing_address: yup.string().required(formT?.errors?.billing_address),
+      billing_activity_code: yup.string().required(formT?.errors?.billing_activity_code),
+      billing_cabys_default: yup.string().required(formT?.errors?.billing_cabys_default)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
 
       try {
-        const result = await requestEditConfiguration(values, i18n.language);
+        const newValues = { ...values, billing_phone: getTelInputValue(values.billing_phone) };
+
+        const result = await requestEditConfiguration(newValues, i18n.language);
 
         if (!result.valid) {
           return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
@@ -570,7 +582,7 @@ const Configuration = () => {
                   <Typography variant="h5">{textT?.billingTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       fullWidth
                       required
@@ -587,7 +599,7 @@ const Configuration = () => {
                       disabled={formik.isSubmitting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       fullWidth
                       required
@@ -610,7 +622,60 @@ const Configuration = () => {
                       disabled={formik.isSubmitting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="email"
+                      id="billing_email"
+                      name="billing_email"
+                      label={formT?.labels?.billing_email}
+                      placeholder={formT?.placeholders?.billing_email}
+                      value={formik.values.billing_email}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_email && formik.errors.billing_email)}
+                      color={Boolean(formik.touched.billing_email && formik.errors.billing_email) ? 'error' : 'primary'}
+                      helperText={formik.touched.billing_email && (formik.errors.billing_email as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <MuiTelInput
+                      fullWidth
+                      required
+                      id="billing_phone"
+                      name="billing_phone"
+                      defaultCountry="CR"
+                      label={formT?.labels?.billing_phone}
+                      placeholder={formT?.placeholders?.billing_phone}
+                      value={formik.values.billing_phone}
+                      onChange={(value) => formik.setFieldValue('billing_phone', value)}
+                      error={Boolean(formik.touched.billing_phone && formik.errors.billing_phone)}
+                      color={Boolean(formik.touched.billing_phone && formik.errors.billing_phone) ? 'error' : 'primary'}
+                      helperText={formik.touched.billing_phone && (formik.errors.billing_phone as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="billing_address"
+                      name="billing_address"
+                      label={formT?.labels?.billing_address}
+                      placeholder={formT?.placeholders?.billing_address}
+                      value={formik.values.billing_address}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_address && formik.errors.billing_address)}
+                      color={
+                        Boolean(formik.touched.billing_address && formik.errors.billing_address) ? 'error' : 'primary'
+                      }
+                      helperText={formik.touched.billing_address && (formik.errors.billing_address as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       fullWidth
                       required
@@ -629,6 +694,29 @@ const Configuration = () => {
                       }
                       helperText={
                         formik.touched.billing_activity_code && (formik.errors.billing_activity_code as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="text"
+                      id="billing_cabys_default"
+                      name="billing_cabys_default"
+                      label={formT?.labels?.billing_cabys_default}
+                      placeholder={formT?.placeholders?.billing_cabys_default}
+                      value={formik.values.billing_cabys_default}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_cabys_default && formik.errors.billing_cabys_default)}
+                      color={
+                        Boolean(formik.touched.billing_cabys_default && formik.errors.billing_cabys_default)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.billing_cabys_default && (formik.errors.billing_cabys_default as string)
                       }
                       disabled={formik.isSubmitting}
                     />

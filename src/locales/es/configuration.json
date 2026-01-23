@@ -30,9 +30,13 @@
       "maritime_address_postal_code": "Código Postal",
       "maritime_address_phone": "Teléfono",
 
-      "billing_name": "Nombre de la compañia",
-      "billing_identification": "Identificación de la compañia",
-      "billing_activity_code": "Código de actividad de la compañia"
+      "billing_name": "Nombre",
+      "billing_identification": "Identificación",
+      "billing_email": "Correo electrónico",
+      "billing_phone": "Teléfono",
+      "billing_address": "Dirección",
+      "billing_activity_code": "Código de actividad",
+      "billing_cabys_default": "CAByS predeterminado"
     },
     "placeholders": {
       "pound_fee": "Ingrese un valor en dólares",
@@ -54,9 +58,13 @@
       "maritime_address_postal_code": "Ingrese un valor",
       "maritime_address_phone": "Ingrese un valor",
 
-      "billing_name": "Ingrese el nombre de la compañia",
-      "billing_identification": "Ingrese la identificación de la compañia",
-      "billing_activity_code": "Ingrese el código de actividad de la compañia"
+      "billing_name": "Ingrese el nombre",
+      "billing_identification": "Ingrese la identificación",
+      "billing_email": "Ingrese el correo electrónico",
+      "billing_phone": "Ingrese el teléfono",
+      "billing_address": "Ingrese la dirección",
+      "billing_activity_code": "Ingrese el código de actividad",
+      "billing_cabys_default": "Ingrese el CAByS predeterminado"
     },
     "errors": {
       "invalidType": "Tipo inválido",
@@ -81,7 +89,11 @@
 
       "billing_name": "Campo requerido",
       "billing_identification": "Campo requerido",
-      "billing_activity_code": "Campo requerido"
+      "billing_email": "Campo requerido",
+      "billing_phone": "Campo requerido",
+      "billing_address": "Campo requerido",
+      "billing_activity_code": "Campo requerido",
+      "billing_cabys_default": "Campo requerido"
     },
     "successMessage": "Configuración guardada con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"

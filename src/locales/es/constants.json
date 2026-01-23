@@ -8,6 +8,10 @@
       "CRC": "Colones",
       "USD": "Dólares"
     },
+    "clientStatus": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo"
+    },
     "identificationType": {
       "PHYSICAL": "Física",
       "LEGAL": "Jurídica",
@@ -15,8 +19,8 @@
       "PASSPORT": "Pasaporte"
     },
     "invoiceType": {
-      "TICKET": "Tiquete",
-      "ELECTRONIC": "Electrónica"
+      "TICKET": "Tiquete Electrónico",
+      "ELECTRONIC": "Factura Electrónica"
     },
     "invoicePaymentCondition": {
       "CASH": "Contado",
@@ -29,9 +33,10 @@
       "CREDIT_60": "Crédito 60 días",
       "CREDIT_90": "Crédito 90 días"
     },
-    "clientStatus": {
-      "ACTIVE": "Activo",
-      "INACTIVE": "Inactivo"
+    "invoiceStatus": {
+      "PENDING": "Pendiente",
+      "PAID": "Pagada",
+      "CANCELED": "Cancelada"
     },
     "orderStatus": {
       "PENDING": "Pendiente",
