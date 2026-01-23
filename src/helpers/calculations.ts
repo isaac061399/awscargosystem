@@ -1,9 +1,12 @@
+import { CusOrderProduct, CusPackage, CusProduct } from '@/prisma/generated/client';
 import { Currency, PaymentMethod } from '@/prisma/generated/enums';
 
 export type BillingLine = {
   id: string;
-  type: 'package' | 'order_product' | 'custom' | 'product';
-  refObj: any | null;
+  refObj:
+    | { type: 'package'; obj: CusPackage }
+    | { type: 'order_product'; obj: CusOrderProduct }
+    | { type: 'product'; obj: CusProduct };
   ref: string;
   description: string;
   quantity: number;

@@ -111,6 +111,12 @@
   },
   "billing": {
     "errors": {
+      "notEnoughPaidAmount": "The paid amount does not cover the total of the invoice",
+      "paymentsError": "Payments have the following errors: {{ errors }}",
+      "linesError": "Billing lines have the following errors: {{ errors }}",
+      "noClientBillingInfo": "The client has incomplete billing information",
+      "noClient": "Invalid client",
+      "invalidCurrency": "Invalid currency",
       "noOpenCash": "There is no open cash register. Transactions cannot be processed.",
       "save": "Error saving the invoice, please try again",
       "general": "An error occurred, please try again"

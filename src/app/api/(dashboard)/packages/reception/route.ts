@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
-import { Prisma } from '@/prisma/generated/client';
+import { OrderStatus, PackageStatus, Prisma } from '@/prisma/generated/client';
 
 import { calculateShippingPrice } from '@/helpers/calculations';
 import { clientSelectSchema } from '@/controllers/Client.Controller';
@@ -139,7 +139,7 @@ const savePackageReception = async (
       billing_amount: entry.client ? calculateShippingPrice(weight.toString(), entry.client.pound_fee) : undefined,
       location_shelf: ready ? shelf : null,
       location_row: ready ? row : null,
-      status: ready ? 'READY' : undefined,
+      status: ready ? PackageStatus.READY : undefined,
       status_date: ready ? new Date() : undefined
     }
   });
@@ -173,7 +173,7 @@ const savePackageReception = async (
     await tx.cusPackageStatusLog.create({
       data: {
         package_id: entry.id,
-        status: 'READY'
+        status: PackageStatus.READY
       }
     });
 
@@ -229,7 +229,7 @@ const saveOrderReception = async (
       data: {
         location_shelf: ready ? shelf : null,
         location_row: ready ? row : null,
-        status: ready ? 'READY' : undefined,
+        status: ready ? OrderStatus.READY : undefined,
         status_date: ready ? new Date() : undefined
       }
     });
@@ -239,7 +239,7 @@ const saveOrderReception = async (
       await tx.cusOrderProductStatusLog.create({
         data: {
           order_product_id: product.id,
-          status: 'READY'
+          status: OrderStatus.READY
         }
       });
 
@@ -320,7 +320,7 @@ const saveNewPackageReception = async (
       billing_amount: calculateShippingPrice(weight.toString(), client.pound_fee),
       location_shelf: ready ? shelf : null,
       location_row: ready ? row : null,
-      status: ready ? 'READY' : 'ON_THE_WAY',
+      status: ready ? PackageStatus.READY : PackageStatus.ON_THE_WAY,
       status_date: new Date()
     }
   });
@@ -343,7 +343,7 @@ const saveNewPackageReception = async (
   await tx.cusPackageStatusLog.create({
     data: {
       package_id: result.id,
-      status: ready ? 'READY' : 'ON_THE_WAY'
+      status: ready ? PackageStatus.READY : PackageStatus.ON_THE_WAY
     }
   });
 

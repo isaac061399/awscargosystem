@@ -143,9 +143,9 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
           payment_condition: values.invoice_payment_condition,
           currency: values.invoice_currency,
           lines: selectedLines.map((line) => ({
-            package_id: line.type === 'package' ? line.refObj.id : null,
-            order_product_id: line.type === 'order_product' ? line.refObj.id : null,
-            product_id: line.type === 'product' ? line.refObj.id : null,
+            package_id: line.refObj.type === 'package' ? line.refObj.obj.id : null,
+            order_product_id: line.refObj.type === 'order_product' ? line.refObj.obj.id : null,
+            product_id: line.refObj.type === 'product' ? line.refObj.obj.id : null,
             quantity: line.quantity
           })),
           payments: paymentLines.map((line) => ({
@@ -209,8 +209,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   //     try {
   //       const line: BillingLine = {
   //         id: `custom-${Date.now()}`,
-  //         type: 'custom',
-  //         refObj: null,
+  //         refObj: { type: 'custom', obj: null },
   //         ref: values.code,
   //         description: values.description,
   //         quantity: values.quantity,
@@ -262,8 +261,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       try {
         const line: BillingLine = {
           id: `product-${values.product.id}-${Date.now()}`,
-          type: 'product',
-          refObj: values.product,
+          refObj: { type: 'product', obj: values.product },
           ref: values.product.code,
           description: values.product.name,
           quantity: values.quantity,
@@ -411,13 +409,12 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   useEffect(() => {
     setSelectedLines((prev) => {
       // keep any previously added custom/product lines
-      const extras = prev.filter((x) => x.type !== 'package' && x.type !== 'order_product');
+      const extras = prev.filter((x) => x.refObj.type !== 'package' && x.refObj.type !== 'order_product');
 
       // build selected base billable lines
       const selected: BillingLine[] = billableLinesSelected.map((line) => ({
         id: line.id,
-        type: line.type,
-        refObj: line.type === 'package' ? line.package : line.order_product,
+        refObj: { type: line.type, obj: line.type === 'package' ? line.package : line.order_product },
         ref: line.tracking,
         description: line.description,
         quantity: 1,

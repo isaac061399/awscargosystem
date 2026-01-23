@@ -1,6 +1,6 @@
-import { Currency, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
+import { Currency, OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
 import { BillingLine, convertCRC, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
-import { prismaRead } from '@/libs/prisma';
+import { prismaRead, Tx } from '@/libs/prisma';
 
 export const validateLines = async (
   lines: any[]
@@ -26,8 +26,7 @@ export const validateLines = async (
 
       data.push({
         id: `line-${i + 1}`,
-        type: 'package',
-        refObj: pkg,
+        refObj: { type: 'package', obj: pkg },
         ref: pkg.tracking,
         description: pkg.description || '',
         quantity: 1,
@@ -49,8 +48,7 @@ export const validateLines = async (
 
       data.push({
         id: `line-${i + 1}`,
-        type: 'order_product',
-        refObj: orderProduct,
+        refObj: { type: 'order_product', obj: orderProduct },
         ref: orderProduct.tracking || '',
         description: `${orderProduct.quantity} x ${orderProduct.name}`,
         quantity: 1,
@@ -72,8 +70,7 @@ export const validateLines = async (
 
       data.push({
         id: `line-${i + 1}`,
-        type: 'product',
-        refObj: product,
+        refObj: { type: 'product', obj: product },
         ref: product.code,
         description: product.name,
         quantity: quantity,
@@ -151,4 +148,58 @@ export const getMostValuablePayment = (payments: PaymentLine[], buyingConversion
   });
 
   return mostValuable;
+};
+
+export const updateLineReferences = async (lines: BillingLine[], tx: Tx): Promise<boolean> => {
+  try {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (line.refObj.type === 'package') {
+        // save status
+        await tx.cusPackage.update({
+          where: { id: line.refObj.obj.id },
+          data: {
+            payment_status: PaymentStatus.PAID,
+            status: PackageStatus.DELIVERED,
+            status_date: new Date()
+          }
+        });
+
+        // save status log
+        await tx.cusPackageStatusLog.create({
+          data: {
+            package_id: line.refObj.obj.id,
+            status: PackageStatus.DELIVERED
+          }
+        });
+      } else if (line.refObj.type === 'order_product') {
+        // save status
+        await tx.cusOrderProduct.update({
+          where: { id: line.refObj.obj.id },
+          data: {
+            payment_status: PaymentStatus.PAID,
+            status: line.refObj.obj.status === OrderStatus.READY ? OrderStatus.DELIVERED : undefined,
+            status_date: line.refObj.obj.status === OrderStatus.READY ? new Date() : undefined
+          }
+        });
+
+        // save status log
+        if (line.refObj.obj.status === OrderStatus.READY) {
+          await tx.cusOrderProductStatusLog.create({
+            data: {
+              order_product_id: line.refObj.obj.id,
+              status: OrderStatus.DELIVERED
+            }
+          });
+        }
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error: ${error}`);
+
+    return false;
+  }
 };

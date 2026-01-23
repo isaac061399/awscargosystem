@@ -56,6 +56,7 @@ model Administrator {
   order_logs         CusOrderLog[]
   cash_registers     CusCashRegister[]
   cancelled_invoices CusInvoice[]
+  invoice_logs       CusInvoiceLog[]
 
   @@map("auth_administrator")
 }
@@ -690,6 +691,7 @@ model CusInvoice {
   cancelled_by     Administrator?      @relation(fields: [cancelled_by_id], references: [id], onDelete: SetNull)
   invoice_lines    CusInvoiceLine[]
   invoice_payments CusInvoicePayment[]
+  cusInvoiceLogs   CusInvoiceLog[]
 
   @@map("cus_invoice")
 }
@@ -702,6 +704,7 @@ model CusInvoiceLine {
   product_id               Int?
   package_prev_state       PackageStatus?
   order_product_prev_state OrderStatus?
+  prev_payment_status      PaymentStatus?
   currency                 Currency
   quantity                 Float
   unit_price               Float
@@ -715,6 +718,21 @@ model CusInvoiceLine {
   product       CusProduct?      @relation(fields: [product_id], references: [id], onDelete: Restrict)
 
   @@map("cus_invoice_line")
+}
+
+model CusInvoiceLog {
+  id               Int       @id @default(autoincrement())
+  invoice_id       Int?
+  administrator_id Int?
+  action           String
+  data             Json?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime? @updatedAt
+
+  invoice CusInvoice?    @relation(fields: [invoice_id], references: [id], onDelete: SetNull)
+  author  Administrator? @relation(fields: [administrator_id], references: [id], onDelete: SetNull)
+
+  @@map("cus_invoice_log")
 }
 
 model CusInvoicePayment {

@@ -1,4 +1,4 @@
-import { prismaRead, withTransaction } from '@libs/prisma';
+import { prismaRead, prismaWrite, Tx, withTransaction } from '@libs/prisma';
 import { clientSelectSchema } from './Client.Controller';
 
 export const getOrder = async (id: number) => {
@@ -91,9 +91,12 @@ export const validatePendingProducts = async (id: number) => {
   }
 };
 
-export const validateOrderStatus = async (id: number) => {
+export const validateOrderStatus = async (id: number, tx?: Tx) => {
   try {
-    const order = await prismaRead.cusOrder.findUnique({
+    const prismaInstanceRead = tx ? tx : prismaRead;
+    const prismaInstanceWrite = tx ? tx : prismaWrite;
+
+    const order = await prismaInstanceRead.cusOrder.findUnique({
       where: { id },
       select: { status: true, products: true }
     });
@@ -106,7 +109,7 @@ export const validateOrderStatus = async (id: number) => {
 
     if (allProductsHaveSameStatus) {
       const newStatus = order.products[0].status;
-      await prismaRead.cusOrder.update({
+      await prismaInstanceWrite.cusOrder.update({
         where: { id },
         data: { status: newStatus, status_date: new Date() }
       });

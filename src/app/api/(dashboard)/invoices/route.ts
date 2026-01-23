@@ -2,17 +2,23 @@ import { NextResponse } from 'next/server';
 
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { Currency } from '@/prisma/generated/enums';
+import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType } from '@/prisma/generated/enums';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 import { isValidBillingInformation } from '@/controllers/Client.Controller';
-import { getMostValuablePayment, validateLines, validatePayments } from '@/controllers/Invoice.Controller';
+import {
+  getMostValuablePayment,
+  updateLineReferences,
+  validateLines,
+  validatePayments
+} from '@/controllers/Invoice.Controller';
 import { getConfiguration } from '@/controllers/Configuration.Controller';
 import {
   calculateBillingChangeAmount,
   calculateBillingPaidAmount,
   calculateBillingTotal
 } from '@/helpers/calculations';
+import { validateOrderStatus } from '@/controllers/Order.Controller';
 
 export const GET = withAuthApi(['invoices.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -165,23 +171,99 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
 
     // create invoice and send to easytax service
     const result = await withTransaction(async (tx) => {
-      // generate invoice variables
+      // 1: generate invoice variables
       const changeAmountCRC = calculateBillingChangeAmount(
         paidAmount,
         totals.total,
         baseCurrency,
         configuration.buying_exchange_rate
       );
-
       const mostValuablePayment = getMostValuablePayment(paymentsData || [], configuration.buying_exchange_rate);
+      const invoiceType = data.invoice_type as InvoiceType;
+      const paymentCondition = data.invoice_payment_condition as InvoicePaymentCondition;
 
-      // create invoice with lines and payments
-      // change packages and order products payment status to PAID and delivered if applies
-      // send invoice to easytax service
+      // 2: create invoice with lines and payments
+      const invoice = await tx.cusInvoice.create({
+        data: {
+          cash_register_id: cashRegister.id,
+          client_id: client.id,
+          number: '', // to be generated
+          consecutive: '', // to be generated
+          type: invoiceType,
+          payment_condition: paymentCondition,
+          iva_percentage: configuration.iva_percentage,
+          selling_exchange_rate: configuration.selling_exchange_rate,
+          buying_exchange_rate: configuration.buying_exchange_rate,
+          currency: baseCurrency,
+          payment_method: mostValuablePayment.method,
+          subtotal: totals.subtotal,
+          tax: totals.taxes,
+          total: totals.total,
+          cash_change: changeAmountCRC,
+          status: paymentCondition === InvoicePaymentCondition.CASH ? InvoiceStatus.PAID : InvoiceStatus.PENDING,
+          invoice_lines: {
+            createMany: {
+              data:
+                linesData?.map((line) => ({
+                  package_id: line.refObj.type === 'package' ? line.refObj.obj.id : undefined,
+                  order_product_id: line.refObj.type === 'order_product' ? line.refObj.obj.id : undefined,
+                  product_id: line.refObj.type === 'product' ? line.refObj.obj.id : undefined,
+                  package_prev_state: line.refObj.type === 'package' ? line.refObj.obj.status : undefined,
+                  order_product_prev_state: line.refObj.type === 'order_product' ? line.refObj.obj.status : undefined,
+                  prev_payment_status: line.refObj.type !== 'product' ? line.refObj.obj.payment_status : undefined,
+                  currency: line.currency,
+                  quantity: line.quantity,
+                  unit_price: line.unit_price,
+                  total: line.total
+                })) || []
+            }
+          },
+          invoice_payments: {
+            createMany: {
+              data:
+                paymentsData?.map((payment) => ({
+                  currency: payment.currency,
+                  payment_method: payment.method,
+                  ref: payment.ref || '',
+                  ref_bank: payment.ref_bank || '',
+                  amount: payment.amount
+                })) || []
+            }
+          }
+        }
+      });
+      if (!invoice) {
+        throw new TransactionError(400, textT?.errors?.save);
+      }
 
-      console.log({ tx, mostValuablePayment }); // prevent eslint errors
+      // 3: change packages and order products payment status to PAID and delivered if applies
+      const statusUpdated = await updateLineReferences(linesData || [], tx);
+      if (!statusUpdated) {
+        throw new TransactionError(400, textT?.errors?.save);
+      }
 
-      return { id: 1, change: changeAmountCRC };
+      // 4: validate order statuses of order products
+      for (const line of linesData || []) {
+        if (line.refObj.type === 'order_product') {
+          // validate order status
+          await validateOrderStatus(line.refObj.obj.order_id, tx);
+        }
+      }
+
+      // 5: send invoice to easytax service
+      // TODO: implement easytax service integration
+
+      // 6: save log
+      await tx.cusInvoiceLog.create({
+        data: {
+          invoice_id: invoice.id,
+          administrator_id: admin.id,
+          action: 'invoice.create',
+          data: JSON.stringify(data)
+        }
+      });
+
+      return { id: invoice.id, change: changeAmountCRC };
     });
 
     return NextResponse.json({ valid: true, ...result }, { status: 200 });
