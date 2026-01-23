@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 // Next Imports
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -65,6 +66,8 @@ function lineTotal(quantity: number, unit_price: number) {
 }
 
 const Billing = ({ cashRegister }: { cashRegister?: any }) => {
+  const router = useRouter();
+
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
   const buyingExchangeRate = configuration?.buying_exchange_rate ?? 0;
@@ -91,6 +94,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const [paidAmount, setPaidAmount] = useState<any>(
     calculateBillingPaidAmount(paymentLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate)
   );
+  const [successState, setSuccessState] = useState({ open: true, id: 1 as number | null, changeAmountCRC: 0 });
 
   // Billing lines dialogs
   // const [customOpen, setCustomOpen] = useState(false);
@@ -168,7 +172,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
           setAlertState({ ...defaultAlertState });
         }, 5000);
 
-        // TODO: open success dialog with option to print invoice and view change if cash
+        handleOpenSuccess(result.id, result.change);
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
@@ -492,6 +496,16 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
   const openPaymentDialog = () => {
     formikPayment.resetForm();
     setPaymentOpen(true);
+  };
+
+  const handleOpenSuccess = (id: number, changeAmountCRC: number) => {
+    setSuccessState({ open: true, id, changeAmountCRC });
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessState({ ...successState, open: false });
+    formik.resetForm();
+    router.refresh();
   };
 
   /** --- grids --- */
@@ -1300,6 +1314,43 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               {textT?.btnAdd}
             </Button>
           </DialogActions>
+        </form>
+      </Dialog>
+
+      {/* Success dialog */}
+      <Dialog
+        open={successState.open}
+        onClose={() => {}} // disable close on outside click
+        aria-labelledby="dialog-success-title"
+        maxWidth="xs"
+        fullWidth>
+        <form noValidate onSubmit={formikPayment.handleSubmit}>
+          <DialogTitle id="dialog-success-title">{textT?.dialogSuccess?.title}</DialogTitle>
+          <DialogContent dividers className="flex flex-col gap-6">
+            <Typography variant="h4" className="text-center">
+              {textT?.dialogSuccess?.changeAmount}{' '}
+              {formatMoney(successState.changeAmountCRC, `${currencies[Currency.CRC].symbol} `)}
+            </Typography>
+            <Stack direction="column" spacing={2}>
+              {successState.id && (
+                <Button variant="contained" color="primary" href={`/print/invoices/${successState.id}`} target="_blank">
+                  {textT?.dialogSuccess?.printInvoice}
+                </Button>
+              )}
+              {successState.id && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  href={`/invoices/view/${successState.id}`}
+                  target="_blank">
+                  {textT?.dialogSuccess?.viewInvoice}
+                </Button>
+              )}
+              <Button variant="outlined" color="primary" onClick={handleCloseSuccess}>
+                {textT?.dialogSuccess?.newInvoice}
+              </Button>
+            </Stack>
+          </DialogContent>
         </form>
       </Dialog>
     </DashboardLayout>

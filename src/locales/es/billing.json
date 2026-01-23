@@ -115,6 +115,13 @@
     },
     "dialogPayment": {
       "title": "Agregar Información de Pago a la Facturación"
+    },
+    "dialogSuccess": {
+      "title": "Factura registrada",
+      "changeAmount": "Vuelto:",
+      "viewInvoice": "Ver factura",
+      "printInvoice": "Imprimir factura",
+      "newInvoice": "Nueva factura"
     }
   },
   "form": {
