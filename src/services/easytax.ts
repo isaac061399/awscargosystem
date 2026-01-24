@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Moment } from 'moment';
 
 import { Currency, InvoicePaymentCondition, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
+import { paymentConditionsDays } from '@/libs/constants';
 import { padStartZeros } from '@/libs/utils';
 
 const EASYTAX_ENDPOINT = process.env.EASYTAX_ENDPOINT || '';
@@ -61,18 +62,6 @@ const formatGenerateDocumentParams = (data: GenerateDocumentData) => {
     [InvoicePaymentCondition.CREDIT_90]: '9'
   };
 
-  const conditionDaysMap: Record<InvoicePaymentCondition, number> = {
-    [InvoicePaymentCondition.CASH]: 0,
-    [InvoicePaymentCondition.CREDIT_6]: 6,
-    [InvoicePaymentCondition.CREDIT_8]: 8,
-    [InvoicePaymentCondition.CREDIT_16]: 16,
-    [InvoicePaymentCondition.CREDIT_25]: 25,
-    [InvoicePaymentCondition.CREDIT_30]: 30,
-    [InvoicePaymentCondition.CREDIT_45]: 45,
-    [InvoicePaymentCondition.CREDIT_60]: 60,
-    [InvoicePaymentCondition.CREDIT_90]: 90
-  };
-
   const currencyMap: Record<Currency, number> = {
     [Currency.CRC]: 0,
     [Currency.USD]: 1
@@ -100,7 +89,7 @@ const formatGenerateDocumentParams = (data: GenerateDocumentData) => {
     // numero_consecutivo: 1, // dejar que se asigne automáticamente
     terminal: 1, // constante
     fecha_documento: data.date.format('YYYY-MM-DD'),
-    fecha_vencimiento: data.date.clone().add(conditionDaysMap[data.condition], 'days').format('YYYY-MM-DD'),
+    fecha_vencimiento: data.date.clone().add(paymentConditionsDays[data.condition], 'days').format('YYYY-MM-DD'),
     cedula_cliente: data.client.identification, // cedula de cliente
     nombre_cliente: data.client.name, // nombre de cliente
     correoCliente: data.client.email, // correo de cliente
