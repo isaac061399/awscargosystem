@@ -1,4 +1,4 @@
-import type { AuthProvider, DevicePlatform } from '@/prisma/generated/client';
+import { AuthProvider, DevicePlatform, InvoicePaymentCondition } from '@/prisma/generated/enums';
 import { getBucketEndpoint } from '@services/aws-s3';
 
 const bucketEndpoint = getBucketEndpoint();
@@ -36,6 +36,18 @@ export const additionalExchangeRate = 6;
 export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein', 'Target'];
 
 export const bankAccounts = { BAC: 'BAC Credomatic', BN: 'Banco Nacional' };
+
+export const paymentConditionsDays = {
+  [InvoicePaymentCondition.CASH]: 0,
+  [InvoicePaymentCondition.CREDIT_6]: 6,
+  [InvoicePaymentCondition.CREDIT_8]: 8,
+  [InvoicePaymentCondition.CREDIT_16]: 16,
+  [InvoicePaymentCondition.CREDIT_25]: 25,
+  [InvoicePaymentCondition.CREDIT_30]: 30,
+  [InvoicePaymentCondition.CREDIT_45]: 45,
+  [InvoicePaymentCondition.CREDIT_60]: 60,
+  [InvoicePaymentCondition.CREDIT_90]: 90
+};
 
 // App Constants
 

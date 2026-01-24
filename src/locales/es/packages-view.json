@@ -15,7 +15,6 @@
       "name": "Nombre",
       "identification": "Identificación",
       "email": "Correo Electrónico",
-      "office": "Oficina",
       "profile": "Perfil",
       "viewClient": "Ver Cliente"
     },

@@ -23,14 +23,44 @@ export const getInvoice = async (id: number) => {
         total: true,
         cash_change: true,
         status: true,
+        cancelled_at: true,
         created_at: true,
+        cancelled_by: {
+          select: { id: true, full_name: true, email: true }
+        },
         cash_register: {
+          select: { id: true, office: { select: { id: true, name: true } } }
+        },
+        client: {
+          select: clientSelectSchema
+        },
+        invoice_lines: {
           select: {
             id: true,
-            office: { select: { id: true, name: true } }
+            package_id: true,
+            order_product_id: true,
+            product_id: true,
+            package_prev_state: true,
+            order_product_prev_state: true,
+            prev_payment_status: true,
+            currency: true,
+            quantity: true,
+            unit_price: true,
+            total: true,
+            package: { select: { id: true, tracking: true, description: true } },
+            order_product: { select: { id: true, order_id: true, tracking: true, name: true, quantity: true } },
+            product: { select: { id: true, code: true, name: true } }
           }
         },
-        client: { select: clientSelectSchema }
+        invoice_payments: {
+          select: {
+            currency: true,
+            payment_method: true,
+            ref: true,
+            ref_bank: true,
+            amount: true
+          }
+        }
       }
     });
 

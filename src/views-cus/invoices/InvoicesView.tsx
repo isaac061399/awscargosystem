@@ -16,15 +16,18 @@ import moment from 'moment';
 // MUI Imports
 import {
   Alert,
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
+  Button,
   Chip,
   Divider,
   Grid,
   IconButton,
+  Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography
 } from '@mui/material';
 
@@ -34,11 +37,10 @@ import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
 // import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
-import { useConfig } from '@/components/ConfigProvider';
 
-import { currencies } from '@/libs/constants';
+import { bankAccounts, currencies, paymentConditionsDays } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
-import { calculateTaxes, convertCRC } from '@/helpers/calculations';
+import { Currency } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -49,10 +51,6 @@ const statusColors: any = {
 };
 
 const InvoicesView = ({ invoice }: { invoice: any }) => {
-  const { configuration } = useConfig();
-  const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
-  const ivaPercentage = configuration?.iva_percentage ?? 0;
-
   const { t } = useTranslation();
   const textT: any = useMemo(() => t('invoices-view:text', { returnObjects: true, default: {} }), [t]);
   // const formT: any = useMemo(() => t('invoices-view:form', { returnObjects: true, default: {} }), [t]);
@@ -124,7 +122,7 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                   <IconButton className="p-1" color="default" LinkComponent={Link} href="/invoices">
                     <i className="ri-arrow-left-s-line text-4xl" />
                   </IconButton>
-                  {`${textT?.title} ${invoice.tracking}`}
+                  {`${textT?.title} #${invoice.consecutive}`}
                 </Typography>
               </div>
 
@@ -142,153 +140,300 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
             </div>
             <Divider />
           </Grid>
+
           <Grid size={{ xs: 12 }}>
-            <Card>
-              {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
+            {alertState.open && <Alert severity={alertState.type}>{alertState.message}</Alert>}
+          </Grid>
 
-              <CardContent>
-                <Grid container spacing={3} alignItems="top">
-                  {/* Total */}
-                  <Grid size={{ xs: 12, md: 4 }}></Grid>
-
-                  {/* Invoice status */}
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <Stack spacing={1}>
-                      <Typography variant="overline" color="text.secondary">
-                        {textT?.statusLabel}
-                      </Typography>
-                      <Stack direction="row" alignItems="center" spacing={1.5}>
-                        <Chip label={statusChip.label} color={statusChip.color} size="small" />
-                      </Stack>
-                    </Stack>
-                  </Grid>
-                </Grid>
-                <Divider sx={{ mt: 5 }} />
-              </CardContent>
-
-              <CardContent>
-                {/* Header */}
-                <Stack
-                  direction={{ xs: 'column', md: 'row' }}
-                  spacing={2}
-                  alignItems={{ xs: 'flex-start', md: 'center' }}
-                  justifyContent="space-between"
-                  sx={{ mb: 2 }}>
-                  <Box>
+          <Grid size={{ xs: 12 }}>
+            <Stack spacing={2}>
+              {/* Header */}
+              <Paper className="p-4 md:p-6" elevation={1}>
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
                     <Typography variant="h5" fontWeight={700}>
-                      {textT?.trackingLabel}: {invoice.tracking}
+                      {labelsT?.invoiceType?.[invoice.type]} #{invoice.consecutive}
                     </Typography>
-                  </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {textT?.numericKeyLabel}: {invoice.numeric_key}
+                    </Typography>
+                  </div>
 
-                  <Stack direction="row" spacing={1}>
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      label={`${textT?.dateLabel}: ${moment(invoice.created_at).format(textT?.dateFormat)}`}
+                  <div className="flex flex-wrap gap-2">
+                    <Chip label={invoice.cash_register?.office?.name} color="secondary" />
+                    <Chip label={statusChip.label} color={statusChip.color} />
+                  </div>
+                </div>
+
+                <Divider className="my-4" />
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  {/* Client Info */}
+                  <Stack spacing={1.25}>
+                    <Typography variant="body1" color="text.secondary">
+                      {textT?.clientInfo?.title}
+                    </Typography>
+                    <Divider />
+                    <InfoRow
+                      label={textT?.clientInfo?.mailbox}
+                      value={`${invoice.client?.office?.mailbox_prefix}${invoice.client?.id}`}
+                    />
+                    <InfoRow label={textT?.clientInfo?.name} value={invoice.client?.full_name} />
+                    <InfoRow label={textT?.clientInfo?.identification} value={invoice.client?.identification} />
+                    <InfoRow label={textT?.clientInfo?.email} value={invoice.client?.email} />
+                    <InfoRow
+                      label={textT?.clientInfo?.profile}
+                      value={
+                        <Link href={`/clients/edit/${invoice.client?.id}`} target="_blank" className="underline">
+                          {textT?.clientInfo?.viewClient}
+                        </Link>
+                      }
                     />
                   </Stack>
-                </Stack>
 
-                {/* Cards */}
-                <Grid container spacing={5}>
-                  {/* Client Info */}
-                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
-                    <Card sx={{ flexGrow: 1 }}>
-                      <CardHeader title={textT?.clientInfo?.title} />
-                      <CardContent>
-                        <Stack spacing={1.25}>
-                          <InfoRow
-                            label={textT?.clientInfo?.mailbox}
-                            value={`${invoice.client?.office?.mailbox_prefix}${invoice.client?.id}`}
-                          />
-                          <Divider />
-                          <InfoRow label={textT?.clientInfo?.name} value={invoice.client?.full_name} />
-                          <InfoRow label={textT?.clientInfo?.identification} value={invoice.client?.identification} />
-                          <InfoRow label={textT?.clientInfo?.email} value={invoice.client?.email} />
-                          <InfoRow label={textT?.clientInfo?.office} value={invoice.client?.office?.name} />
-                          <Divider />
-                          <InfoRow
-                            label={textT?.clientInfo?.profile}
-                            value={
-                              invoice.client?.id ? (
-                                <Link href={`/clients/edit/${invoice.client.id}`} target="_blank" className="underline">
-                                  {textT?.clientInfo?.viewClient}
-                                </Link>
-                              ) : (
-                                '—'
-                              )
-                            }
-                          />
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                  {/* Payment Info */}
+                  <Stack spacing={1.25}>
+                    <Typography variant="body1" color="text.secondary">
+                      {textT?.paymentInfo?.title}
+                    </Typography>
+                    <Divider />
+                    <InfoRow
+                      label={textT?.paymentInfo?.paymentCondition}
+                      value={labelsT?.invoicePaymentCondition?.[invoice.payment_condition] ?? '—'}
+                    />
+                    <InfoRow
+                      label={textT?.paymentInfo?.currency}
+                      value={labelsT?.currency?.[invoice.currency] ?? '—'}
+                    />
+                    <InfoRow
+                      label={textT?.paymentInfo?.exchangeRate}
+                      value={`${formatMoney(invoice.selling_exchange_rate, `${currencies[Currency.CRC].symbol} `)} | ${formatMoney(invoice.buying_exchange_rate, `${currencies[Currency.CRC].symbol} `)}`}
+                    />
+                    <InfoRow
+                      label={textT?.paymentInfo?.paymentMethod}
+                      value={labelsT?.paymentMethod?.[invoice.payment_method] ?? '—'}
+                    />
+                    <InfoRow
+                      label={textT?.paymentInfo?.cashChange}
+                      value={formatMoney(invoice.cash_change, `${currencies[Currency.CRC].symbol} `)}
+                    />
+                  </Stack>
 
-                  {/* Invoice Info */}
-                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
-                    <Card sx={{ flexGrow: 1 }}>
-                      <CardHeader title={textT?.invoiceInfo?.title} />
-                      <CardContent>
-                        <Stack spacing={1.25}>
-                          <InfoRow label={textT?.invoiceInfo?.courierCompany} value={invoice.courier_company ?? '—'} />
-                          <InfoRow label={textT?.invoiceInfo?.purchasePage} value={invoice.purchase_page ?? '—'} />
-                          <InfoRow label={textT?.invoiceInfo?.price} value={invoice.price} />
-                          <Divider />
-                          <InfoRow label={textT?.invoiceInfo?.description} value={invoice.description ?? '—'} />
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                  {/* Dates Info */}
+                  <Stack spacing={1.25}>
+                    <Typography variant="body1" color="text.secondary">
+                      {textT?.datesInfo?.title}
+                    </Typography>
+                    <Divider />
+                    <InfoRow
+                      label={textT?.datesInfo?.issueDate}
+                      value={moment(invoice.created_at).format(textT?.dateFormat)}
+                    />
+                    <InfoRow
+                      label={textT?.datesInfo?.dueDate}
+                      value={moment(invoice.created_at)
+                        .add(
+                          paymentConditionsDays[invoice.payment_condition as keyof typeof paymentConditionsDays],
+                          'days'
+                        )
+                        .format(textT?.dateFormat)}
+                    />
+                    {invoice.cancelled_at && (
+                      <InfoRow
+                        label={textT?.datesInfo?.cancelDate}
+                        value={moment(invoice.cancelled_at).format(textT?.dateFormat)}
+                      />
+                    )}
+                    {invoice.cancelled_by && (
+                      <InfoRow
+                        label={textT?.datesInfo?.cancelBy}
+                        value={
+                          <Link
+                            href={`/administrators/edit/${invoice.cancelled_by?.id}`}
+                            target="_blank"
+                            className="underline">
+                            {invoice.cancelled_by?.full_name}
+                          </Link>
+                        }
+                      />
+                    )}
+                  </Stack>
+                </div>
 
-                  {/* Billing */}
-                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
-                    <Card sx={{ flexGrow: 1 }}>
-                      <CardHeader title={textT?.billingInfo?.title} />
-                      <CardContent>
-                        <Stack spacing={1.25}>
-                          <InfoRow label={textT?.billingInfo?.weight} value={invoice.billing_weight} />
-                          <InfoRow
-                            label={textT?.billingInfo?.poundFee}
-                            value={formatMoney(invoice.billing_pound_fee, `${currencies.USD.symbol} `)}
-                          />
-                          <Divider />
-                          <InfoRow
-                            label={textT?.billingInfo?.subtotal}
-                            value={
-                              <Typography component="span" fontWeight={600}>
-                                {/* {formatMoney(invoiceTotal.subtotal, `${currencies.USD.symbol} `)} */}
-                              </Typography>
-                            }
-                          />
-                          <InfoRow
-                            label={textT?.billingInfo?.total}
-                            value={
-                              <Typography component="span" fontWeight={600}>
-                                {/* {formatMoney(invoiceTotal.total, `${currencies.USD.symbol} `)} */}
-                              </Typography>
-                            }
-                          />
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                {/* Actions */}
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Button
+                    size="small"
+                    variant="contained"
+                    startIcon={<i className="ri-printer-line"></i>}
+                    // onClick={onPrintTicket}
+                  >
+                    {textT?.btnPrint}
+                  </Button>
 
-                  {/* Location */}
-                  <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
-                    <Card sx={{ flexGrow: 1 }}>
-                      <CardHeader title={textT?.locationInfo?.title} />
-                      <CardContent>
-                        <Stack spacing={1.25}>
-                          <InfoRow label={textT?.locationInfo?.shelf} value={invoice.location_shelf} />
-                          <InfoRow label={textT?.locationInfo?.row} value={invoice.location_row} />
-                          <Divider />
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<i className="ri-file-pdf-2-line"></i>}
+                    // onClick={onDownloadPdf}
+                  >
+                    {textT?.btnPDF}
+                  </Button>
+
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="error"
+                    startIcon={<i className="ri-close-line"></i>}
+                    // disabled={!canCancel}
+                    // onClick={() => setCancelOpen(true)}
+                  >
+                    {textT?.btnCancel}
+                  </Button>
+
+                  {/* {isValidating && (
+              <span className="inline-flex items-center gap-2 text-sm text-gray-600">
+                <CircularProgress size={16} /> Updating…
+              </span>
+            )} */}
+                </div>
+              </Paper>
+
+              {/* Lines */}
+              <Paper className="p-4 md:p-6" elevation={1}>
+                <Typography variant="h6" fontWeight={700} className="mb-3">
+                  {textT?.lines?.title}
+                </Typography>
+
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>#</TableCell>
+                      <TableCell>{textT?.lines?.description}</TableCell>
+                      <TableCell align="right">{textT?.lines?.quantity}</TableCell>
+                      <TableCell align="right">{textT?.lines?.unitPrice}</TableCell>
+                      <TableCell align="right">{textT?.lines?.totalPrice}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {invoice.invoice_lines?.map((l: any, index: number) => {
+                      let desc = '';
+                      let desc2 = '';
+                      let href = '#';
+                      if (l.package) {
+                        desc = `${textT?.lines?.package}: ${textT?.lines?.tracking} ${l.package.tracking}`;
+                        desc2 = l.package.description;
+                        href = `/packages/view/${l.package.id}`;
+                      } else if (l.order_product) {
+                        desc = `${textT?.lines?.orderProduct}: ${textT?.lines?.tracking} ${l.order_product.tracking}`;
+                        desc2 = `${l.order_product.quantity} x ${l.order_product.name}`;
+                        href = `/orders/edit/${l.order_product.order_id}`;
+                      } else if (l.product) {
+                        desc = `${textT?.lines?.product}: ${textT?.lines?.code} ${l.product.code}`;
+                        desc2 = l.product.name;
+                        href = `/products/edit/${l.product.id}`;
+                      }
+
+                      return (
+                        <TableRow key={index}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <Link href={href} target="_blank" className="underline">
+                                <span className="font-medium">{desc}</span>
+                              </Link>
+                              <span className="text-xs text-gray-500">{desc2}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell align="right">{l.quantity}</TableCell>
+                          <TableCell align="right">
+                            {formatMoney(l.unit_price, `${currencies[l.currency].symbol} `)}
+                          </TableCell>
+                          <TableCell align="right">
+                            {formatMoney(l.total, `${currencies[l.currency].symbol} `)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+
+                <Divider className="my-4" />
+
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                  <div />
+                  <div />
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Subtotal</span>
+                      <span className="text-sm font-semibold">
+                        {formatMoney(invoice.subtotal, `${currencies[invoice.currency].symbol} `)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Tax</span>
+                      <span className="text-sm font-semibold">
+                        {formatMoney(invoice.tax, `${currencies[invoice.currency].symbol} `)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-base font-bold">Total</span>
+                      <span className="text-base font-bold">
+                        {formatMoney(invoice.total, `${currencies[invoice.currency].symbol} `)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Paper>
+
+              {/* Payments */}
+              <Paper className="p-4 md:p-6" elevation={1}>
+                <Typography variant="h6" fontWeight={700} className="mb-3">
+                  {textT?.payments?.title}
+                </Typography>
+
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{textT?.payments?.method}</TableCell>
+                      <TableCell>{textT?.payments?.ref}</TableCell>
+                      <TableCell>{textT?.payments?.refBank}</TableCell>
+                      <TableCell align="right">{textT?.payments?.amount}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {invoice.invoice_payments.map((p: any, index: number) => (
+                      <TableRow key={index}>
+                        <TableCell>{labelsT?.paymentMethod[p.payment_method]}</TableCell>
+                        <TableCell>{p.ref || '-'}</TableCell>
+                        <TableCell>{bankAccounts[p.ref_bank as keyof typeof bankAccounts] || '-'}</TableCell>
+                        <TableCell align="right">
+                          {formatMoney(p.amount, `${currencies[p.currency].symbol} `)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Paper>
+
+              {/* Cancel dialog */}
+              {/* <Dialog open={cancelOpen} onClose={() => setCancelOpen(false)} maxWidth="xs" fullWidth>
+          <DialogTitle>Cancel invoice</DialogTitle>
+          <DialogContent dividers>
+            {cancelError && <Alert severity="error" className="mb-3">{cancelError}</Alert>}
+            <Typography variant="body2">
+              This will mark the invoice as <b>CANCELLED</b>, set <b>cancelled_at</b>,
+              and attach <b>cancelled_by_id</b>. This action should be audited.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setCancelOpen(false)}>Close</Button>
+            <Button color="error" variant="contained" onClick={onCancelInvoice}>
+              Confirm cancel
+            </Button>
+          </DialogActions>
+        </Dialog> */}
+            </Stack>
           </Grid>
         </Grid>
       </form>

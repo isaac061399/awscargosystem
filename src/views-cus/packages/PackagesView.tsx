@@ -253,28 +253,21 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                             label={textT?.clientInfo?.mailbox}
                             value={`${packageObj.client?.office?.mailbox_prefix}${packageObj.client?.id}`}
                           />
-                          <Divider />
                           <InfoRow label={textT?.clientInfo?.name} value={packageObj.client?.full_name} />
                           <InfoRow
                             label={textT?.clientInfo?.identification}
                             value={packageObj.client?.identification}
                           />
                           <InfoRow label={textT?.clientInfo?.email} value={packageObj.client?.email} />
-                          <InfoRow label={textT?.clientInfo?.office} value={packageObj.client?.office?.name} />
-                          <Divider />
                           <InfoRow
                             label={textT?.clientInfo?.profile}
                             value={
-                              packageObj.client?.id ? (
-                                <Link
-                                  href={`/clients/edit/${packageObj.client.id}`}
-                                  target="_blank"
-                                  className="underline">
-                                  {textT?.clientInfo?.viewClient}
-                                </Link>
-                              ) : (
-                                '—'
-                              )
+                              <Link
+                                href={`/clients/edit/${packageObj.client?.id}`}
+                                target="_blank"
+                                className="underline">
+                                {textT?.clientInfo?.viewClient}
+                              </Link>
                             }
                           />
                         </Stack>

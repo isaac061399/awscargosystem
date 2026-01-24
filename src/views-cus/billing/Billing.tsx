@@ -296,7 +296,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
         currency: Currency.CRC,
         method: Object.keys(labelsT?.paymentMethod)[0] || '',
         ref: '',
-        ref_bank: Object.keys(bankAccounts)[0],
+        ref_bank: '',
         amount: 0
       }),
       [labelsT]
@@ -638,7 +638,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             {params.row.ref}
             {params.row.method === PaymentMethod.TRANSFER
               ? ` (${bankAccounts[params.row.ref_bank as keyof typeof bankAccounts]})`
-              : ''}
+              : '-'}
           </span>
         );
       },
