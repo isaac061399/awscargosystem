@@ -266,8 +266,9 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                     size="small"
                     variant="contained"
                     startIcon={<i className="ri-printer-line"></i>}
-                    // onClick={onPrintTicket}
-                  >
+                    LinkComponent={Link}
+                    href={`/print/invoice/${invoice.id}`}
+                    target="_blank">
                     {textT?.btnPrint}
                   </Button>
 

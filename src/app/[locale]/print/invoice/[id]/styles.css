@@ -1,28 +1,65 @@
-@page {
-  size: 80mm auto;
-  margin: 0;
+/* 80mm thermal ticket */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+  body {
+    margin: 0;
+  }
 }
-.wrap {
+
+.ticket {
   width: 80mm;
-  padding: 6mm;
+  padding: 2mm;
   box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: #000;
+}
+
+.logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.logo {
+  max-width: 40mm;
+  object-fit: contain;
+}
+
+.center {
+  text-align: center;
+}
+.bold {
+  font-weight: 700;
+}
+.muted {
+  opacity: 0.85;
+}
+.line {
+  border-top: 1px solid #000;
+  margin: 8px 0;
 }
 .row {
   display: flex;
   justify-content: space-between;
   gap: 8px;
 }
-.muted {
-  opacity: 0.75;
-  font-size: 12px;
+.kv {
+  margin: 2px 0;
 }
-.title {
-  font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 6px;
+.wrap {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
-hr {
-  border: 0;
-  border-top: 1px dashed #999;
+.items {
+  margin-top: 6px;
+}
+.item {
   margin: 8px 0;
+}
+.small {
+  font-size: 11px;
 }

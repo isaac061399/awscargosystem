@@ -29,10 +29,32 @@ export const getInvoice = async (id: number) => {
           select: { id: true, full_name: true, email: true }
         },
         cash_register: {
-          select: { id: true, office: { select: { id: true, name: true } } }
+          select: {
+            id: true,
+            administrator: { select: { id: true, full_name: true, email: true } },
+            office: { select: { id: true, name: true } }
+          }
         },
         client: {
-          select: clientSelectSchema
+          select: {
+            ...clientSelectSchema,
+            address: true,
+            district: {
+              select: {
+                id: true,
+                name: true,
+                canton: {
+                  select: {
+                    id: true,
+                    name: true,
+                    province: {
+                      select: { id: true, name: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         invoice_lines: {
           select: {
@@ -48,7 +70,9 @@ export const getInvoice = async (id: number) => {
             unit_price: true,
             total: true,
             package: { select: { id: true, tracking: true, description: true } },
-            order_product: { select: { id: true, order_id: true, tracking: true, name: true, quantity: true } },
+            order_product: {
+              select: { id: true, order_id: true, tracking: true, code: true, name: true, quantity: true }
+            },
             product: { select: { id: true, code: true, name: true } }
           }
         },

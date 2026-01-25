@@ -1329,7 +1329,11 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
             </Typography>
             <Stack direction="column" spacing={2}>
               {successState.id && (
-                <Button variant="contained" color="primary" href={`/print/invoice/${successState.id}`} target="_blank">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  href={`/print/invoice/${successState.id}?or=1`}
+                  target="_blank">
                   {textT?.dialogSuccess?.printInvoice}
                 </Button>
               )}
