@@ -49,6 +49,8 @@ export const paymentConditionsDays = {
   [InvoicePaymentCondition.CREDIT_90]: 90
 };
 
+export const billingDefaultDesc = 'ENVIO';
+
 // App Constants
 
 export const userProviders: Record<AuthProvider, { icon: string }> = {

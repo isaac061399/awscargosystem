@@ -9,7 +9,7 @@ import moment from 'moment';
 import { useConfig } from '@/components/ConfigProvider';
 
 import { formatMoney } from '@/libs/utils';
-import { currencies } from '@/libs/constants';
+import { billingDefaultDesc, currencies } from '@/libs/constants';
 
 import { Currency } from '@/prisma/generated/enums';
 
@@ -112,7 +112,7 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
           if (l.package) {
             label = 'Tracking-Paq';
             labelValue = l.package.tracking;
-            desc = 'ENVIO';
+            desc = billingDefaultDesc;
           } else if (l.order_product) {
             if (l.order_product.tracking) {
               label = 'Tracking-Ped';
@@ -121,7 +121,7 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
               label = 'Código-Ped';
               labelValue = l.order_product.code;
             }
-            desc = 'ENVIO';
+            desc = billingDefaultDesc;
           } else if (l.product) {
             label = 'Código-Prod';
             labelValue = l.product.code;

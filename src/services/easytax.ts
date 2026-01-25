@@ -11,6 +11,11 @@ const EASYTAX_PASSWORD = process.env.EASYTAX_PASSWORD || '';
 const EASYTAX_DEV_MODE = process.env.EASYTAX_DEV_MODE === 'true';
 
 type GenerateDocumentData = {
+  company: {
+    name: string;
+    identification: string;
+    activityCode: string;
+  };
   officeId: number;
   client: {
     name: string;
@@ -24,16 +29,16 @@ type GenerateDocumentData = {
   currency: Currency;
   method: PaymentMethod;
   ref?: string;
-  total: {
+  ivaPercentage: number;
+  lines: Array<{
+    cabys: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
     subtotal: number;
     tax: number;
     total: number;
-  };
-  company: {
-    name: string;
-    identification: string;
-    activityCode: string;
-  };
+  }>;
 };
 
 export const generateDocument = async (data: GenerateDocumentData) => {
@@ -97,15 +102,15 @@ const formatGenerateDocumentParams = (data: GenerateDocumentData) => {
     condicion_pago: conditionMap[data.condition],
     moneda: currencyMap[data.currency],
     // tipo_cambio: 1, // no enviar para que se use el del día
-    total_gravado: data.total.subtotal,
-    // total_exento: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
-    // total_exonerado: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
-    // total_descuento: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
-    total_impuesto: data.total.tax, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con impuesto.)
-    // total_iva_devuelto: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con IVA devuelto.)
-    // total_iva_exonerado: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
-    // total_otros_cargos: float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con otros cargos.)
-    total_comprobante: data.total.total, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios del comprobante.)
+    // total_gravado: data.total.subtotal,
+    // total_exento: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
+    // total_exonerado: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
+    // total_descuento: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
+    // total_impuesto: data.total.tax, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con impuesto.)
+    // total_iva_devuelto: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con IVA devuelto.)
+    // total_iva_exonerado: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
+    // total_otros_cargos: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con otros cargos.)
+    // total_comprobante: data.total.total, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios del comprobante.)
     forma_pago: methodMap[data.method],
     forma_pago_desc: methodDescMap[data.method],
     forma_pago_referencia: data.ref || '',
@@ -116,7 +121,26 @@ const formatGenerateDocumentParams = (data: GenerateDocumentData) => {
     nombreUsuario: data.company.name, // nombre de aws
     mh: EASYTAX_DEV_MODE ? 0 : 1,
     modulo: 'POS',
-    corregir_consecutivo: 'si'
+    corregir_consecutivo: 'si',
+    detalle_factura: data.lines.map((line, index) => ({
+      numero_linea: index + 1,
+      codigo_producto: line.cabys,
+      descripcion_producto: line.description,
+      cantidad: line.quantity,
+      precio_unitario: line.unitPrice,
+      subtotal: line.subtotal,
+      IVA: data.ivaPercentage,
+      total_descuento: 0,
+      total_gravado: line.subtotal,
+      total_exento: 0,
+      total_exonerado: 0,
+      total_impuesto: line.tax,
+      total_impuesto_exonerado: 0,
+      total_comprobante: line.total,
+      codigo_impuesto: '01',
+      codigo_tarifa: '08',
+      observaciones: ''
+    }))
   };
 };
 
