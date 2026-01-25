@@ -366,19 +366,19 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                   <div />
                   <div className="space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Subtotal</span>
+                      <span className="text-sm text-gray-600">{textT?.lines?.subtotal}</span>
                       <span className="text-sm font-semibold">
                         {formatMoney(invoice.subtotal, `${currencies[invoice.currency].symbol} `)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Tax</span>
+                      <span className="text-sm text-gray-600">{textT?.lines?.tax}</span>
                       <span className="text-sm font-semibold">
                         {formatMoney(invoice.tax, `${currencies[invoice.currency].symbol} `)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-base font-bold">Total</span>
+                      <span className="text-base font-bold">{textT?.lines?.total}</span>
                       <span className="text-base font-bold">
                         {formatMoney(invoice.total, `${currencies[invoice.currency].symbol} `)}
                       </span>

@@ -40,7 +40,10 @@
       "description": "Descripción",
       "quantity": "Cantidad",
       "unitPrice": "Precio Unitario",
-      "totalPrice": "Precio Total"
+      "totalPrice": "Precio Total",
+      "subtotal": "Subtotal",
+      "tax": "Impuesto (IVA)",
+      "total": "Total"
     },
     "payments": {
       "title": "Pagos",
