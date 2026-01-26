@@ -215,6 +215,24 @@ export const calculateBillingChangeAmount = (
   }
 };
 
+export const addTaxToAmount = (amount: number, taxPercentage: number): number => {
+  try {
+    if (isNaN(amount) || isNaN(taxPercentage) || amount <= 0 || taxPercentage < 0) {
+      return 0;
+    }
+
+    const totalAmount = amount + amount * (taxPercentage / 100);
+
+    return parseFloat(totalAmount.toFixed(2));
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error adding tax to amount: ${error}`);
+
+    return 0;
+  }
+};
+
 export const convertCRC = (amount: number, conversionRate: number): number => {
   try {
     if (isNaN(amount) || isNaN(conversionRate) || amount <= 0 || conversionRate <= 0) {
