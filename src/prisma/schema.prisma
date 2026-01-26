@@ -701,20 +701,20 @@ model CusInvoice {
 }
 
 model CusInvoiceLine {
-  id                       Int            @id @default(autoincrement())
-  invoice_id               Int
-  package_id               Int?
-  order_product_id         Int?
-  product_id               Int?
-  package_prev_state       PackageStatus?
-  order_product_prev_state OrderStatus?
-  prev_payment_status      PaymentStatus?
-  currency                 Currency
-  quantity                 Float
-  unit_price               Float
-  total                    Float
-  created_at               DateTime       @default(now())
-  updated_at               DateTime       @updatedAt
+  id                        Int            @id @default(autoincrement())
+  invoice_id                Int
+  package_id                Int?
+  order_product_id          Int?
+  product_id                Int?
+  package_prev_status       PackageStatus?
+  order_product_prev_status OrderStatus?
+  prev_payment_status       PaymentStatus?
+  currency                  Currency
+  quantity                  Float
+  unit_price                Float
+  total                     Float
+  created_at                DateTime       @default(now())
+  updated_at                DateTime       @updatedAt
 
   invoice       CusInvoice       @relation(fields: [invoice_id], references: [id], onDelete: Restrict)
   package       CusPackage?      @relation(fields: [package_id], references: [id], onDelete: Restrict)

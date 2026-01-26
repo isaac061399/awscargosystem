@@ -1309,13 +1309,12 @@ export const requestNewInvoice = async (params: any, lang: string) => {
   }
 };
 
-export const requestCancelInvoice = async (id: number, params: any, lang: string) => {
+export const requestCancelInvoice = async (id: number, lang: string) => {
   try {
     const response = await axios.request({
       method: 'put',
-      url: `/api/invoices/cancel/${id}`,
-      headers: { ...defaultHeaders, 'Accept-Language': lang },
-      data: params
+      url: `/api/invoices/${id}/cancel`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
     });
 
     return response.data;

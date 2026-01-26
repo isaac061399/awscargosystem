@@ -57,7 +57,7 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
 
       {/* Invoice meta */}
       <div className="kv">
-        <span className="bold">Fecha Emisión:</span> {moment(invoice.created_at).format('DD/MM/YYYY HH:mm')}
+        <span className="bold">Fecha Emisión:</span> {moment(invoice.created_at).format('DD/MM/YYYY hh:mm a')}
       </div>
 
       <div className="kv">

@@ -4,6 +4,7 @@
 import { useMemo, useState } from 'react';
 
 // Next Imports
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +19,11 @@ import {
   Alert,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Grid,
   IconButton,
@@ -36,11 +42,16 @@ import DashboardLayout from '@components/layout/DashboardLayout';
 import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
-// import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
+// import {  } from '@helpers/request';
+
+// Auth Imports
+import { useAdmin } from '@/components/AdminProvider';
+import { hasAllPermissions } from '@/helpers/permissions';
 
 import { bankAccounts, currencies, paymentConditionsDays } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
-import { Currency } from '@/prisma/generated/enums';
+import { Currency, InvoiceStatus } from '@/prisma/generated/enums';
+import { requestCancelInvoice } from '@/helpers/request';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -51,12 +62,17 @@ const statusColors: any = {
 };
 
 const InvoicesView = ({ invoice }: { invoice: any }) => {
-  const { t } = useTranslation();
+  const router = useRouter();
+  const { data: admin } = useAdmin();
+  const canCancel = hasAllPermissions('invoices.cancel', admin.permissions);
+
+  const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('invoices-view:text', { returnObjects: true, default: {} }), [t]);
   // const formT: any = useMemo(() => t('invoices-view:form', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
+  const [cancelState, setCancelState] = useState({ open: false, loading: false });
 
   const formik = useFormik({
     validateOnChange: false,
@@ -106,10 +122,42 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
     }
   });
 
+  const handleCancelOpen = () => {
+    setCancelState({ open: true, loading: false });
+  };
+
+  const handleCancelClose = () => {
+    setCancelState({ open: false, loading: false });
+  };
+
+  const handleCancel = async () => {
+    setAlertState({ ...defaultAlertState });
+    setCancelState({ ...cancelState, loading: true });
+
+    const result = await requestCancelInvoice(invoice.id || 0, i18n.language);
+
+    handleCancelClose();
+
+    if (!result.valid) {
+      setAlertState({ open: true, type: 'error', message: result.message });
+
+      return;
+    }
+
+    setAlertState({ open: true, type: 'success', message: textT?.cancelDialog?.successMessage });
+    setTimeout(() => {
+      setAlertState({ ...defaultAlertState });
+    }, 5000);
+
+    router.refresh();
+  };
+
   const statusChip: any = {
     label: labelsT?.invoiceStatus?.[invoice.status] || 'Unknown',
     color: statusColors[invoice.status] || 'info'
   };
+
+  const isCancelable = invoice.status !== InvoiceStatus.CANCELED && canCancel;
 
   return (
     <DashboardLayout>
@@ -252,7 +300,7 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                             href={`/administrators/edit/${invoice.cancelled_by?.id}`}
                             target="_blank"
                             className="underline">
-                            {invoice.cancelled_by?.full_name}
+                            {invoice.cancelled_by?.email}
                           </Link>
                         }
                       />
@@ -281,22 +329,16 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                     {textT?.btnPDF}
                   </Button>
 
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="error"
-                    startIcon={<i className="ri-close-line"></i>}
-                    // disabled={!canCancel}
-                    // onClick={() => setCancelOpen(true)}
-                  >
-                    {textT?.btnCancel}
-                  </Button>
-
-                  {/* {isValidating && (
-              <span className="inline-flex items-center gap-2 text-sm text-gray-600">
-                <CircularProgress size={16} /> Updating…
-              </span>
-            )} */}
+                  {isCancelable && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      startIcon={<i className="ri-close-line"></i>}
+                      onClick={() => handleCancelOpen()}>
+                      {textT?.btnCancel}
+                    </Button>
+                  )}
                 </div>
               </Paper>
 
@@ -418,22 +460,24 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
               </Paper>
 
               {/* Cancel dialog */}
-              {/* <Dialog open={cancelOpen} onClose={() => setCancelOpen(false)} maxWidth="xs" fullWidth>
-          <DialogTitle>Cancel invoice</DialogTitle>
-          <DialogContent dividers>
-            {cancelError && <Alert severity="error" className="mb-3">{cancelError}</Alert>}
-            <Typography variant="body2">
-              This will mark the invoice as <b>CANCELLED</b>, set <b>cancelled_at</b>,
-              and attach <b>cancelled_by_id</b>. This action should be audited.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setCancelOpen(false)}>Close</Button>
-            <Button color="error" variant="contained" onClick={onCancelInvoice}>
-              Confirm cancel
-            </Button>
-          </DialogActions>
-        </Dialog> */}
+              <Dialog
+                open={cancelState.open}
+                onClose={handleCancelClose}
+                aria-labelledby="cancel-dialog-title"
+                aria-describedby="cancel-dialog-description">
+                <DialogTitle id="cancel-dialog-title">{textT?.cancelDialog?.title}</DialogTitle>
+                <DialogContent dividers>
+                  <DialogContentText id="cancel-dialog-description">{textT?.cancelDialog?.message}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button variant="text" color="secondary" onClick={handleCancelClose} disabled={cancelState.loading}>
+                    {textT?.cancelDialog?.btnCancel}
+                  </Button>
+                  <Button variant="text" color="primary" onClick={handleCancel} loading={cancelState.loading}>
+                    {textT?.cancelDialog?.btnConfirm}
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </Stack>
           </Grid>
         </Grid>

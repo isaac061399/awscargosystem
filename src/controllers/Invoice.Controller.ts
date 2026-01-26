@@ -1,4 +1,5 @@
 import { Currency, OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
+import { Prisma } from '@/prisma/generated/client';
 import { BillingLine, convertCRC, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
 import { prismaRead, Tx } from '@/libs/prisma';
 import { clientSelectSchema } from './Client.Controller';
@@ -62,18 +63,16 @@ export const getInvoice = async (id: number) => {
             package_id: true,
             order_product_id: true,
             product_id: true,
-            package_prev_state: true,
-            order_product_prev_state: true,
+            package_prev_status: true,
+            order_product_prev_status: true,
             prev_payment_status: true,
             currency: true,
             quantity: true,
             unit_price: true,
             total: true,
-            package: { select: { id: true, tracking: true, description: true } },
-            order_product: {
-              select: { id: true, order_id: true, tracking: true, code: true, name: true, quantity: true }
-            },
-            product: { select: { id: true, code: true, name: true } }
+            package: true,
+            order_product: true,
+            product: true
           }
         },
         invoice_payments: {
@@ -288,6 +287,74 @@ export const updateLineReferences = async (lines: BillingLine[], tx: Tx): Promis
             data: {
               order_product_id: line.refObj.obj.id,
               status: OrderStatus.DELIVERED
+            }
+          });
+        }
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error: ${error}`);
+
+    return false;
+  }
+};
+
+export const rollbackLineReferences = async (
+  lines: Prisma.CusInvoiceLineGetPayload<{
+    include: {
+      package: true;
+      order_product: true;
+      product: true;
+    };
+  }>[],
+  tx: Tx
+): Promise<boolean> => {
+  try {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (line.package) {
+        const statusChanged = line.package_prev_status && line.package.status !== line.package_prev_status;
+
+        // save status
+        await tx.cusPackage.update({
+          where: { id: line.package.id },
+          data: {
+            payment_status: line.prev_payment_status || undefined,
+            status: statusChanged ? line.package_prev_status || undefined : undefined
+          }
+        });
+
+        // delete last status log
+        if (statusChanged) {
+          await tx.cusPackageStatusLog.deleteMany({
+            where: {
+              package_id: line.package.id,
+              status: line.package.status
+            }
+          });
+        }
+      } else if (line.order_product) {
+        const statusChanged =
+          line.order_product_prev_status && line.order_product.status !== line.order_product_prev_status;
+
+        // save status
+        await tx.cusOrderProduct.update({
+          where: { id: line.order_product.id },
+          data: {
+            payment_status: line.prev_payment_status || undefined,
+            status: statusChanged ? line.order_product_prev_status || undefined : undefined
+          }
+        });
+
+        // delete last status log
+        if (statusChanged) {
+          await tx.cusOrderProductStatusLog.deleteMany({
+            where: {
+              order_product_id: line.order_product.id,
+              status: line.order_product.status
             }
           });
         }

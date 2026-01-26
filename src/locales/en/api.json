@@ -178,6 +178,13 @@
       "general": "An error occurred, please try again"
     }
   },
+  "invoices": {
+    "errors": {
+      "noOpenCash": "There is no open cash register. Transactions cannot be processed.",
+      "save": "Error saving the invoice, please try again",
+      "general": "An error occurred, please try again"
+    }
+  },
   "money-outflows": {
     "errors": {
       "noOpenCash": "There is no open cash register. Transactions cannot be processed.",
