@@ -5,18 +5,18 @@ import './styles.css';
 import { redirect } from 'next/navigation';
 
 // Controller Imports
-import { getInvoice } from '@/controllers/Invoice.Controller';
+import { getCashRegister } from '@/controllers/CashRegister.Controller';
 
 // Components Imports
-import Invoice from '@/views-cus/print/Invoice';
+import CashRegister from '@/views-cus/print/CashRegister';
 
 // Server Action Imports
 import withAuthPage from '@libs/auth/withAuthPage';
 import { getNextPath } from '@libs/translate/functions';
 import TranslationsProvider from '@libs/translate/TranslationProvider';
 
-const InvoicePrintPage = withAuthPage(
-  ['invoices.view'],
+const CashRegisterPrintPage = withAuthPage(
+  ['cash-registers.view'],
   async ({
     params,
     searchParams
@@ -26,17 +26,17 @@ const InvoicePrintPage = withAuthPage(
   }) => {
     const { id } = await params;
 
-    const invoice = await getInvoice(parseInt(id));
-    if (!invoice) {
+    const cashRegister = await getCashRegister(parseInt(id), true);
+    if (!cashRegister) {
       redirect('/not-found');
     }
 
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <Invoice invoice={invoice} original={(await searchParams).or} />
+        <CashRegister cashRegister={cashRegister} original={(await searchParams).or} />
       </TranslationsProvider>
     );
   }
 );
 
-export default InvoicePrintPage;
+export default CashRegisterPrintPage;

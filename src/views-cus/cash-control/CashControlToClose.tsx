@@ -65,10 +65,12 @@ const getFormCloseTotal = (options: { [key: string]: number }, values: { [key: s
 
 const CashToClose = ({
   cashRegister,
-  setAlertState
+  setAlertState,
+  setSuccessOpen
 }: {
   cashRegister: any;
   setAlertState: React.Dispatch<React.SetStateAction<any>>;
+  setSuccessOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { data: admin } = useAdmin();
   const canClose = hasAllPermissions('cash-control.close', admin.permissions);
@@ -121,6 +123,8 @@ const CashToClose = ({
         }
 
         router.refresh();
+
+        setSuccessOpen(true);
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {

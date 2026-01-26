@@ -17,7 +17,7 @@ const footerLines = [
   'Gracias por su preferencia.',
   'Version 4.4',
   'Autorizada mediante resolución DGT-R-033-2019 del 20 de junio de 2019',
-  '--------- Última Línea ---------'
+  '----------------- Última Línea -----------------'
 ];
 
 const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => {

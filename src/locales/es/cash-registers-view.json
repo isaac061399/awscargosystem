@@ -1,7 +1,7 @@
 {
   "text": {
     "title": "Registro de Caja {{ id }}",
-    "btnPrint": "Imprimir Recibo",
+    "btnPrint": "Imprimir Tiquete",
     "btnReopen": "Reabrir Caja",
     "btnContinue": "Continuar",
     "btnCancel": "Cancelar",
@@ -43,7 +43,8 @@
       "sinpeOut": "Salidas en SINPE",
       "transferOut": "Salidas en Transferencia",
       "cardOut": "Salidas en Tarjeta",
-      "totalOut": "Total de Salidas"
+      "totalOut": "Total de Salidas",
+      "cashChange": "Vueltos"
     },
     "cashDetail": {
       "title": "Detalle de Efectivo"

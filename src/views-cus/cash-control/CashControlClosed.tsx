@@ -37,19 +37,15 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
     lines[line.currency] = line;
   });
 
+  // CRC Calculations
   const totalInCRC = lines.CRC.cash_in + lines.CRC.sinpe_in + lines.CRC.transfer_in + lines.CRC.card_in;
   const totalOutCRC = lines.CRC.cash_out + lines.CRC.sinpe_out + lines.CRC.transfer_out + lines.CRC.card_out;
-
-  const totalInUSD = lines.USD.cash_in + lines.USD.sinpe_in + lines.USD.transfer_in + lines.USD.card_in;
-  const totalOutUSD = lines.USD.cash_out + lines.USD.sinpe_out + lines.USD.transfer_out + lines.USD.card_out;
+  const totalChangeCRC =
+    lines.CRC.cash_change + lines.CRC.sinpe_change + lines.CRC.transfer_change + lines.CRC.card_change;
 
   const totalReportedCRC = lines.CRC.cash_reported - lines.CRC.cash_balance;
   const totalCRC = lines.CRC.cash_in - lines.CRC.cash_out;
   const totalDifferenceCRC = totalReportedCRC - Math.abs(totalCRC);
-
-  const totalReportedUSD = lines.USD.cash_reported - lines.USD.cash_balance;
-  const totalUSD = lines.USD.cash_in - lines.USD.cash_out;
-  const totalDifferenceUSD = totalReportedUSD - Math.abs(totalUSD);
 
   const [resultIconCRC, resultColorCRC] =
     totalDifferenceCRC < 0
@@ -57,6 +53,22 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
       : totalDifferenceCRC > 0
         ? ['arrow-up-circle-fill', 'warning']
         : ['checkbox-circle-fill', 'success'];
+
+  const cashDetailCRC = getCashDetail(
+    moneyT?.CRC || {},
+    lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
+  );
+
+  // USD Calculations
+  const totalInUSD = lines.USD.cash_in + lines.USD.sinpe_in + lines.USD.transfer_in + lines.USD.card_in;
+  const totalOutUSD = lines.USD.cash_out + lines.USD.sinpe_out + lines.USD.transfer_out + lines.USD.card_out;
+  const totalChangeUSD =
+    lines.USD.cash_change + lines.USD.sinpe_change + lines.USD.transfer_change + lines.USD.card_change;
+
+  const totalReportedUSD = lines.USD.cash_reported - lines.USD.cash_balance;
+  const totalUSD = lines.USD.cash_in - lines.USD.cash_out;
+  const totalDifferenceUSD = totalReportedUSD - Math.abs(totalUSD);
+
   const [resultIconUSD, resultColorUSD] =
     totalDifferenceUSD < 0
       ? ['arrow-down-circle-fill', 'error']
@@ -64,10 +76,6 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
         ? ['arrow-up-circle-fill', 'warning']
         : ['checkbox-circle-fill', 'success'];
 
-  const cashDetailCRC = getCashDetail(
-    moneyT?.CRC || {},
-    lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
-  );
   const cashDetailUSD = getCashDetail(
     moneyT?.USD || {},
     lines.USD?.cash_reported_data ? JSON.parse(lines.USD.cash_reported_data) : {}
@@ -253,6 +261,14 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
               label={textT?.detail?.totalOut}
               crc={formatMoney(totalOutCRC, `${currencies.CRC.symbol} `)}
               usd={formatMoney(totalOutUSD, `${currencies.USD.symbol} `)}
+            />
+
+            <Divider className="my-2" />
+
+            <DualCurrencyRow
+              label={textT?.detail?.cashChange}
+              crc={formatMoney(totalChangeCRC, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(totalChangeUSD, `${currencies.USD.symbol} `)}
             />
           </CardContent>
         </Card>

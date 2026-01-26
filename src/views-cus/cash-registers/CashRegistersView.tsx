@@ -92,57 +92,33 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
     }
   };
 
-  const handlePrintTicket = async () => {
-    const pdfUrl = `/api/cash-registers/${cashRegister.id}/ticket`;
-    const win = window.open(pdfUrl, '_blank');
-
-    if (win) {
-      // Auto print when the new tab loads
-      win.onload = () => {
-        win.print();
-      };
-    }
-  };
-
   const lines: { [key: string]: any } = {};
   cashRegister.lines.forEach((line: any) => {
     lines[line.currency] = line;
   });
 
+  // CRC calculations
+
   let totalInCRC = 0;
   let totalOutCRC = 0;
-
-  let totalInUSD = 0;
-  let totalOutUSD = 0;
+  let totalChangeCRC = 0;
 
   let totalReportedCRC = 0;
   let totalCRC = 0;
   let totalDifferenceCRC = 0;
 
-  let totalReportedUSD = 0;
-  let totalUSD = 0;
-  let totalDifferenceUSD = 0;
-
   let [resultIconCRC, resultColorCRC] = ['checkbox-circle-fill', 'success'];
-  let [resultIconUSD, resultColorUSD] = ['checkbox-circle-fill', 'success'];
 
   let cashDetailCRC = [] as { title: string; value: number }[];
-  let cashDetailUSD = [] as { title: string; value: number }[];
 
   if (isClosed) {
     totalInCRC = lines.CRC.cash_in + lines.CRC.sinpe_in + lines.CRC.transfer_in + lines.CRC.card_in;
     totalOutCRC = lines.CRC.cash_out + lines.CRC.sinpe_out + lines.CRC.transfer_out + lines.CRC.card_out;
-
-    totalInUSD = lines.USD.cash_in + lines.USD.sinpe_in + lines.USD.transfer_in + lines.USD.card_in;
-    totalOutUSD = lines.USD.cash_out + lines.USD.sinpe_out + lines.USD.transfer_out + lines.USD.card_out;
+    totalChangeCRC = lines.CRC.cash_change + lines.CRC.sinpe_change + lines.CRC.transfer_change + lines.CRC.card_change;
 
     totalReportedCRC = lines.CRC.cash_reported - lines.CRC.cash_balance;
     totalCRC = lines.CRC.cash_in - lines.CRC.cash_out;
     totalDifferenceCRC = totalReportedCRC - Math.abs(totalCRC);
-
-    totalReportedUSD = lines.USD.cash_reported - lines.USD.cash_balance;
-    totalUSD = lines.USD.cash_in - lines.USD.cash_out;
-    totalDifferenceUSD = totalReportedUSD - Math.abs(totalUSD);
 
     [resultIconCRC, resultColorCRC] =
       totalDifferenceCRC < 0
@@ -150,6 +126,35 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
         : totalDifferenceCRC > 0
           ? ['arrow-up-circle-fill', 'warning']
           : ['checkbox-circle-fill', 'success'];
+
+    cashDetailCRC = getCashDetail(
+      moneyT?.CRC || {},
+      lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
+    );
+  }
+
+  // USD calculations
+  let totalInUSD = 0;
+  let totalOutUSD = 0;
+  let totalChangeUSD = 0;
+
+  let totalReportedUSD = 0;
+  let totalUSD = 0;
+  let totalDifferenceUSD = 0;
+
+  let [resultIconUSD, resultColorUSD] = ['checkbox-circle-fill', 'success'];
+
+  let cashDetailUSD = [] as { title: string; value: number }[];
+
+  if (isClosed) {
+    totalInUSD = lines.USD.cash_in + lines.USD.sinpe_in + lines.USD.transfer_in + lines.USD.card_in;
+    totalOutUSD = lines.USD.cash_out + lines.USD.sinpe_out + lines.USD.transfer_out + lines.USD.card_out;
+    totalChangeUSD = lines.USD.cash_change + lines.USD.sinpe_change + lines.USD.transfer_change + lines.USD.card_change;
+
+    totalReportedUSD = lines.USD.cash_reported - lines.USD.cash_balance;
+    totalUSD = lines.USD.cash_in - lines.USD.cash_out;
+    totalDifferenceUSD = totalReportedUSD - Math.abs(totalUSD);
+
     [resultIconUSD, resultColorUSD] =
       totalDifferenceUSD < 0
         ? ['arrow-down-circle-fill', 'error']
@@ -157,10 +162,6 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
           ? ['arrow-up-circle-fill', 'warning']
           : ['checkbox-circle-fill', 'success'];
 
-    cashDetailCRC = getCashDetail(
-      moneyT?.CRC || {},
-      lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
-    );
     cashDetailUSD = getCashDetail(
       moneyT?.USD || {},
       lines.USD?.cash_reported_data ? JSON.parse(lines.USD.cash_reported_data) : {}
@@ -191,12 +192,13 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
                 </Button>
               )}
               <Button
-                type="button"
+                LinkComponent={Link}
                 size="small"
                 variant="contained"
                 color="primary"
                 startIcon={<i className="ri-printer-line" />}
-                onClick={handlePrintTicket}>
+                href={`/print/cash-register/${cashRegister.id}?or=1`}
+                target="_blank">
                 {textT?.btnPrint}
               </Button>
             </div>
@@ -417,6 +419,14 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
                             crc={formatMoney(totalOutCRC, `${currencies.CRC.symbol} `)}
                             usd={formatMoney(totalOutUSD, `${currencies.USD.symbol} `)}
                           />
+
+                          <Divider className="my-2" />
+
+                          <DualCurrencyRow
+                            label={textT?.detail?.cashChange}
+                            crc={formatMoney(totalChangeCRC, `${currencies.CRC.symbol} `)}
+                            usd={formatMoney(totalChangeUSD, `${currencies.USD.symbol} `)}
+                          />
                         </CardContent>
                       </Card>
                     </Grid>
@@ -470,6 +480,7 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
                       </Card>
                     </Grid>
 
+                    {/* Reopen dialog */}
                     <Dialog
                       open={reopenState.open}
                       onClose={handleReopenClose}

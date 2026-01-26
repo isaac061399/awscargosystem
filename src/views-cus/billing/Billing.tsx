@@ -1320,38 +1320,38 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
         aria-labelledby="dialog-success-title"
         maxWidth="xs"
         fullWidth>
-        <form noValidate onSubmit={formikPayment.handleSubmit}>
-          <DialogTitle id="dialog-success-title">{textT?.dialogSuccess?.title}</DialogTitle>
-          <DialogContent dividers className="flex flex-col gap-6">
-            <Typography variant="h4" className="text-center">
-              {textT?.dialogSuccess?.changeAmount}{' '}
-              {formatMoney(successState.changeAmountCRC, `${currencies[Currency.CRC].symbol} `)}
-            </Typography>
-            <Stack direction="column" spacing={2}>
-              {successState.id && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  href={`/print/invoice/${successState.id}?or=1`}
-                  target="_blank">
-                  {textT?.dialogSuccess?.printInvoice}
-                </Button>
-              )}
-              {successState.id && (
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  href={`/invoices/view/${successState.id}`}
-                  target="_blank">
-                  {textT?.dialogSuccess?.viewInvoice}
-                </Button>
-              )}
-              <Button variant="outlined" color="primary" onClick={handleCloseSuccess}>
-                {textT?.dialogSuccess?.newInvoice}
+        <DialogTitle id="dialog-success-title">{textT?.dialogSuccess?.title}</DialogTitle>
+        <DialogContent dividers className="flex flex-col gap-6">
+          <Typography variant="h4" className="text-center">
+            {textT?.dialogSuccess?.changeAmount}{' '}
+            {formatMoney(successState.changeAmountCRC, `${currencies[Currency.CRC].symbol} `)}
+          </Typography>
+          <Stack direction="column" spacing={2}>
+            {successState.id && (
+              <Button
+                LinkComponent={Link}
+                variant="contained"
+                color="primary"
+                href={`/print/invoice/${successState.id}?or=1`}
+                target="_blank">
+                {textT?.dialogSuccess?.printInvoice}
               </Button>
-            </Stack>
-          </DialogContent>
-        </form>
+            )}
+            {successState.id && (
+              <Button
+                LinkComponent={Link}
+                variant="contained"
+                color="secondary"
+                href={`/invoices/view/${successState.id}`}
+                target="_blank">
+                {textT?.dialogSuccess?.viewInvoice}
+              </Button>
+            )}
+            <Button variant="outlined" color="primary" onClick={handleCloseSuccess}>
+              {textT?.dialogSuccess?.newInvoice}
+            </Button>
+          </Stack>
+        </DialogContent>
       </Dialog>
     </DashboardLayout>
   );

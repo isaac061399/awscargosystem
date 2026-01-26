@@ -2,9 +2,7 @@ import { cookies } from 'next/headers';
 import moment, { Moment } from 'moment-timezone';
 
 import { prismaRead } from '@libs/prisma';
-import { CashRegisterStatus, Currency, PaymentMethod } from '@/prisma/generated/enums';
-
-// import { formatMoney } from '@/libs/utils';
+import { CashRegisterStatus, Currency, InvoicePaymentCondition, PaymentMethod } from '@/prisma/generated/enums';
 
 export const getCashRegister = async (
   id: number,
@@ -156,15 +154,60 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any,
     const adminId = cashRegister.administrator.id;
     const openDate = moment(cashRegister.open_date);
 
-    const cashIn = 0;
-    const sinpeIn = 0;
-    const transferIn = 0;
-    const cardIn = 0;
+    let cashIn = 0;
+    let sinpeIn = 0;
+    let transferIn = 0;
+    let cardIn = 0;
     let cashOut = 0;
     let sinpeOut = 0;
     let transferOut = 0;
     let cardOut = 0;
-    const cashChange = 0;
+    let cashChange = 0;
+
+    // get invoice data
+    const invoices = await prismaRead.cusInvoice.findMany({
+      where: {
+        cash_register_id: cashRegister.id,
+        payment_condition: InvoicePaymentCondition.CASH,
+        created_at: { gte: openDate.toDate(), lte: closeDate.toDate() }
+      },
+      select: {
+        id: true,
+        cash_change: true,
+        invoice_payments: {
+          select: { id: true, currency: true, payment_method: true, amount: true }
+        }
+      }
+    });
+
+    if (invoices && invoices.length > 0) {
+      invoices.forEach((inv) => {
+        inv.invoice_payments.forEach((pay) => {
+          if (pay.currency === currency) {
+            switch (pay.payment_method) {
+              case PaymentMethod.CASH:
+                cashIn += pay.amount;
+                break;
+              case PaymentMethod.SINPE:
+                sinpeIn += pay.amount;
+                break;
+              case PaymentMethod.TRANSFER:
+                transferIn += pay.amount;
+                break;
+              case PaymentMethod.CARD:
+                cardIn += pay.amount;
+                break;
+              default:
+                break;
+            }
+          }
+        });
+
+        if (currency === Currency.CRC && inv.cash_change && inv.cash_change > 0) {
+          cashChange += inv.cash_change;
+        }
+      });
+    }
 
     // get MoneyOutflows data
     const moneyOutflows = await prismaRead.cusMoneyOutflow.findMany({
@@ -247,136 +290,6 @@ export const getCashData = (options: { [key: string]: string }, data: { [key: st
 
   return { details, total };
 };
-
-// export const getCashRegisterTicketHtml = async (entry: any) => {
-//   const tz = (await cookies()).get('tz')?.value || 'UTC';
-
-//   const totalEntries = entry.cash_amount + entry.sinpe_amount + entry.transfer_amount + entry.card_amount;
-//   const totalOutflows = entry.cash_outflows + entry.sinpe_outflows + entry.transfer_outflows + entry.card_outflows;
-
-//   const totalCashReported = entry.cash_reported - entry.cash_balance;
-//   const totalCash = entry.cash_amount - entry.cash_outflows;
-//   const totalDifference = totalCashReported - totalCash;
-
-//   const ticketWidthMm = 62;
-
-//   return `
-//       <!doctype html>
-//       <html lang="es">
-//         <head>
-//           <meta charset="utf-8" />
-//           <title>Registro de Caja #${entry.id}</title>
-//           <meta name="viewport" content="width=device-width, initial-scale=1" />
-//           <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
-//           <style>
-//             @page {
-//               size: ${ticketWidthMm}mm auto;
-//               margin: 7mm;
-//             }
-//             html, body {
-//               padding: 0;
-//               margin: 0;
-//             }
-//             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-//             body {
-//               font-family: 'Noto Sans', sans-serif;
-//               font-size: 10pt;
-//               color: #111;
-//             }
-//             .ticket-container {
-//               box-sizing: border-box;
-//               width: ${ticketWidthMm}mm;
-//               margin: 0;
-//             }
-//             .divider {
-//               border: none;
-//               border-top: 1px solid #000;
-//               margin: 15px 0;
-//             }
-//             .header {
-//               text-align: center;
-//               border-bottom: 1px solid #000;
-//               padding-bottom: 10px;
-//             }
-//             .header img {
-//               max-width: 100px;
-//               margin: 0 auto;
-//             }
-//             .header h1 {
-//               margin: 5px 0;
-//               font-size: 18pt;
-//             }
-//             .header p {
-//               margin: 10px 0;
-//             }
-//             .details {
-//               margin-top: 15px;
-//             }
-//             .details p {
-//               margin: 3px 0;
-//             }
-//             .label {
-//               font-weight: bold;
-//             }
-//             .signature {
-//               text-align: center;
-//               margin-top: 100px;
-//             }
-//             .signature-line {
-//               border-top: 1px solid #000;
-//               width: 200px;
-//               margin-top: 40px;
-//             }
-//             .footer {
-//               margin-top: 20px;
-//               text-align: center;
-//             }
-//           </style>
-//         </head>
-//         <body>
-//           <div class="ticket-container">
-//             <div class="header">
-//               <img src="${process.env.NEXTAUTH_URL}${process.env.SITE_LOGO}" width="100" height="100" alt="Logo" />
-//               <h1>${process.env.BUSINESS_NAME}</h1>
-//               <p>Correo: ${process.env.BUSINESS_EMAIL}</p>
-//               <p>Registro de Caja #${entry.id}</p>
-//             </div>
-
-//             <div class="details">
-//               <p><span class="label">Administrador:</span> ${entry.administrator.full_name}</p>
-//               <p><span class="label">Correo:</span> ${entry.administrator.email}</p>
-//               <hr class="divider" />
-//               <p><span class="label">Apertura:</span> ${moment(entry.open_date).tz(tz).format('DD/MM/YYYY hh:mm A')}</p>
-//               <p><span class="label">Cierre:</span> ${moment(entry.close_date).tz(tz).format('DD/MM/YYYY hh:mm A')}</p>
-//               <hr class="divider" />
-//               <p><span class="label">Balance inicial:</span> ${formatMoney(entry.cash_balance)}</p>
-//               <p><span class="label">Efectivo reportado:</span> ${formatMoney(entry.cash_reported)}</p>
-//               <hr class="divider" />
-//               <p><span class="label">Entradas en efectivo:</span> ${formatMoney(entry.cash_amount)}</p>
-//               <p><span class="label">Entradas en SINPE:</span> ${formatMoney(entry.sinpe_amount)}</p>
-//               <p><span class="label">Entradas en transferencia:</span> ${formatMoney(entry.transfer_amount)}</p>
-//               <p><span class="label">Total de entradas:</span> ${formatMoney(totalEntries)}</p>
-//               <hr class="divider" />
-//               <p><span class="label">Salidas en efectivo:</span> ${formatMoney(entry.cash_outflows)}</p>
-//               <p><span class="label">Salidas en SINPE:</span> ${formatMoney(entry.sinpe_outflows)}</p>
-//               <p><span class="label">Salidas en transferencia:</span> ${formatMoney(entry.transfer_outflows)}</p>
-//               <p><span class="label">Total de salidas:</span> ${formatMoney(totalOutflows)}</p>
-//               <hr class="divider" />
-//               <p><span class="label">Efectivo</span></p>
-//               <p><span class="label">Total reportado:</span> ${formatMoney(totalCashReported)}</p>
-//               <p><span class="label">Total en sistema:</span> ${formatMoney(totalCash)}</p>
-//               <p><span class="label">Diferencia:</span> ${formatMoney(totalDifference)}</p>
-//               <hr class="divider" />
-//               <p><span class="label">Comentario:</span> ${entry.comment}</p>
-//             </div>
-
-//             <div class="signature">
-//               <p><span class="label">Firma:</span> ___________________________</p>
-//             </div>
-//           </div>
-//         </body>
-//       </html>`;
-// };
 
 export const getOpenCashRegister = async (adminId: number) => {
   try {

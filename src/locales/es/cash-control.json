@@ -3,7 +3,7 @@
     "title": "Caja",
     "btnOpen": "Abrir",
     "btnClose": "Cerrar",
-    "btnPrint": "Imprimir Recibo",
+    "btnPrint": "Imprimir Tiquete",
     "confirmation": "Confirmación",
     "cashBalance": "Balance Inicial",
     "btnView": "Ver",
@@ -37,13 +37,19 @@
       "sinpeOut": "Salidas en SINPE",
       "transferOut": "Salidas en Transferencia",
       "cardOut": "Salidas en Tarjeta",
-      "totalOut": "Total de Salidas"
+      "totalOut": "Total de Salidas",
+      "cashChange": "Vueltos"
     },
     "cashDetail": {
       "title": "Detalle de Efectivo"
     },
     "comment": {
       "title": "Comentario"
+    },
+    "dialogSuccess": {
+      "title": "Caja cerrada con éxito",
+      "print": "Imprimir tiquete",
+      "close": "Cerrar"
     }
   },
   "formOpen": {
