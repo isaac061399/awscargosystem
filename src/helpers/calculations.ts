@@ -78,7 +78,12 @@ export const calculateShippingPrice = (weight: string, poundFee: number) => {
       return 0;
     }
 
-    const price = parseFloat(weight) * poundFee;
+    let price = parseFloat(weight) * poundFee;
+
+    // ensure minimum fee of one pound
+    if (price < poundFee) {
+      price = poundFee;
+    }
 
     return parseFloat(price.toFixed(2));
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
