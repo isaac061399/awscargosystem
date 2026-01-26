@@ -120,7 +120,7 @@
       "title": "Factura registrada",
       "changeAmount": "Vuelto:",
       "viewInvoice": "Ver factura",
-      "printInvoice": "Imprimir factura",
+      "printTicket": "Imprimir tiquete",
       "newInvoice": "Nueva factura"
     }
   },

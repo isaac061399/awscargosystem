@@ -1334,7 +1334,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                 color="primary"
                 href={`/print/invoice/${successState.id}?or=1`}
                 target="_blank">
-                {textT?.dialogSuccess?.printInvoice}
+                {textT?.dialogSuccess?.printTicket}
               </Button>
             )}
             {successState.id && (
