@@ -163,6 +163,32 @@
           "dateFormat": "DD/MM/YYYY hh:mm a"
         }
       }
+    },
+    "invoices": {
+      "title": "Facturas Emitidas",
+      "text": {
+        "btnExport": "Exportar"
+      },
+      "table": {
+        "consecutive": {
+          "title": "Consecutivo"
+        },
+        "office": {
+          "title": "Oficina"
+        },
+        "type": {
+          "title": "Info",
+          "type": "Tipo",
+          "paymentCondition": "Condición de Pago"
+        },
+        "status": {
+          "title": "Estado"
+        },
+        "created_at": {
+          "title": "Fecha de Registro",
+          "dateFormat": "DD/MM/YYYY hh:mm a"
+        }
+      }
     }
   }
 }

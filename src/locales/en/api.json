@@ -180,6 +180,9 @@
   },
   "invoices": {
     "errors": {
+      "cancel": "Error canceling the invoice, please try again",
+      "alreadyCanceled": "The invoice is already canceled",
+      "notFound": "Invoice not found",
       "noOpenCash": "There is no open cash register. Transactions cannot be processed.",
       "save": "Error saving the invoice, please try again",
       "general": "An error occurred, please try again"

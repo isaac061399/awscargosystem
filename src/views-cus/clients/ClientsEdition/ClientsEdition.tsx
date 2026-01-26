@@ -20,11 +20,13 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 const InfoTab = dynamic(() => import('./Info'));
 const PackagesTab = dynamic(() => import('./Packages'));
 const OrdersTab = dynamic(() => import('./Orders'));
+const InvoicesTab = dynamic(() => import('./Invoices'));
 
 const tabContentList = (provinces: any[], client?: any): { [key: string]: ReactElement } => ({
   info: <InfoTab provinces={provinces} client={client} />,
   packages: <PackagesTab client={client} />,
-  orders: <OrdersTab client={client} />
+  orders: <OrdersTab client={client} />,
+  invoices: <InvoicesTab client={client} />
 });
 
 const ClientsEdition = ({ provinces, client }: { provinces: any[]; client?: any }) => {
@@ -79,6 +81,14 @@ const ClientsEdition = ({ provinces, client }: { provinces: any[]; client?: any 
                         icon={<i className="ri-shopping-bag-4-line" />}
                         iconPosition="start"
                         value="orders"
+                      />
+                    )}
+                    {client && (
+                      <Tab
+                        label={tabsT?.invoices?.title}
+                        icon={<i className="ri-file-list-3-line" />}
+                        iconPosition="start"
+                        value="invoices"
                       />
                     )}
                   </TabList>
