@@ -1,4 +1,4 @@
-import { CusOrderProduct, CusPackage, CusProduct } from '@/prisma/generated/client';
+import { CusCashRegisterLine, CusOrderProduct, CusPackage, CusProduct } from '@/prisma/generated/client';
 import { Currency, PaymentMethod } from '@/prisma/generated/enums';
 
 export type BillingLine = {
@@ -275,4 +275,44 @@ export const roundCRC = (amount: number): number => {
   const newAmount = Math.round(amount);
 
   return Math.round(newAmount / 5) * 5;
+};
+
+export const calculateCashRegisterTotals = (line: CusCashRegisterLine) => {
+  const response = {
+    in: 0,
+    out: 0,
+    change: 0,
+    cash: {
+      reported: 0,
+      system: 0,
+      difference: 0
+    }
+  };
+
+  const l = {
+    cash_reported: line.cash_reported || 0,
+    cash_balance: line.cash_balance || 0,
+    cash_in: line.cash_in || 0,
+    sinpe_in: line.sinpe_in || 0,
+    transfer_in: line.transfer_in || 0,
+    card_in: line.card_in || 0,
+    cash_out: line.cash_out || 0,
+    sinpe_out: line.sinpe_out || 0,
+    transfer_out: line.transfer_out || 0,
+    card_out: line.card_out || 0,
+    cash_change: line.cash_change || 0,
+    sinpe_change: line.sinpe_change || 0,
+    transfer_change: line.transfer_change || 0,
+    card_change: line.card_change || 0
+  };
+
+  response.in = l.cash_in + l.sinpe_in + l.transfer_in + l.card_in;
+  response.out = l.cash_out + l.sinpe_out + l.transfer_out + l.card_out;
+  response.change = l.cash_change + l.sinpe_change + l.transfer_change + l.card_change;
+
+  response.cash.reported = l.cash_reported;
+  response.cash.system = l.cash_balance + l.cash_in - l.cash_out - l.cash_change;
+  response.cash.difference = response.cash.reported - Math.abs(response.cash.system);
+
+  return response;
 };

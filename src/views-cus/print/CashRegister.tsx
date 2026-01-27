@@ -10,6 +10,7 @@ import { useConfig } from '@/components/ConfigProvider';
 
 import { formatMoney } from '@/libs/utils';
 import { currencies } from '@/libs/constants';
+import { calculateCashRegisterTotals } from '@/helpers/calculations';
 
 const footerLines = [
   '',
@@ -78,13 +79,15 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
       {cashRegister.lines.map((line: any, index: number) => {
         const moneyPrefix = `${currencies[line.currency].symbol} `;
 
-        const totalEntries = line.cash_in + line.sinpe_in + line.transfer_in + line.card_in;
-        const totalOutflows = line.cash_out + line.sinpe_out + line.transfer_out + line.card_out;
-        const totalChange = line.cash_change + line.sinpe_change + line.transfer_change + line.card_change;
+        const totals = calculateCashRegisterTotals(line);
 
-        const totalCashReported = line.cash_reported - line.cash_balance;
-        const totalCash = line.cash_in - line.cash_out;
-        const totalDifference = totalCashReported - Math.abs(totalCash);
+        // const totalEntries = line.cash_in + line.sinpe_in + line.transfer_in + line.card_in;
+        // const totalOutflows = line.cash_out + line.sinpe_out + line.transfer_out + line.card_out;
+        // const totalChange = line.cash_change + line.sinpe_change + line.transfer_change + line.card_change;
+
+        // const totalCashReported = line.cash_reported - line.cash_balance;
+        // const totalCash = line.cash_in - line.cash_out;
+        // const totalDifference = totalCashReported - Math.abs(totalCash);
 
         return (
           <Fragment key={index}>
@@ -116,7 +119,7 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
               <span className="bold">Entradas Tarjeta:</span> {formatMoney(line.card_in, moneyPrefix)}
             </div>
             <div className="kv">
-              <span className="bold">Total Entradas:</span> {formatMoney(totalEntries, moneyPrefix)}
+              <span className="bold">Total Entradas:</span> {formatMoney(totals.in, moneyPrefix)}
             </div>
 
             <br />
@@ -134,25 +137,25 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
               <span className="bold">Salidas Tarjeta:</span> {formatMoney(line.card_out, moneyPrefix)}
             </div>
             <div className="kv">
-              <span className="bold">Total Salidas:</span> {formatMoney(totalOutflows, moneyPrefix)}
+              <span className="bold">Total Salidas:</span> {formatMoney(totals.out, moneyPrefix)}
             </div>
 
             <br />
 
             <div className="kv">
-              <span className="bold">Vueltos:</span> {formatMoney(totalChange, moneyPrefix)}
+              <span className="bold">Vueltos:</span> {formatMoney(totals.change, moneyPrefix)}
             </div>
 
             <br />
 
             <div className="kv">
-              <span className="bold">Total Efectivo Reportado:</span> {formatMoney(totalCashReported, moneyPrefix)}
+              <span className="bold">Total Efectivo Reportado:</span> {formatMoney(totals.cash.reported, moneyPrefix)}
             </div>
             <div className="kv">
-              <span className="bold">Total Efectivo Sistema:</span> {formatMoney(totalCash, moneyPrefix)}
+              <span className="bold">Total Efectivo Sistema:</span> {formatMoney(totals.cash.system, moneyPrefix)}
             </div>
             <div className="kv">
-              <span className="bold">Diferencia:</span> {formatMoney(totalDifference, moneyPrefix)}
+              <span className="bold">Diferencia:</span> {formatMoney(totals.cash.difference, moneyPrefix)}
             </div>
 
             <div className="line" />

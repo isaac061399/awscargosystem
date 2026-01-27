@@ -15,6 +15,7 @@ import { Button, Card, CardContent, CardHeader, Divider, Grid, Tooltip, Typograp
 // Utils Imports
 import { formatMoney } from '@libs/utils';
 import { currencies } from '@/libs/constants';
+import { calculateCashRegisterTotals } from '@/helpers/calculations';
 
 const getCashDetail = (options: { [key: string]: string }, data: { [key: string]: number }) => {
   const detail = [] as { title: string; value: number }[];
@@ -37,49 +38,31 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
     lines[line.currency] = line;
   });
 
-  // CRC Calculations
-  const totalInCRC = lines.CRC.cash_in + lines.CRC.sinpe_in + lines.CRC.transfer_in + lines.CRC.card_in;
-  const totalOutCRC = lines.CRC.cash_out + lines.CRC.sinpe_out + lines.CRC.transfer_out + lines.CRC.card_out;
-  const totalChangeCRC =
-    lines.CRC.cash_change + lines.CRC.sinpe_change + lines.CRC.transfer_change + lines.CRC.card_change;
-
-  const totalReportedCRC = lines.CRC.cash_reported - lines.CRC.cash_balance;
-  const totalCRC = lines.CRC.cash_in - lines.CRC.cash_out;
-  const totalDifferenceCRC = totalReportedCRC - Math.abs(totalCRC);
-
-  const [resultIconCRC, resultColorCRC] =
-    totalDifferenceCRC < 0
-      ? ['arrow-down-circle-fill', 'error']
-      : totalDifferenceCRC > 0
-        ? ['arrow-up-circle-fill', 'warning']
-        : ['checkbox-circle-fill', 'success'];
-
+  // CRC calculations
+  const totalsCRC = calculateCashRegisterTotals(lines['CRC']);
   const cashDetailCRC = getCashDetail(
     moneyT?.CRC || {},
     lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
   );
-
-  // USD Calculations
-  const totalInUSD = lines.USD.cash_in + lines.USD.sinpe_in + lines.USD.transfer_in + lines.USD.card_in;
-  const totalOutUSD = lines.USD.cash_out + lines.USD.sinpe_out + lines.USD.transfer_out + lines.USD.card_out;
-  const totalChangeUSD =
-    lines.USD.cash_change + lines.USD.sinpe_change + lines.USD.transfer_change + lines.USD.card_change;
-
-  const totalReportedUSD = lines.USD.cash_reported - lines.USD.cash_balance;
-  const totalUSD = lines.USD.cash_in - lines.USD.cash_out;
-  const totalDifferenceUSD = totalReportedUSD - Math.abs(totalUSD);
-
-  const [resultIconUSD, resultColorUSD] =
-    totalDifferenceUSD < 0
+  const [resultIconCRC, resultColorCRC] =
+    totalsCRC.cash.difference < 0
       ? ['arrow-down-circle-fill', 'error']
-      : totalDifferenceUSD > 0
+      : totalsCRC.cash.difference > 0
         ? ['arrow-up-circle-fill', 'warning']
         : ['checkbox-circle-fill', 'success'];
 
+  // USD calculations
+  const totalsUSD = calculateCashRegisterTotals(lines['USD']);
   const cashDetailUSD = getCashDetail(
     moneyT?.USD || {},
     lines.USD?.cash_reported_data ? JSON.parse(lines.USD.cash_reported_data) : {}
   );
+  const [resultIconUSD, resultColorUSD] =
+    totalsUSD.cash.difference < 0
+      ? ['arrow-down-circle-fill', 'error']
+      : totalsUSD.cash.difference > 0
+        ? ['arrow-up-circle-fill', 'warning']
+        : ['checkbox-circle-fill', 'success'];
 
   return (
     <Grid container spacing={5}>
@@ -124,21 +107,19 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
 
           <CardContent>
             <Typography variant="body1" className="flex items-center gap-1">
-              <strong>{textT?.result?.totalReported}:</strong>{' '}
-              {formatMoney(totalReportedCRC, `${currencies.CRC.symbol} `)}
-              <Tooltip title={textT?.result?.totalReportedInfo} placement="top">
-                <i className="ri-information-fill text-primary" />
-              </Tooltip>
+              <strong>{textT?.result?.reported}:</strong>{' '}
+              {formatMoney(totalsCRC.cash.reported, `${currencies.CRC.symbol} `)}
             </Typography>
             <Typography variant="body1" className="flex items-center gap-1">
-              <strong>{textT?.result?.total}:</strong> {formatMoney(totalCRC, `${currencies.CRC.symbol} `)}
-              <Tooltip title={textT?.result?.totalInfo} placement="top">
+              <strong>{textT?.result?.system}:</strong>{' '}
+              {formatMoney(totalsCRC.cash.system, `${currencies.CRC.symbol} `)}
+              <Tooltip title={textT?.result?.systemInfo} placement="top">
                 <i className="ri-information-fill text-primary" />
               </Tooltip>
             </Typography>
             <Typography variant="body1">
               <strong>{textT?.result?.difference}:</strong>{' '}
-              {formatMoney(totalDifferenceCRC, `${currencies.CRC.symbol} `)}
+              {formatMoney(totalsCRC.cash.difference, `${currencies.CRC.symbol} `)}
             </Typography>
           </CardContent>
         </Card>
@@ -155,21 +136,19 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
 
           <CardContent>
             <Typography variant="body1" className="flex items-center gap-1">
-              <strong>{textT?.result?.totalReported}:</strong>{' '}
-              {formatMoney(totalReportedUSD, `${currencies.USD.symbol} `)}
-              <Tooltip title={textT?.result?.totalReportedInfo} placement="top">
-                <i className="ri-information-fill text-primary" />
-              </Tooltip>
+              <strong>{textT?.result?.reported}:</strong>{' '}
+              {formatMoney(totalsUSD.cash.reported, `${currencies.USD.symbol} `)}
             </Typography>
             <Typography variant="body1" className="flex items-center gap-1">
-              <strong>{textT?.result?.total}:</strong> {formatMoney(totalUSD, `${currencies.USD.symbol} `)}
-              <Tooltip title={textT?.result?.totalInfo} placement="top">
+              <strong>{textT?.result?.system}:</strong>{' '}
+              {formatMoney(totalsUSD.cash.system, `${currencies.USD.symbol} `)}
+              <Tooltip title={textT?.result?.systemInfo} placement="top">
                 <i className="ri-information-fill text-primary" />
               </Tooltip>
             </Typography>
             <Typography variant="body1">
               <strong>{textT?.result?.difference}:</strong>{' '}
-              {formatMoney(totalDifferenceUSD, `${currencies.USD.symbol} `)}
+              {formatMoney(totalsUSD.cash.difference, `${currencies.USD.symbol} `)}
             </Typography>
           </CardContent>
         </Card>
@@ -231,8 +210,8 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
             />
             <DualCurrencyRow
               label={textT?.detail?.totalIn}
-              crc={formatMoney(totalInCRC, `${currencies.CRC.symbol} `)}
-              usd={formatMoney(totalInUSD, `${currencies.USD.symbol} `)}
+              crc={formatMoney(totalsCRC.in, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(totalsUSD.in, `${currencies.USD.symbol} `)}
             />
 
             <Divider className="my-2" />
@@ -259,16 +238,16 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
             />
             <DualCurrencyRow
               label={textT?.detail?.totalOut}
-              crc={formatMoney(totalOutCRC, `${currencies.CRC.symbol} `)}
-              usd={formatMoney(totalOutUSD, `${currencies.USD.symbol} `)}
+              crc={formatMoney(totalsCRC.out, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(totalsUSD.out, `${currencies.USD.symbol} `)}
             />
 
             <Divider className="my-2" />
 
             <DualCurrencyRow
               label={textT?.detail?.cashChange}
-              crc={formatMoney(totalChangeCRC, `${currencies.CRC.symbol} `)}
-              usd={formatMoney(totalChangeUSD, `${currencies.USD.symbol} `)}
+              crc={formatMoney(totalsCRC.change, `${currencies.CRC.symbol} `)}
+              usd={formatMoney(totalsUSD.change, `${currencies.USD.symbol} `)}
             />
           </CardContent>
         </Card>

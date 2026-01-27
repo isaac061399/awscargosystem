@@ -16,10 +16,9 @@
     },
     "result": {
       "title": "Resultado del Efectivo",
-      "totalReported": "Total reportado",
-      "totalReportedInfo": "Efectivo Reportado - Balance Inicial",
-      "total": "Total en sistema",
-      "totalInfo": "Entradas en Efectivo - Salidas en Efectivo",
+      "reported": "Total reportado",
+      "system": "Total en sistema",
+      "systemInfo": "Balance Inicial + Entradas en Efectivo - Salidas en Efectivo - Vueltos",
       "difference": "Diferencia"
     },
     "detail": {
