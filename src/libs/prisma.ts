@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Prisma, PrismaClient } from '@/prisma/generated/client';
 
@@ -8,27 +7,22 @@ import { Prisma, PrismaClient } from '@/prisma/generated/client';
 const globalForPrisma = global as unknown as {
   prismaWrite: PrismaClient;
   prismaRead: PrismaClient;
-  poolWrite: Pool;
-  poolRead: Pool;
 };
 
-const poolWrite =
-  globalForPrisma.poolWrite ||
-  new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
-const poolRead =
-  globalForPrisma.poolRead ||
-  new Pool({ connectionString: process.env.DATABASE_URL_REPLICA, ssl: { rejectUnauthorized: false } });
-
-const adapterWrite = new PrismaPg(poolWrite);
-const adapterRead = new PrismaPg(poolRead);
+const adapterWrite = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+const adapterRead = new PrismaPg({
+  connectionString: process.env.DATABASE_URL_REPLICA,
+  ssl: { rejectUnauthorized: false }
+});
 
 export const prismaWrite = globalForPrisma.prismaWrite || new PrismaClient({ adapter: adapterWrite });
 
 export const prismaRead = globalForPrisma.prismaRead || new PrismaClient({ adapter: adapterRead });
 
 if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.poolWrite = poolWrite;
-  globalForPrisma.poolRead = poolRead;
   globalForPrisma.prismaWrite = prismaWrite;
   globalForPrisma.prismaRead = prismaRead;
 }
