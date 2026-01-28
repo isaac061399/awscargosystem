@@ -41,7 +41,7 @@ import { useConfig } from '@/components/ConfigProvider';
 
 // Utility Imports
 import { getTelInputValue } from '@/libs/utils';
-import { currencies, defaultActivityCode } from '@/libs/constants';
+import { currencies, billingDefaultActivityCode } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -107,7 +107,7 @@ const Info = ({ provinces, client }: { provinces: any[]; client?: any }) => {
         billing_canton_id: client ? client.billing_district?.canton?.id : '',
         billing_district_id: client ? client.billing_district?.id : '',
         billing_address: client ? client.billing_address : '',
-        billing_activity_code: client ? client.billing_activity_code : defaultActivityCode,
+        billing_activity_code: client ? client.billing_activity_code : billingDefaultActivityCode,
 
         pound_fee: client ? client.pound_fee : poundFee,
         status: client ? client.status : Object.keys(labelsT?.clientStatus)[0] || ''

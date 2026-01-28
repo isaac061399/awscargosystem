@@ -97,29 +97,31 @@ const CashControl = ({ cashRegister, redirect }: { cashRegister?: any; redirect?
             </CardContent>
 
             {/* Success dialog */}
-            <Dialog
-              open={successOpen}
-              onClose={() => {}} // disable close on outside click
-              aria-labelledby="dialog-success-title"
-              maxWidth="xs"
-              fullWidth>
-              <DialogTitle id="dialog-success-title">{textT?.dialogSuccess?.title}</DialogTitle>
-              <DialogContent dividers className="flex flex-col gap-6">
-                <Stack direction="column" spacing={2}>
-                  <Button
-                    LinkComponent={Link}
-                    variant="contained"
-                    color="primary"
-                    href={`/print/cash-register/${cashRegister.id}?or=1`}
-                    target="_blank">
-                    {textT?.dialogSuccess?.print}
-                  </Button>
-                  <Button variant="outlined" color="primary" onClick={() => setSuccessOpen(false)}>
-                    {textT?.dialogSuccess?.close}
-                  </Button>
-                </Stack>
-              </DialogContent>
-            </Dialog>
+            {(isReadyToClose || isClosed) && (
+              <Dialog
+                open={successOpen}
+                onClose={() => {}} // disable close on outside click
+                aria-labelledby="dialog-success-title"
+                maxWidth="xs"
+                fullWidth>
+                <DialogTitle id="dialog-success-title">{textT?.dialogSuccess?.title}</DialogTitle>
+                <DialogContent dividers className="flex flex-col gap-6">
+                  <Stack direction="column" spacing={2}>
+                    <Button
+                      LinkComponent={Link}
+                      variant="contained"
+                      color="primary"
+                      href={`/print/cash-register/${cashRegister.id}?or=1`}
+                      target="_blank">
+                      {textT?.dialogSuccess?.print}
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={() => setSuccessOpen(false)}>
+                      {textT?.dialogSuccess?.close}
+                    </Button>
+                  </Stack>
+                </DialogContent>
+              </Dialog>
+            )}
           </Card>
         </Grid>
       </Grid>

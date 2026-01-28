@@ -10,7 +10,7 @@ const EASYTAX_USERNAME = process.env.EASYTAX_USERNAME || '';
 const EASYTAX_PASSWORD = process.env.EASYTAX_PASSWORD || '';
 const EASYTAX_DEV_MODE = process.env.EASYTAX_DEV_MODE === 'true';
 
-type GenerateDocumentData = {
+export type DocumentData = {
   company: {
     name: string;
     identification: string;
@@ -41,15 +41,21 @@ type GenerateDocumentData = {
   }>;
 };
 
-export const generateDocument = async (data: GenerateDocumentData) => {
+export const generateDocument = async (data: DocumentData) => {
+  console.log('documentPayload', data);
+
   const params = formatGenerateDocumentParams(data);
 
+  console.log('easytaxPayload', params);
+
   const response = await requestCreateDocument(params);
+
+  console.log('easytaxResponse', response);
 
   return response;
 };
 
-const formatGenerateDocumentParams = (data: GenerateDocumentData) => {
+const formatGenerateDocumentParams = (data: DocumentData) => {
   const invoiceTypeMap: Record<InvoiceType, number> = {
     [InvoiceType.ELECTRONIC]: 1,
     [InvoiceType.TICKET]: 4
@@ -162,7 +168,7 @@ const requestCreateDocument = async (data: any) => {
       data
     });
 
-    return { valid: true, data: response.data };
+    return { valid: true, status: response.status, statusText: response.statusText, data: response.data };
   } catch (e: any) {
     console.error(e);
     const data = e.response?.data;

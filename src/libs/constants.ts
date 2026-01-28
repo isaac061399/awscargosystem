@@ -29,8 +29,6 @@ export const defaultConfigId = 1;
 
 export const mailboxPrefix = 'AWS-';
 
-export const defaultActivityCode = '00';
-
 export const additionalExchangeRate = 6;
 
 export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein', 'Target'];
@@ -48,6 +46,8 @@ export const paymentConditionsDays = {
   [InvoicePaymentCondition.CREDIT_60]: 60,
   [InvoicePaymentCondition.CREDIT_90]: 90
 };
+
+export const billingDefaultActivityCode = '00';
 
 export const billingDefaultDesc = 'ENVIO';
 

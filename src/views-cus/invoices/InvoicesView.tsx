@@ -51,6 +51,7 @@ import { hasAllPermissions } from '@/helpers/permissions';
 import { Currency, InvoiceStatus } from '@/prisma/generated/enums';
 import { bankAccounts, currencies, paymentConditionsDays } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
+import { convertCRC, convertUSD } from '@/helpers/calculations';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -376,6 +377,19 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                         href = `/products/edit/${l.product.id}`;
                       }
 
+                      const invoiceCurrency = invoice.currency;
+                      let unitPrice = l.unit_price;
+                      let subtotal = l.total;
+                      if (l.currency !== invoiceCurrency) {
+                        if (invoiceCurrency === Currency.CRC) {
+                          unitPrice = convertCRC(l.unit_price, invoice.selling_exchange_rate);
+                          subtotal = convertCRC(l.total, invoice.selling_exchange_rate);
+                        } else if (invoiceCurrency === Currency.USD) {
+                          unitPrice = convertUSD(l.unit_price, invoice.buying_exchange_rate);
+                          subtotal = convertUSD(l.total, invoice.buying_exchange_rate);
+                        }
+                      }
+
                       return (
                         <TableRow key={index}>
                           <TableCell>{index + 1}</TableCell>
@@ -389,10 +403,10 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                           </TableCell>
                           <TableCell align="right">{l.quantity}</TableCell>
                           <TableCell align="right">
-                            {formatMoney(l.unit_price, `${currencies[l.currency].symbol} `)}
+                            {formatMoney(unitPrice, `${currencies[invoiceCurrency].symbol} `)}
                           </TableCell>
                           <TableCell align="right">
-                            {formatMoney(l.total, `${currencies[l.currency].symbol} `)}
+                            {formatMoney(subtotal, `${currencies[invoiceCurrency].symbol} `)}
                           </TableCell>
                         </TableRow>
                       );

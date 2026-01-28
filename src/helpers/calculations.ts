@@ -229,7 +229,6 @@ export const addTaxToAmount = (amount: number, taxPercentage: number): number =>
     const totalAmount = amount + amount * (taxPercentage / 100);
 
     return parseFloat(totalAmount.toFixed(2));
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error adding tax to amount: ${error}`);
@@ -244,8 +243,9 @@ export const convertCRC = (amount: number, conversionRate: number): number => {
       return 0;
     }
 
-    return amount * conversionRate;
+    const convertedAmount = amount * conversionRate;
 
+    return parseFloat(convertedAmount.toFixed(2));
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating conversion rate: ${error}`);
@@ -254,13 +254,13 @@ export const convertCRC = (amount: number, conversionRate: number): number => {
   }
 };
 
-export const convertUSD = (amount: number, rate: number): number => {
+export const convertUSD = (amount: number, conversionRate: number): number => {
   try {
-    if (isNaN(amount) || isNaN(rate) || amount <= 0 || rate <= 0) {
+    if (isNaN(amount) || isNaN(conversionRate) || amount <= 0 || conversionRate <= 0) {
       return 0;
     }
 
-    const convertedAmount = amount / rate;
+    const convertedAmount = amount / conversionRate;
 
     return parseFloat(convertedAmount.toFixed(2));
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

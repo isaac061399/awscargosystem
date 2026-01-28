@@ -4,33 +4,7 @@ import { prismaRead, prismaWrite } from '@libs/prisma';
 export const getConfiguration = async () => {
   try {
     const configuration = await prismaRead.cusConfiguration.findUnique({
-      where: { id: defaultConfigId },
-      select: {
-        pound_fee: true,
-        iva_percentage: true,
-        selling_exchange_rate: true,
-        buying_exchange_rate: true,
-        updated_exchange_rate: true,
-        air_address_line_1: true,
-        air_address_line_2: true,
-        air_address_city: true,
-        air_address_state: true,
-        air_address_postal_code: true,
-        air_address_phone: true,
-        maritime_address_line_1: true,
-        maritime_address_line_2: true,
-        maritime_address_city: true,
-        maritime_address_state: true,
-        maritime_address_postal_code: true,
-        maritime_address_phone: true,
-        billing_name: true,
-        billing_identification: true,
-        billing_email: true,
-        billing_phone: true,
-        billing_address: true,
-        billing_activity_code: true,
-        billing_cabys_default: true
-      }
+      where: { id: defaultConfigId }
     });
 
     if (!configuration) {

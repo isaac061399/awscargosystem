@@ -12,6 +12,7 @@ import { formatMoney } from '@/libs/utils';
 import { billingDefaultDesc, currencies } from '@/libs/constants';
 
 import { Currency } from '@/prisma/generated/enums';
+import { convertCRC, convertUSD } from '@/helpers/calculations';
 
 const footerLines = [
   'Gracias por su preferencia.',
@@ -128,6 +129,16 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
             desc = l.product.name;
           }
 
+          const invoiceCurrency = invoice.currency;
+          let subtotal = l.total;
+          if (l.currency !== invoiceCurrency) {
+            if (invoiceCurrency === Currency.CRC) {
+              subtotal = convertCRC(l.total, invoice.selling_exchange_rate);
+            } else if (invoiceCurrency === Currency.USD) {
+              subtotal = convertUSD(l.total, invoice.buying_exchange_rate);
+            }
+          }
+
           return (
             <Fragment key={index}>
               <div className="item">
@@ -141,7 +152,7 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
                 </div>
                 <div className="row">
                   <div className="muted">Precio:</div>
-                  <div>{formatMoney(l.total, `${currencies[l.currency].symbol} `)}</div>
+                  <div>{formatMoney(subtotal, `${currencies[invoiceCurrency].symbol} `)}</div>
                 </div>
               </div>
               {index !== invoice.invoice_lines.length - 1 ? <div className="line" /> : null}

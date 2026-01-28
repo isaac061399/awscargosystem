@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { defaultActivityCode } from './constants';
+import { billingDefaultActivityCode } from './constants';
 
 const endpoint = process.env.HACIENDA_ENDPOINT;
 
@@ -24,7 +24,7 @@ export const getActivityCodes = async (identification: string): Promise<{ code: 
       }
     });
 
-    let codes = [{ code: defaultActivityCode, description: 'Default' }];
+    let codes = [{ code: billingDefaultActivityCode, description: 'Default' }];
 
     if (response?.data?.actividades && Array.isArray(response.data.actividades)) {
       codes = response.data.actividades.map((activity: any) => ({
@@ -37,6 +37,6 @@ export const getActivityCodes = async (identification: string): Promise<{ code: 
   } catch (e: any) {
     console.error(`Error fetching activity codes for identification ${identification}:`, e);
 
-    return [{ code: defaultActivityCode, description: 'Default' }];
+    return [{ code: billingDefaultActivityCode, description: 'Default' }];
   }
 };

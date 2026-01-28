@@ -118,7 +118,7 @@
       "noClient": "Cliente inválido",
       "invalidCurrency": "Moneda inválida",
       "noOpenCash": "No hay una caja abierta. No se pueden procesar transacciones.",
-      "save": "Error al guardar la factura, por favor inténtalo de nuevo",
+      "save": "Error al crear la factura, por favor inténtalo de nuevo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },

@@ -143,8 +143,8 @@
       "invoice_payment_condition": "La condición de pago es requerida",
       "invoice_currency": "La moneda es requerida"
     },
-    "successMessage": "Datos guardados con éxito",
-    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo",
+    "successMessage": "Factura creada exitosamente",
+    "errorMessage": "Error al crear la factura, por favor inténtalo de nuevo",
     "amountErrorMessage": "El monto pagado debe ser al menos igual al total de la factura"
   },
   "formCustomLine": {

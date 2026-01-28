@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from 'next/server';
 
+import moment from 'moment';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType } from '@/prisma/generated/enums';
@@ -14,11 +16,18 @@ import {
 } from '@/controllers/Invoice.Controller';
 import { getConfiguration } from '@/controllers/Configuration.Controller';
 import {
+  BillingLine,
   calculateBillingChangeAmount,
   calculateBillingPaidAmount,
-  calculateBillingTotal
+  calculateBillingTotal,
+  calculateTaxes,
+  convertCRC,
+  convertUSD
 } from '@/helpers/calculations';
 import { validateOrderStatus } from '@/controllers/Order.Controller';
+import { DocumentData, generateDocument } from '@/services/easytax';
+import { CusConfiguration, CusInvoice } from '@/prisma/generated/client';
+import { billingDefaultActivityCode, billingDefaultDesc } from '@/libs/constants';
 
 export const GET = withAuthApi(['invoices.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -251,9 +260,23 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
       }
 
       // 5: send invoice to easytax service
-      // TODO: implement easytax service integration
+      // const documentPayload = buildCreateDocumentPayload({
+      //   configuration,
+      //   client,
+      //   invoice,
+      //   lines: linesData || [],
+      //   officeId: cashRegister.office_id
+      // });
+      // const easytaxResponse = await generateDocument(documentPayload);
+      // if (!easytaxResponse.valid) {
+      //   throw new TransactionError(500, textT?.errors?.easytaxService);
+      // }
+      // throw new TransactionError(500, textT?.errors?.save);
 
-      // 6: save log
+      // 6: save easytax response data
+      // TODO: adapt according to easytax response structure
+
+      // 7: save log
       await tx.cusInvoiceLog.create({
         data: {
           invoice_id: invoice.id,
@@ -277,3 +300,71 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
   }
 });
+
+const buildCreateDocumentPayload = (data: {
+  configuration: CusConfiguration;
+  client: any;
+  invoice: CusInvoice;
+  lines: BillingLine[];
+  officeId: number;
+}): DocumentData => {
+  const { configuration, client, invoice, lines, officeId } = data;
+
+  return {
+    company: {
+      name: configuration.billing_name,
+      identification: configuration.billing_identification,
+      activityCode: configuration.billing_activity_code
+    },
+    officeId,
+    client: {
+      name: client.billing_full_name,
+      identification: client.billing_identification,
+      email: client.billing_email,
+      activityCode: client.billing_activity_code || billingDefaultActivityCode
+    },
+    invoiceType: invoice.type,
+    date: moment(invoice.created_at),
+    condition: invoice.payment_condition,
+    currency: invoice.currency,
+    method: invoice.payment_method,
+    // ref?: string;
+    ivaPercentage: invoice.iva_percentage,
+    lines: lines.map((line) => {
+      const invoiceCurrency = invoice.currency;
+
+      let cabys, description;
+      if (line.refObj.type === 'product') {
+        cabys = line.refObj.obj.cabys;
+        description = line.refObj.obj.code;
+      } else {
+        cabys = configuration.billing_cabys_default;
+        description = billingDefaultDesc;
+      }
+
+      let unitPrice = line.unit_price;
+      let subtotal = line.total;
+      if (line.currency !== invoiceCurrency) {
+        if (invoiceCurrency === Currency.CRC) {
+          unitPrice = convertCRC(line.unit_price, invoice.selling_exchange_rate);
+          subtotal = convertCRC(line.total, invoice.selling_exchange_rate);
+        } else if (invoiceCurrency === Currency.USD) {
+          unitPrice = convertUSD(line.unit_price, invoice.buying_exchange_rate);
+          subtotal = convertUSD(line.total, invoice.buying_exchange_rate);
+        }
+      }
+
+      const totals = calculateTaxes(subtotal, invoice.iva_percentage);
+
+      return {
+        cabys,
+        description,
+        quantity: line.quantity,
+        unitPrice: unitPrice,
+        subtotal: totals.subtotal,
+        tax: totals.taxes,
+        total: totals.total
+      };
+    })
+  };
+};
