@@ -130,11 +130,14 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
           }
 
           const invoiceCurrency = invoice.currency;
+          let unitPrice = l.unit_price;
           let subtotal = l.total;
           if (l.currency !== invoiceCurrency) {
             if (invoiceCurrency === Currency.CRC) {
+              unitPrice = convertCRC(l.unit_price, invoice.selling_exchange_rate);
               subtotal = convertCRC(l.total, invoice.selling_exchange_rate);
             } else if (invoiceCurrency === Currency.USD) {
+              unitPrice = convertUSD(l.unit_price, invoice.buying_exchange_rate);
               subtotal = convertUSD(l.total, invoice.buying_exchange_rate);
             }
           }
@@ -151,7 +154,15 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
                   <div>{desc}</div>
                 </div>
                 <div className="row">
-                  <div className="muted">Precio:</div>
+                  <div className="muted">Cantidad:</div>
+                  <div>{l.quantity}</div>
+                </div>
+                <div className="row">
+                  <div className="muted">Precio Unitario:</div>
+                  <div>{formatMoney(unitPrice, `${currencies[invoiceCurrency].symbol} `)}</div>
+                </div>
+                <div className="row">
+                  <div className="muted">Precio Total:</div>
                   <div>{formatMoney(subtotal, `${currencies[invoiceCurrency].symbol} `)}</div>
                 </div>
               </div>
