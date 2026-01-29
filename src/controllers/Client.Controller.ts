@@ -106,5 +106,6 @@ export const clientSelectSchema = {
   identification_type: true,
   identification: true,
   email: true,
+  phone: true,
   office: { select: { id: true, name: true, mailbox_prefix: true } }
 };

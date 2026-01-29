@@ -98,8 +98,8 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
         <span className="bold">Teléfono:</span> {invoice.client.phone}
       </div>
       <div className="kv">
-        <span className="bold">Dirección:</span> {invoice.client.district.canton.province.name},{' '}
-        {invoice.client.district.canton.name}, {invoice.client.district.name}, {invoice.client.address}
+        <span className="bold">Dirección:</span> {invoice.client?.district?.canton?.province?.name},{' '}
+        {invoice.client?.district?.canton?.name}, {invoice.client?.district?.name}, {invoice.client?.address}
       </div>
 
       <div className="line" />

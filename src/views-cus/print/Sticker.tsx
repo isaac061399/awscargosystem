@@ -1,8 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useEffect } from 'react';
+import moment from 'moment';
 
-const Sticker = ({ sticker }: { sticker: { id: string; sku: string; name: string; price: number } }) => {
+import Barcode from '@/components/custom/Bardcode';
+
+const Sticker = ({ sticker }: { sticker: any }) => {
   // Auto print
   useEffect(() => {
     // small delay helps fonts/layout settle
@@ -11,18 +15,65 @@ const Sticker = ({ sticker }: { sticker: { id: string; sku: string; name: string
     return () => window.clearTimeout(t);
   }, []);
 
-  return (
-    <div className="print-sticker">
-      <div className="no-print" style={{ padding: 12 }}>
-        <button onClick={() => window.print()} style={{ padding: '8px 12px' }}>
-          Print sticker #{sticker.id}
-        </button>
-      </div>
+  const date = moment().format('DD/MM/YYYY hh:mm A');
 
-      <div className="label">
-        <div className="name">{sticker.name}</div>
-        <div className="sku">SKU: {sticker.sku}</div>
-        <div className="price">${sticker.price.toFixed(2)}</div>
+  // const data = {
+  //   tracking: 'TBA326773120722',
+  //   location: {
+  //     shelf: 'C',
+  //     row: '2'
+  //   },
+  //   client: {
+  //     mailbox: 'AWS-1232-ATENAS',
+  //     name: 'JORGE LUIS VÍQUEZ GONZÁLEZ',
+  //     phone: '85043135',
+  //     address: 'Frente al cuerpo de bomberos de Atenas, casa portón rojo'
+  //   },
+  //   serviceLabel: 'ENVIO'
+  // };
+
+  return (
+    <div className="sheet">
+      <div className="grid">
+        {/* MAIN */}
+        <div className="main">
+          {/* Header */}
+          <div className="header">
+            <img className="logo" src="/logos/logo.svg" alt="Logo" />
+
+            <div className="hdr-right">
+              <div className="warehouse">AWS CARGO & COURIER</div>
+              <div className="warehouse-code">{sticker?.client?.mailbox}</div>
+              <div className="loc">
+                Estante: {sticker?.location?.shelf} &nbsp; Fila: {sticker?.location?.row}
+              </div>
+            </div>
+          </div>
+
+          {/* Name */}
+          <div className="name"> {sticker?.client?.name}</div>
+
+          {/* Phone */}
+          <div className="line">Teléfono: {sticker?.client?.phone}</div>
+
+          {/* Address */}
+          <div className="line">Dirección: {sticker?.client?.address}</div>
+
+          {/* Barcode + meta */}
+          <div className="barcodeBlock">
+            <div className="printMeta">Fecha Impresión: {date}</div>
+            <div className="tracking">Tracking: {sticker?.tracking}</div>
+
+            <div className="barcodeWrap">
+              <Barcode value={sticker?.tracking} height={44} displayValue={false} />
+            </div>
+          </div>
+        </div>
+
+        {/* SIDE VERTICAL */}
+        <div className="side">
+          <span>{sticker?.serviceLabel}</span>
+        </div>
       </div>
     </div>
   );

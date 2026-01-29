@@ -58,53 +58,6 @@ import { useConfig } from '@/components/ConfigProvider';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-// const htmlEscapeMap: Record<string, string> = {
-//   '&': '&amp;',
-//   '<': '&lt;',
-//   '>': '&gt;',
-//   '"': '&quot;',
-//   "'": '&#39;'
-// };
-// const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (match) => htmlEscapeMap[match]);
-
-// type TicketLine = { label: string; value: string };
-// const buildTicketHtml = (title: string, subtitle: string, lines: TicketLine[], footer: string) => {
-//   const lineItems = lines
-//     .filter((line) => line.value.trim() !== '')
-//     .map(
-//       (line) =>
-//         `<div class="row"><span class="label">${escapeHtml(line.label)}</span><span class="value">${escapeHtml(
-//           line.value
-//         )}</span></div>`
-//     )
-//     .join('');
-
-//   return `<!doctype html>
-// <html>
-//   <head>
-//     <meta charset="utf-8" />
-//     <title>${escapeHtml(title)}</title>
-//     <style>
-//       * { box-sizing: border-box; font-family: "Courier New", monospace; }
-//       body { margin: 0; padding: 12px; color: #000; }
-//       h1 { font-size: 14px; margin: 0 0 6px; text-align: center; letter-spacing: 0.5px; }
-//       h2 { font-size: 12px; margin: 0 0 8px; text-align: center; font-weight: 400; }
-//       .row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; margin: 2px 0; }
-//       .label { font-weight: 700; }
-//       .value { text-align: right; }
-//       .section { margin-top: 8px; border-top: 1px dashed #000; padding-top: 6px; }
-//       .footer { margin-top: 8px; font-size: 11px; text-align: center; }
-//     </style>
-//   </head>
-//   <body>
-//     <h1>${escapeHtml(title)}</h1>
-//     <h2>${escapeHtml(subtitle)}</h2>
-//     <div class="section">${lineItems}</div>
-//     <div class="footer">${escapeHtml(footer)}</div>
-//   </body>
-// </html>`;
-// };
-
 const PackageReception = () => {
   const { offices } = useConfig();
   const { data: admin } = useAdmin();
@@ -191,33 +144,9 @@ const PackageReception = () => {
           setAlertState({ ...defaultAlertState });
         }, 5000);
 
-        // const officeName =
-        //   offices.find((office) => office.id === values.office_id)?.name || formik.values.client?.office?.name || '';
-        // const subtitle = `${textT?.title || 'Package Reception'} - ${officeName}`;
-        // const ticketLines: TicketLine[] = [
-        //   { label: formT?.labels?.tracking || 'Tracking', value: values.tracking },
-        //   { label: formT?.labels?.mailbox || 'Mailbox', value: formik.values.client?.mailbox || values.mailbox },
-        //   { label: formT?.labels?.weight || 'Weight', value: values.weight?.toString() || '' },
-        //   {
-        //     label: textT?.priceLabel || 'Price',
-        //     value: formatMoney(price, `${currencies.USD.symbol} `)
-        //   },
-        //   { label: formT?.labels?.shelf || 'Shelve', value: values.shelf || '' },
-        //   { label: formT?.labels?.row || 'Row', value: values.row || '' },
-        //   { label: textT?.clientCard?.fullName || 'Client', value: formik.values.client?.full_name || '' },
-        //   {
-        //     label: textT?.clientCard?.identification || 'ID',
-        //     value: formik.values.client?.identification || ''
-        //   }
-        // ];
-        // const footer = new Date().toLocaleString(i18n.language);
-        // const ticketHtml = buildTicketHtml(textT?.title || 'Package Reception', subtitle, ticketLines, footer);
-        // const electronBridge = (window as any)?.electron;
-        // if (typeof electronBridge?.printTicket === 'function') {
-        //   void electronBridge.printTicket({ html: ticketHtml, options: { silent: true, printBackground: true } });
-        // } else if (typeof electronBridge?.print === 'function') {
-        //   void electronBridge.print({ html: ticketHtml, options: { silent: true, printBackground: true } });
-        // }
+        if (result.ready) {
+          window.open(`/print/sticker/${result.tracking}`, '_blank');
+        }
 
         resetProcess();
 
@@ -492,6 +421,7 @@ const PackageReception = () => {
             <Card>
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
+                {/* Office and Cut Number Fields */}
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 3 }}>
                     <Select
@@ -532,6 +462,7 @@ const PackageReception = () => {
 
                 <Divider className="my-5" />
 
+                {/* Tracking Field */}
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
@@ -573,6 +504,7 @@ const PackageReception = () => {
                     <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                       <Typography variant="h5">{textT?.clientTitle}</Typography>
                     </Divider>
+                    {/* Mailbox Field and Client Card */}
                     <Grid container spacing={5}>
                       {formik.values.package_id === '' && formik.values.order_id === '' && (
                         <>
@@ -664,6 +596,7 @@ const PackageReception = () => {
                     <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                       <Typography variant="h5">{textT?.packageTitle}</Typography>
                     </Divider>
+                    {/* Weight and Price Fields */}
                     <Grid container spacing={5}>
                       <Grid size={{ xs: 12, md: 3 }}>
                         <TextField
@@ -693,6 +626,7 @@ const PackageReception = () => {
                     <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                       <Typography variant="h5">{textT?.locationTitle}</Typography>
                     </Divider>
+                    {/* Shelve and Row Fields */}
                     <Grid container spacing={5}>
                       <Grid size={{ xs: 12, md: 3 }}>
                         <Autocomplete

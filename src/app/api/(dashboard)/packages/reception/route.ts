@@ -29,6 +29,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
     const weight = data.weight || 0;
     const shelf = data.shelf || '';
     const row = data.row || '';
+    const ready = shelf !== '' && row !== '';
 
     const client = await prismaRead.cusClient.findUnique({
       where: { id: Number(data.client_id) },
@@ -109,7 +110,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
       await sendNotification(result.notificationData, client);
     }
 
-    return NextResponse.json({ valid: true }, { status: 200 });
+    return NextResponse.json({ valid: true, tracking, ready }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
 
