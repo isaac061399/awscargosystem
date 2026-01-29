@@ -60,17 +60,25 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
 
       {/* Cash Register meta */}
       <div className="kv">
+        <span className="bold">Oficina:</span> {cashRegister.office.name}
+      </div>
+      <div className="kv">
+        <span className="bold">Usuario:</span> {cashRegister.administrator.email}
+      </div>
+
+      <br />
+
+      <div className="kv">
         <span className="bold">Apertura:</span> {moment(cashRegister.open_date).format('DD/MM/YYYY hh:mm a')}
       </div>
       <div className="kv">
         <span className="bold">Cierre:</span> {moment(cashRegister.close_date).format('DD/MM/YYYY hh:mm a')}
       </div>
 
+      <br />
+
       <div className="kv">
-        <span className="bold">Oficina:</span> {cashRegister.office.name}
-      </div>
-      <div className="kv">
-        <span className="bold">Usuario:</span> {cashRegister.administrator.email}
+        <span className="bold">Cantidad Facturas:</span> {cashRegister.invoice_count}
       </div>
 
       <div className="line" />
@@ -81,27 +89,12 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
 
         const totals = calculateCashRegisterTotals(line);
 
-        // const totalEntries = line.cash_in + line.sinpe_in + line.transfer_in + line.card_in;
-        // const totalOutflows = line.cash_out + line.sinpe_out + line.transfer_out + line.card_out;
-        // const totalChange = line.cash_change + line.sinpe_change + line.transfer_change + line.card_change;
-
-        // const totalCashReported = line.cash_reported - line.cash_balance;
-        // const totalCash = line.cash_in - line.cash_out;
-        // const totalDifference = totalCashReported - Math.abs(totalCash);
+        const totalForAdmin = totals.cash.reported - line.cash_balance;
 
         return (
           <Fragment key={index}>
             <div className="kv">
               <span className="bold">Moneda:</span> {labelsT?.currency[line.currency]}
-            </div>
-
-            <br />
-
-            <div className="kv">
-              <span className="bold">Balance inicial:</span> {formatMoney(line.cash_balance, moneyPrefix)}
-            </div>
-            <div className="kv">
-              <span className="bold">Efectivo reportado:</span> {formatMoney(line.cash_reported, moneyPrefix)}
             </div>
 
             <br />
@@ -149,13 +142,22 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
             <br />
 
             <div className="kv">
-              <span className="bold">Total Efectivo Reportado:</span> {formatMoney(totals.cash.reported, moneyPrefix)}
+              <span className="bold">Balance inicial:</span> {formatMoney(line.cash_balance, moneyPrefix)}
             </div>
             <div className="kv">
-              <span className="bold">Total Efectivo Sistema:</span> {formatMoney(totals.cash.system, moneyPrefix)}
+              <span className="bold">Efectivo Reportado:</span> {formatMoney(totals.cash.reported, moneyPrefix)}
+            </div>
+            <div className="kv">
+              <span className="bold">Efectivo Sistema:</span> {formatMoney(totals.cash.system, moneyPrefix)}
             </div>
             <div className="kv">
               <span className="bold">Diferencia:</span> {formatMoney(totals.cash.difference, moneyPrefix)}
+            </div>
+
+            <br />
+
+            <div className="kv">
+              <span className="bold">Monto Para Entregar:</span> {formatMoney(totalForAdmin, moneyPrefix)}
             </div>
 
             <div className="line" />

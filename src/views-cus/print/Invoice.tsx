@@ -225,6 +225,12 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
         <div>Medio de Pago</div>
         <div>Monto</div>
       </div>
+      {invoice.invoice_payments.length === 0 ? (
+        <div className="row">
+          <div>Pendiente</div>
+          <div></div>
+        </div>
+      ) : null}
       {invoice.invoice_payments.map((p: any, index: number) => (
         <div className="row" key={index}>
           <div>{labelsT?.paymentMethod[p.payment_method]}</div>

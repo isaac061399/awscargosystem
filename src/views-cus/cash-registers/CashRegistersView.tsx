@@ -154,7 +154,7 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<i className="ri-printer-line" />}
-                  href={`/print/cash-register/${cashRegister.id}?or=1`}
+                  href={`/print/cash-register/${cashRegister.id}`}
                   target="_blank">
                   {textT?.btnPrint}
                 </Button>
@@ -296,6 +296,9 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
                           <Typography variant="body1">
                             <strong>{textT?.detail?.closeDate}:</strong>{' '}
                             {moment(cashRegister.close_date).format(textT?.dateTimeFormat)}
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>{textT?.detail?.invoiceCount}:</strong> {cashRegister.invoice_count}
                           </Typography>
 
                           <Divider className="my-2" />

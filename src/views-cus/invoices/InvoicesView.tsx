@@ -320,15 +320,6 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                     {textT?.btnPrint}
                   </Button>
 
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    startIcon={<i className="ri-file-pdf-2-line"></i>}
-                    // onClick={onDownloadPdf}
-                  >
-                    {textT?.btnPDF}
-                  </Button>
-
                   {isCancelable && (
                     <Button
                       size="small"
@@ -451,6 +442,7 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
+                      <TableCell>{textT?.payments?.date}</TableCell>
                       <TableCell>{textT?.payments?.method}</TableCell>
                       <TableCell>{textT?.payments?.ref}</TableCell>
                       <TableCell>{textT?.payments?.refBank}</TableCell>
@@ -460,6 +452,7 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                   <TableBody>
                     {invoice.invoice_payments.map((p: any, index: number) => (
                       <TableRow key={index}>
+                        <TableCell>{moment(p.created_at).format(textT?.dateFormat)}</TableCell>
                         <TableCell>{labelsT?.paymentMethod[p.payment_method]}</TableCell>
                         <TableCell>{p.ref || '-'}</TableCell>
                         <TableCell>{bankAccounts[p.ref_bank as keyof typeof bankAccounts] || '-'}</TableCell>

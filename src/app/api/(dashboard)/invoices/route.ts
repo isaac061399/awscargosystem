@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import moment from 'moment';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType } from '@/prisma/generated/enums';
+import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 import { clientSelectSchema, isValidBillingInformation } from '@/controllers/Client.Controller';
@@ -112,6 +112,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     const baseCurrency = data.currency as Currency;
     const lines = data.lines;
     const payments = data.payments;
+    const hasToValidatePayments = paymentCondition === InvoicePaymentCondition.CASH;
 
     // validate if admin has open cash register
     const cashRegister = await getOpenCashRegister(admin.id);
@@ -152,7 +153,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
 
     // validate payments
     const { valid: paymentsValid, data: paymentsData, errors: paymentsErrors } = validatePayments(payments);
-    if (!paymentsValid) {
+    if (hasToValidatePayments && !paymentsValid) {
       return NextResponse.json(
         {
           valid: false,
@@ -176,7 +177,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
       configuration.selling_exchange_rate,
       configuration.buying_exchange_rate
     );
-    if (paidAmount < totals.total) {
+    if (hasToValidatePayments && paidAmount < totals.total) {
       return NextResponse.json({ valid: false, message: textT?.errors?.notEnoughPaidAmount }, { status: 400 });
     }
 
@@ -204,7 +205,8 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
           selling_exchange_rate: configuration.selling_exchange_rate,
           buying_exchange_rate: configuration.buying_exchange_rate,
           currency: baseCurrency,
-          payment_method: mostValuablePayment.method,
+          payment_method: mostValuablePayment?.method || PaymentMethod.CASH,
+          payment_method_ref: mostValuablePayment?.ref || '',
           subtotal: totals.subtotal,
           tax: totals.taxes,
           total: totals.total,
@@ -328,7 +330,7 @@ const buildCreateDocumentPayload = (data: {
     condition: invoice.payment_condition,
     currency: invoice.currency,
     method: invoice.payment_method,
-    // ref?: string;
+    ref: invoice.payment_method_ref || '',
     ivaPercentage: invoice.iva_percentage,
     lines: lines.map((line) => {
       const invoiceCurrency = invoice.currency;

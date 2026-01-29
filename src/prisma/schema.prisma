@@ -498,6 +498,7 @@ model CusCashRegister {
   office_id        Int
   open_date        DateTime
   close_date       DateTime?
+  invoice_count    Int?
   comment          String?            @db.Text
   status           CashRegisterStatus @default(OPEN)
   created_at       DateTime           @default(now())
@@ -589,33 +590,35 @@ model CusClientResetToken {
 }
 
 model CusConfiguration {
-  id                           Int      @id @default(autoincrement())
-  pound_fee                    Float    @default(0)
-  iva_percentage               Float    @default(0)
-  selling_exchange_rate        Float    @default(0)
-  buying_exchange_rate         Float    @default(0)
-  updated_exchange_rate        DateTime @default(now())
-  air_address_line_1           String?
-  air_address_line_2           String?
-  air_address_city             String?
-  air_address_state            String?
-  air_address_postal_code      String?
-  air_address_phone            String?
-  maritime_address_line_1      String?
-  maritime_address_line_2      String?
-  maritime_address_city        String?
-  maritime_address_state       String?
-  maritime_address_postal_code String?
-  maritime_address_phone       String?
-  billing_name                 String
-  billing_identification       String
-  billing_email                String
-  billing_phone                String
-  billing_address              String
-  billing_activity_code        String
-  billing_cabys_default        String
-  created_at                   DateTime @default(now())
-  updated_at                   DateTime @updatedAt
+  id                              Int      @id @default(autoincrement())
+  pound_fee                       Float    @default(0)
+  iva_percentage                  Float    @default(0)
+  selling_exchange_rate           Float    @default(0)
+  buying_exchange_rate            Float    @default(0)
+  updated_exchange_rate           DateTime @default(now())
+  air_address_line_1              String?
+  air_address_line_2              String?
+  air_address_city                String?
+  air_address_state               String?
+  air_address_postal_code         String?
+  air_address_phone               String?
+  maritime_address_line_1         String?
+  maritime_address_line_2         String?
+  maritime_address_city           String?
+  maritime_address_state          String?
+  maritime_address_postal_code    String?
+  maritime_address_phone          String?
+  billing_name                    String
+  billing_identification          String
+  billing_email                   String
+  billing_phone                   String
+  billing_address                 String
+  billing_activity_code           String
+  billing_cabys_default           String
+  special_package_amount          Float
+  special_package_manifest_amount Float
+  created_at                      DateTime @default(now())
+  updated_at                      DateTime @updatedAt
 
   @@map("cus_configuration")
 }
@@ -680,6 +683,7 @@ model CusInvoice {
   buying_exchange_rate  Float                   @default(0)
   currency              Currency
   payment_method        PaymentMethod
+  payment_method_ref    String
   subtotal              Float
   tax                   Float
   total                 Float
@@ -967,6 +971,51 @@ model CusProduct {
   @@map("cus_product")
 }
 
+model CusSpecialPackage {
+  id                          Int                @id @default(autoincrement())
+  special_package_manifest_id Int?
+  tracking                    String             @unique
+  mailbox                     String
+  type                        SpecialPackageType
+  indications                 String             @db.Text
+  created_at                  DateTime           @default(now())
+  updated_at                  DateTime           @updatedAt
+
+  special_package_manifest  CusSpecialPackageManifest?  @relation(fields: [special_package_manifest_id], references: [id], onDelete: Restrict)
+  special_package_documents CusSpecialPackageDocument[]
+
+  @@map("cus_special_package")
+}
+
+model CusSpecialPackageDocument {
+  id                 Int      @id @default(autoincrement())
+  special_package_id Int
+  description        String
+  file               String
+  file_name          String
+  file_size          Int
+  file_type          String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  special_package CusSpecialPackage @relation(fields: [special_package_id], references: [id], onDelete: Restrict)
+
+  @@map("cus_special_package_document")
+}
+
+model CusSpecialPackageManifest {
+  id               Int      @id @default(autoincrement())
+  package_quantity Int
+  description      String
+  amount           Float
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  special_packages CusSpecialPackage[]
+
+  @@map("cus_special_package_manifest")
+}
+
 model CusUnownedPackage {
   id          Int      @id @default(autoincrement())
   office_id   Int?
@@ -1052,4 +1101,9 @@ enum PackageStatus {
   ON_THE_WAY
   READY
   DELIVERED
+}
+
+enum SpecialPackageType {
+  MARITIME
+  URGENT
 }

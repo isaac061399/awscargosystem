@@ -94,18 +94,6 @@ const CashRegisters = () => {
     setAlertState({ ...defaultAlertState });
   };
 
-  const handlePrintTicket = async (id: number) => {
-    const pdfUrl = `/api/cash-registers/${id}/ticket`;
-    const win = window.open(pdfUrl, '_blank');
-
-    if (win) {
-      // Auto print when the new tab loads
-      win.onload = () => {
-        win.print();
-      };
-    }
-  };
-
   // data
   const columns: GridColDef[] = [
     {
@@ -200,9 +188,11 @@ const CashRegisters = () => {
             <Tooltip title={textT?.table?.actions?.printLabel} placement="top">
               <IconButton
                 aria-label={textT?.table?.actions?.printLabel}
+                LinkComponent={Link}
                 color="primary"
                 size="small"
-                onClick={() => handlePrintTicket(params.row.id)}>
+                href={`/print/cash-register/${params.row.id}`}
+                target="_blank">
                 <i className="ri-printer-fill" />
               </IconButton>
             </Tooltip>

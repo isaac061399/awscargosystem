@@ -58,32 +58,13 @@ export const getInvoice = async (id: number) => {
           }
         },
         invoice_lines: {
-          select: {
-            id: true,
-            package_id: true,
-            order_product_id: true,
-            product_id: true,
-            package_prev_status: true,
-            order_product_prev_status: true,
-            prev_payment_status: true,
-            currency: true,
-            quantity: true,
-            unit_price: true,
-            total: true,
+          include: {
             package: true,
             order_product: true,
             product: true
           }
         },
-        invoice_payments: {
-          select: {
-            currency: true,
-            payment_method: true,
-            ref: true,
-            ref_bank: true,
-            amount: true
-          }
-        }
+        invoice_payments: true
       }
     });
 
@@ -103,7 +84,7 @@ export const validateLines = async (
   lines: any[]
 ): Promise<{ valid: boolean; data?: BillingLine[]; errors?: string[] }> => {
   if (!lines || !Array.isArray(lines) || lines.length === 0) {
-    return { valid: false, errors: ['No se han proporcionado líneas de facturación'] };
+    return { valid: false, data: [], errors: ['No se han proporcionado líneas de facturación'] };
   }
 
   const errors: string[] = [];
@@ -182,14 +163,14 @@ export const validateLines = async (
 
   return {
     valid: errors.length === 0,
-    data: errors.length === 0 ? data : undefined,
+    data: errors.length === 0 ? data : [],
     errors: errors.length > 0 ? errors : undefined
   };
 };
 
 export const validatePayments = (payments: any[]): { valid: boolean; data?: PaymentLine[]; errors?: string[] } => {
   if (!payments || !Array.isArray(payments) || payments.length === 0) {
-    return { valid: false, errors: ['No se han proporcionado pagos'] };
+    return { valid: false, data: [], errors: ['No se han proporcionado pagos'] };
   }
 
   const errors: string[] = [];
@@ -224,7 +205,7 @@ export const validatePayments = (payments: any[]): { valid: boolean; data?: Paym
 
   return {
     valid: errors.length === 0,
-    data: errors.length === 0 ? data : undefined,
+    data: errors.length === 0 ? data : [],
     errors: errors.length > 0 ? errors : undefined
   };
 };

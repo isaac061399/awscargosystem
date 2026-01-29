@@ -25,12 +25,7 @@ export const getCashRegister = async (
 
     const cashRegister = await prismaRead.cusCashRegister.findUnique({
       where,
-      select: {
-        id: true,
-        open_date: true,
-        close_date: true,
-        comment: true,
-        status: true,
+      include: {
         administrator: {
           select: {
             id: true,
@@ -47,6 +42,7 @@ export const getCashRegister = async (
           }
         },
         lines: {
+          orderBy: { currency: 'desc' },
           select: {
             id: true,
             currency: true,
@@ -92,12 +88,7 @@ export const getCashRegisterAdmin = async (email: string) => {
         administrator: { email },
         open_date: { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() }
       },
-      select: {
-        id: true,
-        open_date: true,
-        close_date: true,
-        comment: true,
-        status: true,
+      include: {
         administrator: {
           select: {
             id: true,
@@ -114,6 +105,7 @@ export const getCashRegisterAdmin = async (email: string) => {
           }
         },
         lines: {
+          orderBy: { currency: 'desc' },
           select: {
             id: true,
             currency: true,

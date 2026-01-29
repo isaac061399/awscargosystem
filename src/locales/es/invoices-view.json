@@ -46,6 +46,7 @@
       "total": "Total"
     },
     "payments": {
+      "date": "Fecha de pago",
       "title": "Pagos",
       "method": "Método",
       "ref": "Referencia",

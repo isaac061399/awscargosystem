@@ -54,7 +54,7 @@ import {
   PaymentLine
 } from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
-import { Currency, PaymentMethod } from '@/prisma/generated/enums';
+import { Currency, InvoicePaymentCondition, PaymentMethod } from '@/prisma/generated/enums';
 
 /** ------- Default States ------- */
 const defaultAlertState = { open: false, type: 'success', message: '' };
@@ -126,7 +126,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       setAlertState({ ...defaultAlertState });
 
       // validate amount vrs total if payment method is cash
-      if (paidAmount < totals.total) {
+      if (formik.values.invoice_payment_condition === InvoicePaymentCondition.CASH && paidAmount < totals.total) {
         setAlertState({ open: true, type: 'error', message: formT?.amountErrorMessage });
         setTimeout(() => {
           setAlertState({ ...defaultAlertState });
@@ -449,7 +449,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     setPaidAmount(result);
   }, [paymentLines, formik.values.invoice_currency, sellingExchangeRate, buyingExchangeRate]);
 
-  // update payment amount value when dialog opens or currency changes
+  // update payment amount and currency value when dialog opens
   useEffect(() => {
     if (!paymentOpen) return;
 
@@ -459,7 +459,14 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
       formikPayment.setFieldValue('currency', formik.values.invoice_currency);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentOpen, formikPayment.values.currency]);
+  }, [paymentOpen]);
+
+  // update payments lines if invoice payment condition changes
+  useEffect(() => {
+    if (formik.values.invoice_payment_condition !== InvoicePaymentCondition.CASH) {
+      setPaymentLines([]);
+    }
+  }, [formik.values.invoice_payment_condition]);
 
   const removeSelectedLine = (id: string) => {
     // If it’s a base billable line, unselect it from ToBill
@@ -693,7 +700,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
         </Grid>
 
         <Stack spacing={2}>
-          {/* Top row: Client + FX */}
+          {/* Top row: Client + Invoice Data */}
           <Grid container spacing={2} className="items-stretch">
             <Grid size={{ xs: 12, md: 6 }}>
               <Card className="h-full">
@@ -954,7 +961,12 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
                             variant="contained"
                             startIcon={<i className="ri-add-large-line" />}
                             onClick={openPaymentDialog}
-                            disabled={!formik.values.client || !cashRegister || selectedLines.length === 0}>
+                            disabled={
+                              !formik.values.client ||
+                              !cashRegister ||
+                              selectedLines.length === 0 ||
+                              formik.values.invoice_payment_condition !== InvoicePaymentCondition.CASH
+                            }>
                             {textT?.cards?.payment?.btnAddPayment}
                           </Button>
                         </Stack>
@@ -1216,7 +1228,11 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               label={formPaymentT?.labels?.currency}
               // placeholder={formPaymentT?.placeholders?.currency}
               value={formikPayment.values.currency}
-              onChange={formikPayment.handleChange}
+              onChange={(e) => {
+                console.log(e);
+                const result = formikPayment.handleChange(e);
+                console.log(result);
+              }}
               error={Boolean(formikPayment.touched.currency && formikPayment.errors.currency)}
               color={Boolean(formikPayment.touched.currency && formikPayment.errors.currency) ? 'error' : 'primary'}
               helperText={formikPayment.touched.currency && (formikPayment.errors.currency as string)}

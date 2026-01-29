@@ -44,18 +44,6 @@ const CashControl = ({ cashRegister, redirect }: { cashRegister?: any; redirect?
   const isReadyToClose = cashRegister && cashRegister.status === CashRegisterStatus.OPEN;
   const isClosed = cashRegister && cashRegister.status === CashRegisterStatus.CLOSED;
 
-  const handlePrintTicket = async () => {
-    const pdfUrl = `/api/cash-registers/today-ticket`;
-    const win = window.open(pdfUrl, '_blank');
-
-    if (win) {
-      // Auto print when the new tab loads
-      win.onload = () => {
-        win.print();
-      };
-    }
-  };
-
   return (
     <DashboardLayout>
       <Grid container spacing={6}>
@@ -66,13 +54,14 @@ const CashControl = ({ cashRegister, redirect }: { cashRegister?: any; redirect?
             </Typography>
             <div className="flex items-center gap-2">
               <Button
-                type="button"
+                LinkComponent={Link}
                 size="small"
                 variant="contained"
                 color="primary"
                 startIcon={<i className="ri-printer-line" />}
-                onClick={handlePrintTicket}>
-                {textT?.btnPrint}
+                href={`/print/cash-register/${cashRegister.id}`}
+                target="_blank">
+                {textT?.dialogSuccess?.print}
               </Button>
             </div>
           </div>

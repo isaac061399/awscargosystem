@@ -31,6 +31,7 @@
       "title": "Detalle de la Caja",
       "openDate": "Apertura",
       "closeDate": "Cierre",
+      "invoiceCount": "Cantidad de Facturas",
       "cashBalance": "Balance Inicial",
       "cashReported": "Efectivo Reportado",
       "cashIn": "Entradas en Efectivo",
