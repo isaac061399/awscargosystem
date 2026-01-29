@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import moment, { Moment } from 'moment-timezone';
+import moment from 'moment-timezone';
 
 import { prismaRead } from '@libs/prisma';
 import { CashRegisterStatus, Currency, InvoicePaymentCondition, PaymentMethod } from '@/prisma/generated/enums';
@@ -141,10 +141,9 @@ export const getCashRegisterAdmin = async (email: string) => {
   }
 };
 
-export const getCashRegisterData = async (currency: Currency, cashRegister: any, closeDate: Moment) => {
+export const getCashRegisterData = async (currency: Currency, cashRegister: any) => {
   try {
     const adminId = cashRegister.administrator.id;
-    const openDate = moment(cashRegister.open_date);
 
     let cashIn = 0;
     let sinpeIn = 0;
@@ -156,12 +155,18 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any,
     let cardOut = 0;
     let cashChange = 0;
 
+    // get invoice count
+    const invoiceCount = await prismaRead.cusInvoice.count({
+      where: {
+        cash_register_id: cashRegister.id
+      }
+    });
+
     // get invoice data
     const invoices = await prismaRead.cusInvoice.findMany({
       where: {
         cash_register_id: cashRegister.id,
-        payment_condition: InvoicePaymentCondition.CASH,
-        created_at: { gte: openDate.toDate(), lte: closeDate.toDate() }
+        payment_condition: InvoicePaymentCondition.CASH
       },
       select: {
         id: true,
@@ -201,13 +206,56 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any,
       });
     }
 
+    // get payments from pending invoices paid
+    const pendingPaymentsPaid = await prismaRead.cusInvoicePayment.findMany({
+      where: {
+        cash_register_id: cashRegister.id,
+        invoice: {
+          payment_condition: { not: InvoicePaymentCondition.CASH }
+        },
+        currency: currency
+      },
+      select: {
+        id: true,
+        amount: true,
+        payment_method: true,
+        invoice: {
+          select: { id: true, cash_change: true }
+        }
+      }
+    });
+
+    if (pendingPaymentsPaid && pendingPaymentsPaid.length > 0) {
+      pendingPaymentsPaid.forEach((pay) => {
+        switch (pay.payment_method) {
+          case PaymentMethod.CASH:
+            cashIn += pay.amount;
+            break;
+          case PaymentMethod.SINPE:
+            sinpeIn += pay.amount;
+            break;
+          case PaymentMethod.TRANSFER:
+            transferIn += pay.amount;
+            break;
+          case PaymentMethod.CARD:
+            cardIn += pay.amount;
+            break;
+          default:
+            break;
+        }
+
+        if (currency === Currency.CRC && pay.invoice.cash_change && pay.invoice.cash_change > 0) {
+          cashChange += pay.invoice.cash_change;
+        }
+      });
+    }
+
     // get MoneyOutflows data
     const moneyOutflows = await prismaRead.cusMoneyOutflow.findMany({
       where: {
         cash_register_id: cashRegister.id,
         administrator_id: adminId,
-        currency: currency,
-        created_at: { gte: openDate.toDate(), lte: closeDate.toDate() }
+        currency: currency
       },
       select: { id: true, amount: true, method: true }
     });
@@ -234,6 +282,7 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any,
     }
 
     return {
+      invoice_count: invoiceCount || 0,
       cash_in: cashIn,
       sinpe_in: sinpeIn,
       transfer_in: transferIn,
@@ -251,6 +300,7 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any,
   } catch (e) {
     // console.error(`Error: ${e}`);
     return {
+      invoice_count: 0,
       cash_in: 0,
       sinpe_in: 0,
       transfer_in: 0,

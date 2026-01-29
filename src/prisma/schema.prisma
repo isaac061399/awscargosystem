@@ -504,11 +504,12 @@ model CusCashRegister {
   created_at       DateTime           @default(now())
   updated_at       DateTime           @updatedAt
 
-  administrator  Administrator         @relation(fields: [administrator_id], references: [id], onDelete: Restrict)
-  office         CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
-  lines          CusCashRegisterLine[]
-  money_outflows CusMoneyOutflow[]
-  invoices       CusInvoice[]
+  administrator    Administrator         @relation(fields: [administrator_id], references: [id], onDelete: Restrict)
+  office           CusOffice             @relation(fields: [office_id], references: [id], onDelete: Restrict)
+  lines            CusCashRegisterLine[]
+  money_outflows   CusMoneyOutflow[]
+  invoices         CusInvoice[]
+  invoice_payments CusInvoicePayment[]
 
   @@map("cus_cash_register")
 }
@@ -744,17 +745,19 @@ model CusInvoiceLog {
 }
 
 model CusInvoicePayment {
-  id             Int           @id @default(autoincrement())
-  invoice_id     Int
-  currency       Currency
-  payment_method PaymentMethod
-  ref            String
-  ref_bank       String
-  amount         Float
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+  id               Int           @id @default(autoincrement())
+  invoice_id       Int
+  cash_register_id Int?
+  currency         Currency
+  payment_method   PaymentMethod
+  ref              String
+  ref_bank         String
+  amount           Float
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
 
-  invoice CusInvoice @relation(fields: [invoice_id], references: [id], onDelete: Restrict)
+  invoice       CusInvoice       @relation(fields: [invoice_id], references: [id], onDelete: Restrict)
+  cash_register CusCashRegister? @relation(fields: [cash_register_id], references: [id], onDelete: Restrict)
 
   @@map("cus_invoice_payment")
 }

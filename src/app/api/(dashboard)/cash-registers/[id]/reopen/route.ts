@@ -28,6 +28,7 @@ export const PUT = withAuthApi(
           where: { id: entry.id },
           data: {
             close_date: null,
+            invoice_count: null,
             comment: null,
             status: CashRegisterStatus.OPEN,
             lines: {

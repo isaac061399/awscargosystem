@@ -87,7 +87,10 @@ const Configuration = () => {
         billing_phone: configuration ? configuration.billing_phone : '',
         billing_address: configuration ? configuration.billing_address : '',
         billing_activity_code: configuration ? configuration.billing_activity_code : '',
-        billing_cabys_default: configuration ? configuration.billing_cabys_default : ''
+        billing_cabys_default: configuration ? configuration.billing_cabys_default : '',
+
+        special_package_amount: configuration ? configuration.special_package_amount : 0,
+        special_package_manifest_amount: configuration ? configuration.special_package_manifest_amount : 0
       }),
       [configuration]
     ),
@@ -117,7 +120,10 @@ const Configuration = () => {
       billing_phone: yup.string().required(formT?.errors?.billing_phone),
       billing_address: yup.string().required(formT?.errors?.billing_address),
       billing_activity_code: yup.string().required(formT?.errors?.billing_activity_code),
-      billing_cabys_default: yup.string().required(formT?.errors?.billing_cabys_default)
+      billing_cabys_default: yup.string().required(formT?.errors?.billing_cabys_default),
+
+      special_package_amount: yup.number().required(formT?.errors?.special_package_amount),
+      special_package_manifest_amount: yup.number().required(formT?.errors?.special_package_manifest_amount)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
@@ -196,8 +202,8 @@ const Configuration = () => {
             <Card>
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
-                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
-                  <Typography variant="h5">{textT?.generalTitle}</Typography>
+                <Divider textAlign="left" sx={{ mb: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.generalTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 3 }}>
@@ -295,8 +301,8 @@ const Configuration = () => {
                 </Grid>
               </CardContent>
               <CardContent>
-                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
-                  <Typography variant="h5">{textT?.airAddressTitle}</Typography>
+                <Divider textAlign="left" sx={{ mb: 5, mt: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.airAddressTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 4 }}>
@@ -428,8 +434,8 @@ const Configuration = () => {
                 </Grid>
               </CardContent>
               <CardContent>
-                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
-                  <Typography variant="h5">{textT?.maritimeAddressTitle}</Typography>
+                <Divider textAlign="left" sx={{ mb: 5, mt: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.maritimeAddressTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 4 }}>
@@ -578,8 +584,8 @@ const Configuration = () => {
                 </Grid>
               </CardContent>
               <CardContent>
-                <Divider textAlign="left" sx={{ mb: 7, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
-                  <Typography variant="h5">{textT?.billingTitle}</Typography>
+                <Divider textAlign="left" sx={{ mb: 5, mt: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.billingTitle}</Typography>
                 </Divider>
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 3 }}>
@@ -717,6 +723,73 @@ const Configuration = () => {
                       }
                       helperText={
                         formik.touched.billing_cabys_default && (formik.errors.billing_cabys_default as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+              <CardContent>
+                <Divider textAlign="left" sx={{ mb: 5, mt: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.specialPackagesTitle}</Typography>
+                </Divider>
+                <Grid container spacing={5}>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <MoneyField
+                      fullWidth
+                      required
+                      type="text"
+                      decimalScale={2}
+                      decimalSeparator="."
+                      thousandSeparator=","
+                      prefix={`${currencies.USD.symbol} `}
+                      id="special_package_amount"
+                      name="special_package_amount"
+                      label={formT?.labels?.special_package_amount}
+                      placeholder={formT?.placeholders?.special_package_amount}
+                      value={formik.values.special_package_amount}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.special_package_amount && formik.errors.special_package_amount)}
+                      color={
+                        Boolean(formik.touched.special_package_amount && formik.errors.special_package_amount)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.special_package_amount && (formik.errors.special_package_amount as string)
+                      }
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <MoneyField
+                      fullWidth
+                      required
+                      type="text"
+                      decimalScale={2}
+                      decimalSeparator="."
+                      thousandSeparator=","
+                      prefix={`${currencies.USD.symbol} `}
+                      id="special_package_manifest_amount"
+                      name="special_package_manifest_amount"
+                      label={formT?.labels?.special_package_manifest_amount}
+                      placeholder={formT?.placeholders?.special_package_manifest_amount}
+                      value={formik.values.special_package_manifest_amount}
+                      onChange={formik.handleChange}
+                      error={Boolean(
+                        formik.touched.special_package_manifest_amount && formik.errors.special_package_manifest_amount
+                      )}
+                      color={
+                        Boolean(
+                          formik.touched.special_package_manifest_amount &&
+                          formik.errors.special_package_manifest_amount
+                        )
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={
+                        formik.touched.special_package_manifest_amount &&
+                        (formik.errors.special_package_manifest_amount as string)
                       }
                       disabled={formik.isSubmitting}
                     />

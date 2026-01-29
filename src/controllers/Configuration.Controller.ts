@@ -45,7 +45,11 @@ export const saveConfiguration = async (data: any) => {
       billing_phone: data.billing_phone || '',
       billing_address: data.billing_address || '',
       billing_activity_code: data.billing_activity_code || '',
-      billing_cabys_default: data.billing_cabys_default || ''
+      billing_cabys_default: data.billing_cabys_default || '',
+      special_package_amount: data.special_package_amount ? parseFloat(data.special_package_amount) : 0,
+      special_package_manifest_amount: data.special_package_manifest_amount
+        ? parseFloat(data.special_package_manifest_amount)
+        : 0
     };
 
     const result = await prismaWrite.cusConfiguration.upsert({

@@ -5,6 +5,7 @@
     "airAddressTitle": "Configuración de Dirección Aerea",
     "maritimeAddressTitle": "Configuración de Dirección Marítima",
     "billingTitle": "Configuración de Facturación",
+    "specialPackagesTitle": "Configuración de Paquetes Especiales",
     "lastExchangeRateUpdate": "Última actualización automática del tipo de cambio",
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "btnSave": "Guardar"
@@ -36,7 +37,10 @@
       "billing_phone": "Teléfono",
       "billing_address": "Dirección",
       "billing_activity_code": "Código de actividad",
-      "billing_cabys_default": "CAByS predeterminado"
+      "billing_cabys_default": "CAByS predeterminado",
+
+      "special_package_amount": "Monto por paquete",
+      "special_package_manifest_amount": "Monto por manifiesto"
     },
     "placeholders": {
       "pound_fee": "Ingrese un valor en dólares",
@@ -64,7 +68,10 @@
       "billing_phone": "Ingrese el teléfono",
       "billing_address": "Ingrese la dirección",
       "billing_activity_code": "Ingrese el código de actividad",
-      "billing_cabys_default": "Ingrese el CAByS predeterminado"
+      "billing_cabys_default": "Ingrese el CAByS predeterminado",
+
+      "special_package_amount": "Ingrese un monto",
+      "special_package_manifest_amount": "Ingrese un monto"
     },
     "errors": {
       "invalidType": "Tipo inválido",
@@ -93,7 +100,10 @@
       "billing_phone": "Campo requerido",
       "billing_address": "Campo requerido",
       "billing_activity_code": "Campo requerido",
-      "billing_cabys_default": "Campo requerido"
+      "billing_cabys_default": "Campo requerido",
+
+      "special_package_amount": "Campo requerido",
+      "special_package_manifest_amount": "Campo requerido"
     },
     "successMessage": "Configuración guardada con éxito",
     "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"

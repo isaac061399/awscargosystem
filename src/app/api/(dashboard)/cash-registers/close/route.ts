@@ -29,8 +29,8 @@ export const POST = withAuthApi(['cash-control.close'], async (req) => {
       }
 
       const closeDate = moment();
-      const closeDataCRC = await getCashRegisterData(Currency.CRC, entry, closeDate);
-      const closeDataUSD = await getCashRegisterData(Currency.USD, entry, closeDate);
+      const closeDataCRC = await getCashRegisterData(Currency.CRC, entry);
+      const closeDataUSD = await getCashRegisterData(Currency.USD, entry);
       const cashDataCRC = getCashData(moneyT?.CRC || {}, data.crc || {});
       const cashDataUSD = getCashData(moneyT?.USD || {}, data.usd || {});
 
@@ -38,6 +38,7 @@ export const POST = withAuthApi(['cash-control.close'], async (req) => {
         where: { id: entry.id },
         data: {
           close_date: closeDate.toDate(),
+          invoice_count: closeDataCRC.invoice_count,
           comment: data.comment || '',
           status: CashRegisterStatus.CLOSED,
           lines: {
