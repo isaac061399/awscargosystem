@@ -3,9 +3,11 @@
     "title": "Factura: ",
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "numericKeyLabel": "Clave numérica",
-    "btnPrint": "Imprimir Tiquete",
-    "btnPDF": "Descargar PDF",
-    "btnCancel": "Cancelar Factura",
+    "btnPrintTicket": "Imprimir Tiquete",
+    "btnPayInvoice": "Pagar Factura",
+    "btnCancelInvoice": "Cancelar Factura",
+    "btnPay": "Pagar",
+    "btnCancel": "Cancelar",
     "clientInfo": {
       "title": "Cliente",
       "mailbox": "Casillero",
@@ -26,6 +28,7 @@
     "datesInfo": {
       "title": "Fechas",
       "issueDate": "Fecha de Emisión",
+      "paidDate": "Fecha de Pago",
       "dueDate": "Fecha de Vencimiento",
       "cancelDate": "Fecha de Cancelación",
       "cancelBy": "Cancelado por"
@@ -46,7 +49,6 @@
       "total": "Total"
     },
     "payments": {
-      "date": "Fecha de pago",
       "title": "Pagos",
       "method": "Método",
       "ref": "Referencia",
@@ -59,6 +61,40 @@
       "btnCancel": "Cerrar",
       "btnConfirm": "Sí, Cancelar Factura",
       "successMessage": "La factura ha sido cancelada exitosamente."
+    },
+    "dialogPayment": {
+      "title": "Pago de Factura"
+    },
+    "dialogPaymentSuccess": {
+      "title": "Factura pagada",
+      "changeAmount": "Vuelto:",
+      "printTicket": "Imprimir tiquete",
+      "close": "Cerrar"
     }
+  },
+  "formPayment": {
+    "labels": {
+      "currency": "Moneda",
+      "method": "Método de pago",
+      "ref": "Referencia de pago",
+      "ref_bank": "Cuenta bancaria",
+      "amount": "Monto recibido"
+    },
+    "placeholders": {
+      "currency": "Seleccione una opción",
+      "method": "Seleccione una opción",
+      "ref": "Ingrese la referencia de pago",
+      "ref_bank": "Seleccione la cuenta bancaria",
+      "amount": "Ingrese el monto recibido"
+    },
+    "errors": {
+      "currency": "La moneda es requerida",
+      "method": "El método de pago es requerido",
+      "ref": "La referencia de pago es requerida",
+      "ref_bank": "La cuenta bancaria es requerida",
+      "amount": "El monto recibido es requerido"
+    },
+    "amountErrorMessage": "El monto recibido es menor al total de la factura",
+    "errorMessage": "Error al realizar el pago, por favor inténtalo de nuevo"
   }
 }

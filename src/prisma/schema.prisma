@@ -692,6 +692,7 @@ model CusInvoice {
   status                InvoiceStatus
   cancelled_by_id       Int?
   cancelled_at          DateTime?
+  paid_at               DateTime?
   created_at            DateTime                @default(now())
   updated_at            DateTime                @updatedAt
 

@@ -167,6 +167,9 @@ const CashClosed = ({ cashRegister }: { cashRegister: any }) => {
               <strong>{textT?.detail?.closeDate}:</strong>{' '}
               {moment(cashRegister.close_date).format(textT?.dateTimeFormat)}
             </Typography>
+            <Typography variant="body1">
+              <strong>{textT?.detail?.invoiceCount}:</strong> {cashRegister.invoice_count}
+            </Typography>
 
             <Divider className="my-2" />
 

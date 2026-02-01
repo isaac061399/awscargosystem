@@ -182,6 +182,10 @@
     "errors": {
       "cancel": "Error al cancelar la factura, por favor inténtalo de nuevo",
       "alreadyCanceled": "La factura ya está cancelada",
+      "pay": "Error al pagar la factura, por favor inténtalo de nuevo",
+      "notEnoughPaidAmount": "El monto pagado no cubre el total de la factura",
+      "paymentsError": "Los pagos presentan los siguientes errores: {{ errors }}",
+      "notPayable": "La factura ya está pagada o cancelada",
       "notFound": "Factura no encontrada",
       "noOpenCash": "No hay una caja abierta. No se pueden procesar transacciones.",
       "save": "Error al guardar la factura, por favor inténtalo de nuevo",

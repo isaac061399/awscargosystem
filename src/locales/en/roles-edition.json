@@ -38,6 +38,7 @@
       "close": "Close",
       "open": "Open",
       "reopen": "Reopen",
+      "pay": "Pay",
       "cancel": "Cancel"
     }
   },

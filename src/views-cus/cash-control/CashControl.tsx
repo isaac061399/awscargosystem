@@ -53,16 +53,18 @@ const CashControl = ({ cashRegister, redirect }: { cashRegister?: any; redirect?
               {textT?.title}
             </Typography>
             <div className="flex items-center gap-2">
-              <Button
-                LinkComponent={Link}
-                size="small"
-                variant="contained"
-                color="primary"
-                startIcon={<i className="ri-printer-line" />}
-                href={`/print/cash-register/${cashRegister.id}`}
-                target="_blank">
-                {textT?.dialogSuccess?.print}
-              </Button>
+              {isClosed && (
+                <Button
+                  LinkComponent={Link}
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<i className="ri-printer-line" />}
+                  href={`/print/cash-register/${cashRegister.id}`}
+                  target="_blank">
+                  {textT?.dialogSuccess?.print}
+                </Button>
+              )}
             </div>
           </div>
           <Divider />

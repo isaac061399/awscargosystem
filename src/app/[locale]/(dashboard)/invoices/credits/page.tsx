@@ -9,7 +9,7 @@ import TranslationsProvider from '@libs/translate/TranslationProvider';
 const InvoicesPage = withAuthPage(['invoices.list'], async ({ params }: { params: Promise<{ locale: string }> }) => {
   return (
     <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-      <Invoices credits={false} />
+      <Invoices credits={true} />
     </TranslationsProvider>
   );
 });

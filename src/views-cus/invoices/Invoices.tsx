@@ -29,6 +29,7 @@ import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
 import { generateUrl } from '@/libs/utils';
+import { paymentConditionsDays } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -38,7 +39,7 @@ const statusColors: any = {
   CANCELED: 'error'
 };
 
-const Invoices = () => {
+const Invoices = ({ credits }: { credits: boolean }) => {
   const { data: admin } = useAdmin();
   const canView = hasAllPermissions('invoices.view', admin.permissions);
 
@@ -64,6 +65,7 @@ const Invoices = () => {
 
     // params
     const params: any = {
+      credits: credits ? 'true' : 'false',
       limit: paginationState.pageSize,
       offset: paginationState.pageSize * paginationState.page,
       s: searchState,
@@ -99,6 +101,7 @@ const Invoices = () => {
 
   const handleExport = async () => {
     const exportUrl = generateUrl('/api/invoices/export', {
+      credits: credits ? 'true' : 'false',
       s: searchState,
       status: statusState
     });
@@ -195,7 +198,7 @@ const Invoices = () => {
       field: 'created_at',
       headerName: textT?.table?.created_at?.title,
       flex: 1,
-      minWidth: 150,
+      minWidth: 200,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           {moment(params.row.created_at).format(textT?.table?.created_at?.dateFormat)}
@@ -203,6 +206,22 @@ const Invoices = () => {
       )
     }
   ];
+
+  if (credits) {
+    columns.push({
+      field: 'expired_at',
+      headerName: textT?.table?.expired_at?.title,
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params: any) => (
+        <div className="h-full inline-flex flex-col justify-center py-2">
+          {moment(params.row.created_at)
+            .add(paymentConditionsDays[params.row.payment_condition as keyof typeof paymentConditionsDays], 'days')
+            .format(textT?.table?.expired_at?.dateFormat)}
+        </div>
+      )
+    });
+  }
 
   const statusOptions = useMemo(
     () =>

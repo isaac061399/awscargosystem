@@ -60,6 +60,10 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
       <div className="kv">
         <span className="bold">Fecha Emisión:</span> {moment(invoice.created_at).format('DD/MM/YYYY hh:mm a')}
       </div>
+      <div className="kv">
+        <span className="bold">Fecha Pago:</span>{' '}
+        {invoice.paid_at ? moment(invoice.paid_at).format('DD/MM/YYYY hh:mm a') : 'Pendiente'}
+      </div>
 
       <div className="kv">
         <span className="bold">Moneda:</span> {labelsT?.currency?.[invoice.currency]}

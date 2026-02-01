@@ -8,24 +8,7 @@ export const getInvoice = async (id: number) => {
   try {
     const invoice = await prismaRead.cusInvoice.findUnique({
       where: { id },
-      select: {
-        id: true,
-        consecutive: true,
-        numeric_key: true,
-        type: true,
-        payment_condition: true,
-        iva_percentage: true,
-        selling_exchange_rate: true,
-        buying_exchange_rate: true,
-        currency: true,
-        payment_method: true,
-        subtotal: true,
-        tax: true,
-        total: true,
-        cash_change: true,
-        status: true,
-        cancelled_at: true,
-        created_at: true,
+      include: {
         cancelled_by: {
           select: { id: true, full_name: true, email: true }
         },

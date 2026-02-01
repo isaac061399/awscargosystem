@@ -28,6 +28,10 @@
       "created_at": {
         "title": "Fecha de Registro",
         "dateFormat": "DD/MM/YYYY hh:mm a"
+      },
+      "expired_at": {
+        "title": "Fecha de Vencimiento",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
       }
     }
   }

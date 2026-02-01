@@ -1309,6 +1309,26 @@ export const requestNewInvoice = async (params: any, lang: string) => {
   }
 };
 
+export const requestPayInvoice = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/invoices/${id}/pay`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 export const requestCancelInvoice = async (id: number, lang: string) => {
   try {
     const response = await axios.request({

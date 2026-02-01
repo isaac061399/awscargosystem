@@ -1228,11 +1228,7 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
               label={formPaymentT?.labels?.currency}
               // placeholder={formPaymentT?.placeholders?.currency}
               value={formikPayment.values.currency}
-              onChange={(e) => {
-                console.log(e);
-                const result = formikPayment.handleChange(e);
-                console.log(result);
-              }}
+              onChange={formikPayment.handleChange}
               error={Boolean(formikPayment.touched.currency && formikPayment.errors.currency)}
               color={Boolean(formikPayment.touched.currency && formikPayment.errors.currency) ? 'error' : 'primary'}
               helperText={formikPayment.touched.currency && (formikPayment.errors.currency as string)}

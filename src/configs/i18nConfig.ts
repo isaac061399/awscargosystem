@@ -50,6 +50,7 @@ const i18nConfig = {
     '/[locale]/(dashboard)/clients/edit/[id]': ['clients-edition'],
     '/[locale]/(dashboard)/configuration': ['configuration'],
     '/[locale]/(dashboard)/invoices': ['invoices'],
+    '/[locale]/(dashboard)/invoices/credits': ['invoices'],
     '/[locale]/(dashboard)/invoices/view/[id]': ['invoices-view'],
     '/[locale]/(dashboard)/money-outflows': ['money-outflows'],
     '/[locale]/(dashboard)/offices': ['offices'],

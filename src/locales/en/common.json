@@ -307,6 +307,13 @@
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["invoices.list"]
+              },
+              {
+                "label": "Accounts Receivable",
+                "link": "/invoices/credits",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["invoices.list"]
               }
             ]
           }
