@@ -65,9 +65,10 @@ const Invoices = ({ credits }: { credits: boolean }) => {
 
     // params
     const params: any = {
-      credits: credits ? 'true' : 'false',
       limit: paginationState.pageSize,
       offset: paginationState.pageSize * paginationState.page,
+      credits: credits ? 'true' : undefined,
+      cash: !credits ? 'true' : undefined,
       s: searchState,
       status: statusState
     };
@@ -101,7 +102,8 @@ const Invoices = ({ credits }: { credits: boolean }) => {
 
   const handleExport = async () => {
     const exportUrl = generateUrl('/api/invoices/export', {
-      credits: credits ? 'true' : 'false',
+      credits: credits ? 'true' : undefined,
+      cash: !credits ? 'true' : undefined,
       s: searchState,
       status: statusState
     });

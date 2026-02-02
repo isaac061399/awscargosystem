@@ -190,6 +190,32 @@
       "noOpenCash": "No hay una caja abierta. No se pueden procesar transacciones.",
       "save": "Error al guardar la factura, por favor inténtalo de nuevo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
+    },
+    "export": {
+      "id": "ID",
+      "cash_register_office": "Oficina",
+      "client_office": "Oficina del Cliente",
+      "client_mailbox": "Casillero del Cliente",
+      "client_full_name": "Nombre del Cliente",
+      "client_identification": "Identificación del Cliente",
+      "client_email": "Correo Electrónico del Cliente",
+      "consecutive": "Consecutivo",
+      "numeric_key": "Clave Numérica",
+      "type": "Tipo",
+      "payment_condition": "Condición de Pago",
+      "iva_percentage": "Porcentaje de IVA",
+      "selling_exchange_rate": "Tipo de Cambio de Venta",
+      "buying_exchange_rate": "Tipo de Cambio de Compra",
+      "currency": "Moneda",
+      "payment_method": "Método de Pago",
+      "payment_method_ref": "Referencia",
+      "subtotal": "Subtotal",
+      "tax": "Impuesto",
+      "total": "Total",
+      "cash_change": "Vuelto",
+      "status": "Estado",
+      "paid_at": "Fecha de Pago",
+      "created_at": "Fecha de Registro"
     }
   },
   "money-outflows": {

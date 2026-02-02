@@ -34,15 +34,15 @@ export const GET = withAuthApi(['invoices.list'], async (req) => {
   const textT: any = t('api:invoices', { returnObjects: true, default: {} });
 
   const params = Object.fromEntries(req.nextUrl.searchParams.entries());
-  const paymentConditionFilter =
-    params.credits !== 'true' ? InvoicePaymentCondition.CASH : { not: InvoicePaymentCondition.CASH };
 
   try {
     // filters
-    const where: any = { payment_condition: paymentConditionFilter };
+    const where: any = {};
     const search = params.s || '';
     const status = params.status || '';
     const clientId = params.client_id || '';
+    const credits = params.credits === 'true';
+    const cash = params.cash === 'true';
 
     if (search.trim() !== '') {
       where['OR'] = [
@@ -61,6 +61,12 @@ export const GET = withAuthApi(['invoices.list'], async (req) => {
 
     if (clientId !== '') {
       where['client_id'] = parseInt(clientId);
+    }
+
+    if (credits) {
+      where['payment_condition'] = { not: InvoicePaymentCondition.CASH };
+    } else if (cash) {
+      where['payment_condition'] = InvoicePaymentCondition.CASH;
     }
 
     // query
