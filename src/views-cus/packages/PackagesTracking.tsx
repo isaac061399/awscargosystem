@@ -1,7 +1,7 @@
 'use client';
 
 // React Imports
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 // Next Imports
 import { useTranslation } from 'react-i18next';
@@ -41,15 +41,12 @@ const PackagesTracking = ({ trackingLoaded }: { trackingLoaded?: string }) => {
   const [trackingSearched, setTrackingSearched] = useState<string>('');
   const [trackingData, setTrackingData] = useState<any[] | null>(null);
 
-  const trackingFieldRef = useRef<HTMLInputElement>(null);
-
   // focus tracking field on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      trackingFieldRef.current?.focus();
-    }, 0);
-
-    return () => clearTimeout(timer);
+    if (trackingLoaded && trackingLoaded.trim().length > 0) {
+      fetchTrackingInfo();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTrackingInfo = async () => {
@@ -101,7 +98,7 @@ const PackagesTracking = ({ trackingLoaded }: { trackingLoaded?: string }) => {
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
-                      inputRef={trackingFieldRef}
+                      autoFocus
                       fullWidth
                       required
                       type="text"

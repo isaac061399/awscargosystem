@@ -8,12 +8,16 @@ import TranslationsProvider from '@libs/translate/TranslationProvider';
 
 const PackagesTrackingPage = withAuthPage(
   ['packages.track'],
-  async ({ params }: { params: Promise<{ locale: string; tracking: string }> }) => {
-    const { tracking } = await params;
-
+  async ({
+    params,
+    searchParams
+  }: {
+    params: Promise<{ locale: string }>;
+    searchParams: Promise<{ tracking?: string }>;
+  }) => {
     return (
       <TranslationsProvider page={getNextPath(__dirname)} locale={(await params).locale}>
-        <PackagesTracking trackingLoaded={tracking} />
+        <PackagesTracking trackingLoaded={(await searchParams).tracking} />
       </TranslationsProvider>
     );
   }
