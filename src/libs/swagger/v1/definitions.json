@@ -277,6 +277,26 @@
           }
         }
       }
+    },
+
+    "packages": {
+      "tracking-history": {
+        "get": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "default": true
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/objects/tracking_history"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "objects": {
@@ -678,6 +698,21 @@
         },
         "push_notifications": {
           "type": "boolean"
+        }
+      }
+    },
+
+    "tracking_history": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "status_label": {
+          "type": "string"
         }
       }
     }

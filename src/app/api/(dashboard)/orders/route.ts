@@ -23,11 +23,13 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
       where['OR'] = [
         { number: { contains: search.trim(), mode: 'insensitive' } },
         { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
-        { client: { id: parseInt(search.trim()) } },
         { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
         { client: { email: { contains: search.trim(), mode: 'insensitive' } } },
         { products: { some: { tracking: { contains: search.trim(), mode: 'insensitive' } } } }
       ];
+      if (!isNaN(parseInt(search.trim()))) {
+        where['OR'].push({ client: { id: parseInt(search.trim()) } });
+      }
     }
 
     if (status !== '') {

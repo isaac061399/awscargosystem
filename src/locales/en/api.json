@@ -322,6 +322,11 @@
       "general": "An error occurred, it is possible that the package has already been received, please try again"
     }
   },
+  "packages-tracking": {
+    "errors": {
+      "general": "An error occurred, please try again"
+    }
+  },
   "products": {
     "errors": {
       "code": "This code is already associated with an existing product. Please use a different code",

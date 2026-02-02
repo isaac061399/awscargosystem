@@ -1,0 +1,17 @@
+{
+  "tracking-history": {
+    "statuses": {
+      "RECEIVED_ORIGIN": "Recibido en País Origen",
+      "IN_PROCESS_ORIGIN": "Procesado en País Origen",
+      "IN_TRANSIT_DESTINATION": "En Transito a País Destino",
+      "CUSTOMS": "En Aduanas",
+      "INTERNAL_TRANSIT": "En Transito Interno",
+      "CLAIMED": "Reclamado",
+      "REVIEW_TRACKING": "Revisar Tracking",
+      "PRE_ALERTED": "Prealertado",
+      "ON_THE_WAY": "En Transito a País Destino",
+      "READY": "Listo para Retirar",
+      "DELIVERED": "Entregado"
+    }
+  }
+}

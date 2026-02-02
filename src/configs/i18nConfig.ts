@@ -62,6 +62,7 @@ const i18nConfig = {
     '/[locale]/(dashboard)/packages': ['packages'],
     '/[locale]/(dashboard)/packages/view/[id]': ['packages-view'],
     '/[locale]/(dashboard)/packages-reception': ['packages-reception'],
+    '/[locale]/(dashboard)/packages-tracking': ['packages-tracking'],
     '/[locale]/(dashboard)/products': ['products'],
     '/[locale]/(dashboard)/products/new': ['products-edition'],
     '/[locale]/(dashboard)/products/edit/[id]': ['products-edition'],

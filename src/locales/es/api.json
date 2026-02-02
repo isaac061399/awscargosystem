@@ -322,6 +322,11 @@
       "general": "Se produjo un error, es posible que el paquete ya haya sido recibido, por favor inténtalo de nuevo"
     }
   },
+  "packages-tracking": {
+    "errors": {
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
   "products": {
     "errors": {
       "code": "Este código ya está asociado a un producto existente. Por favor, use un código diferente",

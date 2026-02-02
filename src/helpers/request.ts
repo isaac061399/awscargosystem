@@ -1699,6 +1699,24 @@ export const requestPackagesReception = async (params: any, lang: string) => {
   }
 };
 
+// packages tracking
+
+export const requestPackagesTracking = async (tracking: string, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: `/api/packages/tracking/${tracking}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
 // products
 
 export const requestGetProducts = async (params: any, lang: string) => {

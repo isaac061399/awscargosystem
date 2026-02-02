@@ -166,7 +166,8 @@
           "orders.create",
           "packages.list",
           "unowned-packages.list",
-          "packages.reception"
+          "packages.reception",
+          "packages.track"
         ],
         "items": [
           {
@@ -220,7 +221,7 @@
             "link": "",
             "externalLink": false,
             "icon": "ri-box-3-line",
-            "permissions": ["packages.list", "unowned-packages.list", "packages.reception"],
+            "permissions": ["packages.list", "unowned-packages.list", "packages.reception", "packages.track"],
             "subItems": [
               {
                 "label": "Listar",
@@ -242,6 +243,13 @@
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["packages.reception"]
+              },
+              {
+                "label": "Rastrear Paquetes",
+                "link": "/packages-tracking",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["packages.track"]
               }
             ]
           }

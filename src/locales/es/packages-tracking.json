@@ -1,0 +1,11 @@
+{
+  "text": {
+    "title": "Rastreo de Paquetes",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "noData": "No se encontraron datos para el tracking proporcionado.",
+    "tracking": {
+      "label": "Tracking",
+      "placeholder": "Ingrese el tracking"
+    }
+  }
+}

@@ -19,11 +19,13 @@ export const GET = withAuthApi(['clients.list'], async (req) => {
 
     if (search.trim() !== '') {
       where['OR'] = [
-        { id: parseInt(search.trim()) },
         { full_name: { contains: search.trim(), mode: 'insensitive' } },
         { identification: { contains: search.trim(), mode: 'insensitive' } },
         { email: { contains: search.trim(), mode: 'insensitive' } }
       ];
+      if (!isNaN(parseInt(search.trim()))) {
+        where['OR'].push({ id: parseInt(search.trim()) });
+      }
     }
 
     if (status !== '') {

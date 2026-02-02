@@ -22,11 +22,13 @@ export const GET = withAuthApi(['packages.list'], async (req) => {
     if (search.trim() !== '') {
       where['OR'] = [
         { tracking: { contains: search.trim(), mode: 'insensitive' } },
-        { client: { id: parseInt(search.trim()) } },
         { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
         { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
         { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
       ];
+      if (!isNaN(parseInt(search.trim()))) {
+        where['OR'].push({ client: { id: parseInt(search.trim()) } });
+      }
     }
 
     if (status !== '') {
