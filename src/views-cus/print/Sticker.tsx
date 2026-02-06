@@ -9,28 +9,19 @@ import Barcode from '@/components/custom/Bardcode';
 const Sticker = ({ sticker }: { sticker: any }) => {
   // Auto print
   useEffect(() => {
-    // small delay helps fonts/layout settle
+    // Auto close tab after print, allowed because this page is opened via window.open from the reception page
+    window.addEventListener('afterprint', () => window.close());
+
+    // Auto print small delay helps fonts/layout settle
     const t = window.setTimeout(() => window.print(), 150);
 
-    return () => window.clearTimeout(t);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('afterprint', () => window.close());
+    };
   }, []);
 
   const date = moment().format('DD/MM/YYYY hh:mm A');
-
-  // const data = {
-  //   tracking: 'TBA326773120722',
-  //   location: {
-  //     shelf: 'C',
-  //     row: '2'
-  //   },
-  //   client: {
-  //     mailbox: 'AWS-1232-ATENAS',
-  //     name: 'JORGE LUIS VÍQUEZ GONZÁLEZ',
-  //     phone: '85043135',
-  //     address: 'Frente al cuerpo de bomberos de Atenas, casa portón rojo'
-  //   },
-  //   serviceLabel: 'ENVIO'
-  // };
 
   return (
     <div className="sheet">
@@ -45,7 +36,7 @@ const Sticker = ({ sticker }: { sticker: any }) => {
               <div className="warehouse">AWS CARGO & COURIER</div>
               <div className="warehouse-code">{sticker?.client?.mailbox}</div>
               <div className="loc">
-                Estante: {sticker?.location?.shelf} &nbsp; Fila: {sticker?.location?.row}
+                Estante: {sticker?.location?.shelf || '-'} &nbsp; Fila: {sticker?.location?.row || '-'}
               </div>
             </div>
           </div>
@@ -54,10 +45,10 @@ const Sticker = ({ sticker }: { sticker: any }) => {
           <div className="name"> {sticker?.client?.name}</div>
 
           {/* Phone */}
-          <div className="line">Teléfono: {sticker?.client?.phone}</div>
+          <div className="line">Teléfono: {sticker?.client?.phone || '-'}</div>
 
           {/* Address */}
-          <div className="line">Dirección: {sticker?.client?.address}</div>
+          <div className="line">Dirección: {sticker?.client?.address || '-'}</div>
 
           {/* Barcode + meta */}
           <div className="barcodeBlock">
@@ -68,11 +59,6 @@ const Sticker = ({ sticker }: { sticker: any }) => {
               <Barcode value={sticker?.tracking} height={44} displayValue={false} />
             </div>
           </div>
-        </div>
-
-        {/* SIDE VERTICAL */}
-        <div className="side">
-          <span>{sticker?.serviceLabel}</span>
         </div>
       </div>
     </div>

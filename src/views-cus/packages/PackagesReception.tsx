@@ -26,6 +26,8 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  IconButton,
+  InputAdornment,
   List,
   ListItemButton,
   ListItemText,
@@ -85,11 +87,17 @@ const PackageReception = () => {
     selected: { package_id: '', order_id: '', client: null }
   });
 
+  const isTrackingFirstRender = useRef(true);
+  const lastFieldRef = useRef<HTMLInputElement>(null);
+
+  const cutFieldRef = useRef<HTMLInputElement>(null);
   const trackingFieldRef = useRef<HTMLInputElement>(null);
-  const trackingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const mailboxFieldRef = useRef<HTMLInputElement>(null);
-  const mailboxTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const weightFieldRef = useRef<HTMLInputElement>(null);
+  const shelfFieldRef = useRef<HTMLInputElement>(null);
+  const rowFieldRef = useRef<HTMLInputElement>(null);
+
+  const trackingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const weightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const formik = useFormik({
@@ -144,9 +152,7 @@ const PackageReception = () => {
           setAlertState({ ...defaultAlertState });
         }, 5000);
 
-        if (result.ready) {
-          window.open(`/print/sticker/${result.tracking}`, '_blank');
-        }
+        window.open(`/print/sticker/${result.tracking}`, '_blank');
 
         resetProcess();
 
@@ -158,20 +164,12 @@ const PackageReception = () => {
     }
   });
 
-  // focus tracking field on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      trackingFieldRef.current?.focus();
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   // focus mailbox field when showClientFields is true
   useEffect(() => {
     if (showClientFields) {
       setTimeout(() => {
         mailboxFieldRef.current?.focus();
+        lastFieldRef.current = mailboxFieldRef.current;
       }, 0);
     }
   }, [showClientFields]);
@@ -181,12 +179,19 @@ const PackageReception = () => {
     if (showAllOtherFields) {
       setTimeout(() => {
         weightFieldRef.current?.focus();
+        lastFieldRef.current = weightFieldRef.current;
       }, 0);
     }
   }, [showAllOtherFields]);
 
   // tracking field change effect
   useEffect(() => {
+    if (isTrackingFirstRender.current) {
+      isTrackingFirstRender.current = false;
+
+      return;
+    }
+
     const fetchTrackingInfo = async (tracking: string) => {
       setIsLoading(true);
 
@@ -240,50 +245,18 @@ const PackageReception = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.tracking]);
 
-  // mailbox field change effect
-  useEffect(() => {
-    const fetchClientInfo = async (mailbox: string) => {
-      setIsLoading(true);
-
-      const result = await requestPackagesReceptionClient(mailbox, i18n.language);
-
-      setIsLoading(false);
-
-      if (!result.valid || !result.client) {
-        setErrorAlert({ open: true, inputRef: mailboxFieldRef, message: textT?.clientAlertMessage });
-
-        return;
-      }
-
-      formik.setFieldValue('client', result.client);
-
-      setShowAllOtherFields(true);
-    };
-
-    if (formik.values.mailbox && formik.values.mailbox.length > 0) {
-      if (mailboxTimeoutRef.current) {
-        clearTimeout(mailboxTimeoutRef.current);
-      }
-
-      mailboxTimeoutRef.current = setTimeout(() => {
-        fetchClientInfo(formik.values.mailbox);
-      }, 500);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.mailbox]);
-
   // validate same office for client
   useEffect(() => {
     if (formik.values.client) {
       if (formik.values.client.office.id !== formik.values.office_id) {
         setErrorAlert({
           open: true,
-          inputRef: mailboxFieldRef.current ? mailboxFieldRef : trackingFieldRef,
           message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')
         });
       } else {
         setTimeout(() => {
           weightFieldRef.current?.focus();
+          lastFieldRef.current = weightFieldRef.current;
         }, 0);
       }
     }
@@ -332,6 +305,7 @@ const PackageReception = () => {
     setShowClientFields(true);
     setTimeout(() => {
       mailboxFieldRef.current?.focus();
+      lastFieldRef.current = mailboxFieldRef.current;
     }, 100);
 
     // hide the rest of the fields
@@ -360,6 +334,7 @@ const PackageReception = () => {
 
     setTimeout(() => {
       trackingFieldRef.current?.focus();
+      lastFieldRef.current = trackingFieldRef.current;
     }, 100);
   };
 
@@ -404,6 +379,48 @@ const PackageReception = () => {
     resetProcess();
   };
 
+  // events
+  const onMailboxSearch = () => {
+    const fetchClientInfo = async (mailbox: string) => {
+      setIsLoading(true);
+
+      const result = await requestPackagesReceptionClient(mailbox, i18n.language);
+
+      setIsLoading(false);
+
+      if (!result.valid || !result.client) {
+        setErrorAlert({ open: true, inputRef: mailboxFieldRef, message: textT?.clientAlertMessage });
+
+        return;
+      }
+
+      formik.setFieldValue('client', result.client);
+
+      setShowAllOtherFields(true);
+    };
+
+    if (formik.values.mailbox && formik.values.mailbox.length > 0) {
+      fetchClientInfo(formik.values.mailbox);
+    }
+  };
+
+  const onAlertClose = () => {
+    if (lastFieldRef && lastFieldRef.current) {
+      const inputElement = lastFieldRef.current as HTMLInputElement;
+      setTimeout(() => {
+        inputElement.focus();
+      }, 500);
+    } else if (trackingFieldRef && trackingFieldRef.current) {
+      const inputElement = trackingFieldRef.current as HTMLInputElement;
+      lastFieldRef.current = inputElement;
+      setTimeout(() => {
+        inputElement.focus();
+      }, 500);
+    }
+
+    setErrorAlert({ ...errorAlert, open: false });
+  };
+
   return (
     <DashboardLayout>
       <form noValidate onSubmit={formik.handleSubmit}>
@@ -443,6 +460,8 @@ const PackageReception = () => {
                   </Grid>
                   <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
+                      inputRef={cutFieldRef}
+                      autoFocus
                       fullWidth
                       required
                       type="text"
@@ -456,6 +475,13 @@ const PackageReception = () => {
                       color={Boolean(formik.touched.cut_number && formik.errors.cut_number) ? 'error' : 'primary'}
                       helperText={formik.touched.cut_number && (formik.errors.cut_number as string)}
                       disabled={formik.isSubmitting || isLoading}
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter') return;
+
+                        e.preventDefault();
+                        trackingFieldRef.current?.focus();
+                        lastFieldRef.current = trackingFieldRef.current;
+                      }}
                     />
                   </Grid>
                 </Grid>
@@ -499,12 +525,12 @@ const PackageReception = () => {
                   )}
                 </Grid>
 
+                {/* Mailbox Field and Client Card */}
                 {showClientFields && (
                   <>
                     <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                       <Typography variant="h5">{textT?.clientTitle}</Typography>
                     </Divider>
-                    {/* Mailbox Field and Client Card */}
                     <Grid container spacing={5}>
                       {formik.values.package_id === '' && formik.values.order_id === '' && (
                         <>
@@ -526,8 +552,22 @@ const PackageReception = () => {
                               disabled={formik.isSubmitting || isLoading}
                               slotProps={{
                                 input: {
-                                  endAdornment: isLoading ? <i className="ri-loader-4-line animate-spin" /> : null
+                                  endAdornment: isLoading ? (
+                                    <i className="ri-loader-4-line animate-spin" />
+                                  ) : (
+                                    <InputAdornment position="end">
+                                      <IconButton edge="end" type="button" onClick={onMailboxSearch}>
+                                        <i className="ri-arrow-right-line"></i>
+                                      </IconButton>
+                                    </InputAdornment>
+                                  )
                                 }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key !== 'Enter') return;
+
+                                e.preventDefault();
+                                onMailboxSearch();
                               }}
                             />
                           </Grid>
@@ -591,12 +631,13 @@ const PackageReception = () => {
                   </>
                 )}
 
+                {/* Weight and Price Fields - Shelve and Row Fields - Submit Button */}
                 {showAllOtherFields && (
                   <>
+                    {/* Weight and Price Fields */}
                     <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                       <Typography variant="h5">{textT?.packageTitle}</Typography>
                     </Divider>
-                    {/* Weight and Price Fields */}
                     <Grid container spacing={5}>
                       <Grid size={{ xs: 12, md: 3 }}>
                         <TextField
@@ -614,6 +655,13 @@ const PackageReception = () => {
                           color={Boolean(formik.touched.weight && formik.errors.weight) ? 'error' : 'primary'}
                           helperText={formik.touched.weight && (formik.errors.weight as string)}
                           disabled={formik.isSubmitting || isLoading}
+                          onKeyDown={(e) => {
+                            if (e.key !== 'Enter') return;
+
+                            e.preventDefault();
+                            shelfFieldRef.current?.focus();
+                            lastFieldRef.current = shelfFieldRef.current;
+                          }}
                         />
                       </Grid>
                       <Grid size={{ xs: 12, md: 3 }} className="flex flex-col gap-1 justify-center">
@@ -623,10 +671,10 @@ const PackageReception = () => {
                       </Grid>
                     </Grid>
 
+                    {/* Shelve and Row Fields */}
                     <Divider textAlign="left" sx={{ my: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
                       <Typography variant="h5">{textT?.locationTitle}</Typography>
                     </Divider>
-                    {/* Shelve and Row Fields */}
                     <Grid container spacing={5}>
                       <Grid size={{ xs: 12, md: 3 }}>
                         <Autocomplete
@@ -643,6 +691,7 @@ const PackageReception = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
+                              inputRef={shelfFieldRef}
                               id="shelf"
                               name="shelf"
                               label={formT?.labels?.shelf}
@@ -651,6 +700,13 @@ const PackageReception = () => {
                               color={Boolean(formik.touched.shelf && formik.errors.shelf) ? 'error' : 'primary'}
                               helperText={formik.touched.shelf && (formik.errors.shelf as string)}
                               disabled={formik.isSubmitting || isLoading}
+                              onKeyDown={(e) => {
+                                if (e.key !== 'Enter') return;
+
+                                e.preventDefault();
+                                rowFieldRef.current?.focus();
+                                lastFieldRef.current = rowFieldRef.current;
+                              }}
                             />
                           )}
                         />
@@ -670,6 +726,7 @@ const PackageReception = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
+                              inputRef={rowFieldRef}
                               id="row"
                               name="row"
                               label={formT?.labels?.row}
@@ -684,6 +741,7 @@ const PackageReception = () => {
                       </Grid>
                     </Grid>
 
+                    {/* Submit Button */}
                     <Grid container spacing={5} className="mt-5">
                       <Grid size={{ xs: 12, md: 3 }} offset={{ md: 4.5 }}>
                         <Button
@@ -804,7 +862,20 @@ const PackageReception = () => {
 
       <Dialog
         open={errorAlert.open}
-        // onClose={() => setShowOfficeAlert(false)}
+        onClose={onAlertClose}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter') return;
+
+          const el = e.target as HTMLElement | null;
+          const isTextArea = el?.tagName === 'TEXTAREA';
+          const isMultiline = (el as HTMLInputElement | null)?.getAttribute?.('aria-multiline') === 'true';
+
+          // Don’t close if user is writing multi-line text
+          if (isTextArea || isMultiline) return;
+
+          e.preventDefault();
+          onAlertClose();
+        }}
         aria-labelledby="office-alert-title"
         aria-describedby="office-alert-description">
         <DialogTitle id="office-alert-title" variant="h2">
@@ -816,19 +887,7 @@ const PackageReception = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="text"
-            color="primary"
-            onClick={() => {
-              if (errorAlert.inputRef && errorAlert.inputRef.current) {
-                const inputElement = errorAlert.inputRef.current as HTMLInputElement;
-                setTimeout(() => {
-                  inputElement.focus();
-                }, 500);
-              }
-
-              setErrorAlert({ ...errorAlert, open: false });
-            }}>
+          <Button variant="text" color="primary" onClick={() => onAlertClose()}>
             {textT?.btnClose}
           </Button>
         </DialogActions>

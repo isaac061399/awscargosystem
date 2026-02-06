@@ -29,10 +29,16 @@ const Invoice = ({ invoice, original }: { invoice: any; original?: string }) => 
 
   // Auto print
   useEffect(() => {
-    // small delay helps fonts/layout settle
+    // Auto close tab after print, allowed because this page is opened via window.open from the reception page
+    window.addEventListener('afterprint', () => window.close());
+
+    // Auto print small delay helps fonts/layout settle
     const t = window.setTimeout(() => window.print(), 150);
 
-    return () => window.clearTimeout(t);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('afterprint', () => window.close());
+    };
   }, []);
 
   return (

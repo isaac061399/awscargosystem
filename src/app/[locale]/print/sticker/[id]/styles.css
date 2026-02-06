@@ -22,7 +22,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 0.42in; /* right vertical strip */
+  grid-template-columns: 1fr;
   gap: 0.08in;
   height: 100%;
 }
@@ -96,23 +96,6 @@
   line-height: 1.15;
   word-break: break-word;
   margin-bottom: 0.02in;
-}
-
-/* Right vertical label */
-.side {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.side span {
-  display: inline-block;
-  transform: rotate(90deg);
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 /* Barcode area */
