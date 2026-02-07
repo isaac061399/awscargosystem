@@ -65,6 +65,6 @@
       "client": "El cliente es requerido"
     },
     "successMessage": "Datos guardados con éxito",
-    "errorMessage": "Error al guardar la configuración, por favor inténtalo de nuevo"
+    "errorMessage": "Error al guardar los datos, por favor inténtalo de nuevo"
   }
 }

@@ -6,7 +6,11 @@
     "totalLabel": "Total",
     "statusLabel": "Estado",
     "paymentStatusLabel": "Estado de Pago",
+    "btnEdit": "Editar",
     "btnSave": "Guardar",
+    "btnCancel": "Cancelar",
+    "dialogEditTitle": "Editar Paquete",
+    "priceLabel": "Precio",
     "trackingLabel": "Tracking",
     "dateLabel": "Registrado el",
     "clientInfo": {
@@ -37,5 +41,18 @@
       "shelf": "Estante",
       "row": "Fila"
     }
+  },
+  "form": {
+    "labels": {
+      "billing_weight": "Peso (libras)"
+    },
+    "placeholders": {
+      "billing_weight": "Ingrese el peso"
+    },
+    "errors": {
+      "billing_weight": "El peso es requerido"
+    },
+    "successMessage": "Datos guardados con éxito",
+    "errorMessage": "Error al guardar los datos, por favor inténtalo de nuevo"
   }
 }

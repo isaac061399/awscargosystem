@@ -1584,29 +1584,6 @@ export const requestDeleteOrderProduct = async (id: number, lang: string) => {
   }
 };
 
-// export const requestChangeStatusOrder = async (
-//   id: number,
-//   action: 'on-the-way' | 'ready' | 'delivered',
-//   lang: string
-// ) => {
-//   try {
-//     const response = await axios.request({
-//       method: 'put',
-//       url: `/api/orders/${id}/${action}`,
-//       headers: { ...defaultHeaders, 'Accept-Language': lang }
-//     });
-
-//     return response.data;
-//   } catch (e: any) {
-//     // console.error(e);
-//     if (e?.response?.data) {
-//       return e?.response?.data;
-//     }
-
-//     return { valid: false };
-//   }
-// };
-
 // packages
 
 export const requestGetPackages = async (params: any, lang: string) => {
@@ -1622,6 +1599,26 @@ export const requestGetPackages = async (params: any, lang: string) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e: any) {
     // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestEditPackage = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'put',
+      url: `/api/packages/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
     return { valid: false };
   }
 };

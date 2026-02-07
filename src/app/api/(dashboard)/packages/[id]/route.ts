@@ -4,80 +4,66 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { TransactionError, withTransaction } from '@libs/prisma';
 
-import { validateOrderStatus, validatePendingProducts } from '@/controllers/Order.Controller';
+import { PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
+import { calculateShippingPrice } from '@/helpers/calculations';
 
-export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params: Promise<{ id: string }> }) => {
+export const PUT = withAuthApi(['packages.edit'], async (req, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:orders', { returnObjects: true, default: {} });
+  const textT: any = t('api:packages', { returnObjects: true, default: {} });
 
   const admin = req.session;
   const data = await req.json();
 
   try {
-    const result = await withTransaction(async (tx) => {
-      // create/update relations
-      for (const p of data.products || []) {
-        const productData = {
-          tracking: p.tracking,
-          code: p.code,
-          name: p.name,
-          description: p.description,
-          quantity: p.quantity ? parseInt(p.quantity) : 0,
-          price: p.price ? parseFloat(p.price) : 0,
-          service_price: p.service_price ? parseFloat(p.service_price) : 0,
-          url: p.url,
-          image_url: p.image_url
-        };
+    const billingWeight = data.billing_weight ? Number(data.billing_weight) : 0;
 
-        if (p.id) {
-          await tx.cusOrderProduct.update({
-            where: { id: p.id },
-            data: productData
-          });
-        } else {
-          await tx.cusOrderProduct.create({
-            data: {
-              order_id: Number(id),
-              ...productData
-            }
-          });
-        }
+    const result = await withTransaction(async (tx) => {
+      const entry = await tx.cusPackage.findFirst({
+        where: { id: Number(id) }
+      });
+
+      if (!entry) {
+        throw new TransactionError(400, textT?.errors?.notFound);
       }
 
-      // update order
-      const order = await tx.cusOrder.update({
+      if (entry.status === PackageStatus.DELIVERED || entry.payment_status === PaymentStatus.PAID) {
+        throw new TransactionError(400, textT?.errors?.invalid);
+      }
+
+      const pkg = await tx.cusPackage.update({
         where: { id: Number(id) },
         data: {
-          client_id: data.client_id,
-          number: data.number,
-          purchase_page: data.purchase_page
+          billing_weight: billingWeight,
+          billing_amount: calculateShippingPrice(billingWeight.toString(), entry.billing_pound_fee)
         }
       });
 
-      if (!order) {
+      if (!pkg) {
         throw new TransactionError(400, textT?.errors?.save);
       }
 
-      // save log
-      await tx.cusOrderLog.create({
+      // edit cut log
+      await tx.cusCutLog.updateMany({
+        where: { package_id: pkg.id, tracking: pkg.tracking },
         data: {
-          order_id: order.id,
+          weight: billingWeight
+        }
+      });
+
+      // save log
+      await tx.cusPackageLog.create({
+        data: {
+          package_id: pkg.id,
           administrator_id: admin.id,
-          action: 'order.edit',
+          action: 'package.edit',
           data: JSON.stringify(data)
         }
       });
 
-      return order;
+      return pkg;
     });
-
-    // await validate pending products
-    await validatePendingProducts(result.id);
-
-    // validate order status
-    await validateOrderStatus(result.id);
 
     return NextResponse.json({ valid: true, id: result.id }, { status: 200 });
   } catch (error) {
@@ -91,27 +77,26 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
   }
 });
 
-export const DELETE = withAuthApi(['orders.delete'], async (req, { params }: { params: Promise<{ id: string }> }) => {
+export const DELETE = withAuthApi(['packages.delete'], async (req, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:orders', { returnObjects: true, default: {} });
+  const textT: any = t('api:packages', { returnObjects: true, default: {} });
 
   const admin = req.session;
 
   try {
     await withTransaction(async (tx) => {
-      // delete order
-      const entry = await tx.cusOrder.findFirst({
-        where: { id: Number(id) },
-        include: { products: true }
+      // delete package
+      const entry = await tx.cusPackage.findFirst({
+        where: { id: Number(id) }
       });
 
       if (!entry) {
         throw new TransactionError(400, textT?.errors?.delete);
       }
 
-      const result = await tx.cusOrder.delete({
+      const result = await tx.cusPackage.delete({
         where: { id: Number(id) }
       });
 
@@ -120,10 +105,10 @@ export const DELETE = withAuthApi(['orders.delete'], async (req, { params }: { p
       }
 
       // save log
-      await tx.cusOrderLog.create({
+      await tx.cusPackageLog.create({
         data: {
           administrator_id: admin.id,
-          action: 'order.delete',
+          action: 'package.delete',
           data: JSON.stringify(entry)
         }
       });

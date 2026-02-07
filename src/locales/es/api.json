@@ -285,6 +285,8 @@
   },
   "packages": {
     "errors": {
+      "invalid": "Paquete no puede ser editado en su estado actual",
+      "notFound": "Paquete no encontrado",
       "save": "Error al guardar la información, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el paquete, si ya tiene datos asociados, no podrá eliminarlo",
       "general": "Se produjo un error, por favor inténtalo de nuevo"
