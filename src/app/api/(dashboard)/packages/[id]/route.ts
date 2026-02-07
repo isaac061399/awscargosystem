@@ -4,7 +4,7 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { TransactionError, withTransaction } from '@libs/prisma';
 
-import { PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
+import { PackageStatus } from '@/prisma/generated/enums';
 import { calculateShippingPrice } from '@/helpers/calculations';
 
 export const PUT = withAuthApi(['packages.edit'], async (req, { params }: { params: Promise<{ id: string }> }) => {
@@ -28,7 +28,7 @@ export const PUT = withAuthApi(['packages.edit'], async (req, { params }: { para
         throw new TransactionError(400, textT?.errors?.notFound);
       }
 
-      if (entry.status === PackageStatus.DELIVERED || entry.payment_status === PaymentStatus.PAID) {
+      if (entry.status !== PackageStatus.ON_THE_WAY && entry.status !== PackageStatus.READY) {
         throw new TransactionError(400, textT?.errors?.invalid);
       }
 
