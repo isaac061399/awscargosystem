@@ -26,7 +26,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
     const tracking = data.tracking || '';
     const package_id = data.package_id || '';
     const order_id = data.order_id || '';
-    const weight = data.weight || 0;
+    const weight = data.weight;
     const shelf = data.shelf || '';
     const row = data.row || '';
     const ready = shelf !== '' && row !== '';
@@ -49,7 +49,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
             cut_number,
             package_id: Number(package_id),
             pound_fee: client.pound_fee,
-            weight: Number(weight),
+            weight: weight ? Number(weight) : undefined,
             shelf,
             row
           },
@@ -65,7 +65,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
             order_id: Number(order_id),
             tracking,
             pound_fee: client.pound_fee,
-            weight: Number(weight),
+            weight: weight ? Number(weight) : undefined,
             shelf,
             row
           },
@@ -81,7 +81,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
             tracking,
             client_id: client.id,
             pound_fee: client.pound_fee,
-            weight: Number(weight),
+            weight: weight ? Number(weight) : undefined,
             shelf,
             row
           },
@@ -94,7 +94,7 @@ export const POST = withAuthApi(['packages.reception'], async (req) => {
     });
 
     if (!result.valid) {
-      throw new TransactionError(400, result.message || textT?.errors?.general);
+      return NextResponse.json({ valid: false, message: result.message || textT?.errors?.general }, { status: 400 });
     }
 
     // mark tracking as found if exists in unowned packages
@@ -128,7 +128,7 @@ const savePackageReception = async (
     cut_number: string;
     package_id: number;
     pound_fee: number;
-    weight: number;
+    weight?: number;
     shelf: string;
     row: string;
   },
@@ -136,6 +136,7 @@ const savePackageReception = async (
   textT: any
 ) => {
   const { cut_number, package_id, pound_fee, weight, shelf, row } = data;
+  const editWeight = weight !== undefined;
   const ready = shelf !== '' && row !== '';
   let notificationData: { tracking: string; amount: number } | null = null;
 
@@ -152,9 +153,9 @@ const savePackageReception = async (
     const result = await tx.cusPackage.update({
       where: { id: entry.id },
       data: {
-        billing_weight: weight,
-        billing_pound_fee: pound_fee,
-        billing_amount: calculateShippingPrice(weight.toString(), pound_fee),
+        billing_weight: editWeight ? weight : undefined,
+        billing_pound_fee: editWeight ? pound_fee : undefined,
+        billing_amount: editWeight ? calculateShippingPrice(weight.toString(), pound_fee) : undefined,
         location_shelf: ready ? shelf : null,
         location_row: ready ? row : null,
         status: ready ? PackageStatus.READY : undefined,
@@ -175,15 +176,10 @@ const savePackageReception = async (
       }
     });
 
-    // save cut number log
-    await tx.cusCutLog.create({
-      data: {
-        package_id: entry.id,
-        number: cut_number,
-        tracking: entry.tracking,
-        weight: weight
-      }
-    });
+    if (editWeight) {
+      // save cut number log
+      await saveCutLog(tx, { package_id: entry.id, number: cut_number, tracking: entry.tracking, weight: weight });
+    }
 
     if (ready) {
       // save status log
@@ -212,7 +208,7 @@ const saveOrderReception = async (
     order_id: number;
     tracking: string;
     pound_fee: number;
-    weight: number;
+    weight?: number;
     shelf: string;
     row: string;
   },
@@ -220,6 +216,7 @@ const saveOrderReception = async (
   textT: any
 ) => {
   const { cut_number, order_id, tracking, pound_fee, weight, shelf, row } = data;
+  const editWeight = weight !== undefined;
   const ready = shelf !== '' && row !== '';
   let notificationData: { tracking: string; amount: number } | null = null;
 
@@ -270,16 +267,6 @@ const saveOrderReception = async (
       }
     }
 
-    await tx.cusOrderPackage.create({
-      data: {
-        order_id: entry.id,
-        tracking,
-        billing_weight: weight,
-        billing_pound_fee: pound_fee,
-        billing_amount: calculateShippingPrice(weight.toString(), pound_fee)
-      }
-    });
-
     // save log
     await tx.cusOrderLog.create({
       data: {
@@ -290,15 +277,23 @@ const saveOrderReception = async (
       }
     });
 
+    // save order-package relation
+    if (editWeight) {
+      await tx.cusOrderPackage.create({
+        data: {
+          order_id: entry.id,
+          tracking,
+          billing_weight: weight,
+          billing_pound_fee: pound_fee,
+          billing_amount: calculateShippingPrice(weight.toString(), pound_fee)
+        }
+      });
+    }
+
     // save cut number log
-    await tx.cusCutLog.create({
-      data: {
-        order_id: entry.id,
-        number: cut_number,
-        tracking: tracking,
-        weight: weight
-      }
-    });
+    if (editWeight) {
+      await saveCutLog(tx, { order_id: entry.id, number: cut_number, tracking: tracking, weight: weight });
+    }
 
     return { valid: true, notificationData };
   } catch (error) {
@@ -315,7 +310,7 @@ const saveNewPackageReception = async (
     tracking: string;
     client_id: number;
     pound_fee: number;
-    weight: number;
+    weight?: number;
     shelf: string;
     row: string;
   },
@@ -323,6 +318,7 @@ const saveNewPackageReception = async (
   textT: any
 ) => {
   const { cut_number, tracking, client_id, pound_fee, weight, shelf, row } = data;
+  const editWeight = weight !== undefined;
   const ready = shelf !== '' && row !== '';
   let notificationData: { tracking: string; amount: number } | null = null;
 
@@ -337,9 +333,9 @@ const saveNewPackageReception = async (
         price: 0,
         description: '',
         notes: '',
-        billing_weight: weight,
-        billing_pound_fee: pound_fee,
-        billing_amount: calculateShippingPrice(weight.toString(), pound_fee),
+        billing_weight: editWeight ? weight : undefined,
+        billing_pound_fee: editWeight ? pound_fee : undefined,
+        billing_amount: editWeight ? calculateShippingPrice(weight.toString(), pound_fee) : undefined,
         location_shelf: ready ? shelf : null,
         location_row: ready ? row : null,
         status: ready ? PackageStatus.READY : PackageStatus.ON_THE_WAY,
@@ -370,14 +366,9 @@ const saveNewPackageReception = async (
     });
 
     // save cut number log
-    await tx.cusCutLog.create({
-      data: {
-        package_id: result.id,
-        number: cut_number,
-        tracking: tracking,
-        weight: weight
-      }
-    });
+    if (editWeight) {
+      await saveCutLog(tx, { package_id: result.id, number: cut_number, tracking, weight });
+    }
 
     if (ready) {
       notificationData = { tracking, amount: result.billing_amount };
@@ -409,6 +400,49 @@ const markTrackingAsFound = async (tracking: string) => {
     return true;
   } catch (error) {
     console.error(`Error marking tracking as found: ${error}`);
+
+    return false;
+  }
+};
+
+const saveCutLog = async (
+  tx: Prisma.TransactionClient,
+  data: { package_id?: number; order_id?: number; number: string; tracking: string; weight: number }
+) => {
+  const { package_id, order_id, number, tracking, weight } = data;
+
+  try {
+    const entry = await tx.cusCutLog.findFirst({
+      where: {
+        number,
+        tracking,
+        package_id,
+        order_id
+      }
+    });
+
+    if (entry) {
+      await tx.cusCutLog.update({
+        where: { id: entry.id },
+        data: { weight }
+      });
+
+      return true;
+    }
+
+    await tx.cusCutLog.create({
+      data: {
+        package_id,
+        order_id,
+        number,
+        tracking,
+        weight
+      }
+    });
+
+    return true;
+  } catch (error) {
+    console.error(`Error saving cut log: ${error}`);
 
     return false;
   }

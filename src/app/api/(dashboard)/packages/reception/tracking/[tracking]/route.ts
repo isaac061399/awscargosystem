@@ -26,6 +26,7 @@ export const GET = withAuthApi(
         where: { tracking: trackingTrimmed, status: { notIn: [...PACKAGE_RECEIVED] } },
         select: {
           id: true,
+          billing_weight: true,
           client: { select: { ...clientSelectSchema, pound_fee: true } }
         }
       });
@@ -40,11 +41,12 @@ export const GET = withAuthApi(
           id: true,
           client: { select: { ...clientSelectSchema, pound_fee: true } },
           products: {
-            where: { tracking, status: { notIn: [...ORDER_RECEIVED] } },
-            select: {
-              id: true,
-              tracking: true
-            }
+            where: { tracking: trackingTrimmed, status: { notIn: [...ORDER_RECEIVED] } },
+            select: { id: true, tracking: true }
+          },
+          packages: {
+            where: { tracking: trackingTrimmed },
+            select: { id: true, billing_weight: true }
           }
         }
       });
@@ -56,12 +58,12 @@ export const GET = withAuthApi(
 
       // 3) Nothing receivable found -> check if already received before
       const alreadyReceivedPackage = await prismaRead.cusPackage.findFirst({
-        where: { tracking, status: { in: [...PACKAGE_RECEIVED] } },
+        where: { tracking: trackingTrimmed, status: { in: [...PACKAGE_RECEIVED] } },
         select: { id: true, status: true }
       });
 
       const alreadyReceivedInOrder = await prismaRead.cusOrder.findFirst({
-        where: { products: { some: { tracking, status: { in: [...ORDER_RECEIVED] } } } },
+        where: { products: { some: { tracking: trackingTrimmed, status: { in: [...ORDER_RECEIVED] } } } },
         select: { id: true }
       });
 

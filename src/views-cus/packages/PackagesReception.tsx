@@ -74,6 +74,7 @@ const PackageReception = () => {
   const [errorAlert, setErrorAlert] = useState<any>({ open: false, inputRef: null, message: '' });
   const [showClientFields, setShowClientFields] = useState<boolean>(false);
   const [showAllOtherFields, setShowAllOtherFields] = useState<boolean>(false);
+  const [blockWeightField, setBlockWeightField] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
   const [unownedPackageState, setUnownedPackageState] = useState({
     open: false,
@@ -84,7 +85,7 @@ const PackageReception = () => {
   const [selectorState, setSelectorState] = useState({
     open: false,
     items: { orders: [], packages: [] },
-    selected: { package_id: '', order_id: '', client: null }
+    selected: { package_id: '', order_id: '', client: null, weight: undefined as any }
   });
 
   const isTrackingFirstRender = useRef(true);
@@ -136,7 +137,7 @@ const PackageReception = () => {
           package_id: values.package_id,
           order_id: values.order_id,
           client_id: values.client.id,
-          weight: values.weight,
+          weight: !blockWeightField ? values.weight : undefined,
           shelf: values.shelf,
           row: values.row
         };
@@ -178,10 +179,16 @@ const PackageReception = () => {
   useEffect(() => {
     if (showAllOtherFields) {
       setTimeout(() => {
-        weightFieldRef.current?.focus();
-        lastFieldRef.current = weightFieldRef.current;
+        if (blockWeightField) {
+          shelfFieldRef.current?.focus();
+          lastFieldRef.current = shelfFieldRef.current;
+        } else {
+          weightFieldRef.current?.focus();
+          lastFieldRef.current = weightFieldRef.current;
+        }
       }, 0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAllOtherFields]);
 
   // tracking field change effect
@@ -219,14 +226,20 @@ const PackageReception = () => {
           ...selectorState,
           open: true,
           items: { packages, orders },
-          selected: { package_id: '', order_id: '', client: null }
+          selected: { package_id: '', order_id: '', client: null, weight: undefined }
         });
       } else {
         // set the found item
-        if (orders[0]) {
-          setTrackingItem('order', orders[0].id, orders[0].client);
-        } else if (packages[0]) {
-          setTrackingItem('package', packages[0].id, packages[0].client);
+        if (packages[0]) {
+          const weight =
+            packages[0].billing_weight && !isNaN(packages[0].billing_weight) ? packages[0].billing_weight : undefined;
+          setTrackingItem('package', packages[0].id, packages[0].client, weight);
+        } else if (orders[0]) {
+          const weight =
+            orders[0].packages && orders[0].packages[0] && !isNaN(orders[0].packages[0].billing_weight)
+              ? orders[0].packages[0].billing_weight
+              : undefined;
+          setTrackingItem('order', orders[0].id, orders[0].client, weight);
         }
       }
     };
@@ -280,7 +293,7 @@ const PackageReception = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.weight]);
 
-  const setTrackingItem = (type: 'package' | 'order', id: string, client: any) => {
+  const setTrackingItem = (type: 'package' | 'order', id: string, client: any, weight?: number) => {
     if (type === 'package') {
       formik.setFieldValue('package_id', id);
       formik.setFieldValue('order_id', '');
@@ -290,6 +303,14 @@ const PackageReception = () => {
     }
 
     formik.setFieldValue('client', client);
+
+    if (weight) {
+      formik.setFieldValue('weight', weight);
+      setBlockWeightField(true);
+    } else {
+      formik.setFieldValue('weight', '');
+      setBlockWeightField(false);
+    }
 
     // show the rest of the fields
     setShowClientFields(true);
@@ -329,7 +350,7 @@ const PackageReception = () => {
     setSelectorState({
       open: false,
       items: { orders: [], packages: [] },
-      selected: { package_id: '', order_id: '', client: null }
+      selected: { package_id: '', order_id: '', client: null, weight: undefined }
     });
 
     setTimeout(() => {
@@ -654,7 +675,7 @@ const PackageReception = () => {
                           error={Boolean(formik.touched.weight && formik.errors.weight)}
                           color={Boolean(formik.touched.weight && formik.errors.weight) ? 'error' : 'primary'}
                           helperText={formik.touched.weight && (formik.errors.weight as string)}
-                          disabled={formik.isSubmitting || isLoading}
+                          disabled={formik.isSubmitting || isLoading || blockWeightField}
                           onKeyDown={(e) => {
                             if (e.key !== 'Enter') return;
 
@@ -782,9 +803,10 @@ const PackageReception = () => {
                   <ListItemButton
                     key={p.id}
                     onClick={() => {
+                      const weight = p.billing_weight && !isNaN(p.billing_weight) ? p.billing_weight : undefined;
                       setSelectorState({
                         ...selectorState,
-                        selected: { package_id: p.id, order_id: '', client: p.client }
+                        selected: { package_id: p.id, order_id: '', client: p.client, weight }
                       });
                     }}
                     selected={selectorState.selected.package_id === p.id}
@@ -816,9 +838,13 @@ const PackageReception = () => {
                   <ListItemButton
                     key={o.id}
                     onClick={() => {
+                      const weight =
+                        o.packages && o.packages[0] && !isNaN(o.packages[0].billing_weight)
+                          ? o.packages[0].billing_weight
+                          : undefined;
                       setSelectorState({
                         ...selectorState,
-                        selected: { package_id: '', order_id: o.id, client: o.client }
+                        selected: { package_id: '', order_id: o.id, client: o.client, weight }
                       });
                     }}
                     selected={selectorState.selected.order_id === o.id}
@@ -847,9 +873,19 @@ const PackageReception = () => {
             color="primary"
             onClick={() => {
               if (selectorState.selected.package_id !== '') {
-                setTrackingItem('package', selectorState.selected.package_id, selectorState.selected.client);
+                setTrackingItem(
+                  'package',
+                  selectorState.selected.package_id,
+                  selectorState.selected.client,
+                  selectorState.selected.weight
+                );
               } else if (selectorState.selected.order_id !== '') {
-                setTrackingItem('order', selectorState.selected.order_id, selectorState.selected.client);
+                setTrackingItem(
+                  'order',
+                  selectorState.selected.order_id,
+                  selectorState.selected.client,
+                  selectorState.selected.weight
+                );
               }
 
               setSelectorState({ ...selectorState, open: false });
