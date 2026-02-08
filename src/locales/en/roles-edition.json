@@ -15,16 +15,19 @@
       "menus": "CMS - Menus",
       "pages": "CMS - Pages",
       "global-settings": "CMS - Global Settings",
+
       "billing": "Cash - Billing",
       "cash-control": "Cash - Cash Control",
       "cash-registers": "Cash - Cash Registers",
       "clients": "Logistics - Clients",
       "configuration": "Configuration - Configuration",
+      "manifests": "Special Operations - Manifests",
       "money-outflows": "Cash - Money Outflows",
       "offices": "Configuration - Offices",
       "orders": "Logistics - Orders",
       "packages": "Logistics - Packages",
       "products": "Configuration - Products",
+      "special-packages": "Special Operations - Special Packages",
       "unowned-packages": "Logistics - Unowned Packages"
     },
     "permissions": {
@@ -34,13 +37,16 @@
       "delete": "Delete",
       "send": "Send",
       "view": "View",
+
       "reception": "Reception",
       "track": "Track",
       "close": "Close",
       "open": "Open",
       "reopen": "Reopen",
       "pay": "Pay",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "pre-alert": "Pre-alert",
+      "receive": "Receive"
     }
   },
   "form": {

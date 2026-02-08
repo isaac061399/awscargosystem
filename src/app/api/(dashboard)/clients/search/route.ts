@@ -8,7 +8,7 @@ import { clientSelectSchema } from '@/controllers/Client.Controller';
 import { ClientStatus } from '@/prisma/generated/enums';
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 
-export const GET = withAuthApi(['clients.list'], async (req) => {
+export const GET = withAuthApi([], async (req) => {
   const { t } = await initTranslationsApi(req);
   const textT: any = t('api:clients', { returnObjects: true, default: {} });
 

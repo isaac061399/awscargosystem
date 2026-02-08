@@ -256,6 +256,71 @@
         ]
       },
       {
+        "sectionTitle": "Operaciones Especiales",
+        "permissions": ["special-packages.list", "special-packages.pre-alert", "special-packages.receive"],
+        "items": [
+          {
+            "label": "Paquetes Especiales",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-box-3-line",
+            "permissions": [
+              "special-packages.list",
+              "special-packages.pre-alert",
+              "special-packages.receive",
+              "manifests.list",
+              "manifests.create"
+            ],
+            "subItems": [
+              {
+                "label": "Listar",
+                "link": "/special-packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["special-packages.list"]
+              },
+              {
+                "label": "Pre Alertar (CR)",
+                "link": "/special-packages/pre-alert",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["special-packages.pre-alert"]
+              },
+              {
+                "label": "Recibir (Miami)",
+                "link": "/special-packages/receive",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["special-packages.receive"]
+              }
+            ]
+          },
+          {
+            "label": "Manifiestos",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-file-list-2-line",
+            "permissions": ["manifests.list", "manifests.create"],
+            "subItems": [
+              {
+                "label": "Listar",
+                "link": "/manifests",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["manifests.list"]
+              },
+              {
+                "label": "Nuevo",
+                "link": "/manifests/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["manifests.create"]
+              }
+            ]
+          }
+        ]
+      },
+      {
         "sectionTitle": "Caja",
         "permissions": ["billing.create", "money-outflows.list"],
         "items": [

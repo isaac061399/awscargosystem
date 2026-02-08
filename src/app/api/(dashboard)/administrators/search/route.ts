@@ -6,42 +6,36 @@ import { prismaRead } from '@libs/prisma';
 
 export const GET = withAuthApi([], async (req) => {
   const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:products', { returnObjects: true, default: {} });
+  const textT: any = t('api:administrators', { returnObjects: true, default: {} });
 
   const params = Object.fromEntries(req.nextUrl.searchParams.entries());
 
   try {
     // filters
-    const where: any = { enabled: true };
+    const where: any = { user: { enabled: true } };
     const search = params.search || '';
 
     if (search.trim() !== '') {
       where['OR'] = [
-        { code: { contains: search.trim(), mode: 'insensitive' } },
-        { name: { contains: search.trim(), mode: 'insensitive' } }
+        { full_name: { contains: search.trim(), mode: 'insensitive' } },
+        { email: { contains: search.trim(), mode: 'insensitive' } }
       ];
     }
 
     // query
-    const products = await prismaRead.cusProduct.findMany({
+    const administrators = await prismaRead.administrator.findMany({
       take: params.limit ? parseInt(params.limit) : 10,
       skip: 0,
       where,
       orderBy: [{ id: 'asc' }],
-      select: {
-        id: true,
-        code: true,
-        name: true,
-        currency: true,
-        price: true
-      }
+      select: { id: true, full_name: true, email: true }
     });
 
-    if (!products) {
+    if (!administrators) {
       return NextResponse.json({ valid: true, data: [] }, { status: 200 });
     }
 
-    return NextResponse.json({ valid: true, data: products }, { status: 200 });
+    return NextResponse.json({ valid: true, data: administrators }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
 

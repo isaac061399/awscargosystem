@@ -15,17 +15,20 @@
       "menus": "CMS - Menús",
       "pages": "CMS - Páginas",
       "global-settings": "CMS - Configuración Global",
+
       "billing": "Caja - Operaciones - Facturación",
       "cash-control": "Caja - Control - Control de Caja",
       "cash-registers": "Caja - Control - Registros de Caja",
       "clients": "Logística - Clientes",
       "configuration": "Configuración - Configuración",
       "invoices": "Caja - Control - Facturas Emitidas",
+      "manifests": "Operaciones Especiales - Manifiestos",
       "money-outflows": "Caja - Operaciones - Salidas de Dinero",
       "offices": "Configuración - Oficinas",
       "orders": "Logística - Pedidos",
       "packages": "Logística - Paquetes",
       "products": "Configuración - Productos",
+      "special-packages": "Operaciones Especiales - Paquetes Especiales",
       "unowned-packages": "Logística - Paquetes Sin Dueño"
     },
     "permissions": {
@@ -35,13 +38,17 @@
       "delete": "Eliminar",
       "send": "Enviar",
       "view": "Ver",
+
       "reception": "Recepción",
       "track": "Rastrear",
       "close": "Cerrar",
       "open": "Abrir",
       "reopen": "Reabrir",
       "pay": "Pagar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "admin": "Administrar",
+      "pre-alert": "Pre-Alerta",
+      "receive": "Recibir"
     }
   },
   "form": {

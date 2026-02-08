@@ -183,6 +183,26 @@ export const requestDeleteAdministrator = async (id: number, lang: string) => {
   }
 };
 
+export const requestSearchAdministrators = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/administrators/search',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // cache
 
 export const requestCleanCache = async (lang: string, route?: string) => {
@@ -1866,6 +1886,100 @@ export const requestDeleteUnownedPackage = async (id: number, lang: string) => {
       return e?.response?.data;
     }
 
+    return { valid: false };
+  }
+};
+
+// packages
+
+export const requestGetSpecialPackages = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/special-packages',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestDeleteSpecialPackage = async (id: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'delete',
+      url: `/api/special-packages/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestPreAlertSpecialPackage = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/special-packages/pre-alert`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestReceiveSpecialPackage = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/special-packages/receive`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestGetSpecialPackagesByTracking = async (tracking: string, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: `/api/special-packages/tracking/${tracking}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
     return { valid: false };
   }
 };

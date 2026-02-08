@@ -1,0 +1,34 @@
+{
+  "text": {
+    "title": "Pre-Alerta de Paquete Especial",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "loading": "Cargando...",
+    "noOptions": "No hay opciones disponibles",
+    "btnSave": "Guardar"
+  },
+  "form": {
+    "labels": {
+      "owner": "Receptor",
+      "tracking": "Tracking",
+      "mailbox": "Casillero",
+      "type": "Tipo",
+      "indications": "Indicaciones"
+    },
+    "placeholders": {
+      "owner": "Buscar por nombre o correo electrónico",
+      "tracking": "Ingrese un tracking",
+      "mailbox": "Ingrese el casillero",
+      "type": "Seleccione el tipo",
+      "indications": "Ingrese las indicaciones"
+    },
+    "errors": {
+      "owner": "El receptor es requerido",
+      "tracking": "El tracking es requerido",
+      "mailbox": "El casillero es requerido",
+      "type": "El tipo es requerido",
+      "indications": "Las indicaciones son requeridas"
+    },
+    "successMessage": "Pre alerta guardada con éxito",
+    "errorMessage": "Error al guardar la pre alerta, por favor inténtalo de nuevo"
+  }
+}

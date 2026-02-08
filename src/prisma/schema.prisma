@@ -47,16 +47,18 @@ model Administrator {
   updated_at  DateTime @updatedAt
   office_id   Int?
 
-  user               User                 @relation(fields: [email], references: [email], onDelete: Restrict)
-  role               Role                 @relation(fields: [role_id], references: [id], onDelete: Restrict)
-  office             CusOffice?           @relation(fields: [office_id], references: [id], onDelete: Restrict)
-  money_outflows     CusMoneyOutflow[]
-  money_outflow_logs CusMoneyOutflowLog[]
-  package_logs       CusPackageLog[]
-  order_logs         CusOrderLog[]
-  cash_registers     CusCashRegister[]
-  cancelled_invoices CusInvoice[]
-  invoice_logs       CusInvoiceLog[]
+  user                      User                        @relation(fields: [email], references: [email], onDelete: Restrict)
+  role                      Role                        @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  office                    CusOffice?                  @relation(fields: [office_id], references: [id], onDelete: Restrict)
+  money_outflows            CusMoneyOutflow[]
+  money_outflow_logs        CusMoneyOutflowLog[]
+  package_logs              CusPackageLog[]
+  order_logs                CusOrderLog[]
+  cash_registers            CusCashRegister[]
+  cancelled_invoices        CusInvoice[]
+  invoice_logs              CusInvoiceLog[]
+  special_packages          CusSpecialPackage[]
+  special_package_manifests CusSpecialPackageManifest[]
 
   @@map("auth_administrator")
 }
@@ -976,16 +978,20 @@ model CusProduct {
 }
 
 model CusSpecialPackage {
-  id                          Int                @id @default(autoincrement())
+  id                          Int                  @id @default(autoincrement())
+  owner_id                    Int
   special_package_manifest_id Int?
-  tracking                    String             @unique
+  tracking                    String               @unique
   mailbox                     String
   type                        SpecialPackageType
-  indications                 String             @db.Text
-  created_at                  DateTime           @default(now())
-  updated_at                  DateTime           @updatedAt
+  indications                 String               @db.Text
+  status                      SpecialPackageStatus @default(PRE_ALERTED)
+  status_date                 DateTime             @default(now())
+  created_at                  DateTime             @default(now())
+  updated_at                  DateTime             @updatedAt
 
-  special_package_manifest  CusSpecialPackageManifest?  @relation(fields: [special_package_manifest_id], references: [id], onDelete: Restrict)
+  owner                     Administrator               @relation(fields: [owner_id], references: [id], onDelete: Restrict)
+  special_package_manifest  CusSpecialPackageManifest?  @relation(fields: [special_package_manifest_id], references: [id], onDelete: SetNull)
   special_package_documents CusSpecialPackageDocument[]
 
   @@map("cus_special_package")
@@ -1009,12 +1015,14 @@ model CusSpecialPackageDocument {
 
 model CusSpecialPackageManifest {
   id               Int      @id @default(autoincrement())
+  owner_id         Int
   package_quantity Int
   description      String
   amount           Float
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
+  owner            Administrator       @relation(fields: [owner_id], references: [id], onDelete: Restrict)
   special_packages CusSpecialPackage[]
 
   @@map("cus_special_package_manifest")
@@ -1110,4 +1118,10 @@ enum PackageStatus {
 enum SpecialPackageType {
   MARITIME
   URGENT
+}
+
+enum SpecialPackageStatus {
+  PRE_ALERTED
+  RECEIVED
+  PROCESSED
 }

@@ -78,7 +78,7 @@
     "errors": {
       "client": "El cliente es requerido",
       "number": "El número de pedido es requerido",
-      "purchase_page": "Ingrese la página de compra",
+      "purchase_page": "La página de compra es requerida",
 
       "products": {
         "title": "",

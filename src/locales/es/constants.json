@@ -59,6 +59,15 @@
       "ON_THE_WAY": "En Camino",
       "READY": "Listo para Retirar",
       "DELIVERED": "Entregado"
+    },
+    "specialPackageType": {
+      "MARITIME": "Marítimo",
+      "URGENT": "Urgente"
+    },
+    "specialPackageStatus": {
+      "PRE_ALERTED": "Pre-alertado",
+      "RECEIVED": "Recibido",
+      "PROCESSED": "Procesado"
     }
   },
   "money": {

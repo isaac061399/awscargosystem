@@ -337,6 +337,16 @@
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
+  "special-packages": {
+    "errors": {
+      "exists": "El tracking ya está registrado",
+      "notFound": "Paquete especial no encontrado",
+      "receive": "Error al recibir el paquete especial, por favor inténtalo de nuevo",
+      "preAlert": "Error al pre-alertar el paquete especial, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el paquete especial, si ya tiene datos asociados, no podrá eliminarlo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
   "unowned-packages": {
     "errors": {
       "tracking": "El tracking ya está registrado",

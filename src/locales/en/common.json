@@ -256,6 +256,71 @@
         ]
       },
       {
+        "sectionTitle": "Special Operations",
+        "permissions": ["special-packages.list", "special-packages.pre-alert", "special-packages.receive"],
+        "items": [
+          {
+            "label": "Special Packages",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-box-3-line",
+            "permissions": [
+              "special-packages.list",
+              "special-packages.pre-alert",
+              "special-packages.receive",
+              "manifests.list",
+              "manifests.create"
+            ],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/special-packages",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["special-packages.list"]
+              },
+              {
+                "label": "Pre Alert (CR)",
+                "link": "/special-packages/pre-alert",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["special-packages.pre-alert"]
+              },
+              {
+                "label": "Receive (Miami)",
+                "link": "/special-packages/receive",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["special-packages.receive"]
+              }
+            ]
+          },
+          {
+            "label": "Manifests",
+            "link": "",
+            "externalLink": false,
+            "icon": "ri-file-list-2-line",
+            "permissions": ["manifests.list", "manifests.create"],
+            "subItems": [
+              {
+                "label": "List",
+                "link": "/manifests",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["manifests.list"]
+              },
+              {
+                "label": "New",
+                "link": "/manifests/new",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["manifests.create"]
+              }
+            ]
+          }
+        ]
+      },
+      {
         "sectionTitle": "Cash Register",
         "permissions": ["billing.create", "money-outflows.list"],
         "items": [
