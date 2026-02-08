@@ -233,6 +233,19 @@ const OrdersEdition = ({ order }: { order?: any }) => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                {order.payment_status === PaymentStatus.PENDING && (
+                  <Button
+                    LinkComponent={Link}
+                    href={`/billing?client=${order.client.id}`}
+                    size="small"
+                    type="button"
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<i className="ri-file-text-line" />}>
+                    {textT?.btnBilling}
+                  </Button>
+                )}
+
                 <Button
                   size="small"
                   type="submit"
@@ -252,31 +265,34 @@ const OrdersEdition = ({ order }: { order?: any }) => {
 
               <CardContent>
                 <Grid container spacing={3} alignItems="top">
-                  {/* Total */}
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Stack>
-                      <div className="flex items-center gap-1">
-                        <Typography variant="overline" color="text.secondary">
-                          {textT?.subtotalLabel}:
-                        </Typography>
-                        <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(orderTotal.usd.subtotal, `${currencies.USD.symbol} `)}
-                          {' | '}
-                          {formatMoney(orderTotal.crc.subtotal, `${currencies.CRC.symbol} `)}
-                        </Typography>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Typography variant="overline" color="text.secondary">
-                          {textT?.totalLabel}:
-                        </Typography>
-                        <Typography variant="h5" fontWeight={600}>
-                          {formatMoney(orderTotal.usd.total, `${currencies.USD.symbol} `)}
-                          {' | '}
-                          {formatMoney(orderTotal.crc.total, `${currencies.CRC.symbol} `)}
-                        </Typography>
-                      </div>
+                  {/* Subtotal */}
+                  <Grid size={{ xs: 12, md: 2 }}>
+                    <Stack spacing={1}>
+                      <Typography variant="overline" color="text.secondary">
+                        {textT?.subtotalLabel}:
+                      </Typography>
+                      <Typography variant="h5" fontWeight={600}>
+                        {formatMoney(orderTotal.usd.subtotal, `${currencies.USD.symbol} `)}
+                        {' | '}
+                        {formatMoney(orderTotal.crc.subtotal, `${currencies.CRC.symbol} `)}
+                      </Typography>
                     </Stack>
                   </Grid>
+
+                  {/* Total */}
+                  <Grid size={{ xs: 12, md: 2 }}>
+                    <Stack spacing={1}>
+                      <Typography variant="overline" color="text.secondary">
+                        {textT?.totalLabel}:
+                      </Typography>
+                      <Typography variant="h5" fontWeight={600}>
+                        {formatMoney(orderTotal.usd.total, `${currencies.USD.symbol} `)}
+                        {' | '}
+                        {formatMoney(orderTotal.crc.total, `${currencies.CRC.symbol} `)}
+                      </Typography>
+                    </Stack>
+                  </Grid>
+
                   {isEditing && (
                     <>
                       {/* Order status */}

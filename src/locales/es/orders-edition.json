@@ -10,6 +10,7 @@
     "statusLabel": "Estado",
     "paymentStatusLabel": "Estado de Pago",
     "btnSave": "Guardar",
+    "btnBilling": "Facturar",
     "btnCancel": "Cancelar",
     "btnContinue": "Continuar",
     "btnOnTheWay": "Marcar como En Camino",

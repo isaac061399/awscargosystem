@@ -64,7 +64,7 @@ function lineTotal(quantity: number, unit_price: number) {
   return (quantity || 0) * (unit_price || 0);
 }
 
-const Billing = ({ cashRegister }: { cashRegister?: any }) => {
+const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any }) => {
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
   const buyingExchangeRate = configuration?.buying_exchange_rate ?? 0;
@@ -347,13 +347,18 @@ const Billing = ({ cashRegister }: { cashRegister?: any }) => {
     }
   });
 
-  // focus client field on mount
+  // load client if provided or focus client field on mount
   useEffect(() => {
     const timer = setTimeout(() => {
-      clientFieldRef.current?.focus();
+      if (client) {
+        formik.setFieldValue('client', client);
+      } else {
+        clientFieldRef.current?.focus();
+      }
     }, 0);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // focus custom line code field when custom line dialog opens
