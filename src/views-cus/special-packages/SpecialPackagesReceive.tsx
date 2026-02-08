@@ -14,10 +14,12 @@ import * as yup from 'yup';
 // MUI Imports
 import {
   Alert,
+  Box,
   Button,
   Card,
   CardContent,
   CardHeader,
+  Chip,
   Divider,
   Grid,
   IconButton,
@@ -29,29 +31,30 @@ import {
 // Component Imports
 import DashboardLayout from '@components/layout/DashboardLayout';
 import AdministratorField from '@/components/custom/AdministratorField';
-import Select from '@/components/Select';
 
 // Helpers Imports
-import { requestGetSpecialPackagesByTracking, requestPreAlertSpecialPackage } from '@helpers/request';
+import { requestGetSpecialPackagesByTracking, requestReceiveSpecialPackage } from '@helpers/request';
 
 // Auth Imports
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
+import { SpecialPackageType } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
-const SpecialPackagesPreAlert = () => {
+const SpecialPackagesReceive = () => {
   const { data: admin } = useAdmin();
   const isAdmin = hasAllPermissions('special-packages.admin', admin.permissions);
 
   const { t, i18n } = useTranslation();
-  const textT: any = useMemo(() => t('special-packages-pre-alert:text', { returnObjects: true, default: {} }), [t]);
-  const formT: any = useMemo(() => t('special-packages-pre-alert:form', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('special-packages-receive:text', { returnObjects: true, default: {} }), [t]);
+  const formT: any = useMemo(() => t('special-packages-receive:form', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showFields, setShowFields] = useState(false);
+  const [preAlertedPackage, setPreAlertedPackage] = useState<any>(null);
 
   const trackingFieldRef = useRef<HTMLInputElement>(null);
 
@@ -64,18 +67,14 @@ const SpecialPackagesPreAlert = () => {
         id: null as any,
         owner: null as any,
         tracking: '',
-        mailbox: '',
-        type: '',
-        indications: ''
+        mailbox: ''
       }),
       []
     ),
     validationSchema: yup.object({
       owner: isAdmin ? yup.object().required(formT?.errors?.owner) : yup.object().nullable().notRequired(),
       tracking: yup.string().required(formT?.errors?.tracking),
-      mailbox: yup.string(),
-      type: yup.string().required(formT?.errors?.type),
-      indications: yup.string()
+      mailbox: yup.string().required(formT?.errors?.mailbox)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
@@ -84,7 +83,7 @@ const SpecialPackagesPreAlert = () => {
         const newValues = { ...values, owner_id: values.owner?.id || null };
         delete newValues.owner;
 
-        const result = await requestPreAlertSpecialPackage(newValues, i18n.language);
+        const result = await requestReceiveSpecialPackage(newValues, i18n.language);
         if (!result.valid) {
           return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
         }
@@ -114,11 +113,11 @@ const SpecialPackagesPreAlert = () => {
       if (!valid) {
         clearFields();
       } else {
+        setPreAlertedPackage(data);
+
         formik.setFieldValue('id', data?.id || null);
         formik.setFieldValue('owner', data?.owner || null);
         formik.setFieldValue('mailbox', data?.mailbox || '');
-        formik.setFieldValue('type', data?.type || '');
-        formik.setFieldValue('indications', data?.indications || '');
       }
 
       setShowFields(true);
@@ -137,15 +136,14 @@ const SpecialPackagesPreAlert = () => {
       id: null,
       owner: null,
       tracking: clearTracking ? '' : formik.values.tracking,
-      mailbox: '',
-      type: '',
-      indications: ''
+      mailbox: ''
     });
   };
 
   const resetProcess = () => {
     clearFields(true);
     setShowFields(false);
+    setPreAlertedPackage(null);
 
     setTimeout(() => {
       trackingFieldRef.current?.focus();
@@ -233,9 +231,8 @@ const SpecialPackagesPreAlert = () => {
 
                   {showFields && isAdmin && (
                     <>
-                      <Grid size={{ xs: 12, md: 8 }}>
+                      <Grid size={{ xs: 12, md: 6 }}>
                         <AdministratorField
-                          required
                           initialOptions={[]}
                           isOptionEqualToValue={(option, v) => option.id === v.id}
                           loadingText={textT?.loading}
@@ -254,35 +251,16 @@ const SpecialPackagesPreAlert = () => {
                           disabled={formik.isSubmitting}
                         />
                       </Grid>
-                      <Grid size={{ xs: 12, md: 4 }} sx={{ display: { xs: 'none', md: 'block' } }} />
+                      <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'block' } }} />
                     </>
                   )}
 
                   {showFields && (
                     <>
                       <Grid size={{ xs: 12, md: 4 }}>
-                        <Select
-                          options={Object.keys(labelsT?.specialPackageType).map((value) => ({
-                            value,
-                            label: labelsT?.specialPackageType[value]
-                          }))}
-                          fullWidth
-                          required
-                          id="type"
-                          name="type"
-                          label={formT?.labels?.type}
-                          placeholder={formT?.placeholders?.type}
-                          value={formik.values.type}
-                          onChange={formik.handleChange}
-                          error={Boolean(formik.touched.type && formik.errors.type)}
-                          color={Boolean(formik.touched.type && formik.errors.type) ? 'error' : 'primary'}
-                          helperText={formik.touched.type && (formik.errors.type as string)}
-                          disabled={formik.isSubmitting}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 4 }}>
                         <TextField
                           fullWidth
+                          required
                           type="text"
                           id="mailbox"
                           name="mailbox"
@@ -296,28 +274,42 @@ const SpecialPackagesPreAlert = () => {
                           disabled={formik.isSubmitting}
                         />
                       </Grid>
-                      <Grid size={{ xs: 12, md: 4 }} sx={{ display: { xs: 'none', md: 'block' } }} />
-
-                      <Grid size={{ xs: 12, md: 8 }}>
-                        <TextField
-                          fullWidth
-                          multiline
-                          minRows={2}
-                          type="text"
-                          id="indications"
-                          name="indications"
-                          label={formT?.labels?.indications}
-                          placeholder={formT?.placeholders?.indications}
-                          value={formik.values.indications}
-                          onChange={formik.handleChange}
-                          error={Boolean(formik.touched.indications && formik.errors.indications)}
-                          color={Boolean(formik.touched.indications && formik.errors.indications) ? 'error' : 'primary'}
-                          helperText={formik.touched.indications && formik.errors.indications}
-                          disabled={formik.isSubmitting}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 4 }} sx={{ display: { xs: 'none', md: 'block' } }} />
+                      <Grid size={{ xs: 12, md: 8 }} sx={{ display: { xs: 'none', md: 'block' } }} />
                     </>
+                  )}
+
+                  {preAlertedPackage && (
+                    <Grid size={{ xs: 12 }}>
+                      <Card
+                        className={`border-l-4 ${preAlertedPackage.type === SpecialPackageType.URGENT ? 'border-red-500 bg-red-50' : 'border-blue-500 bg-blue-50'}`}
+                        elevation={0}>
+                        <Box className="p-4 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <i
+                              className={`ri-alert-line ${preAlertedPackage.type === SpecialPackageType.URGENT ? 'text-red-600' : 'text-blue-600'}`}
+                            />
+                            <Typography variant="subtitle1" className="font-semibold">
+                              {textT?.preAlertedTitle}
+                            </Typography>
+                            <Chip
+                              size="small"
+                              color={preAlertedPackage.type === SpecialPackageType.URGENT ? 'error' : 'primary'}
+                              label={labelsT?.specialPackageType?.[preAlertedPackage.type] || preAlertedPackage.type}
+                            />
+                          </div>
+
+                          {preAlertedPackage.indications ? (
+                            <Typography variant="body2" className="text-slate-700">
+                              {preAlertedPackage.indications}
+                            </Typography>
+                          ) : (
+                            <Typography variant="body2" className="italic text-slate-500">
+                              {textT?.preAlertedNoIndications}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Card>
+                    </Grid>
                   )}
                 </Grid>
               </CardContent>
@@ -329,4 +321,4 @@ const SpecialPackagesPreAlert = () => {
   );
 };
 
-export default SpecialPackagesPreAlert;
+export default SpecialPackagesReceive;

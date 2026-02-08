@@ -716,6 +716,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                     <ClientField
                       isBilling
                       inputRef={clientFieldRef}
+                      required
                       initialOptions={[]}
                       isOptionEqualToValue={(option, v) => option.id === v.id}
                       loadingText={textT?.loading}

@@ -5,6 +5,7 @@ import { requestSearchAdministrators } from '@/helpers/request';
 
 type AdministratorFieldProps = {
   inputRef?: React.Ref<any>;
+  required?: boolean;
   initialOptions: any[];
   isOptionEqualToValue: (option: any, value: any) => boolean;
   loadingText: string;
@@ -23,6 +24,7 @@ type AdministratorFieldProps = {
 
 const AdministratorField = ({
   inputRef,
+  required,
   initialOptions,
   isOptionEqualToValue,
   loadingText,
@@ -87,6 +89,7 @@ const AdministratorField = ({
         <TextField
           {...params}
           inputRef={inputRef}
+          required={required}
           id={id}
           name={name}
           label={label}

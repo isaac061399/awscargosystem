@@ -4,7 +4,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 // Next Imports
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 // MUI Imports
@@ -38,36 +37,29 @@ import FilterSearch from '@components/data-tables/FilterSearch';
 import FilterSelect from '@/components/data-tables/FilterSelect';
 
 // Helpers Imports
-import { requestDeleteOrder, requestGetOrders } from '@helpers/request';
+import { requestDeleteSpecialPackage, requestGetSpecialPackages } from '@helpers/request';
 
 // Auth Imports
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
-import { generateUrl, padStartZeros } from '@/libs/utils';
+import { generateUrl } from '@/libs/utils';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const statusColors: any = {
-  PENDING: 'warning',
-  ON_THE_WAY: 'primary',
-  READY: 'info',
-  DELIVERED: 'success'
+  PRE_ALERTED: 'warning',
+  RECEIVED: 'info',
+  PROCESSED: 'primary'
 };
 
-const paymentStatusColors: any = {
-  PENDING: 'warning',
-  PAID: 'success'
-};
-
-const Orders = () => {
+const SpecialPackages = () => {
   const { data: admin } = useAdmin();
-  const canCreate = hasAllPermissions('orders.create', admin.permissions);
-  const canEdit = hasAllPermissions('orders.edit', admin.permissions);
-  const canDelete = hasAllPermissions('orders.delete', admin.permissions);
+  const isAdmin = hasAllPermissions('special-packages.admin', admin.permissions);
+  const canDelete = hasAllPermissions('special-packages.delete', admin.permissions);
 
   const { t, i18n } = useTranslation();
-  const textT: any = useMemo(() => t('orders:text', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('special-packages:text', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
   const dgLocale = i18n.language === 'en' ? enUS : esES;
 
@@ -76,20 +68,20 @@ const Orders = () => {
   const [paginationState, setPaginationState] = useState({ page: 0, pageSize: 10 });
   const [searchState, setSearchState] = useState('');
   const [statusState, setStatusState] = useState('');
-  const [paymentStatusState, setPaymentStatusState] = useState('');
 
   const [deleteState, setDeleteState] = useState({
     open: false,
     loading: false,
-    id: null
+    id: null,
+    tracking: ''
   });
 
   useEffect(() => {
-    handleFetchOrders();
+    handleFetchSpecialPackages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationState, statusState, paymentStatusState]);
+  }, [paginationState, statusState]);
 
-  const handleFetchOrders = async () => {
+  const handleFetchSpecialPackages = async () => {
     // start loading
     setRowsState((prevState) => ({ ...prevState, isLoading: true }));
 
@@ -98,11 +90,10 @@ const Orders = () => {
       limit: paginationState.pageSize,
       offset: paginationState.pageSize * paginationState.page,
       s: searchState,
-      status: statusState,
-      payment_status: paymentStatusState
+      status: statusState
     };
 
-    const result = await requestGetOrders(params, i18n.language);
+    const result = await requestGetSpecialPackages(params, i18n.language);
 
     if (result.valid) {
       setRowsState((prevState) => ({
@@ -129,8 +120,8 @@ const Orders = () => {
     setAlertState({ ...defaultAlertState });
   };
 
-  const handleDeleteOpen = (id: number) => {
-    setDeleteState((prevState: any) => ({ ...prevState, open: true, id }));
+  const handleDeleteOpen = (id: number, tracking: string) => {
+    setDeleteState((prevState: any) => ({ ...prevState, open: true, id, tracking }));
   };
 
   const handleDeleteClose = () => {
@@ -141,22 +132,21 @@ const Orders = () => {
     setAlertState({ ...defaultAlertState });
     setDeleteState((prevState: any) => ({ ...prevState, loading: true }));
 
-    const result = await requestDeleteOrder(deleteState.id || 0, i18n.language);
+    const result = await requestDeleteSpecialPackage(deleteState.id || 0, i18n.language);
 
     handleDeleteClose();
 
     if (!result.valid) {
       setAlertState({ open: true, type: 'error', message: result.message });
     } else {
-      handleFetchOrders();
+      handleFetchSpecialPackages();
     }
   };
 
   const handleExport = async () => {
-    const exportUrl = generateUrl('/api/orders/export', {
+    const exportUrl = generateUrl('/api/special-packages/export', {
       s: searchState,
-      status: statusState,
-      payment_status: paymentStatusState
+      status: statusState
     });
 
     window.open(exportUrl, '_blank');
@@ -165,65 +155,51 @@ const Orders = () => {
   // data
   const columns: GridColDef[] = [
     {
-      field: 'id',
-      headerName: textT?.table?.id?.title,
-      flex: 1,
-      minWidth: 100,
-      renderCell: (params) => (
-        <div className="h-full inline-flex flex-col justify-center py-2">
-          {canEdit ? (
-            <Link
-              href={`/orders/edit/${params.row.id}`}
-              className="font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition">
-              {`# ${padStartZeros(params.row.id, 4)}`}
-            </Link>
-          ) : (
-            `# ${padStartZeros(params.row.id, 4)}`
-          )}
-        </div>
-      )
-    },
-    {
-      field: 'number',
-      headerName: textT?.table?.number?.title,
+      field: 'tracking',
+      headerName: textT?.table?.tracking?.title,
       flex: 1,
       minWidth: 200,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          <span>{params.row.number}</span>
-          <span>
-            <strong>{textT?.table?.number?.products}</strong>: {params.row._count?.products || 0}
-          </span>
+          <span>{params.row.tracking}</span>
         </div>
       )
     },
     {
-      field: 'client.office',
-      headerName: textT?.table?.office?.title,
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params: any) => (
-        <div className="h-full inline-flex flex-col justify-center py-2">{params.row.client?.office?.name}</div>
-      )
-    },
-    {
-      field: 'client',
-      headerName: textT?.table?.client?.title,
+      field: 'owner',
+      headerName: textT?.table?.owner?.title,
       flex: 1,
       minWidth: 250,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           <span>
-            <strong>
-              {`${params.row.client?.office?.mailbox_prefix}${params.row.client?.id}`} | {params.row.client?.full_name}
-            </strong>
+            <strong>{params.row.owner?.full_name}</strong>
           </span>
           <span>
-            <strong>{textT?.table?.client?.identification}</strong>: {params.row.client?.identification}
+            <strong>{textT?.table?.owner?.email}</strong>: {params.row.owner?.email}
           </span>
-          <span>
-            <strong>{textT?.table?.client?.email}</strong>: {params.row.client?.email}
-          </span>
+        </div>
+      )
+    },
+    {
+      field: 'mailbox',
+      headerName: textT?.table?.mailbox?.title,
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params: any) => (
+        <div className="h-full inline-flex flex-col justify-center py-2">
+          <span>{params.row.mailbox || '--'}</span>
+        </div>
+      )
+    },
+    {
+      field: 'type',
+      headerName: textT?.table?.type?.title,
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params: any) => (
+        <div className="h-full inline-flex flex-col justify-center py-2">
+          <span>{labelsT?.specialPackageType?.[params.row.type] || 'Unknown'}</span>
         </div>
       )
     },
@@ -233,7 +209,7 @@ const Orders = () => {
       flex: 1,
       minWidth: 150,
       renderCell: (params: any) => {
-        const label = labelsT?.orderStatus?.[params.row.status] || 'Unknown';
+        const label = labelsT?.specialPackageStatus?.[params.row.status] || 'Unknown';
         const status: keyof typeof statusColors = params.row.status as keyof typeof statusColors;
         const color = (statusColors[status] as any) || 'info';
 
@@ -245,30 +221,13 @@ const Orders = () => {
       }
     },
     {
-      field: 'payment_status',
-      headerName: textT?.table?.payment_status?.title,
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params: any) => {
-        const label = labelsT?.paymentStatus?.[params.row.payment_status] || 'Unknown';
-        const status: keyof typeof paymentStatusColors = params.row.payment_status as keyof typeof paymentStatusColors;
-        const color = (paymentStatusColors[status] as any) || 'info';
-
-        return (
-          <div className="h-full inline-flex flex-col justify-center py-2">
-            <Chip label={label} color={color} size="small" variant="outlined" />
-          </div>
-        );
-      }
-    },
-    {
-      field: 'created_at',
-      headerName: textT?.table?.created_at?.title,
+      field: 'status_date',
+      headerName: textT?.table?.status_date?.title,
       flex: 1,
       minWidth: 200,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          {moment(params.row.created_at).format(textT?.table?.created_at?.dateFormat)}
+          {moment(params.row.status_date).format(textT?.table?.status_date?.dateFormat)}
         </div>
       )
     },
@@ -287,7 +246,7 @@ const Orders = () => {
                   color="primary"
                   size="small"
                   onClick={() => {
-                    handleDeleteOpen(params.row.id);
+                    handleDeleteOpen(params.row.id, params.row.tracking);
                   }}>
                   <i className="ri-delete-bin-2-fill" />
                 </IconButton>
@@ -299,23 +258,22 @@ const Orders = () => {
     }
   ];
 
-  const paymentStatusOptions = useMemo(
+  const statusOptions = useMemo(
     () =>
-      Object.keys(labelsT?.paymentStatus || {}).map((key) => ({
+      Object.keys(labelsT?.specialPackageStatus || {}).map((key) => ({
         value: key,
-        label: labelsT?.paymentStatus?.[key] || key
+        label: labelsT?.specialPackageStatus?.[key] || key
       })),
     [labelsT]
   );
 
-  const statusOptions = useMemo(
-    () =>
-      Object.keys(labelsT?.orderStatus || {}).map((key) => ({
-        value: key,
-        label: labelsT?.orderStatus?.[key] || key
-      })),
-    [labelsT]
-  );
+  // if user is not admin, remove owner column
+  if (!isAdmin) {
+    const ownerIndex = columns.findIndex((col) => col.field === 'owner');
+    if (ownerIndex >= 0) {
+      columns.splice(ownerIndex, 1);
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -323,19 +281,7 @@ const Orders = () => {
         <Grid size={{ xs: 12 }}>
           <div className="flex justify-between mb-3">
             <Typography variant="h3">{textT?.title}</Typography>
-            <div className="flex items-center gap-2">
-              {canCreate && (
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  LinkComponent={Link}
-                  href="/orders/new"
-                  startIcon={<i className="ri-add-large-line" />}>
-                  {textT?.btnCreate}
-                </Button>
-              )}
-            </div>
+            <div className="flex items-center gap-2"></div>
           </div>
           <Divider />
         </Grid>
@@ -345,19 +291,13 @@ const Orders = () => {
               <FilterSearch
                 value={searchState}
                 onChange={(e) => setSearchState(e.target.value)}
-                onSearch={handleFetchOrders}
+                onSearch={handleFetchSpecialPackages}
               />
               <FilterSelect
                 allLabel={textT?.filterStatus}
                 options={statusOptions}
                 value={statusState}
                 onChange={(e) => setStatusState(e.target.value)}
-              />
-              <FilterSelect
-                allLabel={textT?.filterPaymentStatus}
-                options={paymentStatusOptions}
-                value={paymentStatusState}
-                onChange={(e) => setPaymentStatusState(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2 mb-2">
@@ -403,7 +343,7 @@ const Orders = () => {
         <DialogTitle id="alert-dialog-title">{textT?.dialogDeleteTitle}</DialogTitle>
         <DialogContent dividers>
           <DialogContentText id="alert-dialog-description">
-            {textT?.dialogDeleteMessage?.replace('{{ id }}', `# ${padStartZeros(deleteState.id || 0, 4)}`)}
+            {textT?.dialogDeleteMessage?.replace('{{ tracking }}', deleteState.tracking)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -429,4 +369,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default SpecialPackages;

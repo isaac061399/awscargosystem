@@ -1,0 +1,37 @@
+{
+  "text": {
+    "title": "Paquetes Especiales",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "btnExport": "Exportar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el paquete especial \"{{ tracking }}\"? Esta acción no se puede deshacer.",
+    "filterStatus": "Filtrar por Estado",
+    "table": {
+      "tracking": {
+        "title": "Tracking"
+      },
+      "owner": {
+        "title": "Receptor",
+        "email": "Correo"
+      },
+      "mailbox": {
+        "title": "Casillero"
+      },
+      "type": {
+        "title": "Tipo"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "status_date": {
+        "title": "Última Actualización",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Acciones",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

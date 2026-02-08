@@ -6,7 +6,7 @@ import { TransactionError, withTransaction } from '@libs/prisma';
 import { SpecialPackageStatus, SpecialPackageType } from '@/prisma/generated/enums';
 import { hasAllPermissions } from '@/helpers/permissions';
 
-export const POST = withAuthApi(['special-packages.pre-alert'], async (req) => {
+export const POST = withAuthApi(['special-packages.receive'], async (req) => {
   const { t } = await initTranslationsApi(req);
   const textT: any = t('api:special-packages', { returnObjects: true, default: {} });
 
@@ -58,8 +58,8 @@ export const POST = withAuthApi(['special-packages.pre-alert'], async (req) => {
       const saveData = {
         owner_id: ownerLoadedId,
         mailbox: data.mailbox || '',
-        type: data.type || SpecialPackageType.MARITIME,
-        indications: data.indications || ''
+        status: SpecialPackageStatus.RECEIVED,
+        status_date: new Date()
       };
 
       let specialPackage;
@@ -73,14 +73,14 @@ export const POST = withAuthApi(['special-packages.pre-alert'], async (req) => {
           data: {
             ...saveData,
             tracking: trimmedTracking,
-            status: SpecialPackageStatus.PRE_ALERTED,
-            status_date: new Date()
+            type: SpecialPackageType.MARITIME,
+            indications: ''
           }
         });
       }
 
       if (!specialPackage) {
-        throw new TransactionError(400, textT?.errors?.preAlert);
+        throw new TransactionError(400, textT?.errors?.receive);
       }
 
       return specialPackage;

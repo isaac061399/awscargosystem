@@ -328,6 +328,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                 <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 8 }}>
                     <ClientField
+                      required
                       initialOptions={order ? [order.client] : []}
                       isOptionEqualToValue={(option, v) => option.id === v.id}
                       loadingText={textT?.loading}

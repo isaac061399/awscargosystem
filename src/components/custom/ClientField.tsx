@@ -6,6 +6,7 @@ import { requestSearchClients } from '@/helpers/request';
 type ClientFieldProps = {
   isBilling?: boolean;
   inputRef?: React.Ref<any>;
+  required?: boolean;
   initialOptions: any[];
   isOptionEqualToValue: (option: any, value: any) => boolean;
   loadingText: string;
@@ -25,6 +26,7 @@ type ClientFieldProps = {
 const ClientField = ({
   isBilling,
   inputRef,
+  required,
   initialOptions,
   isOptionEqualToValue,
   loadingText,
@@ -89,6 +91,7 @@ const ClientField = ({
         <TextField
           {...params}
           inputRef={inputRef}
+          required={required}
           id={id}
           name={name}
           label={label}

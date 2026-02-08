@@ -108,9 +108,9 @@ const PackagesTracking = ({ trackingLoaded }: { trackingLoaded?: string }) => {
                       placeholder={textT?.tracking?.placeholder}
                       value={tracking}
                       onChange={(e) => setTracking(e.target.value)}
-                      disabled={isLoading}
                       slotProps={{
                         input: {
+                          readOnly: isLoading,
                           startAdornment: (
                             <InputAdornment position="start">
                               <i className="ri-search-line"></i>

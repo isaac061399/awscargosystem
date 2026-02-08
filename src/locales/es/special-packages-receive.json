@@ -1,0 +1,36 @@
+{
+  "text": {
+    "title": "Recepción de Paquete Especial",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "loading": "Cargando...",
+    "noOptions": "No hay opciones disponibles",
+    "btnSave": "Guardar",
+    "preAlertedTitle": "Paquete Pre-Alertado",
+    "preAlertedNoIndications": "No hay indicaciones para este paquete pre-alertado"
+  },
+  "form": {
+    "labels": {
+      "owner": "Receptor",
+      "tracking": "Tracking",
+      "mailbox": "Casillero",
+      "type": "Tipo",
+      "indications": "Indicaciones"
+    },
+    "placeholders": {
+      "owner": "Buscar por nombre o correo electrónico",
+      "tracking": "Ingrese un tracking",
+      "mailbox": "Ingrese el casillero",
+      "type": "Seleccione el tipo",
+      "indications": "Ingrese las indicaciones"
+    },
+    "errors": {
+      "owner": "El receptor es requerido",
+      "tracking": "El tracking es requerido",
+      "mailbox": "El casillero es requerido",
+      "type": "El tipo es requerido",
+      "indications": "Las indicaciones son requeridas"
+    },
+    "successMessage": "Datos guardados con éxito",
+    "errorMessage": "Error al guardar los datos, por favor inténtalo de nuevo"
+  }
+}
