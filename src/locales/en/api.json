@@ -348,6 +348,16 @@
       "general": "An error occurred, please try again"
     }
   },
+  "special-package-manifests": {
+    "errors": {
+      "pay": "Error paying the manifest, please try again",
+      "alreadyPaid": "The manifest has already been paid",
+      "notItems": "Manifests cannot be created without packages",
+      "save": "Error saving the manifest, please try again",
+      "delete": "Error deleting the manifest, if it already has associated data, you will not be able to delete it",
+      "general": "An error occurred, please try again"
+    }
+  },
   "unowned-packages": {
     "errors": {
       "tracking": "The tracking is already registered",

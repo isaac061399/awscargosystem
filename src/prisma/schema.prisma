@@ -1014,13 +1014,17 @@ model CusSpecialPackageDocument {
 }
 
 model CusSpecialPackageManifest {
-  id               Int      @id @default(autoincrement())
-  owner_id         Int
-  package_quantity Int
-  description      String
-  amount           Float
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id                  Int           @id @default(autoincrement())
+  owner_id            Int
+  package_quantity    Int
+  package_amount      Float
+  manifest_amount     Float
+  amount              Float
+  description         String
+  payment_status      PaymentStatus @default(PENDING)
+  payment_status_date DateTime      @default(now())
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
 
   owner            Administrator       @relation(fields: [owner_id], references: [id], onDelete: Restrict)
   special_packages CusSpecialPackage[]

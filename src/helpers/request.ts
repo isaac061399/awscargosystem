@@ -2020,3 +2020,97 @@ export const requestUploadSpecialPackageDocument = async (url: string, file: Fil
     return false;
   }
 };
+
+// special package manifests
+
+export const requestGetSpecialPackageManifests = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/special-package-manifests',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestNewSpecialPackageManifest = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/special-package-manifests`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestDeleteSpecialPackageManifest = async (id: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'delete',
+      url: `/api/special-package-manifests/${id}`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestGetSpecialPackageManifestItems = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/special-package-manifests/items',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
+export const requestPaySpecialPackageManifest = async (id: number, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `/api/special-package-manifests/${id}/pay`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang }
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};

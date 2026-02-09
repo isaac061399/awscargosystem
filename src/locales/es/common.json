@@ -268,8 +268,8 @@
               "special-packages.list",
               "special-packages.pre-alert",
               "special-packages.receive",
-              "manifests.list",
-              "manifests.create"
+              "special-package-manifests.list",
+              "special-package-manifests.create"
             ],
             "subItems": [
               {
@@ -300,21 +300,21 @@
             "link": "",
             "externalLink": false,
             "icon": "ri-file-list-2-line",
-            "permissions": ["manifests.list", "manifests.create"],
+            "permissions": ["special-package-manifests.list", "special-package-manifests.create"],
             "subItems": [
               {
                 "label": "Listar",
-                "link": "/manifests",
+                "link": "/special-package-manifests",
                 "externalLink": false,
                 "icon": "",
-                "permissions": ["manifests.list"]
+                "permissions": ["special-package-manifests.list"]
               },
               {
                 "label": "Nuevo",
-                "link": "/manifests/new",
+                "link": "/special-package-manifests/new",
                 "externalLink": false,
                 "icon": "",
-                "permissions": ["manifests.create"]
+                "permissions": ["special-package-manifests.create"]
               }
             ]
           }

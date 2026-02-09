@@ -69,6 +69,9 @@ const i18nConfig = {
     '/[locale]/(dashboard)/special-packages': ['special-packages'],
     '/[locale]/(dashboard)/special-packages/pre-alert': ['special-packages-pre-alert'],
     '/[locale]/(dashboard)/special-packages/receive': ['special-packages-receive'],
+    '/[locale]/(dashboard)/special-package-manifests': ['special-package-manifests'],
+    '/[locale]/(dashboard)/special-package-manifests/new': ['special-package-manifests-new'],
+    '/[locale]/(dashboard)/special-package-manifests/view/[id]': ['special-package-manifests-view'],
     '/[locale]/(dashboard)/unowned-packages': ['unowned-packages']
   }
 };

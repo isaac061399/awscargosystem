@@ -1,0 +1,36 @@
+{
+  "text": {
+    "title": "Manifiestos de Paquetes Especiales",
+    "btnContinue": "Continuar",
+    "btnCancel": "Cancelar",
+    "btnExport": "Exportar",
+    "dialogDeleteTitle": "Confirmar Eliminación",
+    "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el manifiesto  \"{{ id }}\"? Esta acción no se puede deshacer.",
+    "filterPaymentStatus": "Filtrar por Estado de Pago",
+    "table": {
+      "id": {
+        "title": "ID"
+      },
+      "owner": {
+        "title": "Receptor",
+        "email": "Correo"
+      },
+      "amount": {
+        "title": "Info",
+        "package_quantity": "Cantidad de Paquetes",
+        "amount": "Monto Total"
+      },
+      "payment_status": {
+        "title": "Estado de Pago"
+      },
+      "payment_status_date": {
+        "title": "Última Actualización",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      },
+      "actions": {
+        "title": "Acciones",
+        "deleteLabel": "Eliminar"
+      }
+    }
+  }
+}

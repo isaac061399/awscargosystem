@@ -522,6 +522,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
       field: 'type',
       headerName: textT?.billableLinesTable?.type?.title,
       width: 120,
+      sortable: false,
       renderCell: (params) => {
         const href =
           params.row.type === 'package'
@@ -540,28 +541,27 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
             }
           />
         );
-      },
-      sortable: false
+      }
     },
     { field: 'tracking', headerName: textT?.billableLinesTable?.tracking?.title, width: 200, sortable: false },
     {
       field: 'location_shelf',
       headerName: textT?.billableLinesTable?.location?.title,
       width: 200,
+      sortable: false,
       renderCell: (params) =>
         params.row.location_shelf && params.row.location_row
           ? textT?.billableLinesTable?.location?.format
               .replace('{{ shelf }}', params.row.location_shelf)
               .replace('{{ row }}', params.row.location_row)
-          : textT?.billableLinesTable?.location?.noLocation,
-      sortable: false
+          : textT?.billableLinesTable?.location?.noLocation
     },
     {
       field: 'billing_amount',
       headerName: textT?.billableLinesTable?.amount?.title,
       width: 120,
-      valueGetter: (value, row) => formatMoney(row.billing_amount, `${currencies.USD.symbol}`),
-      sortable: false
+      sortable: false,
+      valueGetter: (value, row) => formatMoney(row.billing_amount, `${currencies.USD.symbol}`)
     },
     {
       field: 'description',
@@ -577,8 +577,8 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
       field: 'refObj',
       headerName: textT?.selectedLinesTable?.type?.title,
       width: 120,
-      renderCell: (params) => <Chip size="small" label={textT?.lineTypes?.[params.value.type]} />,
-      sortable: false
+      sortable: false,
+      renderCell: (params) => <Chip size="small" label={textT?.lineTypes?.[params.value.type]} />
     },
     { field: 'ref', headerName: textT?.selectedLinesTable?.ref?.title, width: 200, sortable: false },
     {
@@ -599,15 +599,15 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
       field: 'unit_price',
       headerName: textT?.selectedLinesTable?.unit_price?.title,
       width: 120,
-      valueGetter: (value, row) => formatMoney(row.unit_price, `${currencies[row.currency].symbol} `),
-      sortable: false
+      sortable: false,
+      valueGetter: (value, row) => formatMoney(row.unit_price, `${currencies[row.currency].symbol} `)
     },
     {
       field: 'total',
       headerName: textT?.selectedLinesTable?.total?.title,
       width: 120,
-      valueGetter: (value, row) => formatMoney(row.total, `${currencies[row.currency].symbol} `),
-      sortable: false
+      sortable: false,
+      valueGetter: (value, row) => formatMoney(row.total, `${currencies[row.currency].symbol} `)
     },
     {
       field: 'actions',
@@ -628,20 +628,21 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
       field: 'method',
       headerName: textT?.paymentLinesTable?.method?.title,
       width: 150,
-      valueGetter: (value, row) => labelsT?.paymentMethod?.[row.method],
-      sortable: false
+      sortable: false,
+      valueGetter: (value, row) => labelsT?.paymentMethod?.[row.method]
     },
     {
       field: 'amount',
       headerName: textT?.paymentLinesTable?.amount?.title,
       width: 150,
-      valueGetter: (value, row) => formatMoney(row.amount, `${currencies[row.currency].symbol} `),
-      sortable: false
+      sortable: false,
+      valueGetter: (value, row) => formatMoney(row.amount, `${currencies[row.currency].symbol} `)
     },
     {
       field: 'ref',
       headerName: textT?.paymentLinesTable?.ref?.title,
       width: 250,
+      sortable: false,
       renderCell: (params) => {
         if (!params.row.ref) return '-';
 
@@ -653,8 +654,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               : '-'}
           </span>
         );
-      },
-      sortable: false
+      }
     },
     {
       field: 'actions',

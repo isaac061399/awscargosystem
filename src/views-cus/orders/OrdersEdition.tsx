@@ -240,7 +240,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                     size="small"
                     type="button"
                     variant="contained"
-                    color="secondary"
+                    color="success"
                     startIcon={<i className="ri-file-text-line" />}>
                     {textT?.btnBilling}
                   </Button>
@@ -269,7 +269,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                   <Grid size={{ xs: 12, md: 2 }}>
                     <Stack spacing={1}>
                       <Typography variant="overline" color="text.secondary">
-                        {textT?.subtotalLabel}:
+                        {textT?.subtotalLabel}
                       </Typography>
                       <Typography variant="h5" fontWeight={600}>
                         {formatMoney(orderTotal.usd.subtotal, `${currencies.USD.symbol} `)}
@@ -283,7 +283,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                   <Grid size={{ xs: 12, md: 2 }}>
                     <Stack spacing={1}>
                       <Typography variant="overline" color="text.secondary">
-                        {textT?.totalLabel}:
+                        {textT?.totalLabel}
                       </Typography>
                       <Typography variant="h5" fontWeight={600}>
                         {formatMoney(orderTotal.usd.total, `${currencies.USD.symbol} `)}

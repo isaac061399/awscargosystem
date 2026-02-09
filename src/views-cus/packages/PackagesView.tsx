@@ -183,7 +183,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                   size="small"
                   type="button"
                   variant="contained"
-                  color="secondary"
+                  color="success"
                   startIcon={<i className="ri-file-text-line" />}>
                   {textT?.btnBilling}
                 </Button>
@@ -215,7 +215,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                 <Grid size={{ xs: 12, md: 2 }}>
                   <Stack spacing={1}>
                     <Typography variant="overline" color="text.secondary">
-                      {textT?.subtotalLabel}:
+                      {textT?.subtotalLabel}
                     </Typography>
                     <Typography variant="h5" fontWeight={600}>
                       {formatMoney(packageTotal.subtotal, `${currencies.USD.symbol} `)}
@@ -229,7 +229,7 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                 <Grid size={{ xs: 12, md: 2 }}>
                   <Stack spacing={1}>
                     <Typography variant="overline" color="text.secondary">
-                      {textT?.totalLabel}:
+                      {textT?.totalLabel}
                     </Typography>
                     <Typography variant="h5" fontWeight={600}>
                       {formatMoney(packageTotal.total, `${currencies.USD.symbol} `)}

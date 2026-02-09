@@ -1,0 +1,42 @@
+{
+  "text": {
+    "title": "Manifiesto de Paquetes Especiales:",
+    "btnPay": "Pagar Manifiesto",
+    "btnCancel": "Cancelar",
+    "btnContinue": "Continuar",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "amountPerPackageLabel": "Monto por paquete",
+    "amountPerManifestLabel": "Monto por manifiesto",
+    "quantityLabel": "Cantidad de paquetes",
+    "totalLabel": "Monto total",
+    "paymentStatusLabel": "Estado de pago",
+    "ownerLabel": "Receptor",
+    "descriptionLabel": "Descripción",
+    "itemsTitle": "Paquetes",
+    "dialogPay": {
+      "title": "Pago de Manifiesto",
+      "message": "¿Está seguro que desea pagar este manifiesto? Esta acción no se puede deshacer."
+    },
+    "itemsTable": {
+      "index": {
+        "title": "#"
+      },
+      "tracking": {
+        "title": "Tracking"
+      },
+      "mailbox": {
+        "title": "Casillero"
+      },
+      "type": {
+        "title": "Tipo"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "status_date": {
+        "title": "Última Actualización",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      }
+    }
+  }
+}

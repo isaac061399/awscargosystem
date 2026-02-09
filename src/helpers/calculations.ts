@@ -316,3 +316,27 @@ export const calculateCashRegisterTotals = (line: CusCashRegisterLine) => {
 
   return response;
 };
+
+export const calculateManifestTotal = (quantity: number, amountPerPackage: number, amountPerManifest: number) => {
+  try {
+    if (
+      isNaN(quantity) ||
+      isNaN(amountPerPackage) ||
+      isNaN(amountPerManifest) ||
+      quantity < 0 ||
+      amountPerPackage < 0 ||
+      amountPerManifest < 0
+    ) {
+      return 0;
+    }
+
+    const total = quantity * amountPerPackage + amountPerManifest;
+
+    return parseFloat(total.toFixed(2));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating manifest total: ${error}`);
+
+    return 0;
+  }
+};

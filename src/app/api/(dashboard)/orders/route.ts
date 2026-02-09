@@ -28,6 +28,7 @@ export const GET = withAuthApi(['orders.list'], async (req) => {
         { products: { some: { tracking: { contains: search.trim(), mode: 'insensitive' } } } }
       ];
       if (!isNaN(parseInt(search.trim()))) {
+        where['OR'].push({ id: parseInt(search.trim()) });
         where['OR'].push({ client: { id: parseInt(search.trim()) } });
       }
     }

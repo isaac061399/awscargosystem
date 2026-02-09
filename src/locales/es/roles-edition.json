@@ -22,13 +22,13 @@
       "clients": "Logística - Clientes",
       "configuration": "Configuración - Configuración",
       "invoices": "Caja - Control - Facturas Emitidas",
-      "manifests": "Operaciones Especiales - Manifiestos",
       "money-outflows": "Caja - Operaciones - Salidas de Dinero",
       "offices": "Configuración - Oficinas",
       "orders": "Logística - Pedidos",
       "packages": "Logística - Paquetes",
       "products": "Configuración - Productos",
       "special-packages": "Operaciones Especiales - Paquetes Especiales",
+      "special-package-manifests": "Operaciones Especiales - Manifiestos",
       "unowned-packages": "Logística - Paquetes Sin Dueño"
     },
     "permissions": {

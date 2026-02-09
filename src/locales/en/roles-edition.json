@@ -21,13 +21,13 @@
       "cash-registers": "Cash - Cash Registers",
       "clients": "Logistics - Clients",
       "configuration": "Configuration - Configuration",
-      "manifests": "Special Operations - Manifests",
       "money-outflows": "Cash - Money Outflows",
       "offices": "Configuration - Offices",
       "orders": "Logistics - Orders",
       "packages": "Logistics - Packages",
       "products": "Configuration - Products",
       "special-packages": "Special Operations - Special Packages",
+      "special-package-manifests": "Special Operations - Manifests",
       "unowned-packages": "Logistics - Unowned Packages"
     },
     "permissions": {

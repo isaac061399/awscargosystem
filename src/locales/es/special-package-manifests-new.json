@@ -1,0 +1,54 @@
+{
+  "text": {
+    "title": "Nuevo Manifiesto de Paquetes Especiales",
+    "btnSave": "Guardar",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "loading": "Cargando...",
+    "noOptions": "No hay opciones disponibles",
+    "amountPerPackageLabel": "Monto por paquete",
+    "amountPerManifestLabel": "Monto por manifiesto",
+    "quantityLabel": "Cantidad de paquetes",
+    "totalLabel": "Monto total",
+    "itemsTitle": "Paquetes",
+    "noItemsMessage": "No se han agregado paquetes al manifiesto",
+    "btnFetchItems": "Obtener Paquetes del Manifiesto",
+    "itemsTable": {
+      "index": {
+        "title": "#"
+      },
+      "tracking": {
+        "title": "Tracking"
+      },
+      "mailbox": {
+        "title": "Casillero"
+      },
+      "type": {
+        "title": "Tipo"
+      },
+      "status": {
+        "title": "Estado"
+      },
+      "status_date": {
+        "title": "Última Actualización",
+        "dateFormat": "DD/MM/YYYY hh:mm a"
+      }
+    }
+  },
+  "form": {
+    "labels": {
+      "owner": "Receptor",
+      "description": "Descripción"
+    },
+    "placeholders": {
+      "owner": "Buscar por nombre o correo electrónico",
+      "description": "Ingrese la descripción"
+    },
+    "errors": {
+      "owner": "El receptor es requerido",
+      "description": "La descripción es requerida"
+    },
+    "successMessage": "Manifiesto guardado con éxito",
+    "errorMessage": "Error al guardar el manifiesto, por favor inténtalo de nuevo",
+    "fetchItemsErrorMessage": "Error al obtener los ítems del manifiesto, por favor inténtalo de nuevo"
+  }
+}

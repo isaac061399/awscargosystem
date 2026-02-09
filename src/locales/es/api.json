@@ -348,6 +348,16 @@
       "general": "Se produjo un error, por favor inténtalo de nuevo"
     }
   },
+  "special-package-manifests": {
+    "errors": {
+      "pay": "Error al pagar el manifiesto, por favor inténtalo de nuevo",
+      "alreadyPaid": "El manifiesto ya fue pagado",
+      "notItems": "No se pueden crear manifiestos sin paquetes",
+      "save": "Error al guardar el manifiesto, por favor inténtalo de nuevo",
+      "delete": "Error al eliminar el manifiesto, si ya tiene datos asociados, no podrá eliminarlo",
+      "general": "Se produjo un error, por favor inténtalo de nuevo"
+    }
+  },
   "unowned-packages": {
     "errors": {
       "tracking": "El tracking ya está registrado",
