@@ -337,6 +337,17 @@
       "general": "An error occurred, please try again"
     }
   },
+  "special-packages": {
+    "errors": {
+      "requiredParams": "Missing required parameters",
+      "exists": "The tracking is already registered",
+      "notFound": "Special package not found",
+      "receive": "Error receiving the special package, please try again",
+      "preAlert": "Error pre-alerting the special package, please try again",
+      "delete": "Error deleting the special package, if it already has associated data, you will not be able to delete it",
+      "general": "An error occurred, please try again"
+    }
+  },
   "unowned-packages": {
     "errors": {
       "tracking": "The tracking is already registered",
