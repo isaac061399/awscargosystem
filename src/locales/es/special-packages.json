@@ -7,6 +7,17 @@
     "dialogDeleteTitle": "Confirmar Eliminación",
     "dialogDeleteMessage": "¿Estás seguro de que deseas eliminar el paquete especial \"{{ tracking }}\"? Esta acción no se puede deshacer.",
     "filterStatus": "Filtrar por Estado",
+    "viewDialog": {
+      "title": "Detalles del Paquete Especial",
+      "tracking": "Tracking",
+      "owner": "Receptor",
+      "mailbox": "Casillero",
+      "type": "Tipo",
+      "indications": "Indicaciones",
+      "status": "Estado",
+      "documents": "Documentos Adjuntos",
+      "btnClose": "Cerrar"
+    },
     "table": {
       "tracking": {
         "title": "Tracking"

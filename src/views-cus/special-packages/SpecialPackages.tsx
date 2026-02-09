@@ -4,12 +4,14 @@
 import { useEffect, useMemo, useState } from 'react';
 
 // Next Imports
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 // MUI Imports
 import type { SnackbarCloseReason } from '@mui/material';
 import {
   Alert,
+  Box,
   Button,
   Chip,
   Dialog,
@@ -68,7 +70,7 @@ const SpecialPackages = () => {
   const [paginationState, setPaginationState] = useState({ page: 0, pageSize: 10 });
   const [searchState, setSearchState] = useState('');
   const [statusState, setStatusState] = useState('');
-
+  const [viewState, setViewState] = useState({ open: false, data: null as any });
   const [deleteState, setDeleteState] = useState({
     open: false,
     loading: false,
@@ -161,7 +163,13 @@ const SpecialPackages = () => {
       minWidth: 200,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
-          <span>{params.row.tracking}</span>
+          <span
+            className="cursor-pointer font-medium underline underline-offset-2 hover:no-underline hover:text-primary transition"
+            onClick={() => {
+              setViewState({ open: true, data: params.row });
+            }}>
+            {params.row.tracking}
+          </span>
         </div>
       )
     },
@@ -352,6 +360,73 @@ const SpecialPackages = () => {
           </Button>
           <Button variant="text" color="primary" onClick={handleDelete} loading={deleteState.loading}>
             {textT?.btnContinue}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={viewState.open}
+        onClose={() => setViewState({ ...viewState, open: false })}
+        fullWidth
+        maxWidth="sm"
+        scroll="paper"
+        aria-labelledby="dialog-view-title">
+        <DialogTitle id="dialog-view-title">{textT?.viewDialog?.title}</DialogTitle>
+        <DialogContent dividers>
+          <DialogContentText>
+            <Typography variant="body1" gutterBottom>
+              {textT?.viewDialog?.tracking}: <strong>{viewState.data?.tracking}</strong>
+            </Typography>
+            {isAdmin && (
+              <Typography variant="body1" gutterBottom>
+                {textT?.viewDialog?.owner}:{' '}
+                <strong>
+                  {viewState.data?.owner?.full_name} ({viewState.data?.owner?.email})
+                </strong>
+              </Typography>
+            )}
+            <Typography variant="body1" gutterBottom>
+              {textT?.viewDialog?.mailbox}: <strong>{viewState.data?.mailbox || '--'}</strong>
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {textT?.viewDialog?.type}:{' '}
+              <strong>{labelsT?.specialPackageType?.[viewState.data?.type] || 'Unknown'}</strong>
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {textT?.viewDialog?.indications}: <strong>{viewState.data?.indications || '--'}</strong>
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {textT?.viewDialog?.status}:{' '}
+              <strong>{labelsT?.specialPackageStatus?.[viewState.data?.status] || 'Unknown'}</strong>
+            </Typography>
+            {viewState.data?.special_package_documents && viewState.data.special_package_documents.length > 0 && (
+              <>
+                <Typography variant="body1" gutterBottom>
+                  {textT?.viewDialog?.documents}:
+                </Typography>
+                <Box className="space-y-2">
+                  {viewState.data?.special_package_documents.map((doc: any) => (
+                    <Box key={doc.id} className="flex items-center gap-1 ml-3">
+                      <Typography variant="body1">
+                        <strong>{doc.description}:</strong>
+                      </Typography>
+                      <Link
+                        href={doc.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline">
+                        {doc.file_name}
+                      </Link>
+                    </Box>
+                  ))}
+                </Box>
+              </>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="secondary" onClick={() => setViewState({ ...viewState, open: false })}>
+            {textT?.viewDialog?.btnClose}
           </Button>
         </DialogActions>
       </Dialog>

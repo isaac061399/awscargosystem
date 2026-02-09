@@ -1008,7 +1008,7 @@ model CusSpecialPackageDocument {
   created_at         DateTime @default(now())
   updated_at         DateTime @updatedAt
 
-  special_package CusSpecialPackage @relation(fields: [special_package_id], references: [id], onDelete: Restrict)
+  special_package CusSpecialPackage @relation(fields: [special_package_id], references: [id], onDelete: Cascade)
 
   @@map("cus_special_package_document")
 }
