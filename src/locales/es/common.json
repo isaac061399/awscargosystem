@@ -280,7 +280,7 @@
                 "permissions": ["special-packages.list"]
               },
               {
-                "label": "Pre Alertar (CR)",
+                "label": "Pre-Alertar (CR)",
                 "link": "/special-packages/pre-alert",
                 "externalLink": false,
                 "icon": "",

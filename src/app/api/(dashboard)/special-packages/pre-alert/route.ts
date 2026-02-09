@@ -54,12 +54,31 @@ export const POST = withAuthApi(['special-packages.pre-alert'], async (req) => {
         ownerLoadedId = admin.id;
       }
 
+      // delete documents marked for deletion
+      if (data.documentsToDelete && Array.isArray(data.documentsToDelete) && data.documentsToDelete.length > 0) {
+        await tx.cusSpecialPackageDocument.deleteMany({
+          where: { id: { in: data.documentsToDelete } }
+        });
+      }
+
       // load data to save
       const saveData = {
         owner_id: ownerLoadedId,
         mailbox: data.mailbox || '',
         type: data.type || SpecialPackageType.MARITIME,
-        indications: data.indications || ''
+        indications: data.indications || '',
+        special_package_documents:
+          data.documentsToAdd && Array.isArray(data.documentsToAdd) && data.documentsToAdd.length > 0
+            ? {
+                create: data.documentsToAdd.map((doc: any) => ({
+                  description: doc.description || '',
+                  file: doc.file || '',
+                  file_name: doc.file_name || '',
+                  file_size: Number(doc.file_size) || 0,
+                  file_type: doc.file_type || ''
+                }))
+              }
+            : undefined
       };
 
       let specialPackage;

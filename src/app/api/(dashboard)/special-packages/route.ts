@@ -4,6 +4,9 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead } from '@libs/prisma';
 import { hasAllPermissions } from '@/helpers/permissions';
+import { getBucketEndpoint } from '@/services/aws-s3';
+
+const bucketEndpoint = getBucketEndpoint();
 
 export const GET = withAuthApi(['special-packages.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -44,7 +47,10 @@ export const GET = withAuthApi(['special-packages.list'], async (req) => {
       where,
       orderBy: [{ id: 'desc' }],
       include: {
-        owner: { select: { id: true, full_name: true, email: true } }
+        owner: { select: { id: true, full_name: true, email: true } },
+        special_package_documents: {
+          select: { id: true, description: true, file: true, file_name: true, file_size: true, file_type: true }
+        }
       }
     });
 
@@ -55,7 +61,16 @@ export const GET = withAuthApi(['special-packages.list'], async (req) => {
     const total = await prismaRead.cusSpecialPackage.count({ where });
     const pagination = { total: total || 0, count: specialPackages?.length || 0 };
 
-    return NextResponse.json({ valid: true, data: specialPackages, pagination }, { status: 200 });
+    const specialPackagesWithUrl = specialPackages.map((pkg) => {
+      const documentsWithUrl = pkg.special_package_documents.map((doc) => ({
+        ...doc,
+        file_url: `${bucketEndpoint}${doc.file}`
+      }));
+
+      return { ...pkg, special_package_documents: documentsWithUrl };
+    });
+
+    return NextResponse.json({ valid: true, data: specialPackagesWithUrl, pagination }, { status: 200 });
   } catch (error) {
     console.error(`Error: ${error}`);
 

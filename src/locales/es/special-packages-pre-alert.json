@@ -4,7 +4,18 @@
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "loading": "Cargando...",
     "noOptions": "No hay opciones disponibles",
-    "btnSave": "Guardar"
+    "btnSave": "Guardar",
+    "documentsLabel": "Documentos",
+    "btnAddDocument": "Agregar Documento",
+    "documentDialog": {
+      "title": "Agregar Documento",
+      "btnCancel": "Cancelar",
+      "btnAdd": "Agregar",
+      "dropzone": {
+        "text": "Arrastra y suelta un archivo aquí o haz clic",
+        "maxSizeText": "Tamaño máximo: {{ size }} por archivo"
+      }
+    }
   },
   "form": {
     "labels": {
@@ -28,7 +39,23 @@
       "type": "El tipo es requerido",
       "indications": "Las indicaciones son requeridas"
     },
-    "successMessage": "Pre alerta guardada con éxito",
-    "errorMessage": "Error al guardar la pre alerta, por favor inténtalo de nuevo"
+    "successMessage": "Pre-alerta guardada con éxito",
+    "errorMessage": "Error al guardar la pre-alerta, por favor inténtalo de nuevo"
+  },
+  "formDocument": {
+    "labels": {
+      "description": "Descripción",
+      "file": "Archivo"
+    },
+    "placeholders": {
+      "description": "Ingrese una descripción",
+      "file": "Seleccione el archivo"
+    },
+    "errors": {
+      "description": "La descripción es requerida",
+      "file": "El archivo es requerido"
+    },
+    "successMessage": "Pre-alerta guardada con éxito",
+    "errorMessage": "Error al guardar la pre-alerta, por favor inténtalo de nuevo"
   }
 }

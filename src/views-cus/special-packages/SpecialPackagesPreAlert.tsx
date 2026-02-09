@@ -14,14 +14,26 @@ import * as yup from 'yup';
 // MUI Imports
 import {
   Alert,
+  Autocomplete,
+  Avatar,
   Button,
   Card,
   CardContent,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  FormControl,
+  FormHelperText,
   Grid,
   IconButton,
   InputAdornment,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
   TextField,
   Typography
 } from '@mui/material';
@@ -30,15 +42,24 @@ import {
 import DashboardLayout from '@components/layout/DashboardLayout';
 import AdministratorField from '@/components/custom/AdministratorField';
 import Select from '@/components/Select';
+import Dropzone from '@/components/Dropzone';
 
 // Helpers Imports
-import { requestGetSpecialPackagesByTracking, requestPreAlertSpecialPackage } from '@helpers/request';
+import {
+  requestGetSpecialPackageDocumentSignedUrl,
+  requestGetSpecialPackagesByTracking,
+  requestPreAlertSpecialPackage,
+  requestUploadSpecialPackageDocument
+} from '@helpers/request';
 
 // Auth Imports
 import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
+import { specialPackageDocumentTypes } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
+
+const maxFileSizeUpload = 50 * 1024 * 1024; // 50MB
 
 const SpecialPackagesPreAlert = () => {
   const { data: admin } = useAdmin();
@@ -47,11 +68,16 @@ const SpecialPackagesPreAlert = () => {
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('special-packages-pre-alert:text', { returnObjects: true, default: {} }), [t]);
   const formT: any = useMemo(() => t('special-packages-pre-alert:form', { returnObjects: true, default: {} }), [t]);
+  const formDocumentT: any = useMemo(
+    () => t('special-packages-pre-alert:formDocument', { returnObjects: true, default: {} }),
+    [t]
+  );
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
 
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showFields, setShowFields] = useState(false);
+  const [showDocumentDialog, setShowDocumentDialog] = useState(false);
 
   const trackingFieldRef = useRef<HTMLInputElement>(null);
 
@@ -66,7 +92,10 @@ const SpecialPackagesPreAlert = () => {
         tracking: '',
         mailbox: '',
         type: '',
-        indications: ''
+        indications: '',
+        documents: [] as any,
+        documentsToAdd: [] as any,
+        documentsToDelete: [] as any
       }),
       []
     ),
@@ -81,7 +110,16 @@ const SpecialPackagesPreAlert = () => {
       setAlertState({ ...defaultAlertState });
 
       try {
-        const newValues = { ...values, owner_id: values.owner?.id || null };
+        // upload files and replace file objects with uploaded file info
+        const uploadedDocuments = [];
+        for (const doc of values.documentsToAdd) {
+          const uploadResult = await uploadDocumentFile(doc.file);
+          if (uploadResult) {
+            uploadedDocuments.push({ description: doc.description, ...uploadResult });
+          }
+        }
+
+        const newValues = { ...values, owner_id: values.owner?.id || null, documentsToAdd: uploadedDocuments };
         delete newValues.owner;
 
         const result = await requestPreAlertSpecialPackage(newValues, i18n.language);
@@ -103,6 +141,28 @@ const SpecialPackagesPreAlert = () => {
     }
   });
 
+  const formikDocument = useFormik({
+    validateOnChange: false,
+    validateOnBlur: false,
+    enableReinitialize: true,
+    initialValues: useMemo(
+      () => ({
+        description: '',
+        file: null
+      }),
+      []
+    ),
+    validationSchema: yup.object({
+      description: yup.string().required(formDocumentT?.errors?.description),
+      file: yup.mixed().required(formDocumentT?.errors?.file)
+    }),
+    onSubmit: async (values) => {
+      formik.values.documentsToAdd.push(values);
+
+      handleDocumentDialogClose();
+    }
+  });
+
   const onTrackingSearch = async () => {
     const fetchTrackingInfo = async (tracking: string) => {
       setIsLoading(true);
@@ -119,6 +179,7 @@ const SpecialPackagesPreAlert = () => {
         formik.setFieldValue('mailbox', data?.mailbox || '');
         formik.setFieldValue('type', data?.type || '');
         formik.setFieldValue('indications', data?.indications || '');
+        formik.setFieldValue('documents', data?.special_package_documents || []);
       }
 
       setShowFields(true);
@@ -139,7 +200,10 @@ const SpecialPackagesPreAlert = () => {
       tracking: clearTracking ? '' : formik.values.tracking,
       mailbox: '',
       type: '',
-      indications: ''
+      indications: '',
+      documents: [],
+      documentsToAdd: [],
+      documentsToDelete: []
     });
   };
 
@@ -150,6 +214,53 @@ const SpecialPackagesPreAlert = () => {
     setTimeout(() => {
       trackingFieldRef.current?.focus();
     }, 100);
+  };
+
+  const uploadDocumentFile = async (file: File) => {
+    // get signed url for upload
+    const signedUrlResult = await requestGetSpecialPackageDocumentSignedUrl(
+      {
+        fileName: file.name,
+        fileType: file.type
+      },
+      i18n.language
+    );
+
+    if (!signedUrlResult.valid) {
+      return null;
+    }
+
+    // upload file to s3
+    const uploadResult = await requestUploadSpecialPackageDocument(signedUrlResult.url, file);
+
+    if (!uploadResult) {
+      return null;
+    }
+
+    return {
+      file: signedUrlResult.key,
+      file_name: file.name,
+      file_size: file.size,
+      file_type: file.type
+    };
+  };
+
+  const handleRemoveNewDocument = (index: number) => {
+    const newDocuments = [...formik.values.documentsToAdd];
+    newDocuments.splice(index, 1);
+    formik.setFieldValue('documentsToAdd', newDocuments);
+  };
+
+  const handleRemoveExistingDocument = (id: number, index: number) => {
+    const newDocuments = [...formik.values.documents];
+    newDocuments.splice(index, 1);
+    formik.setFieldValue('documents', newDocuments);
+    formik.values.documentsToDelete.push(id);
+  };
+
+  const handleDocumentDialogClose = () => {
+    setShowDocumentDialog(false);
+    formikDocument.resetForm();
   };
 
   return (
@@ -317,6 +428,68 @@ const SpecialPackagesPreAlert = () => {
                         />
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }} sx={{ display: { xs: 'none', md: 'block' } }} />
+
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <Divider sx={{ mb: 5 }} />
+
+                        <Typography variant="h5" className="flex gap-3 items-center">
+                          {textT?.documentsLabel}
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                            startIcon={<i className="ri-add-line" />}
+                            onClick={() => setShowDocumentDialog(true)}>
+                            {textT?.btnAddDocument}
+                          </Button>
+                        </Typography>
+
+                        <List sx={{ mb: 2 }}>
+                          {formik.values.documents.map((doc: any, idx: any) => (
+                            <ListItem
+                              key={`doc-${idx}`}
+                              secondaryAction={
+                                <IconButton edge="end" onClick={() => handleRemoveExistingDocument(doc.id, idx)}>
+                                  <i className="ri-close-circle-fill" />
+                                </IconButton>
+                              }>
+                              <ListItemAvatar>
+                                <Avatar variant="rounded" sx={{ bgcolor: 'grey.300' }}>
+                                  <i className="ri-file-list-fill" />
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={doc.description}
+                                secondary={
+                                  <Link
+                                    href={doc.file_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline">
+                                    {doc.file_name}
+                                  </Link>
+                                }
+                              />
+                            </ListItem>
+                          ))}
+                          {formik.values.documentsToAdd.map((doc: any, idx: any) => (
+                            <ListItem
+                              key={`doc-to-add-${idx}`}
+                              secondaryAction={
+                                <IconButton edge="end" onClick={() => handleRemoveNewDocument(idx)}>
+                                  <i className="ri-close-circle-fill" />
+                                </IconButton>
+                              }>
+                              <ListItemAvatar>
+                                <Avatar variant="rounded" sx={{ bgcolor: 'grey.300' }}>
+                                  <i className="ri-file-list-fill" />
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText primary={doc.description} secondary={doc.file.name} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Grid>
                     </>
                   )}
                 </Grid>
@@ -325,6 +498,86 @@ const SpecialPackagesPreAlert = () => {
           </Grid>
         </Grid>
       </form>
+
+      <Dialog
+        open={showDocumentDialog}
+        onClose={handleDocumentDialogClose}
+        fullWidth
+        maxWidth="sm"
+        scroll="paper"
+        aria-labelledby="dialog-document-title">
+        <form onSubmit={formikDocument.handleSubmit} noValidate>
+          <DialogTitle id="dialog-document-title">{textT?.documentDialog?.title}</DialogTitle>
+          <DialogContent dividers>
+            <Grid container spacing={5}>
+              <Grid size={{ xs: 12 }}>
+                <Autocomplete
+                  freeSolo
+                  clearOnBlur={false}
+                  options={specialPackageDocumentTypes}
+                  filterOptions={(x) => x}
+                  inputValue={formikDocument.values.description}
+                  onInputChange={(_, newValue) => {
+                    // newValue is always a string (or null)
+                    formikDocument.setFieldValue('description', newValue ?? '');
+                  }}
+                  disabled={formikDocument.isSubmitting}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      id="description"
+                      name="description"
+                      label={formDocumentT?.labels?.description}
+                      placeholder={formDocumentT?.placeholders?.description}
+                      error={Boolean(formikDocument.touched.description && formikDocument.errors.description)}
+                      color={
+                        Boolean(formikDocument.touched.description && formikDocument.errors.description)
+                          ? 'error'
+                          : 'primary'
+                      }
+                      helperText={formikDocument.touched.description && (formikDocument.errors.description as string)}
+                      disabled={formikDocument.isSubmitting}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <FormControl fullWidth required error={Boolean(formikDocument.errors.file)}>
+                  <Dropzone
+                    acceptedFiles={[
+                      'image/*',
+                      'application/pdf',
+                      'application/msword', // .doc
+                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+                      'application/vnd.ms-excel', // .xls
+                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+                    ]}
+                    dropzoneText={textT?.documentDialog?.dropzone?.text}
+                    dropzoneMaxSizeText={textT?.documentDialog?.dropzone?.maxSizeText}
+                    onChange={(files) => formikDocument.setFieldValue('file', files[0])}
+                    maxFiles={1}
+                    maxFileSize={maxFileSizeUpload}
+                    showPreviews
+                  />
+                  {formikDocument.errors.file && <FormHelperText>{formikDocument.errors.file}</FormHelperText>}
+                </FormControl>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleDocumentDialogClose}
+              disabled={formikDocument.isSubmitting}>
+              {textT?.documentDialog?.btnCancel}
+            </Button>
+            <Button type="submit" variant="contained" color="primary" loading={formikDocument.isSubmitting}>
+              {textT?.documentDialog?.btnAdd}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </DashboardLayout>
   );
 };

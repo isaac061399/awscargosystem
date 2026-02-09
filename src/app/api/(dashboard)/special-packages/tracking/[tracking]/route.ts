@@ -5,6 +5,9 @@ import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead } from '@libs/prisma';
 import { hasAllPermissions } from '@/helpers/permissions';
 import { SpecialPackageStatus } from '@/prisma/generated/browser';
+import { getBucketEndpoint } from '@/services/aws-s3';
+
+const bucketEndpoint = getBucketEndpoint();
 
 export const GET = withAuthApi(
   ['special-packages.list'],
@@ -33,6 +36,9 @@ export const GET = withAuthApi(
         include: {
           owner: {
             select: { id: true, full_name: true, email: true }
+          },
+          special_package_documents: {
+            select: { id: true, description: true, file: true, file_name: true, file_size: true, file_type: true }
           }
         }
       });
@@ -40,6 +46,14 @@ export const GET = withAuthApi(
       if (!specialPackage) {
         return NextResponse.json({ valid: false }, { status: 200 });
       }
+
+      // add bucket endpoint to file urls
+      const documentsWithUrl = specialPackage.special_package_documents.map((doc) => ({
+        ...doc,
+        file_url: `${bucketEndpoint}${doc.file}`
+      }));
+
+      specialPackage.special_package_documents = documentsWithUrl;
 
       return NextResponse.json({ valid: true, data: specialPackage }, { status: 200 });
     } catch (error) {

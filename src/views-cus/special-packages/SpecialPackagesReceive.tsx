@@ -299,14 +299,29 @@ const SpecialPackagesReceive = () => {
                           </div>
 
                           {preAlertedPackage.indications ? (
-                            <Typography variant="body2" className="text-slate-700">
+                            <Typography variant="body1" className="text-slate-700">
                               {preAlertedPackage.indications}
                             </Typography>
                           ) : (
-                            <Typography variant="body2" className="italic text-slate-500">
+                            <Typography variant="body1" className="italic text-slate-500">
                               {textT?.preAlertedNoIndications}
                             </Typography>
                           )}
+
+                          <Box className="space-y-2">
+                            {preAlertedPackage.special_package_documents.map((doc: any) => (
+                              <Box key={doc.id} className="flex items-center gap-1">
+                                <Typography variant="body1">{doc.description}:</Typography>
+                                <Link
+                                  href={doc.file_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline">
+                                  {doc.file_name}
+                                </Link>
+                              </Box>
+                            ))}
+                          </Box>
                         </Box>
                       </Card>
                     </Grid>

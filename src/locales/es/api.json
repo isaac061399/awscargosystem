@@ -339,6 +339,7 @@
   },
   "special-packages": {
     "errors": {
+      "requiredParams": "Faltan parámetros requeridos",
       "exists": "El tracking ya está registrado",
       "notFound": "Paquete especial no encontrado",
       "receive": "Error al recibir el paquete especial, por favor inténtalo de nuevo",

@@ -1890,7 +1890,7 @@ export const requestDeleteUnownedPackage = async (id: number, lang: string) => {
   }
 };
 
-// packages
+// special packages
 
 export const requestGetSpecialPackages = async (params: any, lang: string) => {
   try {
@@ -1981,5 +1981,42 @@ export const requestGetSpecialPackagesByTracking = async (tracking: string, lang
   } catch (e: any) {
     // console.error(e);
     return { valid: false };
+  }
+};
+
+export const requestGetSpecialPackageDocumentSignedUrl = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/special-packages/documents/signed-urls',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
+export const requestUploadSpecialPackageDocument = async (url: string, file: File) => {
+  try {
+    await axios.request({
+      method: 'put',
+      url,
+      headers: { 'Content-Type': file.type },
+      data: file
+    });
+
+    return true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return false;
   }
 };

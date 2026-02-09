@@ -33,6 +33,8 @@ export const additionalExchangeRate = 6;
 
 export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein', 'Target'];
 
+export const specialPackageDocumentTypes = ['Factura comercial', 'Guía aérea', 'Packing list'];
+
 export const bankAccounts = { BAC: 'BAC Credomatic', BN: 'Banco Nacional' };
 
 export const paymentConditionsDays = {
