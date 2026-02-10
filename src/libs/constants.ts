@@ -96,23 +96,20 @@ export const socialMedia = {
 };
 
 export const settings = {
-  primaryColor: '#004B95',
-  banner: 'https://place-hold.it/600x200',
-  website_url: 'https://pangea.cr',
-  terms_of_use_url: 'https://pangea.cr',
-  privacy_policy_url: 'https://pangea.cr',
+  primaryColor: '#004C97',
+  banner: `${bucketEndpoint}email-assets/banner.png`,
+  website_url: `https://www.awscargo.com`,
+  terms_of_use_url: `https://www.awscargo.com/terms-conditions`,
+  privacy_policy_url: `https://www.awscargo.com/privacy-policy`,
   app_store_url: 'https://www.apple.com/app-store',
   play_store_url: 'https://play.google.com/store/apps',
   social_media: [
-    { type: 'FACEBOOK', url: 'https://pangea.cr' },
-    { type: 'INSTAGRAM', url: 'https://pangea.cr' },
-    { type: 'TWITTER', url: 'https://pangea.cr' },
-    { type: 'YOUTUBE', url: 'https://pangea.cr' },
-    { type: 'TIKTOK', url: 'https://pangea.cr' },
-    { type: 'LINKEDIN', url: 'https://pangea.cr' },
-    { type: 'WHATSAPP', url: 'https://pangea.cr' }
+    { type: 'FACEBOOK', url: 'https://www.facebook.com/AtenasWebShop' },
+    { type: 'INSTAGRAM', url: 'https://www.instagram.com/aws_cargo_courier' },
+    { type: 'YOUTUBE', url: 'https://www.youtube.com/@atenaswebshop4120' },
+    { type: 'WHATSAPP', url: 'https://api.whatsapp.com/send/?phone=50672902221' }
   ],
-  support_emails: 'guillermo@pangea.cr',
+  support_emails: 'info@awscargo.com',
   linkLabels: {
     en: { visit: 'Visit Us', terms: 'Terms of Use', privacy: 'Privacy Policy' },
     es: { visit: 'Visítanos', terms: 'Términos de Uso', privacy: 'Política de Privacidad' }

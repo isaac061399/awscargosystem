@@ -72,6 +72,7 @@ const PackageReception = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
   const [errorAlert, setErrorAlert] = useState<any>({ open: false, inputRef: null, message: '' });
+  const [trackingHasChanged, setTrackingHasChanged] = useState<boolean>(false);
   const [showClientFields, setShowClientFields] = useState<boolean>(false);
   const [showAllOtherFields, setShowAllOtherFields] = useState<boolean>(false);
   const [blockWeightField, setBlockWeightField] = useState<boolean>(false);
@@ -88,7 +89,6 @@ const PackageReception = () => {
     selected: { package_id: '', order_id: '', client: null, weight: undefined as any }
   });
 
-  const isTrackingFirstRender = useRef(true);
   const lastFieldRef = useRef<HTMLInputElement>(null);
 
   const cutFieldRef = useRef<HTMLInputElement>(null);
@@ -165,6 +165,14 @@ const PackageReception = () => {
     }
   });
 
+  // cut field auto focus on load
+  useEffect(() => {
+    setTimeout(() => {
+      cutFieldRef.current?.focus();
+      lastFieldRef.current = cutFieldRef.current;
+    }, 0);
+  }, []);
+
   // focus mailbox field when showClientFields is true
   useEffect(() => {
     if (showClientFields) {
@@ -193,12 +201,6 @@ const PackageReception = () => {
 
   // tracking field change effect
   useEffect(() => {
-    if (isTrackingFirstRender.current) {
-      isTrackingFirstRender.current = false;
-
-      return;
-    }
-
     const fetchTrackingInfo = async (tracking: string) => {
       setIsLoading(true);
 
@@ -245,6 +247,8 @@ const PackageReception = () => {
     };
 
     if (formik.values.tracking && formik.values.tracking.length > 0) {
+      setTrackingHasChanged(true);
+
       if (trackingTimeoutRef.current) {
         clearTimeout(trackingTimeoutRef.current);
       }
@@ -253,7 +257,9 @@ const PackageReception = () => {
         fetchTrackingInfo(formik.values.tracking);
       }, 500);
     } else {
-      resetProcess();
+      if (trackingHasChanged) {
+        resetProcess();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.tracking]);
@@ -482,7 +488,6 @@ const PackageReception = () => {
                   <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       inputRef={cutFieldRef}
-                      autoFocus
                       fullWidth
                       required
                       type="text"

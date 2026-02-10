@@ -1,4 +1,5 @@
 import { sendPackageReadyWhatsapp } from './whatsappNotifications';
+import { packageReceptionNotification } from './emailNotifications';
 
 type PackageReadyNotificationData = {
   clientName: string;
@@ -29,9 +30,20 @@ export const sendPackageReadyNotification = async (notificationData: PackageRead
           }
         })
       : null;
+
   // send email notification logic here
-  // TODO: implement email notification
-  const emailResponse = clientEmail !== '' ? /* await sendPackageReadyEmail(...) */ null : null;
+  const emailResponse =
+    clientEmail !== ''
+      ? await packageReceptionNotification({
+          email: clientEmail,
+          name: clientName,
+          mailbox: clientMailbox,
+          tracking,
+          amountUSD,
+          amountCRC,
+          lang: 'es'
+        })
+      : null;
 
   return { whatsappResponse, emailResponse };
 };

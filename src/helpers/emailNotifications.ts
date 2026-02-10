@@ -36,6 +36,17 @@ interface formData {
   type: string;
   data: any[];
 }
+
+interface packageReceptionData {
+  email: string;
+  name: string;
+  mailbox: string;
+  tracking: string;
+  amountUSD: string;
+  amountCRC: string;
+  lang: string;
+}
+
 interface EmailData {
   from?: string;
   to: string | string[];
@@ -136,6 +147,29 @@ export const formNotifications = async ({ lang, to, customSiteName, type, data }
   });
 
   return result;
+};
+
+export const packageReceptionNotification = async ({
+  email,
+  name,
+  mailbox,
+  tracking,
+  amountUSD,
+  amountCRC,
+  lang
+}: packageReceptionData) => {
+  return sendEmail({
+    to: email,
+    lang,
+    template: 'package-reception',
+    replaceData: {
+      name,
+      mailbox,
+      tracking,
+      amountUSD,
+      amountCRC
+    }
+  });
 };
 
 const sendEmail = async (emailData: EmailData) => {
