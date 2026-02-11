@@ -773,47 +773,27 @@ const ProductsAccordionComponent = ({
                     color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
                   }}>
                   <div className="flex items-center justify-between w-full">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-5">
-                        <Typography component="span">
-                          {item.name}
-                          {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
-                        </Typography>
-                        {statusChip && (
-                          <Chip
-                            variant="outlined"
-                            label={`${textT?.statusLabel}: ${statusChip.label}`}
-                            color={statusChip.color}
-                            size="small"
-                          />
-                        )}
-                        {paymentStatusChip && (
-                          <Chip
-                            variant="outlined"
-                            label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
-                            color={paymentStatusChip.color}
-                            size="small"
-                          />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-5">
-                        <div className="flex items-center gap-1">
-                          <Typography variant="body2">{textT?.subtotalLabel}:</Typography>
-                          <Typography variant="body2">
-                            {formatMoney(orderTotal.usd.items[index].subtotal, `${currencies.USD.symbol} `)}
-                            {' | '}
-                            {formatMoney(orderTotal.crc.items[index].subtotal, `${currencies.CRC.symbol} `)}
-                          </Typography>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Typography variant="body2">{textT?.totalLabel}:</Typography>
-                          <Typography variant="body2">
-                            {formatMoney(orderTotal.usd.items[index].total, `${currencies.USD.symbol} `)}
-                            {' | '}
-                            {formatMoney(orderTotal.crc.items[index].total, `${currencies.CRC.symbol} `)}
-                          </Typography>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-5">
+                      <Typography component="span">
+                        {item.name}
+                        {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
+                      </Typography>
+                      {statusChip && (
+                        <Chip
+                          variant="filled"
+                          label={`${textT?.statusLabel}: ${statusChip.label}`}
+                          color={statusChip.color}
+                          size="small"
+                        />
+                      )}
+                      {paymentStatusChip && (
+                        <Chip
+                          variant="filled"
+                          label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
+                          color={paymentStatusChip.color}
+                          size="small"
+                        />
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <IconButton
@@ -831,7 +811,32 @@ const ProductsAccordionComponent = ({
                   </div>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={5} sx={{ mt: 2 }}>
+                  <Grid container spacing={5}>
+                    <Grid size={{ xs: 12 }}>
+                      <Divider sx={{ mb: 3 }} />
+                      <div className="flex items-center gap-5">
+                        <div className="flex items-center gap-1">
+                          <Typography variant="body1">{textT?.subtotalLabel}:</Typography>
+                          <Typography variant="body1">
+                            {formatMoney(orderTotal.usd.items[index].subtotal, `${currencies.USD.symbol} `)}
+                            {' | '}
+                            {formatMoney(orderTotal.crc.items[index].subtotal, `${currencies.CRC.symbol} `)}
+                          </Typography>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Typography variant="body1">{textT?.totalLabel}:</Typography>
+                          <Typography variant="body1">
+                            {formatMoney(orderTotal.usd.items[index].total, `${currencies.USD.symbol} `)}
+                            {' | '}
+                            {formatMoney(orderTotal.crc.items[index].total, `${currencies.CRC.symbol} `)}
+                          </Typography>
+                        </div>
+                      </div>
+                      <Divider sx={{ mt: 3 }} />
+                    </Grid>
+                  </Grid>
+
+                  <Grid container spacing={5} sx={{ mt: 5 }}>
                     {isEditing && (
                       <Grid size={{ xs: 12, md: 4 }}>
                         <TextField
@@ -846,7 +851,8 @@ const ProductsAccordionComponent = ({
                           error={Boolean(touched.tracking && errors.tracking)}
                           color={Boolean(touched.tracking && errors.tracking) ? 'error' : 'primary'}
                           helperText={touched.tracking && errors.tracking}
-                          disabled={formik.isSubmitting || isLoading || !canEditInfo}
+                          disabled={formik.isSubmitting || isLoading}
+                          slotProps={{ input: { readOnly: !canEditInfo } }}
                         />
                       </Grid>
                     )}
@@ -864,7 +870,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.code && errors.code)}
                         color={Boolean(touched.code && errors.code) ? 'error' : 'primary'}
                         helperText={touched.code && errors.code}
-                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditInfo } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -881,7 +888,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.name && errors.name)}
                         color={Boolean(touched.name && errors.name) ? 'error' : 'primary'}
                         helperText={touched.name && errors.name}
-                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditInfo } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 12 }}>
@@ -897,7 +905,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.description && errors.description)}
                         color={Boolean(touched.description && errors.description) ? 'error' : 'primary'}
                         helperText={touched.description && errors.description}
-                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditInfo } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -914,7 +923,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.quantity && errors.quantity)}
                         color={Boolean(touched.quantity && errors.quantity) ? 'error' : 'primary'}
                         helperText={touched.quantity && errors.quantity}
-                        disabled={formik.isSubmitting || isLoading || !canEditPrice}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditPrice } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -935,7 +945,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.price && errors.price)}
                         color={Boolean(touched.price && errors.price) ? 'error' : 'primary'}
                         helperText={touched.price && errors.price}
-                        disabled={formik.isSubmitting || isLoading || !canEditPrice}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditPrice } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -956,7 +967,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.service_price && errors.service_price)}
                         color={Boolean(touched.service_price && errors.service_price) ? 'error' : 'primary'}
                         helperText={touched.service_price && errors.service_price}
-                        disabled={formik.isSubmitting || isLoading || !canEditPrice}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditPrice } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 12 }}>
@@ -972,7 +984,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.url && errors.url)}
                         color={Boolean(touched.url && errors.url) ? 'error' : 'primary'}
                         helperText={touched.url && errors.url}
-                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditInfo } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 12 }}>
@@ -988,7 +1001,8 @@ const ProductsAccordionComponent = ({
                         error={Boolean(touched.image_url && errors.image_url)}
                         color={Boolean(touched.image_url && errors.image_url) ? 'error' : 'primary'}
                         helperText={touched.image_url && errors.image_url}
-                        disabled={formik.isSubmitting || isLoading || !canEditInfo}
+                        disabled={formik.isSubmitting || isLoading}
+                        slotProps={{ input: { readOnly: !canEditInfo } }}
                       />
                     </Grid>
                   </Grid>
