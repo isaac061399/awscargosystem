@@ -248,9 +248,10 @@
   },
   "orders": {
     "errors": {
+      "deliver": "Error al entregar los productos, por favor inténtalo de nuevo",
+      "someProductsNotDelivered": "Algunos productos no pueden ser entregados, por favor refresque la página e inténtalo de nuevo",
+      "noProductsSelected": "Por favor seleccione al menos un producto para entregar",
       "deleteProduct": "Error al eliminar el producto del pedido, por favor inténtalo de nuevo",
-      "status": "Error al cambiar el estado del pedido, por favor inténtalo de nuevo",
-      "productsWithoutTracking": "Existen productos sin número de tracking. Por favor, asegúrate de que todos los productos tengan un número de tracking antes de proceder.",
       "number": "Este número de pedido ya está asociado a un pedido existente. Por favor, use un número diferente",
       "save": "Error al guardar el pedido, por favor inténtalo de nuevo",
       "delete": "Error al eliminar el pedido, si ya tiene datos asociados, no podrá eliminarlo",

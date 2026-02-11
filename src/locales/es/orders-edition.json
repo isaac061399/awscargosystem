@@ -11,21 +11,31 @@
     "paymentStatusLabel": "Estado de Pago",
     "btnSave": "Guardar",
     "btnBilling": "Facturar",
+    "btnDeliver": "Entregar",
+    "btnPrintDelivered": "Imprimir Tiquete de Entrega",
     "btnCancel": "Cancelar",
     "btnContinue": "Continuar",
-    "btnOnTheWay": "Marcar como En Camino",
-    "btnReady": "Marcar como Listo para Retirar",
-    "btnDelivered": "Marcar como Entregado",
     "locationInfo": {
       "title": "Ubicación",
       "shelf": "Estante",
       "row": "Fila"
     },
-    "dialogStatus": {
-      "title": "Confirmar Cambio de Estado",
-      "onTheWayMessage": "¿Estás seguro de marcar el pedido como en camino?",
-      "readyMessage": "¿Estás seguro de marcar el pedido como listo para retirar?",
-      "deliveredMessage": "¿Estás seguro de marcar el pedido como entregado?"
+    "dialogDeliver": {
+      "title": "Entregar Pedido",
+      "subtitle": "Seleccione los productos a entregar",
+      "tracking": "Tracking",
+      "btnDeliver": "Entregar Seleccionados",
+      "btnClose": "Cerrar",
+      "btnPrintTicket": "Imprimir tiquete de entrega",
+      "selectProductsError": "Por favor seleccione al menos un producto para entregar",
+      "generalError": "Error al guardar los datos, por favor inténtalo de nuevo"
+    },
+    "dialogPrintDelivered": {
+      "title": "Imprimir Tiquete de Entrega",
+      "subtitle": "Seleccione los productos a incluir en el tiquete de entrega",
+      "tracking": "Tracking",
+      "btnPrint": "Imprimir",
+      "btnClose": "Cerrar"
     },
     "deleteProductDialog": {
       "title": "Confirmar Eliminación del Producto",

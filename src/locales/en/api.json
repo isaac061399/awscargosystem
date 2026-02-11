@@ -248,9 +248,10 @@
   },
   "orders": {
     "errors": {
+      "deliver": "Error delivering the products, please try again",
+      "someProductsNotDelivered": "Some products cannot be delivered, please refresh the page and try again",
+      "noProductsSelected": "Please select at least one product to deliver",
       "deleteProduct": "Error deleting the order product, please try again",
-      "status": "Error changing the order status, please try again",
-      "productsWithoutTracking": "There are products without a tracking number. Please ensure all products have a tracking number before proceeding.",
       "number": "This order number is already associated with an existing order. Please use a different number",
       "save": "Error saving the order, please try again",
       "delete": "Error deleting the order, please try again",

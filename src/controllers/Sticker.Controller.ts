@@ -1,4 +1,5 @@
 import { prismaRead } from '@/libs/prisma';
+import { getClientAddress } from '@/helpers/address';
 
 import { clientSelectSchema } from './Client.Controller';
 
@@ -57,7 +58,7 @@ export const getSticker = async (tracking: string): Promise<Sticker | null> => {
         mailbox: `${pkg.client?.office?.mailbox_prefix}${pkg.client?.id}`,
         name: pkg.client?.full_name,
         phone: pkg.client?.phone || '',
-        address: getAddress(pkg.client)
+        address: getClientAddress(pkg.client)
       }
     };
   }
@@ -107,28 +108,10 @@ export const getSticker = async (tracking: string): Promise<Sticker | null> => {
         mailbox: `${orderProduct.order?.client?.office?.mailbox_prefix}${orderProduct.order?.client?.id}`,
         name: orderProduct.order.client?.full_name,
         phone: orderProduct.order.client?.phone || '',
-        address: getAddress(orderProduct.order.client)
+        address: getClientAddress(orderProduct.order.client)
       }
     };
   }
 
   return null;
-};
-
-const getAddress = (client: any) => {
-  const addressParts = [];
-  if (client?.district?.canton?.province?.name) {
-    addressParts.push(client.district.canton.province.name);
-  }
-  if (client?.district?.canton?.name) {
-    addressParts.push(client.district.canton.name);
-  }
-  if (client?.district?.name) {
-    addressParts.push(client.district.name);
-  }
-  if (client?.address) {
-    addressParts.push(client.address);
-  }
-
-  return addressParts.join(', ');
 };

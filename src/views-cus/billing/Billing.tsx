@@ -23,6 +23,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Divider,
   Grid,
@@ -45,7 +46,7 @@ import MoneyField from '@/components/MoneyField';
 // Helpers Imports
 import { requestGetBillingLines, requestNewInvoice } from '@/helpers/request';
 import { bankAccounts, currencies } from '@/libs/constants';
-import { formatMoney } from '@/libs/utils';
+import { formatMoney, padStartZeros } from '@/libs/utils';
 import {
   BillingLine,
   calculateBillingChangeAmount,
@@ -92,6 +93,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
     calculateBillingPaidAmount(paymentLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate)
   );
   const [successState, setSuccessState] = useState({ open: false, id: 0, changeAmountCRC: 0 });
+  const [readyOrdersState, setReadyOrdersState] = useState({ open: false, orders: [] as any[] });
 
   // Billing lines dialogs
   // const [customOpen, setCustomOpen] = useState(false);
@@ -399,6 +401,12 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
         setIsLoading(false);
         setBillableLines(result.lines || []);
         setBillableLinesSelected(result.lines || []);
+
+        if (result.ready_orders && result.ready_orders.length > 0) {
+          setReadyOrdersState({ open: true, orders: result.ready_orders });
+        } else {
+          setReadyOrdersState({ open: false, orders: [] });
+        }
       };
 
       fetchLinesData();
@@ -1370,6 +1378,53 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
             </Button>
           </Stack>
         </DialogContent>
+      </Dialog>
+
+      {/* Ready orders dialog */}
+      <Dialog
+        open={readyOrdersState.open}
+        onClose={() => setReadyOrdersState({ ...readyOrdersState, open: false })}
+        aria-labelledby="dialog-ready-orders-title"
+        aria-describedby="dialog-ready-description"
+        maxWidth="sm"
+        fullWidth>
+        <DialogTitle id="dialog-ready-orders-title">{textT?.dialogReadyOrders?.title}</DialogTitle>
+        <DialogContent dividers className="flex flex-col gap-6">
+          <DialogContentText id="dialog-ready-description">{textT?.dialogReadyOrders?.subtitle}</DialogContentText>
+          <Stack direction="column" spacing={2}>
+            {readyOrdersState.orders.map((order) => (
+              <Button
+                key={order.id}
+                LinkComponent={Link}
+                variant="outlined"
+                color="primary"
+                href={`/orders/edit/${order.id}`}
+                target="_blank"
+                fullWidth
+                className="justify-start">
+                <Stack direction="column" spacing={0.5} alignItems="flex-start" className="w-full">
+                  <Typography variant="body1" className="font-semibold">
+                    {`ID: # ${padStartZeros(order.id, 4)}`}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {`${textT?.dialogReadyOrders?.orderNumber}: ${order.number}`}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {`${textT?.dialogReadyOrders?.orderProducts}: ${order.products?.length || 0}`}
+                  </Typography>
+                </Stack>
+              </Button>
+            ))}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="text"
+            color="secondary"
+            onClick={() => setReadyOrdersState({ ...readyOrdersState, open: false })}>
+            {textT?.dialogReadyOrders?.btnSkip}
+          </Button>
+        </DialogActions>
       </Dialog>
     </DashboardLayout>
   );

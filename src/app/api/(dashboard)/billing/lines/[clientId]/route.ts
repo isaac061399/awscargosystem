@@ -4,7 +4,7 @@ import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead } from '@libs/prisma';
 
-import { PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
+import { OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
 import { getOrderProductPrice } from '@/helpers/calculations';
 
 export const GET = withAuthApi(
@@ -16,7 +16,7 @@ export const GET = withAuthApi(
     const textT: any = t('api:billing', { returnObjects: true, default: {} });
 
     try {
-      // Find ready packages for that clientId
+      // Find ready and not paid packages for that clientId
       const packages = await prismaRead.cusPackage.findMany({
         where: { client_id: parseInt(clientId), status: PackageStatus.READY, payment_status: PaymentStatus.PENDING },
         select: {
@@ -31,7 +31,7 @@ export const GET = withAuthApi(
         }
       });
 
-      // Find ready orders products for that clientId
+      // Find not paid orders products for that clientId
       const orderProducts = await prismaRead.cusOrderProduct.findMany({
         where: {
           order: { client_id: parseInt(clientId) },
@@ -50,12 +50,28 @@ export const GET = withAuthApi(
         }
       });
 
+      // Find orders with some ready and paid orders products for that clientId
+      const readyOrders = await prismaRead.cusOrder.findMany({
+        where: {
+          client_id: parseInt(clientId),
+          products: { some: { status: OrderStatus.READY, payment_status: PaymentStatus.PAID } }
+        },
+        select: {
+          id: true,
+          number: true,
+          products: {
+            where: { status: OrderStatus.READY, payment_status: PaymentStatus.PAID },
+            select: { id: true }
+          }
+        }
+      });
+
       // format response
       const formattedPackages = formatPackagesInLines(packages);
       const formattedOrderProducts = formatOrderProductsInLines(orderProducts);
 
       return NextResponse.json(
-        { valid: true, lines: [...formattedPackages, ...formattedOrderProducts] },
+        { valid: true, lines: [...formattedPackages, ...formattedOrderProducts], ready_orders: readyOrders },
         { status: 200 }
       );
     } catch (error) {

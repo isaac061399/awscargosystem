@@ -23,6 +23,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   Chip,
   Dialog,
   DialogActions,
@@ -30,6 +31,7 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  FormControlLabel,
   Grid,
   IconButton,
   Stack,
@@ -44,12 +46,13 @@ import ClientField from '@/components/custom/ClientField';
 import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
-import { requestDeleteOrderProduct, requestEditOrder, requestNewOrder } from '@helpers/request';
+import {
+  requestDeleteOrderProduct,
+  requestDeliverOrderProducts,
+  requestEditOrder,
+  requestNewOrder
+} from '@helpers/request';
 import { useConfig } from '@/components/ConfigProvider';
-
-// Auth Imports
-// import { useAdmin } from '@components/AdminProvider';
-// import { hasAllPermissions } from '@helpers/permissions';
 
 import { currencies, sellersPages } from '@/libs/constants';
 import { formatMoney, padStartZeros } from '@/libs/utils';
@@ -82,13 +85,24 @@ const productInitialValues = {
   image_url: ''
 };
 
+const getReadyProducts = (products: any[]) => {
+  return products.filter((p) => p.status === OrderStatus.READY);
+};
+
+const getDeliveredProducts = (products: any[]) => {
+  return products.filter((p) => p.status === OrderStatus.DELIVERED);
+};
+
+const getPrintLink = (orderId: number, productIds?: number[]) => {
+  return `/print/order-delivered/${orderId}?or=1&${productIds?.map((id) => `products=${id}`).join('&')}`;
+};
+
 const OrdersEdition = ({ order }: { order?: any }) => {
   const router = useRouter();
+
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
   const ivaPercentage = configuration?.iva_percentage ?? 0;
-  // const { data: admin } = useAdmin();
-  // const canCreateMedia = hasAllPermissions('media.create', admin.permissions);
 
   const { t, i18n } = useTranslation();
   const textT: any = useMemo(() => t('orders-edition:text', { returnObjects: true, default: {} }), [t]);
@@ -97,9 +111,14 @@ const OrdersEdition = ({ order }: { order?: any }) => {
 
   const [isEditing] = useState(Boolean(order));
   const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // const [isStatusLoading, setIsStatusLoading] = useState(false);
-  // const [statusState, setStatusState] = useState({ open: false, action: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [deliverState, setDeliverState] = useState({
+    open: false,
+    selected: [] as number[],
+    success: false,
+    error: ''
+  });
+  const [printDeliveredState, setPrintDeliveredState] = useState({ open: false, selected: [] as number[] });
 
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
 
@@ -173,38 +192,44 @@ const OrdersEdition = ({ order }: { order?: any }) => {
     }
   });
 
-  // const handleStatusOpen = (action: 'on-the-way' | 'ready' | 'delivered') => {
-  //   setStatusState({ open: true, action });
-  // };
+  const handleDeliverOpen = () => {
+    const selected = readyProducts.map((p) => p.id);
+    setDeliverState({ open: true, selected, success: false, error: '' });
+  };
 
-  // const handleStatusClose = () => {
-  //   setStatusState({ open: false, action: '' });
-  // };
+  const handleDeliverClose = () => {
+    if (deliverState.success) {
+      router.refresh();
+    }
+    setDeliverState({ ...deliverState, open: false });
+  };
 
-  // const handleStatus = async () => {
-  //   setAlertState({ ...defaultAlertState });
-  //   setIsStatusLoading(true);
+  const handleDeliver = async () => {
+    setDeliverState({ ...deliverState, error: '' });
 
-  //   const result = await requestChangeStatusOrder(
-  //     order?.id,
-  //     statusState.action as 'on-the-way' | 'ready' | 'delivered',
-  //     i18n.language
-  //   );
+    if (deliverState.selected.length === 0) {
+      setDeliverState({ ...deliverState, error: textT?.dialogDeliver?.selectProductsError });
 
-  //   setIsStatusLoading(false);
-  //   handleStatusClose();
+      return;
+    }
 
-  //   if (!result.valid) {
-  //     setAlertState({ open: true, type: 'error', message: result.message || textT?.errors?.status });
-  //   } else {
-  //     router.refresh();
-  //   }
-  // };
+    setIsLoading(true);
 
-  // const isPending = order ? order.status === ('PENDING' as OrderStatus) : false;
-  // const isOnTheWay = order ? order.status === ('ON_THE_WAY' as OrderStatus) : false;
-  // const isReady = order ? order.status === ('READY' as OrderStatus) : false;
-  // const isDelivered = order ? order.status === ('DELIVERED' as OrderStatus) : false;
+    const result = await requestDeliverOrderProducts(order?.id, { product_ids: deliverState.selected }, i18n.language);
+
+    setIsLoading(false);
+
+    if (!result.valid) {
+      setDeliverState({ ...deliverState, error: result.message || textT?.dialogDeliver?.generalError });
+    } else {
+      setDeliverState({ ...deliverState, success: true });
+    }
+  };
+
+  const handlePrintDeliveredOpen = () => {
+    const selected = deliveredProducts.map((p) => p.id);
+    setPrintDeliveredState({ open: true, selected });
+  };
 
   const orderTotal = getOrderTotal(formik.values.products, sellingExchangeRate, ivaPercentage);
   const paymentStatusChip: any = { label: '', color: 'info' };
@@ -216,6 +241,11 @@ const OrdersEdition = ({ order }: { order?: any }) => {
     paymentStatusChip.label = labelsT?.paymentStatus?.[order.payment_status] || 'Unknown';
     paymentStatusChip.color = paymentStatusColors[order.payment_status] || 'info';
   }
+
+  const isPayable = order ? order.payment_status === PaymentStatus.PENDING : false;
+
+  const readyProducts = getReadyProducts(formik.values.products);
+  const deliveredProducts = getDeliveredProducts(formik.values.products);
 
   return (
     <DashboardLayout>
@@ -233,7 +263,7 @@ const OrdersEdition = ({ order }: { order?: any }) => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                {order.payment_status === PaymentStatus.PENDING && (
+                {isPayable && (
                   <Button
                     LinkComponent={Link}
                     href={`/billing?client=${order.client.id}`}
@@ -243,6 +273,30 @@ const OrdersEdition = ({ order }: { order?: any }) => {
                     color="success"
                     startIcon={<i className="ri-file-text-line" />}>
                     {textT?.btnBilling}
+                  </Button>
+                )}
+
+                {isEditing && readyProducts.length > 0 && (
+                  <Button
+                    size="small"
+                    type="button"
+                    variant="contained"
+                    color="success"
+                    startIcon={<i className="ri-check-fill" />}
+                    onClick={handleDeliverOpen}>
+                    {textT?.btnDeliver}
+                  </Button>
+                )}
+
+                {isEditing && deliveredProducts.length > 0 && (
+                  <Button
+                    size="small"
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    startIcon={<i className="ri-printer-line" />}
+                    onClick={handlePrintDeliveredOpen}>
+                    {textT?.btnPrintDelivered}
                   </Button>
                 )}
 
@@ -427,32 +481,170 @@ const OrdersEdition = ({ order }: { order?: any }) => {
         </Grid>
       </form>
 
-      {/* isEditing && (
+      {/* Deliver Dialog */}
+      {isEditing && readyProducts.length > 0 && (
         <>
           <Dialog
-            open={statusState.open}
-            onClose={handleStatusClose}
-            aria-labelledby="dialog-status-title"
-            aria-describedby="dialog-status-description">
-            <DialogTitle id="dialog-status-title">{textT?.dialogStatus?.title}</DialogTitle>
+            open={deliverState.open}
+            onClose={handleDeliverClose}
+            aria-labelledby="dialog-deliver-title"
+            aria-describedby="dialog-deliver-description"
+            maxWidth="sm"
+            fullWidth>
+            <DialogTitle id="dialog-deliver-title">{textT?.dialogDeliver?.title}</DialogTitle>
             <DialogContent dividers>
-              <DialogContentText id="dialog-status-description">
-                {statusState.action === 'on-the-way' && textT?.dialogStatus?.onTheWayMessage}
-                {statusState.action === 'ready' && textT?.dialogStatus?.readyMessage}
-                {statusState.action === 'delivered' && textT?.dialogStatus?.deliveredMessage}
-              </DialogContentText>
+              {!deliverState.success ? (
+                <>
+                  <DialogContentText id="dialog-deliver-description">
+                    {textT?.dialogDeliver?.subtitle}
+                  </DialogContentText>
+                  <Stack spacing={2} mt={2}>
+                    {readyProducts.map((product) => {
+                      return (
+                        <FormControlLabel
+                          key={product.id}
+                          control={
+                            <Checkbox
+                              checked={deliverState.selected.includes(product.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setDeliverState({
+                                    ...deliverState,
+                                    selected: [...deliverState.selected, product.id]
+                                  });
+                                } else {
+                                  setDeliverState({
+                                    ...deliverState,
+                                    selected: deliverState.selected.filter((id) => id !== product.id)
+                                  });
+                                }
+                              }}
+                            />
+                          }
+                          label={
+                            <Stack direction="column" spacing={0}>
+                              <Typography component="span" fontWeight={500}>
+                                {product.quantity} x {product.name}
+                              </Typography>
+                              <Typography component="span" variant="caption" color="text.secondary">
+                                {textT?.dialogDeliver?.tracking}: {product.tracking || '--'}
+                              </Typography>
+                            </Stack>
+                          }
+                        />
+                      );
+                    })}
+                  </Stack>
+                  {deliverState.error && (
+                    <Alert severity="error" sx={{ mt: 5 }}>
+                      {deliverState.error}
+                    </Alert>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Stack direction="column" spacing={2}>
+                    <Button
+                      LinkComponent={Link}
+                      variant="contained"
+                      color="primary"
+                      href={getPrintLink(order.id, deliverState.selected)}
+                      target="_blank">
+                      {textT?.dialogDeliver?.btnPrintTicket}
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={handleDeliverClose}>
+                      {textT?.dialogDeliver?.btnClose}
+                    </Button>
+                  </Stack>
+                </>
+              )}
             </DialogContent>
             <DialogActions>
-              <Button variant="text" color="secondary" onClick={handleStatusClose} disabled={isStatusLoading}>
-                {textT?.btnCancel}
+              <Button variant="text" color="secondary" onClick={handleDeliverClose} disabled={isLoading}>
+                {textT?.dialogDeliver?.btnClose}
               </Button>
-              <Button variant="text" color="primary" onClick={handleStatus} loading={isStatusLoading}>
-                {textT?.btnContinue}
+              {!deliverState.success && (
+                <Button variant="text" color="primary" onClick={handleDeliver} loading={isLoading}>
+                  {textT?.dialogDeliver?.btnDeliver}
+                </Button>
+              )}
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
+
+      {/* Print Delivered Dialog */}
+      {isEditing && deliveredProducts.length > 0 && (
+        <>
+          <Dialog
+            open={printDeliveredState.open}
+            onClose={() => setPrintDeliveredState({ ...printDeliveredState, open: false })}
+            aria-labelledby="dialog-print-delivered-title"
+            aria-describedby="dialog-print-delivered-description"
+            maxWidth="sm"
+            fullWidth>
+            <DialogTitle id="dialog-print-delivered-title">{textT?.dialogPrintDelivered?.title}</DialogTitle>
+            <DialogContent dividers>
+              <DialogContentText id="dialog-print-delivered-description">
+                {textT?.dialogPrintDelivered?.subtitle}
+              </DialogContentText>
+              <Stack spacing={2} mt={2}>
+                {deliveredProducts.map((product) => {
+                  return (
+                    <FormControlLabel
+                      key={product.id}
+                      control={
+                        <Checkbox
+                          checked={printDeliveredState.selected.includes(product.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setPrintDeliveredState({
+                                ...printDeliveredState,
+                                selected: [...printDeliveredState.selected, product.id]
+                              });
+                            } else {
+                              setPrintDeliveredState({
+                                ...printDeliveredState,
+                                selected: printDeliveredState.selected.filter((id) => id !== product.id)
+                              });
+                            }
+                          }}
+                        />
+                      }
+                      label={
+                        <Stack direction="column" spacing={0}>
+                          <Typography component="span" fontWeight={500}>
+                            {product.quantity} x {product.name}
+                          </Typography>
+                          <Typography component="span" variant="caption" color="text.secondary">
+                            {textT?.dialogPrintDelivered?.tracking}: {product.tracking || '--'}
+                          </Typography>
+                        </Stack>
+                      }
+                    />
+                  );
+                })}
+              </Stack>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="text"
+                color="secondary"
+                onClick={() => setPrintDeliveredState({ ...printDeliveredState, open: false })}>
+                {textT?.dialogPrintDelivered?.btnClose}
+              </Button>
+              <Button
+                LinkComponent={Link}
+                variant="text"
+                color="primary"
+                href={getPrintLink(order.id, printDeliveredState.selected)}
+                target="_blank">
+                {textT?.dialogPrintDelivered?.btnPrint}
               </Button>
             </DialogActions>
           </Dialog>
         </>
-      ) */}
+      )}
     </DashboardLayout>
   );
 };

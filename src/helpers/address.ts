@@ -37,3 +37,21 @@ export const getAddressOptions = ({
 
   return options;
 };
+
+export const getClientAddress = (client: any) => {
+  const addressParts = [];
+  if (client?.district?.canton?.province?.name) {
+    addressParts.push(client.district.canton.province.name);
+  }
+  if (client?.district?.canton?.name) {
+    addressParts.push(client.district.canton.name);
+  }
+  if (client?.district?.name) {
+    addressParts.push(client.district.name);
+  }
+  if (client?.address) {
+    addressParts.push(client.address);
+  }
+
+  return addressParts.join(', ');
+};

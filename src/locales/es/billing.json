@@ -122,6 +122,13 @@
       "viewInvoice": "Ver factura",
       "printTicket": "Imprimir tiquete",
       "newInvoice": "Nueva factura"
+    },
+    "dialogReadyOrders": {
+      "title": "Pedidos listos para retirar",
+      "subtitle": "Se han encontrado pedidos con productos listos para retirar. Si desea realizar el retiro del pedido haga clic en el detalle del pedido para ser redirigido, de lo contrario puede omitir esta ventana y continuar con la facturación.",
+      "orderNumber": "Número de pedido",
+      "orderProducts": "Productos listos para retirar",
+      "btnSkip": "Omitir"
     }
   },
   "form": {

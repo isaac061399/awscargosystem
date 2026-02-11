@@ -1604,6 +1604,26 @@ export const requestDeleteOrderProduct = async (id: number, lang: string) => {
   }
 };
 
+export const requestDeliverOrderProducts = async (id: number, params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'put',
+      url: `/api/orders/${id}/deliver`,
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      data: params
+    });
+
+    return response.data;
+  } catch (e: any) {
+    // console.error(e);
+    if (e?.response?.data) {
+      return e?.response?.data;
+    }
+
+    return { valid: false };
+  }
+};
+
 // packages
 
 export const requestGetPackages = async (params: any, lang: string) => {

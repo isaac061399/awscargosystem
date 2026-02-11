@@ -788,6 +788,7 @@ const PackageReception = () => {
         </Grid>
       </form>
 
+      {/* Dialog Selector */}
       <Dialog
         open={selectorState.open}
         onClose={() => setSelectorState({ ...selectorState, open: false })}
@@ -901,6 +902,7 @@ const PackageReception = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Alert Dialog */}
       <Dialog
         open={errorAlert.open}
         onClose={onAlertClose}
@@ -934,6 +936,7 @@ const PackageReception = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Unowned Package Dialog */}
       <Dialog
         fullWidth
         maxWidth="sm"
