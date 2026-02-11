@@ -32,6 +32,7 @@
     },
     "billingInfo": {
       "title": "Facturación",
+      "viewInvoice": "Ver Factura",
       "weight": "Peso (libras)",
       "poundFee": "Tarifa por Libra",
       "subtotal": "Subtotal",

@@ -286,7 +286,7 @@
   },
   "packages": {
     "errors": {
-      "invalid": "Package cannot be edited in its current status",
+      "invalid": "The package cannot be modified in its current state",
       "notFound": "Package not found",
       "save": "Error saving the information, please try again",
       "delete": "Error deleting the package, if it already has associated data, you will not be able to delete it",

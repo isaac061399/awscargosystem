@@ -1,6 +1,6 @@
 import { prismaRead, prismaWrite, Tx, withTransaction } from '@libs/prisma';
 import { clientSelectSchema } from './Client.Controller';
-import { OrderStatus } from '@/prisma/generated/enums';
+import { InvoiceStatus, OrderStatus } from '@/prisma/generated/enums';
 
 export const getOrder = async (id: number) => {
   try {
@@ -9,7 +9,15 @@ export const getOrder = async (id: number) => {
       include: {
         client: { select: clientSelectSchema },
         products: {
-          orderBy: { id: 'asc' }
+          orderBy: { id: 'asc' },
+          include: {
+            invoice_lines: {
+              where: { invoice: { status: { not: InvoiceStatus.CANCELED } } },
+              include: {
+                invoice: { select: { id: true } }
+              }
+            }
+          }
         }
       }
     });

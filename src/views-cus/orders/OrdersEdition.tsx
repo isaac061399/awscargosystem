@@ -756,6 +756,8 @@ const ProductsAccordionComponent = ({
             const canEditInfo = isNew || ((isPending || isOnTheWay) && !isReady && !isDelivered);
             const canEditPrice = isNew || ((isPending || isOnTheWay) && !isReady && !isDelivered && !isPaid);
 
+            const invoice = item?.invoice_lines?.[0]?.invoice || null;
+
             return (
               <Accordion
                 key={index}
@@ -793,6 +795,17 @@ const ProductsAccordionComponent = ({
                           color={paymentStatusChip.color}
                           size="small"
                         />
+                      )}
+                      {invoice && (
+                        <Link href={`/invoices/view/${invoice.id}`} target="_blank">
+                          <Chip
+                            label={textT?.viewInvoiceLabel}
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            clickable
+                          />
+                        </Link>
                       )}
                     </div>
                     <div className="flex items-center gap-2">

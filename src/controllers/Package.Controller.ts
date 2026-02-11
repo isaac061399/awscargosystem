@@ -1,28 +1,19 @@
 import { prismaRead } from '@libs/prisma';
 import { clientSelectSchema } from './Client.Controller';
+import { InvoiceStatus } from '@/prisma/generated/enums';
 
 export const getPackage = async (id: number) => {
   try {
     const packageObj = await prismaRead.cusPackage.findUnique({
       where: { id },
-      select: {
-        id: true,
-        client_id: true,
-        tracking: true,
-        courier_company: true,
-        purchase_page: true,
-        price: true,
-        description: true,
-        notes: true,
-        billing_weight: true,
-        billing_pound_fee: true,
-        billing_amount: true,
-        location_shelf: true,
-        location_row: true,
-        payment_status: true,
-        status: true,
-        created_at: true,
-        client: { select: clientSelectSchema }
+      include: {
+        client: { select: clientSelectSchema },
+        invoice_lines: {
+          where: { invoice: { status: { not: InvoiceStatus.CANCELED } } },
+          include: {
+            invoice: { select: { id: true } }
+          }
+        }
       }
     });
 

@@ -9,6 +9,7 @@
     "totalLabel": "Total",
     "statusLabel": "Estado",
     "paymentStatusLabel": "Estado de Pago",
+    "viewInvoiceLabel": "Ver Factura",
     "btnSave": "Guardar",
     "btnBilling": "Facturar",
     "btnDeliver": "Entregar",

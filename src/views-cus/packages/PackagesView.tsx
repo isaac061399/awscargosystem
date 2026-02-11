@@ -161,6 +161,8 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
     total: convertCRC(packageTotal.total, sellingExchangeRate)
   };
 
+  const invoice = packageObj.invoice_lines?.[0]?.invoice || null;
+
   return (
     <DashboardLayout>
       <Grid container spacing={6}>
@@ -336,7 +338,19 @@ const PackagesView = ({ packageObj }: { packageObj: any }) => {
                 {/* Billing */}
                 <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
                   <Card sx={{ flexGrow: 1 }}>
-                    <CardHeader title={textT?.billingInfo?.title} />
+                    <CardHeader
+                      title={textT?.billingInfo?.title}
+                      action={
+                        invoice && (
+                          <Link
+                            href={`/invoices/view/${invoice.id}`}
+                            target="_blank"
+                            className="text-xs text-blue-600 hover:underline">
+                            {textT?.billingInfo?.viewInvoice}
+                          </Link>
+                        )
+                      }
+                    />
                     <CardContent>
                       <Stack spacing={1.25}>
                         <InfoRow label={textT?.billingInfo?.weight} value={packageObj.billing_weight} />
