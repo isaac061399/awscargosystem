@@ -17,15 +17,15 @@ export const menuClasses = {
   disabled: 'ts-disabled',
   active: 'ts-active',
   open: 'ts-open'
-}
+};
 
 // Classes for vertical navigation menu
 export const verticalNavClasses = {
   root: 'ts-vertical-nav-root',
   container: 'ts-vertical-nav-container',
   bgColorContainer: 'ts-vertical-nav-bg-color-container',
-  header: 'ts-vertical-nav-header',
+  header: 'ts-vertical-nav-header z-5',
   backdrop: 'ts-vertical-nav-backdrop',
   toggled: 'ts-toggled',
   breakpointReached: 'ts-breakpoint-reached'
-}
+};
