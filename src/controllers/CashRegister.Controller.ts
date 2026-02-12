@@ -2,7 +2,13 @@ import { cookies } from 'next/headers';
 import moment from 'moment-timezone';
 
 import { prismaRead } from '@libs/prisma';
-import { CashRegisterStatus, Currency, InvoicePaymentCondition, PaymentMethod } from '@/prisma/generated/enums';
+import {
+  CashRegisterStatus,
+  Currency,
+  InvoicePaymentCondition,
+  InvoiceStatus,
+  PaymentMethod
+} from '@/prisma/generated/enums';
 
 export const getCashRegister = async (
   id: number,
@@ -162,11 +168,12 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any)
       }
     });
 
-    // get invoice data
+    // get cash and not canceled invoice data
     const invoices = await prismaRead.cusInvoice.findMany({
       where: {
         cash_register_id: cashRegister.id,
-        payment_condition: InvoicePaymentCondition.CASH
+        payment_condition: InvoicePaymentCondition.CASH,
+        status: { not: InvoiceStatus.CANCELED }
       },
       select: {
         id: true,
@@ -176,7 +183,6 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any)
         }
       }
     });
-
     if (invoices && invoices.length > 0) {
       invoices.forEach((inv) => {
         inv.invoice_payments.forEach((pay) => {
@@ -206,46 +212,55 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any)
       });
     }
 
-    // get payments from pending invoices paid
-    const pendingPaymentsPaid = await prismaRead.cusInvoicePayment.findMany({
+    // get paid credits (pending) invoices
+    const paidCreditInvoices = await prismaRead.cusInvoice.findMany({
       where: {
-        cash_register_id: cashRegister.id,
-        invoice: {
-          payment_condition: { not: InvoicePaymentCondition.CASH }
-        },
-        currency: currency
+        payment_condition: { not: InvoicePaymentCondition.CASH },
+        status: { not: InvoiceStatus.CANCELED },
+        invoice_payments: {
+          some: {
+            cash_register_id: cashRegister.id,
+            currency: currency
+          }
+        }
       },
       select: {
         id: true,
-        amount: true,
-        payment_method: true,
-        invoice: {
-          select: { id: true, cash_change: true }
+        cash_change: true,
+        invoice_payments: {
+          where: {
+            cash_register_id: cashRegister.id,
+            currency: currency
+          },
+          select: { id: true, currency: true, payment_method: true, amount: true }
         }
       }
     });
+    if (paidCreditInvoices && paidCreditInvoices.length > 0) {
+      paidCreditInvoices.forEach((inv) => {
+        inv.invoice_payments.forEach((pay) => {
+          if (pay.currency === currency) {
+            switch (pay.payment_method) {
+              case PaymentMethod.CASH:
+                cashIn += pay.amount;
+                break;
+              case PaymentMethod.SINPE:
+                sinpeIn += pay.amount;
+                break;
+              case PaymentMethod.TRANSFER:
+                transferIn += pay.amount;
+                break;
+              case PaymentMethod.CARD:
+                cardIn += pay.amount;
+                break;
+              default:
+                break;
+            }
+          }
+        });
 
-    if (pendingPaymentsPaid && pendingPaymentsPaid.length > 0) {
-      pendingPaymentsPaid.forEach((pay) => {
-        switch (pay.payment_method) {
-          case PaymentMethod.CASH:
-            cashIn += pay.amount;
-            break;
-          case PaymentMethod.SINPE:
-            sinpeIn += pay.amount;
-            break;
-          case PaymentMethod.TRANSFER:
-            transferIn += pay.amount;
-            break;
-          case PaymentMethod.CARD:
-            cardIn += pay.amount;
-            break;
-          default:
-            break;
-        }
-
-        if (currency === Currency.CRC && pay.invoice.cash_change && pay.invoice.cash_change > 0) {
-          cashChange += pay.invoice.cash_change;
+        if (currency === Currency.CRC && inv.cash_change && inv.cash_change > 0) {
+          cashChange += inv.cash_change;
         }
       });
     }
@@ -259,7 +274,6 @@ export const getCashRegisterData = async (currency: Currency, cashRegister: any)
       },
       select: { id: true, amount: true, method: true }
     });
-
     if (moneyOutflows && moneyOutflows.length > 0) {
       moneyOutflows.forEach((mo) => {
         switch (mo.method) {

@@ -171,21 +171,21 @@
         ],
         "items": [
           {
-            "label": "Clientes",
+            "label": "Clients",
             "link": "",
             "externalLink": false,
             "icon": "ri-group-2-line",
             "permissions": ["clients.list", "clients.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "List",
                 "link": "/clients",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["clients.list"]
               },
               {
-                "label": "Nuevo",
+                "label": "New",
                 "link": "/clients/new",
                 "externalLink": false,
                 "icon": "",
@@ -194,21 +194,21 @@
             ]
           },
           {
-            "label": "Pedidos",
+            "label": "Orders",
             "link": "",
             "externalLink": false,
             "icon": "ri-shopping-bag-4-line",
             "permissions": ["orders.list", "orders.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "List",
                 "link": "/orders",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["orders.list"]
               },
               {
-                "label": "Nuevo",
+                "label": "New",
                 "link": "/orders/new",
                 "externalLink": false,
                 "icon": "",
@@ -231,21 +231,21 @@
                 "permissions": ["packages.list"]
               },
               {
-                "label": "Unowned Packages",
+                "label": "Unowned",
                 "link": "/unowned-packages",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["unowned-packages.list"]
               },
               {
-                "label": "Packages Reception",
+                "label": "Reception",
                 "link": "/packages-reception",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["packages.reception"]
               },
               {
-                "label": "Rastrear Paquetes",
+                "label": "Tracking",
                 "link": "/packages-tracking",
                 "externalLink": false,
                 "icon": "",
@@ -256,7 +256,7 @@
         ]
       },
       {
-        "sectionTitle": "Special Operations",
+        "sectionTitle": "Operations",
         "permissions": ["special-packages.list", "special-packages.pre-alert", "special-packages.receive"],
         "items": [
           {
@@ -280,14 +280,14 @@
                 "permissions": ["special-packages.list"]
               },
               {
-                "label": "Pre-Alert (CR)",
+                "label": "Pre-alert (CR)",
                 "link": "/special-packages/pre-alert",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["special-packages.pre-alert"]
               },
               {
-                "label": "Receive (Miami)",
+                "label": "Reception (Miami)",
                 "link": "/special-packages/receive",
                 "externalLink": false,
                 "icon": "",
@@ -321,11 +321,11 @@
         ]
       },
       {
-        "sectionTitle": "Cash Register",
+        "sectionTitle": "Finances",
         "permissions": ["billing.create", "money-outflows.list"],
         "items": [
           {
-            "label": "Operations",
+            "label": "Movements",
             "link": "",
             "externalLink": false,
             "icon": "ri-hand-coin-line",
@@ -375,7 +375,7 @@
                 "permissions": ["cash-registers.list"]
               },
               {
-                "label": "Issued Invoices",
+                "label": "Invoices",
                 "link": "/invoices",
                 "externalLink": false,
                 "icon": "",
@@ -393,8 +393,15 @@
         ]
       },
       {
-        "sectionTitle": "Configuration",
-        "permissions": ["configuration.view", "offices.list", "offices.create", "products.list", "products.create"],
+        "sectionTitle": "Administration",
+        "permissions": [
+          "configuration.view",
+          "offices.list",
+          "offices.create",
+          "products.list",
+          "products.create",
+          "reports.view"
+        ],
         "items": [
           {
             "label": "Configuration",
@@ -448,11 +455,18 @@
                 "permissions": ["products.create"]
               }
             ]
+          },
+          {
+            "label": "Reports",
+            "link": "/reports",
+            "externalLink": false,
+            "icon": "ri-file-list-2-line",
+            "permissions": ["reports.view"]
           }
         ]
       },
       {
-        "sectionTitle": "Security",
+        "sectionTitle": "Access and Roles",
         "permissions": ["administrators.list", "administrators.create", "roles.list", "roles.create"],
         "items": [
           {

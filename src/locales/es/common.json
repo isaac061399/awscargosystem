@@ -35,7 +35,7 @@
             "permissions": ["pages.list", "pages.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/pages",
                 "externalLink": false,
                 "icon": "",
@@ -58,7 +58,7 @@
             "permissions": ["categories.list", "categories.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/categories",
                 "externalLink": false,
                 "icon": "",
@@ -81,7 +81,7 @@
             "permissions": ["contents.list", "contents.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/contents",
                 "externalLink": false,
                 "icon": "",
@@ -104,7 +104,7 @@
             "permissions": ["menus.list", "menus.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/menus",
                 "externalLink": false,
                 "icon": "",
@@ -178,7 +178,7 @@
             "permissions": ["clients.list", "clients.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/clients",
                 "externalLink": false,
                 "icon": "",
@@ -201,7 +201,7 @@
             "permissions": ["orders.list", "orders.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/orders",
                 "externalLink": false,
                 "icon": "",
@@ -224,28 +224,28 @@
             "permissions": ["packages.list", "unowned-packages.list", "packages.reception", "packages.track"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/packages",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["packages.list"]
               },
               {
-                "label": "Paquetes Sin Dueño",
+                "label": "Sin Dueño",
                 "link": "/unowned-packages",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["unowned-packages.list"]
               },
               {
-                "label": "Recepción de Paquetes",
+                "label": "Recepción",
                 "link": "/packages-reception",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["packages.reception"]
               },
               {
-                "label": "Rastrear Paquetes",
+                "label": "Rastreo",
                 "link": "/packages-tracking",
                 "externalLink": false,
                 "icon": "",
@@ -256,7 +256,7 @@
         ]
       },
       {
-        "sectionTitle": "Operaciones Especiales",
+        "sectionTitle": "Operaciones",
         "permissions": ["special-packages.list", "special-packages.pre-alert", "special-packages.receive"],
         "items": [
           {
@@ -273,21 +273,21 @@
             ],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/special-packages",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["special-packages.list"]
               },
               {
-                "label": "Pre-Alertar (CR)",
+                "label": "Prealerta (CR)",
                 "link": "/special-packages/pre-alert",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["special-packages.pre-alert"]
               },
               {
-                "label": "Recibir (Miami)",
+                "label": "Recepción (Miami)",
                 "link": "/special-packages/receive",
                 "externalLink": false,
                 "icon": "",
@@ -303,7 +303,7 @@
             "permissions": ["special-package-manifests.list", "special-package-manifests.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/special-package-manifests",
                 "externalLink": false,
                 "icon": "",
@@ -321,11 +321,11 @@
         ]
       },
       {
-        "sectionTitle": "Caja",
+        "sectionTitle": "Finanzas",
         "permissions": ["billing.create", "money-outflows.list"],
         "items": [
           {
-            "label": "Operaciones",
+            "label": "Movimientos",
             "link": "",
             "externalLink": false,
             "icon": "ri-hand-coin-line",
@@ -345,7 +345,7 @@
                 "permissions": ["billing.create"]
               },
               {
-                "label": "Salidas de Dinero",
+                "label": "Salidas de Efectivo",
                 "link": "/money-outflows",
                 "externalLink": false,
                 "icon": "",
@@ -375,7 +375,7 @@
                 "permissions": ["cash-registers.list"]
               },
               {
-                "label": "Facturas Emitidas",
+                "label": "Facturas",
                 "link": "/invoices",
                 "externalLink": false,
                 "icon": "",
@@ -393,8 +393,15 @@
         ]
       },
       {
-        "sectionTitle": "Configuración",
-        "permissions": ["configuration.view", "offices.list", "offices.create", "products.list", "products.create"],
+        "sectionTitle": "Administración",
+        "permissions": [
+          "configuration.view",
+          "offices.list",
+          "offices.create",
+          "products.list",
+          "products.create",
+          "reports.view"
+        ],
         "items": [
           {
             "label": "Configuración",
@@ -411,14 +418,14 @@
             "permissions": ["offices.list", "offices.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/offices",
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["offices.list"]
               },
               {
-                "label": "Nueva",
+                "label": "Nuevo",
                 "link": "/offices/new",
                 "externalLink": false,
                 "icon": "",
@@ -434,7 +441,7 @@
             "permissions": ["products.list", "products.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/products",
                 "externalLink": false,
                 "icon": "",
@@ -448,11 +455,18 @@
                 "permissions": ["products.create"]
               }
             ]
+          },
+          {
+            "label": "Reportes",
+            "link": "/reports",
+            "externalLink": false,
+            "icon": "ri-file-list-2-line",
+            "permissions": ["reports.view"]
           }
         ]
       },
       {
-        "sectionTitle": "Seguridad",
+        "sectionTitle": "Acceso y Roles",
         "permissions": ["administrators.list", "administrators.create", "roles.list", "roles.create"],
         "items": [
           {
@@ -463,7 +477,7 @@
             "permissions": ["administrators.list", "administrators.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/administrators",
                 "externalLink": false,
                 "icon": "",
@@ -486,7 +500,7 @@
             "permissions": ["roles.list", "roles.create"],
             "subItems": [
               {
-                "label": "Listar",
+                "label": "Listado",
                 "link": "/roles",
                 "externalLink": false,
                 "icon": "",

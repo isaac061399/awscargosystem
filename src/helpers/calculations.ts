@@ -1,5 +1,6 @@
 import { CusCashRegisterLine, CusOrderProduct, CusPackage, CusProduct } from '@/prisma/generated/client';
 import { Currency, PaymentMethod } from '@/prisma/generated/enums';
+import { poundToKgRate } from '@/libs/constants';
 
 export type BillingLine = {
   id: string;
@@ -336,6 +337,23 @@ export const calculateManifestTotal = (quantity: number, amountPerPackage: numbe
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating manifest total: ${error}`);
+
+    return 0;
+  }
+};
+
+export const convertPoundToKg = (pound: number) => {
+  try {
+    if (isNaN(pound) || pound < 0) {
+      return 0;
+    }
+
+    const kg = pound * poundToKgRate;
+
+    return parseFloat(kg.toFixed(2));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error converting pound to kg: ${error}`);
 
     return 0;
   }

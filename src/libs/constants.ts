@@ -53,6 +53,8 @@ export const billingDefaultActivityCode = '00';
 
 export const billingDefaultDesc = 'ENVIO';
 
+export const poundToKgRate = 0.45359237;
+
 // App Constants
 
 export const userProviders: Record<AuthProvider, { icon: string }> = {

@@ -260,7 +260,7 @@
     "export": {
       "id": "ID",
       "client_office": "Client Office",
-      "client_mailbox": "Client Locker Number",
+      "client_mailbox": "Client Mailbox",
       "client_full_name": "Client Name",
       "client_identification": "Client Identification",
       "client_email": "Client Email",
@@ -295,7 +295,7 @@
     "export": {
       "id": "ID",
       "client_office": "Client Office",
-      "client_mailbox": "Client Locker Number",
+      "client_mailbox": "Client Mailbox",
       "client_full_name": "Client Name",
       "client_identification": "Client Identification",
       "client_email": "Client Email",
@@ -336,6 +336,77 @@
       "save": "Error saving the product, please try again",
       "delete": "Error deleting the product. If it already has associated data, you will not be able to delete it.",
       "general": "An error occurred, please try again"
+    }
+  },
+  "reports": {
+    "errors": {
+      "general": "An error occurred, please try again"
+    },
+    "types": {
+      "packagesReady": {
+        "documentName": "packages-ready",
+        "headers": {
+          "id": "ID",
+          "client_office": "Client Office",
+          "client_mailbox": "Client Mailbox",
+          "client_full_name": "Client Name",
+          "client_identification": "Client Identification",
+          "client_email": "Client Email",
+          "tracking": "Tracking",
+          "location_shelf": "Location Shelf",
+          "location_row": "Location Row",
+          "status_date": "Reception Date",
+          "status_date_days": "Days Since Reception"
+        }
+      },
+      "ordersReady": {
+        "documentName": "orders-ready",
+        "headers": {
+          "id": "ID",
+          "client_office": "Client Office",
+          "client_mailbox": "Client Mailbox",
+          "client_full_name": "Client Name",
+          "client_identification": "Client Identification",
+          "client_email": "Client Email",
+          "tracking": "Tracking",
+          "order_id": "Order ID",
+          "order_number": "Order Number",
+          "product": "Product",
+          "location_shelf": "Location Shelf",
+          "location_row": "Location Row",
+          "status_date": "Reception Date",
+          "status_date_days": "Days Since Reception"
+        }
+      },
+      "cashRegisterMovement": {
+        "documentName": "cash-register-movement",
+        "headers": {
+          "method": "Method",
+          "crc": "Colones",
+          "usd": "Dollars"
+        },
+        "amounts": {
+          "cashIn": "Cash In",
+          "sinpeIn": "SINPE In",
+          "transferIn": "Transfer In",
+          "cardIn": "Card In",
+          "cashOut": "Cash Out",
+          "sinpeOut": "SINPE Out",
+          "transferOut": "Transfer Out",
+          "cardOut": "Card Out",
+          "cashChange": "Cash Change",
+          "total": "Total"
+        }
+      },
+      "packageCuts": {
+        "documentName": "package-cuts",
+        "headers": {
+          "cut": "Cut",
+          "packagesCount": "Packages Count",
+          "pounds": "Pounds",
+          "kilos": "Kilos"
+        }
+      }
     }
   },
   "special-packages": {

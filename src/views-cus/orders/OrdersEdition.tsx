@@ -43,7 +43,6 @@ import {
 import DashboardLayout from '@components/layout/DashboardLayout';
 import MoneyField from '@/components/MoneyField';
 import ClientField from '@/components/custom/ClientField';
-import InfoRow from '@/components/custom/InfoRow';
 
 // Helpers Imports
 import {
@@ -772,54 +771,99 @@ const ProductsAccordionComponent = ({
                   id={`products[${index}]-header`}
                   sx={{
                     flexDirection: 'row-reverse',
-                    color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined
+                    color: hasErrors ? 'var(--mui-palette-error-main) !important' : undefined,
+                    '& .MuiAccordionSummary-content': { my: 1 } // tighter vertical padding
                   }}>
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-5">
-                      <Typography component="span">
-                        {item.name}
-                        {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
-                      </Typography>
-                      {statusChip && (
-                        <Chip
-                          variant="filled"
-                          label={`${textT?.statusLabel}: ${statusChip.label}`}
-                          color={statusChip.color}
-                          size="small"
-                        />
-                      )}
-                      {paymentStatusChip && (
-                        <Chip
-                          variant="filled"
-                          label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
-                          color={paymentStatusChip.color}
-                          size="small"
-                        />
-                      )}
-                      {invoice && (
-                        <Link href={`/invoices/view/${invoice.id}`} target="_blank">
-                          <Chip
-                            label={textT?.viewInvoiceLabel}
-                            color="primary"
-                            variant="outlined"
-                            size="small"
-                            clickable
-                          />
-                        </Link>
-                      )}
+                  <div className="w-full">
+                    {/* Row 1: Title */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <Typography component="span" className="block font-medium truncate">
+                          {item.name}
+                          {item.tracking && item.tracking !== '' ? ` - ${item.tracking}` : ''}
+                        </Typography>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <IconButton
+                          className="p-1"
+                          onClick={() => {
+                            if (item.id) handleDeleteOpen(index, item.id, item.name);
+                            else handleRemove(index);
+                          }}>
+                          <i className="ri-delete-bin-2-line" />
+                        </IconButton>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <IconButton
-                        className="p-1"
-                        onClick={() => {
-                          if (item.id) {
-                            handleDeleteOpen(index, item.id, item.name);
-                          } else {
-                            handleRemove(index);
-                          }
-                        }}>
-                        <i className="ri-delete-bin-2-line" />
-                      </IconButton>
+
+                    {/* Row 2: Meta bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      {/* Left: statuses */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {statusChip && (
+                          <Chip
+                            variant="filled"
+                            label={`${textT?.statusLabel}: ${statusChip.label}`}
+                            color={statusChip.color}
+                            size="small"
+                          />
+                        )}
+                        {(isReady || isDelivered) && (
+                          <Chip
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                            label={`${textT?.locationInfo?.shelf}: ${item.location_shelf ?? '—'} · ${
+                              textT?.locationInfo?.row
+                            }: ${item.location_row ?? '—'}`}
+                          />
+                        )}
+                        {paymentStatusChip && (
+                          <Chip
+                            variant="filled"
+                            label={`${textT?.paymentStatusLabel}: ${paymentStatusChip.label}`}
+                            color={paymentStatusChip.color}
+                            size="small"
+                          />
+                        )}
+                        {invoice && (
+                          <Link href={`/invoices/view/${invoice.id}`} target="_blank">
+                            <Chip
+                              label={textT?.viewInvoiceLabel}
+                              color="primary"
+                              variant="outlined"
+                              size="small"
+                              clickable
+                            />
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Right: money */}
+                      <div className="flex flex-wrap items-center gap-2 justify-end">
+                        {/* Money (stays “important”) */}
+                        <div className="flex items-start gap-1 leading-tight">
+                          <Typography variant="caption" className="block text-gray-500">
+                            {textT?.subtotalLabel}
+                          </Typography>
+                          <Typography variant="body2" className="font-medium whitespace-nowrap">
+                            {formatMoney(orderTotal.usd.items[index].subtotal, `${currencies.USD.symbol} `)}
+                            <span className="mx-1 text-gray-400">|</span>
+                            {formatMoney(orderTotal.crc.items[index].subtotal, `${currencies.CRC.symbol} `)}
+                          </Typography>
+                        </div>
+
+                        <div className="flex items-start gap-1 leading-tight">
+                          <Typography variant="caption" className="block text-gray-500">
+                            {textT?.totalLabel}:
+                          </Typography>
+                          <Typography variant="body2" className="font-medium whitespace-nowrap">
+                            {formatMoney(orderTotal.usd.items[index].total, `${currencies.USD.symbol} `)}
+                            <span className="mx-1 text-gray-400">|</span>
+                            {formatMoney(orderTotal.crc.items[index].total, `${currencies.CRC.symbol} `)}
+                          </Typography>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </AccordionSummary>
@@ -1019,27 +1063,6 @@ const ProductsAccordionComponent = ({
                       />
                     </Grid>
                   </Grid>
-
-                  {/* Location */}
-                  {isReady && (
-                    <Grid container spacing={5} sx={{ mt: 5 }}>
-                      <Grid size={{ xs: 12 }}>
-                        <Divider />
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }} offset={{ md: 3 }} sx={{ display: 'flex' }}>
-                        <Card sx={{ flexGrow: 1 }}>
-                          <CardHeader title={textT?.locationInfo?.title} />
-                          <CardContent>
-                            <Stack spacing={1.25}>
-                              <InfoRow label={textT?.locationInfo?.shelf} value={item.location_shelf} />
-                              <InfoRow label={textT?.locationInfo?.row} value={item.location_row} />
-                              <Divider />
-                            </Stack>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    </Grid>
-                  )}
                 </AccordionDetails>
               </Accordion>
             );

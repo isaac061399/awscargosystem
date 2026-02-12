@@ -46,6 +46,7 @@ import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
 import { generateUrl } from '@/libs/utils';
+import { SpecialPackageStatus } from '@/prisma/generated/enums';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -69,7 +70,7 @@ const SpecialPackages = () => {
   const [rowsState, setRowsState] = useState({ isLoading: false, data: [], total: 0 });
   const [paginationState, setPaginationState] = useState({ page: 0, pageSize: 10 });
   const [searchState, setSearchState] = useState('');
-  const [statusState, setStatusState] = useState('');
+  const [statusState, setStatusState] = useState(SpecialPackageStatus.RECEIVED);
   const [viewState, setViewState] = useState({ open: false, data: null as any });
   const [deleteState, setDeleteState] = useState({
     open: false,

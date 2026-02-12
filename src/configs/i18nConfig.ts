@@ -66,6 +66,7 @@ const i18nConfig = {
     '/[locale]/(dashboard)/products': ['products'],
     '/[locale]/(dashboard)/products/new': ['products-edition'],
     '/[locale]/(dashboard)/products/edit/[id]': ['products-edition'],
+    '/[locale]/(dashboard)/reports': ['reports'],
     '/[locale]/(dashboard)/special-packages': ['special-packages'],
     '/[locale]/(dashboard)/special-packages/pre-alert': ['special-packages-pre-alert'],
     '/[locale]/(dashboard)/special-packages/receive': ['special-packages-receive'],
