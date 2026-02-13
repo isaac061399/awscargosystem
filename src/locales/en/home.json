@@ -15,12 +15,34 @@
       "menus": "Menus"
     },
     "admins": {
+      "title": "Administrators",
+      "noItems": "No administrators to display.",
       "administrator": "Administrator",
       "email": "Email",
       "role": "Role",
       "status": "Status",
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "pendingOrderProducts": {
+      "title": "Pending Orders Without Tracking",
+      "noItems": "No pending orders without tracking to display.",
+      "id": "ID",
+      "number": "Number",
+      "client": "Client",
+      "description": "Description",
+      "daysPending": "Days Pending"
+    },
+    "pendingInvoices": {
+      "title": "Pending Invoices",
+      "noItems": "No pending invoices to display.",
+      "dateFormat": "DD/MM/YYYY hh:mm a",
+      "consecutive": "Consecutive",
+      "client": "Client",
+      "amount": "Amount",
+      "date": "Issue Date",
+      "paymentCondition": "Terms",
+      "daysOverdue": "Days Overdue"
     }
   }
 }
