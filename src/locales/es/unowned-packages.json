@@ -17,7 +17,7 @@
       },
       "created_at": {
         "title": "Fecha de Creación",
-        "format": "DD/MM/YYYY hh:mm A"
+        "format": "DD/MM/YYYY hh:mm a"
       },
       "actions": {
         "title": "Acciones",

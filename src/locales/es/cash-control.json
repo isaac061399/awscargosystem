@@ -8,7 +8,7 @@
     "cashBalance": "Balance Inicial",
     "btnView": "Ver",
     "total": "Total",
-    "dateTimeFormat": "DD/MM/YYYY hh:mm A",
+    "dateTimeFormat": "DD/MM/YYYY hh:mm a",
     "admin": {
       "title": "Administrador",
       "name": "Nombre",

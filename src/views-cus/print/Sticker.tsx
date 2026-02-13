@@ -21,7 +21,7 @@ const Sticker = ({ sticker }: { sticker: any }) => {
     };
   }, []);
 
-  const date = moment().format('DD/MM/YYYY hh:mm A');
+  const date = moment().format('DD/MM/YYYY hh:mm a');
 
   return (
     <div className="sheet">

@@ -1,9 +1,18 @@
-import { prismaRead } from '@libs/prisma';
+import moment from 'moment';
 
-export const getDashboardData = async () => {
+import { prismaRead } from '@libs/prisma';
+import { hasAllPermissions } from '@/helpers/permissions';
+import { InvoicePaymentCondition, InvoiceStatus, OrderStatus } from '@/prisma/generated/enums';
+import { paymentConditionsDays } from '@/libs/constants';
+
+import { clientSelectSchema } from './Client.Controller';
+
+export const getDashboardData = async (permissions: string[]) => {
   const result = {
-    statistics: await getStatistics(),
-    admins: await getAdmins()
+    statistics: false ? await getStatistics() : null,
+    admins: hasAllPermissions('administrators.list', permissions) ? await getAdmins() : null,
+    pendingOrderProducts: hasAllPermissions('orders.list', permissions) ? await getPendingOrderProducts() : null,
+    pendingInvoices: hasAllPermissions('invoices.list', permissions) ? await getPendingInvoices() : null
   };
 
   return result;
@@ -49,6 +58,75 @@ const getAdmins = async () => {
     });
 
     return admins;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return [];
+  }
+};
+
+const getPendingOrderProducts = async () => {
+  try {
+    const pendingOrderProducts = await prismaRead.cusOrderProduct.findMany({
+      orderBy: [{ status_date: 'asc' }],
+      where: {
+        status: OrderStatus.PENDING
+      },
+      select: {
+        id: true,
+        name: true,
+        quantity: true,
+        status_date: true,
+        order: {
+          select: {
+            id: true,
+            number: true,
+            client: { select: clientSelectSchema }
+          }
+        }
+      }
+    });
+
+    return pendingOrderProducts;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return [];
+  }
+};
+
+const getPendingInvoices = async () => {
+  try {
+    const pendingInvoices = await prismaRead.cusInvoice.findMany({
+      orderBy: [{ id: 'asc' }],
+      where: {
+        payment_condition: { not: InvoicePaymentCondition.CASH },
+        status: InvoiceStatus.PENDING
+      },
+      select: {
+        id: true,
+        consecutive: true,
+        numeric_key: true,
+        payment_condition: true,
+        currency: true,
+        total: true,
+        created_at: true,
+        client: {
+          select: clientSelectSchema
+        }
+      }
+    });
+
+    return pendingInvoices.map((invoice) => {
+      const overdueDate = moment(invoice.created_at).add(
+        paymentConditionsDays[invoice.payment_condition as keyof typeof paymentConditionsDays] || 0,
+        'days'
+      );
+
+      return {
+        ...invoice,
+        expired_at: overdueDate.toDate(),
+        expired_days: moment().diff(overdueDate, 'days')
+      };
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return [];

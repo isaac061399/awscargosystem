@@ -28,7 +28,7 @@
       },
       "created_at": {
         "title": "Fecha",
-        "dateFormat": "DD/MM/YYYY hh:mm A"
+        "dateFormat": "DD/MM/YYYY hh:mm a"
       },
       "actions": {
         "title": "Acciones",

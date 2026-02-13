@@ -6,7 +6,7 @@
     "btnContinue": "Continuar",
     "btnCancel": "Cancelar",
     "btnView": "Ver",
-    "dateTimeFormat": "DD/MM/YYYY hh:mm A",
+    "dateTimeFormat": "DD/MM/YYYY hh:mm a",
     "dialogReopenTitle": "Reabrir Caja",
     "dialogReopenMessage": "¿Está seguro que desea reabrir esta caja? Esto permitirá registrar nuevas transacciones y los datos de cierre se eliminarán.",
     "admin": {

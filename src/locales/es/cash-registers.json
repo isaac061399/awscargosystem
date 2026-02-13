@@ -17,11 +17,11 @@
       },
       "open_date": {
         "title": "Apertura",
-        "dateFormat": "DD/MM/YYYY hh:mm A"
+        "dateFormat": "DD/MM/YYYY hh:mm a"
       },
       "close_date": {
         "title": "Cierre",
-        "dateFormat": "DD/MM/YYYY hh:mm A"
+        "dateFormat": "DD/MM/YYYY hh:mm a"
       },
       "status": {
         "title": "Estado"

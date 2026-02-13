@@ -67,7 +67,7 @@ export const validatePendingProducts = async (id: number) => {
       const pendingProducts = await tx.cusOrderProduct.findMany({
         where: {
           order_id: id,
-          status: 'PENDING',
+          status: OrderStatus.PENDING,
           AND: [{ tracking: { not: null } }, { tracking: { not: '' } }]
         },
         select: { id: true }
@@ -80,14 +80,14 @@ export const validatePendingProducts = async (id: number) => {
       for (const product of pendingProducts) {
         const result = await tx.cusOrderProduct.update({
           where: { id: product.id },
-          data: { status: 'ON_THE_WAY', status_date: new Date() }
+          data: { status: OrderStatus.ON_THE_WAY, status_date: new Date() }
         });
 
         if (result) {
           await tx.cusOrderProductStatusLog.create({
             data: {
               order_product_id: product.id,
-              status: 'ON_THE_WAY'
+              status: OrderStatus.ON_THE_WAY
             }
           });
         }
