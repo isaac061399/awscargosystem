@@ -57,6 +57,7 @@ const i18nConfig = {
     '/[locale]/(dashboard)/offices/new': ['offices-edition'],
     '/[locale]/(dashboard)/offices/edit/[id]': ['offices-edition'],
     '/[locale]/(dashboard)/orders': ['orders'],
+    '/[locale]/(dashboard)/orders/calculator': ['orders-calculator'],
     '/[locale]/(dashboard)/orders/new': ['orders-edition'],
     '/[locale]/(dashboard)/orders/edit/[id]': ['orders-edition'],
     '/[locale]/(dashboard)/packages': ['packages'],

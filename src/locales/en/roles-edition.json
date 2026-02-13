@@ -48,7 +48,8 @@
       "pay": "Pay",
       "cancel": "Cancel",
       "pre-alert": "Pre-alert",
-      "receive": "Receive"
+      "receive": "Receive",
+      "calculator": "Calculator"
     }
   },
   "form": {

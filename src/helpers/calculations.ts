@@ -73,6 +73,60 @@ export const getOrderTotal = (products: any[], conversionRate: number, taxPercen
   }
 };
 
+export const getOrderCalculatorResult = (quantity: number, unitPrice: number, unitWeight: number) => {
+  const priceTotal = quantity * unitPrice;
+  const weightTotal = quantity * unitWeight;
+
+  /* weight-based transport calculation
+   * $0 - $5 kg: $7 per kg
+   * $5.01 - $10 kg: $6.5 per kg
+   * $10.01 - $20 kg: $6 per kg
+   * $20.01+ kg: $5.5 per kg
+   */
+
+  let transport = 0;
+  if (weightTotal <= 5) {
+    transport = weightTotal * 7;
+  } else if (weightTotal > 5 && weightTotal <= 10) {
+    transport = weightTotal * 6.5;
+  } else if (weightTotal > 10 && weightTotal <= 20) {
+    transport = weightTotal * 6;
+  } else if (weightTotal > 20) {
+    transport = weightTotal * 5.5;
+  }
+
+  /* utility calculation based on product subtotal
+   * $0 - $50: 12%
+   * $50.01 - $100: 10%
+   * $100.01 - $200: 8%
+   * $200.01 - $500: 7.5%
+   * $500.01+: 5%
+   */
+
+  let utility = 0;
+  if (priceTotal <= 50) {
+    utility = priceTotal * 0.12;
+  } else if (priceTotal > 50 && priceTotal <= 100) {
+    utility = priceTotal * 0.1;
+  } else if (priceTotal > 100 && priceTotal <= 200) {
+    utility = priceTotal * 0.08;
+  } else if (priceTotal > 200 && priceTotal <= 500) {
+    utility = priceTotal * 0.075;
+  } else if (priceTotal > 500) {
+    utility = priceTotal * 0.05;
+  }
+
+  const servicePrice = parseFloat((transport + utility).toFixed(2));
+  const total = parseFloat((priceTotal + servicePrice).toFixed(2));
+
+  return {
+    priceTotal,
+    weightTotal,
+    servicePrice,
+    total
+  };
+};
+
 export const calculateShippingPrice = (weight: string, poundFee: number) => {
   try {
     if (isNaN(parseFloat(weight)) || isNaN(poundFee) || parseFloat(weight) <= 0 || poundFee <= 0) {

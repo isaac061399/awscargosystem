@@ -248,6 +248,7 @@
   },
   "orders": {
     "errors": {
+      "invalidParameters": "Invalid parameters",
       "deliver": "Error delivering the products, please try again",
       "someProductsNotDelivered": "Some products cannot be delivered, please refresh the page and try again",
       "noProductsSelected": "Please select at least one product to deliver",
@@ -274,7 +275,7 @@
       "product_name": "Product Name",
       "product_description": "Product Description",
       "product_quantity": "Product Quantity",
-      "product_price": "Product Price",
+      "product_price": "Product Unit Price",
       "product_service_price": "Product Service Price",
       "product_url": "Product URL",
       "product_image_url": "Product Image URL",

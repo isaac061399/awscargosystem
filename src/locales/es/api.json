@@ -248,6 +248,7 @@
   },
   "orders": {
     "errors": {
+      "invalidParameters": "Parámetros inválidos",
       "deliver": "Error al entregar los productos, por favor inténtalo de nuevo",
       "someProductsNotDelivered": "Algunos productos no pueden ser entregados, por favor refresque la página e inténtalo de nuevo",
       "noProductsSelected": "Por favor seleccione al menos un producto para entregar",
@@ -274,7 +275,7 @@
       "product_name": "Nombre del Producto",
       "product_description": "Descripción del Producto",
       "product_quantity": "Cantidad del Producto",
-      "product_price": "Precio del Producto",
+      "product_price": "Precio Unitario del Producto",
       "product_service_price": "Precio del Servicio del Producto",
       "product_url": "URL del Producto",
       "product_image_url": "URL de la Imagen del Producto",

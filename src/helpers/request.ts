@@ -1624,6 +1624,23 @@ export const requestDeliverOrderProducts = async (id: number, params: any, lang:
   }
 };
 
+export const requestOrdersCalculator = async (params: any, lang: string) => {
+  try {
+    const response = await axios.request({
+      method: 'get',
+      url: '/api/orders/calculator',
+      headers: { ...defaultHeaders, 'Accept-Language': lang },
+      params
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
+    // console.error(e);
+    return { valid: false };
+  }
+};
+
 // packages
 
 export const requestGetPackages = async (params: any, lang: string) => {

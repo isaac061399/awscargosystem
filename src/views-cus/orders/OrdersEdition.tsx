@@ -869,31 +869,9 @@ const ProductsAccordionComponent = ({
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={5}>
-                    <Grid size={{ xs: 12 }}>
-                      <Divider sx={{ mb: 3 }} />
-                      <div className="flex items-center gap-5">
-                        <div className="flex items-center gap-1">
-                          <Typography variant="body1">{textT?.subtotalLabel}:</Typography>
-                          <Typography variant="body1">
-                            {formatMoney(orderTotal.usd.items[index].subtotal, `${currencies.USD.symbol} `)}
-                            {' | '}
-                            {formatMoney(orderTotal.crc.items[index].subtotal, `${currencies.CRC.symbol} `)}
-                          </Typography>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Typography variant="body1">{textT?.totalLabel}:</Typography>
-                          <Typography variant="body1">
-                            {formatMoney(orderTotal.usd.items[index].total, `${currencies.USD.symbol} `)}
-                            {' | '}
-                            {formatMoney(orderTotal.crc.items[index].total, `${currencies.CRC.symbol} `)}
-                          </Typography>
-                        </div>
-                      </div>
-                      <Divider sx={{ mt: 3 }} />
+                    <Grid size={{ xs: 12, md: 12 }}>
+                      <Divider />
                     </Grid>
-                  </Grid>
-
-                  <Grid container spacing={5} sx={{ mt: 5 }}>
                     {isEditing && (
                       <Grid size={{ xs: 12, md: 4 }}>
                         <TextField

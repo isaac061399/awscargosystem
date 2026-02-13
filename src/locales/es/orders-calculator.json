@@ -1,0 +1,35 @@
+{
+  "text": {
+    "title": "Calculadora de Pedidos",
+    "dateFormat": "DD/MM/YYYY hh:mm a",
+    "btnCalculate": "Calcular",
+    "result": "Resultado",
+    "quantity": "Cant",
+    "priceTotal": "Precio Total",
+    "weightTotal": "Peso Total",
+    "servicePrice": "Precio de Servicio",
+    "subtotal": "Subtotal",
+    "taxes": "Impuestos",
+    "total": "Total"
+  },
+  "form": {
+    "labels": {
+      "quantity": "Cantidad",
+      "unit_price": "Precio Unitario",
+      "unit_weight": "Peso Unitario (libras)"
+    },
+    "placeholders": {
+      "quantity": "Ingrese una cantidad",
+      "unit_price": "Ingrese el precio unitario",
+      "unit_weight": "Ingrese el peso unitario en libras"
+    },
+    "errors": {
+      "quantity": "Campo requerido",
+      "unit_price": "Campo requerido",
+      "unit_weight": "Campo requerido",
+
+      "invalidInteger": "El valor debe ser un número entero"
+    },
+    "errorMessage": "Error al guardar calcular, por favor inténtalo de nuevo"
+  }
+}

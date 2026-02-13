@@ -164,6 +164,7 @@
           "clients.create",
           "orders.list",
           "orders.create",
+          "orders.calculator",
           "packages.list",
           "unowned-packages.list",
           "packages.reception",
@@ -198,7 +199,7 @@
             "link": "",
             "externalLink": false,
             "icon": "ri-shopping-bag-4-line",
-            "permissions": ["orders.list", "orders.create"],
+            "permissions": ["orders.list", "orders.create", "orders.calculator"],
             "subItems": [
               {
                 "label": "Listado",
@@ -213,6 +214,13 @@
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["orders.create"]
+              },
+              {
+                "label": "Calculadora",
+                "link": "/orders/calculator",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["orders.calculator"]
               }
             ]
           },

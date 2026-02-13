@@ -62,7 +62,7 @@
         "name": "Nombre",
         "description": "Descripción",
         "quantity": "Cantidad",
-        "price": "Precio",
+        "price": "Precio unitario",
         "service_price": "Precio del servicio",
         "url": "URL",
         "image_url": "URL de la imagen"
