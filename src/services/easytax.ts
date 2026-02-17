@@ -2,13 +2,17 @@ import axios from 'axios';
 import { Moment } from 'moment';
 
 import { Currency, InvoicePaymentCondition, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
-import { paymentConditionsDays } from '@/libs/constants';
-import { padStartZeros } from '@/libs/utils';
 
 const EASYTAX_ENDPOINT = process.env.EASYTAX_ENDPOINT || '';
 const EASYTAX_USERNAME = process.env.EASYTAX_USERNAME || '';
 const EASYTAX_PASSWORD = process.env.EASYTAX_PASSWORD || '';
 const EASYTAX_DEV_MODE = process.env.EASYTAX_DEV_MODE === 'true';
+
+// constants
+const terminal = 2; // se refiere al número de caja, el 1 está reservado para POS
+const tipoTransaccion = '01'; // venta normal de bienes y servicios
+const codigoImpuesto = '01'; // IVA
+const codigoTarifa = '08'; // tarifa general 13%
 
 export type DocumentData = {
   company: {
@@ -25,7 +29,9 @@ export type DocumentData = {
   };
   invoiceType: InvoiceType;
   date: Moment;
+  expirationDate: Moment;
   condition: InvoicePaymentCondition;
+  conditionDays: number;
   currency: Currency;
   method: PaymentMethod;
   ref?: string;
@@ -42,15 +48,15 @@ export type DocumentData = {
 };
 
 export const generateDocument = async (data: DocumentData) => {
-  console.log('documentPayload', data);
+  console.log('documentPayload', JSON.stringify(data));
 
   const params = formatGenerateDocumentParams(data);
 
-  console.log('easytaxPayload', params);
+  console.log('easytaxPayload', JSON.stringify(params));
 
   const response = await requestCreateDocument(params);
 
-  console.log('easytaxResponse', response);
+  console.log('easytaxResponse', JSON.stringify(response));
 
   return response;
 };
@@ -62,15 +68,8 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
   };
 
   const conditionMap: Record<InvoicePaymentCondition, string> = {
-    [InvoicePaymentCondition.CASH]: '0',
-    [InvoicePaymentCondition.CREDIT_6]: '10',
-    [InvoicePaymentCondition.CREDIT_8]: '4',
-    [InvoicePaymentCondition.CREDIT_16]: '5',
-    [InvoicePaymentCondition.CREDIT_25]: '6',
-    [InvoicePaymentCondition.CREDIT_30]: '7',
-    [InvoicePaymentCondition.CREDIT_45]: '8',
-    [InvoicePaymentCondition.CREDIT_60]: '11',
-    [InvoicePaymentCondition.CREDIT_90]: '9'
+    [InvoicePaymentCondition.CASH]: '01',
+    [InvoicePaymentCondition.CREDIT]: '02'
   };
 
   const currencyMap: Record<Currency, number> = {
@@ -80,7 +79,7 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
 
   const methodMap: Record<PaymentMethod, string> = {
     [PaymentMethod.CASH]: '01',
-    [PaymentMethod.SINPE]: '04',
+    [PaymentMethod.SINPE]: '06',
     [PaymentMethod.TRANSFER]: '04',
     [PaymentMethod.CARD]: '02'
   };
@@ -95,17 +94,20 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
   return {
     type: 'CREAR_DOCUMENTO',
     tipo_documento: invoiceTypeMap[data.invoiceType],
-    id_company: data.company.identification, //cedula de aws
-    numero_sucursal: padStartZeros(data.officeId, 3),
-    // numero_consecutivo: 1, // dejar que se asigne automáticamente
-    terminal: 1, // constante
-    fecha_documento: data.date.format('YYYY-MM-DD'),
-    fecha_vencimiento: data.date.clone().add(paymentConditionsDays[data.condition], 'days').format('YYYY-MM-DD'),
+    id_company: data.company.identification, // cedula de aws
+    numero_sucursal: data.officeId,
+    numero_consecutivo: 0, // constante para que easytax asigne el siguiente consecutivo
+    corregir_consecutivo: 'SI', // constante para siempre corregir el consecutivo en caso de errores
+    terminal: terminal, // se refiere al número de caja, el 1 está reservado para POS
+    fecha_documento: data.date.format('YYYY-MM-DD HH:mm:ss'),
+    fecha_vencimiento: data.expirationDate.format('YYYY-MM-DD HH:mm:ss'),
     cedula_cliente: data.client.identification, // cedula de cliente
     nombre_cliente: data.client.name, // nombre de cliente
     correoCliente: data.client.email, // correo de cliente
     codigoActividadCliente: data.client.activityCode, // código actividad de cliente
+    crearCliente: 'NO',
     condicion_pago: conditionMap[data.condition],
+    plazoCredito: data.conditionDays,
     moneda: currencyMap[data.currency],
     // tipo_cambio: 1, // no enviar para que se use el del día
     // total_gravado: data.total.subtotal,
@@ -125,13 +127,18 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
     id_actividad: data.company.activityCode, // codigo actividad de aws
     idUsuario: data.company.identification, //cedula de aws
     nombreUsuario: data.company.name, // nombre de aws
-    mh: EASYTAX_DEV_MODE ? 0 : 1,
+    // mh: EASYTAX_DEV_MODE ? 1 : 0, // probar bien
+    mh: 1,
+    latitud: '0',
+    longitud: '0',
     modulo: 'POS',
-    corregir_consecutivo: 'si',
+    crearUsuario: 'NO',
+    crearProducto: 'NO',
     detalle_factura: data.lines.map((line, index) => ({
       numero_linea: index + 1,
       codigo_producto: line.cabys,
       descripcion_producto: line.description,
+      tipo_transaccion: tipoTransaccion,
       cantidad: line.quantity,
       precio_unitario: line.unitPrice,
       subtotal: line.subtotal,
@@ -140,17 +147,19 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
       total_gravado: line.subtotal,
       total_exento: 0,
       total_exonerado: 0,
-      total_impuesto: line.tax,
+      total_impuesto: line.total,
       total_impuesto_exonerado: 0,
       total_comprobante: line.total,
-      codigo_impuesto: '01',
-      codigo_tarifa: '08',
+      codigo_impuesto: codigoImpuesto,
+      codigo_tarifa: codigoTarifa,
+      monto_exportacion: 0,
       observaciones: ''
     }))
   };
 };
 
 const requestCreateDocument = async (data: any) => {
+  // const path = '/facturacion';
   const path = '/crear_documento';
 
   const headers = {

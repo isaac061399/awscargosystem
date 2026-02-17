@@ -109,6 +109,7 @@ const formatEntries = async (headers: any, labelsT: any, invoices: any[]) => {
         [headers.numeric_key]: i.numeric_key,
         [headers.type]: labelsT?.invoiceType[i.type],
         [headers.payment_condition]: labelsT?.invoicePaymentCondition[i.payment_condition],
+        [headers.payment_condition_days]: i.payment_condition_days,
         [headers.iva_percentage]: i.iva_percentage,
         [headers.selling_exchange_rate]: i.selling_exchange_rate,
         [headers.buying_exchange_rate]: i.buying_exchange_rate,
@@ -121,6 +122,7 @@ const formatEntries = async (headers: any, labelsT: any, invoices: any[]) => {
         [headers.cash_change]: i.cash_change,
         [headers.status]: labelsT?.invoiceStatus[i.status],
         [headers.paid_at]: i.paid_at ? moment(i.paid_at).tz(tz).format('YYYY-MM-DD HH:mm:ss') : '',
+        [headers.expired_at]: moment(i.expired_at).tz(tz).format('YYYY-MM-DD HH:mm:ss'),
         [headers.created_at]: moment(i.created_at).tz(tz).format('YYYY-MM-DD HH:mm:ss')
       };
     })

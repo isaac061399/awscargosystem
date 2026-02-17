@@ -27,6 +27,7 @@ import { hasAllPermissions } from '@/helpers/permissions';
 
 // Utils Imports
 import { generateUrl } from '@libs/utils';
+import { InvoicePaymentCondition } from '@/prisma/generated/enums';
 
 const statusColors: any = {
   PENDING: 'warning',
@@ -140,6 +141,9 @@ const Invoices = ({ client }: { client?: any }) => {
           <span>
             <strong>{textT?.table?.type?.paymentCondition}</strong>:{' '}
             {labelsT?.invoicePaymentCondition?.[params.row.payment_condition]}
+            {params.row.payment_condition !== InvoicePaymentCondition.CASH
+              ? ` (${params.row.payment_condition_days} ${textT?.table?.type?.paymentConditionDays})`
+              : ''}
           </span>
         </div>
       )

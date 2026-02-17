@@ -27,7 +27,7 @@ import {
 import { validateOrderStatus } from '@/controllers/Order.Controller';
 import { DocumentData, generateDocument } from '@/services/easytax';
 import { CusConfiguration, CusInvoice } from '@/prisma/generated/client';
-import { billingDefaultActivityCode, billingDefaultDesc } from '@/libs/constants';
+import { billingDefaultActivityCode, billingDefaultDesc, billingPaymentConditions } from '@/libs/constants';
 
 export const GET = withAuthApi(['invoices.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -82,7 +82,9 @@ export const GET = withAuthApi(['invoices.list'], async (req) => {
         consecutive: true,
         type: true,
         payment_condition: true,
+        payment_condition_days: true,
         status: true,
+        expired_at: true,
         created_at: true,
         cash_register: {
           select: {
@@ -119,7 +121,9 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
   try {
     const clientId = parseInt(data.client_id);
     const invoiceType = data.type as InvoiceType;
-    const paymentCondition = data.payment_condition as InvoicePaymentCondition;
+    const customPaymentCondition = data.payment_condition as keyof typeof billingPaymentConditions;
+    const paymentCondition = billingPaymentConditions[customPaymentCondition]?.type || InvoicePaymentCondition.CASH;
+    const paymentConditionDays = billingPaymentConditions[customPaymentCondition]?.days || 0;
     const baseCurrency = data.currency as Currency;
     const lines = data.lines;
     const payments = data.payments;
@@ -208,10 +212,11 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
         data: {
           cash_register_id: cashRegister.id,
           client_id: client.id,
-          consecutive: `${Date.now()}`, // TODO: to be generated
-          numeric_key: `${Date.now()}`, // TODO: to be generated
+          consecutive: ``,
+          numeric_key: ``,
           type: invoiceType,
           payment_condition: paymentCondition,
+          payment_condition_days: paymentConditionDays,
           iva_percentage: configuration.iva_percentage,
           selling_exchange_rate: configuration.selling_exchange_rate,
           buying_exchange_rate: configuration.buying_exchange_rate,
@@ -224,6 +229,8 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
           cash_change: changeAmountCRC,
           status: paymentCondition === InvoicePaymentCondition.CASH ? InvoiceStatus.PAID : InvoiceStatus.PENDING,
           paid_at: paymentCondition === InvoicePaymentCondition.CASH ? new Date() : null,
+          expired_at: moment().add(paymentConditionDays, 'days').toDate(),
+          created_at: moment().toDate(),
           invoice_lines: {
             createMany: {
               data:
@@ -285,6 +292,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
       // if (!easytaxResponse.valid) {
       //   throw new TransactionError(500, textT?.errors?.easytaxService);
       // }
+
       // throw new TransactionError(500, textT?.errors?.save);
 
       // 6: save easytax response data
@@ -339,7 +347,9 @@ const buildCreateDocumentPayload = (data: {
     },
     invoiceType: invoice.type,
     date: moment(invoice.created_at),
+    expirationDate: moment(invoice.expired_at),
     condition: invoice.payment_condition,
+    conditionDays: invoice.payment_condition_days,
     currency: invoice.currency,
     method: invoice.payment_method,
     ref: invoice.payment_method_ref || '',

@@ -20,6 +20,7 @@
     "paymentInfo": {
       "title": "Pago",
       "paymentCondition": "Condición de Pago",
+      "paymentConditionDays": "Días",
       "currency": "Moneda",
       "exchangeRate": "Tipo de Cambio",
       "paymentMethod": "Método de Pago",
@@ -29,7 +30,7 @@
       "title": "Fechas",
       "issueDate": "Fecha de Emisión",
       "paidDate": "Fecha de Pago",
-      "dueDate": "Fecha de Vencimiento",
+      "expiredDate": "Fecha de Vencimiento",
       "cancelDate": "Fecha de Cancelación",
       "cancelBy": "Cancelado por"
     },

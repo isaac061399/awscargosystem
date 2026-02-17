@@ -29,7 +29,6 @@ import { useAdmin } from '@components/AdminProvider';
 import { hasAllPermissions } from '@helpers/permissions';
 
 import { generateUrl } from '@/libs/utils';
-import { paymentConditionsDays } from '@/libs/constants';
 
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
@@ -175,6 +174,7 @@ const Invoices = ({ credits }: { credits: boolean }) => {
           <span>
             <strong>{textT?.table?.type?.paymentCondition}</strong>:{' '}
             {labelsT?.invoicePaymentCondition?.[params.row.payment_condition]}
+            {credits ? ` (${params.row.payment_condition_days} ${textT?.table?.type?.paymentConditionDays})` : ''}
           </span>
         </div>
       )
@@ -197,6 +197,17 @@ const Invoices = ({ credits }: { credits: boolean }) => {
       }
     },
     {
+      field: 'expired_at',
+      headerName: textT?.table?.expired_at?.title,
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params: any) => (
+        <div className="h-full inline-flex flex-col justify-center py-2">
+          {credits ? moment(params.row.expired_at).format(textT?.table?.expired_at?.dateFormat) : '--'}
+        </div>
+      )
+    },
+    {
       field: 'created_at',
       headerName: textT?.table?.created_at?.title,
       flex: 1,
@@ -208,22 +219,6 @@ const Invoices = ({ credits }: { credits: boolean }) => {
       )
     }
   ];
-
-  if (credits) {
-    columns.push({
-      field: 'expired_at',
-      headerName: textT?.table?.expired_at?.title,
-      flex: 1,
-      minWidth: 200,
-      renderCell: (params: any) => (
-        <div className="h-full inline-flex flex-col justify-center py-2">
-          {moment(params.row.created_at)
-            .add(paymentConditionsDays[params.row.payment_condition as keyof typeof paymentConditionsDays], 'days')
-            .format(textT?.table?.expired_at?.dateFormat)}
-        </div>
-      )
-    });
-  }
 
   const statusOptions = useMemo(
     () =>

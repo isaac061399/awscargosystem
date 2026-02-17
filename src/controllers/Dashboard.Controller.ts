@@ -3,7 +3,6 @@ import moment from 'moment';
 import { prismaRead } from '@libs/prisma';
 import { hasAllPermissions } from '@/helpers/permissions';
 import { InvoicePaymentCondition, InvoiceStatus, OrderStatus } from '@/prisma/generated/enums';
-import { paymentConditionsDays } from '@/libs/constants';
 
 import { clientSelectSchema } from './Client.Controller';
 
@@ -96,7 +95,7 @@ const getPendingOrderProducts = async () => {
 const getPendingInvoices = async () => {
   try {
     const pendingInvoices = await prismaRead.cusInvoice.findMany({
-      orderBy: [{ id: 'asc' }],
+      orderBy: [{ expired_at: 'asc' }, { created_at: 'asc' }],
       where: {
         payment_condition: { not: InvoicePaymentCondition.CASH },
         status: InvoiceStatus.PENDING
@@ -106,8 +105,10 @@ const getPendingInvoices = async () => {
         consecutive: true,
         numeric_key: true,
         payment_condition: true,
+        payment_condition_days: true,
         currency: true,
         total: true,
+        expired_at: true,
         created_at: true,
         client: {
           select: clientSelectSchema
@@ -116,15 +117,9 @@ const getPendingInvoices = async () => {
     });
 
     return pendingInvoices.map((invoice) => {
-      const overdueDate = moment(invoice.created_at).add(
-        paymentConditionsDays[invoice.payment_condition as keyof typeof paymentConditionsDays] || 0,
-        'days'
-      );
-
       return {
         ...invoice,
-        expired_at: overdueDate.toDate(),
-        expired_days: moment().diff(overdueDate, 'days')
+        expired_days: moment().diff(moment(invoice.expired_at), 'days')
       };
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -55,7 +55,7 @@ import {
   PaymentLine
 } from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
-import { Currency, InvoicePaymentCondition, PaymentMethod } from '@/prisma/generated/enums';
+import { Currency, PaymentMethod } from '@/prisma/generated/enums';
 
 /** ------- Default States ------- */
 const defaultAlertState = { open: false, type: 'success', message: '' };
@@ -113,7 +113,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
       () => ({
         client: null as any,
         invoice_type: Object.keys(labelsT?.invoiceType)[0] || '',
-        invoice_payment_condition: Object.keys(labelsT?.invoicePaymentCondition)[0] || '',
+        invoice_payment_condition: Object.keys(labelsT?.customInvoicePaymentCondition)[0] || '',
         invoice_currency: Currency.CRC
       }),
       [labelsT]
@@ -128,7 +128,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
       setAlertState({ ...defaultAlertState });
 
       // validate amount vrs total if payment method is cash
-      if (formik.values.invoice_payment_condition === InvoicePaymentCondition.CASH && paidAmount < totals.total) {
+      if (formik.values.invoice_payment_condition === 'CASH' && paidAmount < totals.total) {
         setAlertState({ open: true, type: 'error', message: formT?.amountErrorMessage });
         setTimeout(() => {
           setAlertState({ ...defaultAlertState });
@@ -476,7 +476,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
 
   // update payments lines if invoice payment condition changes
   useEffect(() => {
-    if (formik.values.invoice_payment_condition !== InvoicePaymentCondition.CASH) {
+    if (formik.values.invoice_payment_condition !== 'CASH') {
       setPaymentLines([]);
     }
   }, [formik.values.invoice_payment_condition]);
@@ -788,9 +788,9 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                       disabled={formik.isSubmitting}
                     />
                     <Select
-                      options={Object.keys(labelsT?.invoicePaymentCondition).map((value) => ({
+                      options={Object.keys(labelsT?.customInvoicePaymentCondition).map((value) => ({
                         value,
-                        label: labelsT?.invoicePaymentCondition[value]
+                        label: labelsT?.customInvoicePaymentCondition[value]
                       }))}
                       fullWidth
                       required
@@ -979,7 +979,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                               !formik.values.client ||
                               !cashRegister ||
                               selectedLines.length === 0 ||
-                              formik.values.invoice_payment_condition !== InvoicePaymentCondition.CASH
+                              formik.values.invoice_payment_condition !== 'CASH'
                             }>
                             {textT?.cards?.payment?.btnAddPayment}
                           </Button>

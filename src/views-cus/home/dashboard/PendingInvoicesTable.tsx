@@ -27,6 +27,7 @@ import {
 import tableStyles from '@core/styles/table.module.css';
 import { formatMoney } from '@/libs/utils';
 import { currencies } from '@/libs/constants';
+import { InvoicePaymentCondition } from '@/prisma/generated/enums';
 
 const PendingInvoicesTable = ({ pendingInvoices }: { pendingInvoices: any[] }) => {
   const { t } = useTranslation();
@@ -45,8 +46,9 @@ const PendingInvoicesTable = ({ pendingInvoices }: { pendingInvoices: any[] }) =
                   <TableCell align="center">{textT?.consecutive}</TableCell>
                   <TableCell align="center">{textT?.client}</TableCell>
                   <TableCell align="center">{textT?.amount}</TableCell>
-                  <TableCell align="center">{textT?.date}</TableCell>
                   <TableCell align="center">{textT?.paymentCondition}</TableCell>
+                  <TableCell align="center">{textT?.date}</TableCell>
+                  <TableCell align="center">{textT?.expiredDate}</TableCell>
                   <TableCell align="center">{textT?.daysOverdue}</TableCell>
                 </TableRow>
               </TableHead>
@@ -84,12 +86,17 @@ const PendingInvoicesTable = ({ pendingInvoices }: { pendingInvoices: any[] }) =
                     </TableCell>
                     <TableCell>
                       <Typography color="text.primary">
+                        {`${labelsT?.invoicePaymentCondition?.[invoice.payment_condition]} ${invoice.payment_condition !== InvoicePaymentCondition.CASH ? `(${invoice.payment_condition_days} ${textT?.paymentInfo?.paymentConditionDays})` : ''}`}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography color="text.primary">
                         {moment(invoice.created_at).format(textT?.dateFormat)}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography color="text.primary">
-                        {labelsT?.invoicePaymentCondition[invoice.payment_condition]}
+                        {moment(invoice.expired_at).format(textT?.dateFormat)}
                       </Typography>
                     </TableCell>
                     <TableCell>

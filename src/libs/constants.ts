@@ -37,21 +37,21 @@ export const specialPackageDocumentTypes = ['Factura comercial', 'Guía aérea',
 
 export const bankAccounts = { BAC: 'BAC Credomatic', BN: 'Banco Nacional' };
 
-export const paymentConditionsDays = {
-  [InvoicePaymentCondition.CASH]: 0,
-  [InvoicePaymentCondition.CREDIT_6]: 6,
-  [InvoicePaymentCondition.CREDIT_8]: 8,
-  [InvoicePaymentCondition.CREDIT_16]: 16,
-  [InvoicePaymentCondition.CREDIT_25]: 25,
-  [InvoicePaymentCondition.CREDIT_30]: 30,
-  [InvoicePaymentCondition.CREDIT_45]: 45,
-  [InvoicePaymentCondition.CREDIT_60]: 60,
-  [InvoicePaymentCondition.CREDIT_90]: 90
-};
-
 export const billingDefaultActivityCode = '00';
 
 export const billingDefaultDesc = 'ENVIO';
+
+export const billingPaymentConditions = {
+  CASH: { type: InvoicePaymentCondition.CASH, days: 0 },
+  CREDIT_6: { type: InvoicePaymentCondition.CREDIT, days: 6 },
+  CREDIT_8: { type: InvoicePaymentCondition.CREDIT, days: 8 },
+  CREDIT_16: { type: InvoicePaymentCondition.CREDIT, days: 16 },
+  CREDIT_25: { type: InvoicePaymentCondition.CREDIT, days: 25 },
+  CREDIT_30: { type: InvoicePaymentCondition.CREDIT, days: 30 },
+  CREDIT_45: { type: InvoicePaymentCondition.CREDIT, days: 45 },
+  CREDIT_60: { type: InvoicePaymentCondition.CREDIT, days: 60 },
+  CREDIT_90: { type: InvoicePaymentCondition.CREDIT, days: 90 }
+};
 
 export const poundToKgRate = 0.45359237;
 

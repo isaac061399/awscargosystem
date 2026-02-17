@@ -203,6 +203,7 @@
       "numeric_key": "Numeric Key",
       "type": "Type",
       "payment_condition": "Payment Condition",
+      "payment_condition_days": "Payment Term (days)",
       "iva_percentage": "IVA Percentage",
       "selling_exchange_rate": "Selling Exchange Rate",
       "buying_exchange_rate": "Buying Exchange Rate",
@@ -215,6 +216,7 @@
       "cash_change": "Change",
       "status": "Status",
       "paid_at": "Paid At",
+      "expired_at": "Expired At",
       "created_at": "Created At"
     }
   },

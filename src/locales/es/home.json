@@ -40,8 +40,10 @@
       "consecutive": "Consecutivo",
       "client": "Cliente",
       "amount": "Monto",
+      "paymentCondition": "Condición de Pago",
+      "paymentConditionDays": "Días",
       "date": "Fecha Emisión",
-      "paymentCondition": "Plazo",
+      "expiredDate": "Fecha Vencimiento",
       "daysOverdue": "Días Vencido"
     }
   }

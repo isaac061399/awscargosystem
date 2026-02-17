@@ -27,10 +27,12 @@ export const getActivityCodes = async (identification: string): Promise<{ code: 
     let codes = [{ code: billingDefaultActivityCode, description: 'Default' }];
 
     if (response?.data?.actividades && Array.isArray(response.data.actividades)) {
-      codes = response.data.actividades.map((activity: any) => ({
-        code: activity.codigo,
-        description: activity.descripcion
-      }));
+      codes = codes.concat(
+        response.data.actividades.map((activity: any) => ({
+          code: activity.codigo,
+          description: activity.descripcion
+        }))
+      );
     }
 
     return codes;

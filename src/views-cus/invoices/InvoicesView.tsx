@@ -52,7 +52,7 @@ import { useAdmin } from '@/components/AdminProvider';
 import { hasAllPermissions } from '@/helpers/permissions';
 
 import { Currency, InvoicePaymentCondition, InvoiceStatus, PaymentMethod } from '@/prisma/generated/enums';
-import { bankAccounts, currencies, paymentConditionsDays } from '@/libs/constants';
+import { bankAccounts, currencies } from '@/libs/constants';
 import { formatMoney } from '@/libs/utils';
 import { calculateBillingPaidAmount, convertCRC, convertUSD } from '@/helpers/calculations';
 
@@ -298,7 +298,7 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                   <Divider />
                   <InfoRow
                     label={textT?.paymentInfo?.paymentCondition}
-                    value={labelsT?.invoicePaymentCondition?.[invoice.payment_condition] ?? '—'}
+                    value={`${labelsT?.invoicePaymentCondition?.[invoice.payment_condition]} ${invoice.payment_condition !== InvoicePaymentCondition.CASH ? `(${invoice.payment_condition_days} ${textT?.paymentInfo?.paymentConditionDays})` : ''}`}
                   />
                   <InfoRow label={textT?.paymentInfo?.currency} value={labelsT?.currency?.[invoice.currency] ?? '—'} />
                   <InfoRow
@@ -333,13 +333,8 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                   )}
                   {invoice.status === InvoiceStatus.PENDING && (
                     <InfoRow
-                      label={textT?.datesInfo?.dueDate}
-                      value={moment(invoice.created_at)
-                        .add(
-                          paymentConditionsDays[invoice.payment_condition as keyof typeof paymentConditionsDays],
-                          'days'
-                        )
-                        .format(textT?.dateFormat)}
+                      label={textT?.datesInfo?.expiredDate}
+                      value={moment(invoice.expired_at).format(textT?.dateFormat)}
                     />
                   )}
                   {invoice.status === InvoiceStatus.CANCELED && (

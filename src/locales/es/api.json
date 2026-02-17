@@ -203,6 +203,7 @@
       "numeric_key": "Clave Numérica",
       "type": "Tipo",
       "payment_condition": "Condición de Pago",
+      "payment_condition_days": "Plazo de Pago (días)",
       "iva_percentage": "Porcentaje de IVA",
       "selling_exchange_rate": "Tipo de Cambio de Venta",
       "buying_exchange_rate": "Tipo de Cambio de Compra",
@@ -215,6 +216,7 @@
       "cash_change": "Vuelto",
       "status": "Estado",
       "paid_at": "Fecha de Pago",
+      "expired_at": "Fecha de Vencimiento",
       "created_at": "Fecha de Registro"
     }
   },

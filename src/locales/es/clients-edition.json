@@ -179,7 +179,8 @@
         "type": {
           "title": "Info",
           "type": "Tipo",
-          "paymentCondition": "Condición de Pago"
+          "paymentCondition": "Condición de Pago",
+          "paymentConditionDays": "Días"
         },
         "status": {
           "title": "Estado"

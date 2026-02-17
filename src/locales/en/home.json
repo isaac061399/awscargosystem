@@ -40,8 +40,10 @@
       "consecutive": "Consecutive",
       "client": "Client",
       "amount": "Amount",
+      "paymentCondition": "Payment Condition",
+      "paymentConditionDays": "Days",
       "date": "Issue Date",
-      "paymentCondition": "Terms",
+      "expiredDate": "Expiration Date",
       "daysOverdue": "Days Overdue"
     }
   }

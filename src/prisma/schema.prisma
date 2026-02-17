@@ -674,29 +674,31 @@ model CusDistrict {
 }
 
 model CusInvoice {
-  id                    Int                     @id @default(autoincrement())
-  cash_register_id      Int
-  client_id             Int
-  consecutive           String
-  numeric_key           String
-  type                  InvoiceType
-  payment_condition     InvoicePaymentCondition
-  iva_percentage        Float                   @default(0)
-  selling_exchange_rate Float                   @default(0)
-  buying_exchange_rate  Float                   @default(0)
-  currency              Currency
-  payment_method        PaymentMethod
-  payment_method_ref    String
-  subtotal              Float
-  tax                   Float
-  total                 Float
-  cash_change           Float
-  status                InvoiceStatus
-  cancelled_by_id       Int?
-  cancelled_at          DateTime?
-  paid_at               DateTime?
-  created_at            DateTime                @default(now())
-  updated_at            DateTime                @updatedAt
+  id                     Int                     @id @default(autoincrement())
+  cash_register_id       Int
+  client_id              Int
+  consecutive            String
+  numeric_key            String
+  type                   InvoiceType
+  payment_condition      InvoicePaymentCondition
+  payment_condition_days Int
+  iva_percentage         Float                   @default(0)
+  selling_exchange_rate  Float                   @default(0)
+  buying_exchange_rate   Float                   @default(0)
+  currency               Currency
+  payment_method         PaymentMethod
+  payment_method_ref     String
+  subtotal               Float
+  tax                    Float
+  total                  Float
+  cash_change            Float
+  status                 InvoiceStatus
+  cancelled_by_id        Int?
+  cancelled_at           DateTime?
+  paid_at                DateTime?
+  expired_at             DateTime                @default(now())
+  created_at             DateTime                @default(now())
+  updated_at             DateTime                @updatedAt
 
   cash_register    CusCashRegister     @relation(fields: [cash_register_id], references: [id], onDelete: Restrict)
   client           CusClient           @relation(fields: [client_id], references: [id], onDelete: Restrict)
@@ -1077,14 +1079,7 @@ enum InvoiceType {
 
 enum InvoicePaymentCondition {
   CASH
-  CREDIT_6
-  CREDIT_8
-  CREDIT_16
-  CREDIT_25
-  CREDIT_30
-  CREDIT_45
-  CREDIT_60
-  CREDIT_90
+  CREDIT
 }
 
 enum InvoiceStatus {
