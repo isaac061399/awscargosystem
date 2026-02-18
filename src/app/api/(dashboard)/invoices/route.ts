@@ -212,8 +212,8 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
         data: {
           cash_register_id: cashRegister.id,
           client_id: client.id,
-          consecutive: ``,
-          numeric_key: ``,
+          consecutive: new Date().getTime().toString(), // TODO: generate consecutive according to easytax response
+          numeric_key: new Date().getTime().toString(), // TODO: generate numeric key according to easytax response
           type: invoiceType,
           payment_condition: paymentCondition,
           payment_condition_days: paymentConditionDays,
