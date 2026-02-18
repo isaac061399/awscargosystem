@@ -10,7 +10,6 @@ const EASYTAX_DEV_MODE = process.env.EASYTAX_DEV_MODE === 'true';
 
 // constants
 const tipoTransaccion = '01'; // venta normal de bienes y servicios
-const codigoImpuesto = '01'; // IVA
 const codigoTarifa = '08'; // tarifa general 13%
 
 export type DocumentData = {
@@ -99,7 +98,6 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
     id_company: data.company.identification, // cedula de aws
     numero_sucursal: data.office.number,
     // numero_consecutivo: 0, // no enviar para que easytax asigne el siguiente consecutivo
-    corregir_consecutivo: 'SI', // constante para siempre corregir el consecutivo en caso de errores
     terminal: data.office.terminal, // se refiere al número de caja, el 1 está reservado para POS
     fecha_documento: data.date.format('YYYY-MM-DD HH:mm:ss'),
     fecha_vencimiento: data.expirationDate.format('YYYY-MM-DD HH:mm:ss'),
@@ -123,8 +121,8 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
     latitud: '0',
     longitud: '0',
     modulo: 'POS',
+    corregir_consecutivo: 'SI', // constante para siempre corregir el consecutivo en caso de errores
     crearCliente: 'SI',
-    crearUsuario: 'SI',
     crearProducto: 'SI',
     detalle_factura: data.lines.map((line, index) => ({
       numero_linea: index + 1,
@@ -142,7 +140,6 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
       total_impuesto: line.tax,
       total_impuesto_exonerado: 0,
       total_comprobante: line.total,
-      codigo_impuesto: codigoImpuesto,
       codigo_tarifa: codigoTarifa,
       monto_exportacion: 0,
       observaciones: ''
