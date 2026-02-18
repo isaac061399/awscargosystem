@@ -70,6 +70,7 @@ const AdministratorField = ({
   return (
     <Autocomplete
       options={options}
+      filterOptions={(options) => options}
       isOptionEqualToValue={isOptionEqualToValue}
       value={value}
       getOptionLabel={(option) => formatOption(option)}

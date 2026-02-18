@@ -50,6 +50,7 @@ import { formatMoney, padStartZeros } from '@/libs/utils';
 import {
   BillingLine,
   calculateBillingChangeAmount,
+  calculateBillingMissingAmountOtherCurrency,
   calculateBillingPaidAmount,
   calculateBillingTotal,
   PaymentLine
@@ -474,6 +475,17 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentOpen]);
 
+  // update payment amount value when currency changes
+  useEffect(() => {
+    if (formikPayment.values.currency === formik.values.invoice_currency) {
+      formikPayment.setFieldValue('amount', missingAmount);
+    } else {
+      formikPayment.setFieldValue('amount', missingAmountOtherCurrency.amount);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formikPayment.values.currency]);
+
   // update payments lines if invoice payment condition changes
   useEffect(() => {
     if (formik.values.invoice_payment_condition !== 'CASH') {
@@ -680,6 +692,12 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
 
   /** --- vars --- */
   const missingAmount = totals.total - paidAmount >= 0 ? totals.total - paidAmount : 0;
+  const missingAmountOtherCurrency = calculateBillingMissingAmountOtherCurrency(
+    missingAmount,
+    formik.values.invoice_currency,
+    sellingExchangeRate,
+    buyingExchangeRate
+  );
   const changeAmountCRC = calculateBillingChangeAmount(
     paidAmount,
     totals.total,
@@ -950,7 +968,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                     <Divider className="my-2" />
                     <Row
                       label={`${textT?.cards?.totals?.missing}`}
-                      value={formatMoney(missingAmount, `${currencies[formik.values.invoice_currency].symbol} `)}
+                      value={`${formatMoney(missingAmount, `${currencies[formik.values.invoice_currency].symbol} `)} | ${formatMoney(missingAmountOtherCurrency.amount, `${currencies[missingAmountOtherCurrency.currency].symbol} `)}`}
                     />
                     <Divider className="my-2" />
                     <Row

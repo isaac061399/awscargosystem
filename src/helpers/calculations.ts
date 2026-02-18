@@ -246,6 +246,40 @@ export const calculateBillingPaidAmount = (
   }
 };
 
+export const calculateBillingMissingAmountOtherCurrency = (
+  missingAmount: number,
+  baseCurrency: Currency,
+  sellingConversionRate: number,
+  buyingConversionRate: number
+) => {
+  const otherCurrency = baseCurrency === Currency.CRC ? Currency.USD : Currency.CRC;
+  const result = { amount: 0, currency: otherCurrency };
+
+  try {
+    if (isNaN(missingAmount) || missingAmount < 0) {
+      return result;
+    }
+
+    let missingAmountOtherCurrency = 0;
+
+    if (baseCurrency === Currency.CRC) {
+      missingAmountOtherCurrency = convertUSD(missingAmount, buyingConversionRate);
+    } else if (baseCurrency === Currency.USD) {
+      missingAmountOtherCurrency = convertCRC(missingAmount, sellingConversionRate);
+      missingAmountOtherCurrency = roundCRC(missingAmountOtherCurrency);
+    }
+
+    result.amount = parseFloat(missingAmountOtherCurrency.toFixed(2));
+
+    return result;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating billing missing amount in other currency: ${error}`);
+
+    return result;
+  }
+};
+
 export const calculateBillingChangeAmount = (
   paidAmount: number,
   billingTotal: number,
