@@ -357,6 +357,9 @@ export const getOpenCashRegister = async (adminId: number) => {
         administrator_id: adminId,
         open_date: { gte: today.startOf('day').toDate(), lte: today.endOf('day').toDate() },
         status: CashRegisterStatus.OPEN
+      },
+      include: {
+        office: true
       }
     });
 
@@ -364,7 +367,7 @@ export const getOpenCashRegister = async (adminId: number) => {
       return null;
     }
 
-    return { id: cashRegister.id, office_id: cashRegister.office_id };
+    return { id: cashRegister.id, office: cashRegister.office };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     // console.error(`Error: ${e}`);

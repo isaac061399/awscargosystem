@@ -65,6 +65,8 @@ export const POST = withAuthApi(['offices.create'], async (req) => {
           mailbox_prefix: data.mailbox_prefix,
           shelves: data.shelves,
           rows: data.rows,
+          billing_number: parseInt(data.billing_number),
+          billing_terminal: parseInt(data.billing_terminal),
           enabled: data.enabled
         }
       });

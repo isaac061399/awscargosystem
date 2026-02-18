@@ -28,7 +28,7 @@ export const GET = withAuthApi([], async (req) => {
         return NextResponse.json({ valid: true, data: [] }, { status: 200 });
       }
 
-      where.office_id = cashRegister.office_id;
+      where.office_id = cashRegister.office.id;
     }
 
     if (search.trim() !== '') {

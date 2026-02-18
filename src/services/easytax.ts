@@ -9,7 +9,6 @@ const EASYTAX_PASSWORD = process.env.EASYTAX_PASSWORD || '';
 const EASYTAX_DEV_MODE = process.env.EASYTAX_DEV_MODE === 'true';
 
 // constants
-const terminal = 2; // se refiere al número de caja, el 1 está reservado para POS
 const tipoTransaccion = '01'; // venta normal de bienes y servicios
 const codigoImpuesto = '01'; // IVA
 const codigoTarifa = '08'; // tarifa general 13%
@@ -20,7 +19,10 @@ export type DocumentData = {
     identification: string;
     activityCode: string;
   };
-  officeId: number;
+  office: {
+    number: number;
+    terminal: number;
+  };
   client: {
     name: string;
     identification: string;
@@ -95,30 +97,20 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
     type: 'CREAR_DOCUMENTO',
     tipo_documento: invoiceTypeMap[data.invoiceType],
     id_company: data.company.identification, // cedula de aws
-    numero_sucursal: data.officeId,
-    numero_consecutivo: 0, // constante para que easytax asigne el siguiente consecutivo
+    numero_sucursal: data.office.number,
+    // numero_consecutivo: 0, // no enviar para que easytax asigne el siguiente consecutivo
     corregir_consecutivo: 'SI', // constante para siempre corregir el consecutivo en caso de errores
-    terminal: terminal, // se refiere al número de caja, el 1 está reservado para POS
+    terminal: data.office.terminal, // se refiere al número de caja, el 1 está reservado para POS
     fecha_documento: data.date.format('YYYY-MM-DD HH:mm:ss'),
     fecha_vencimiento: data.expirationDate.format('YYYY-MM-DD HH:mm:ss'),
     cedula_cliente: data.client.identification, // cedula de cliente
     nombre_cliente: data.client.name, // nombre de cliente
     correoCliente: data.client.email, // correo de cliente
     codigoActividadCliente: data.client.activityCode, // código actividad de cliente
-    crearCliente: 'NO',
     condicion_pago: conditionMap[data.condition],
     plazoCredito: data.conditionDays,
     moneda: currencyMap[data.currency],
     // tipo_cambio: 1, // no enviar para que se use el del día
-    // total_gravado: data.total.subtotal,
-    // total_exento: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
-    // total_exonerado: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
-    // total_descuento: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exentos.)
-    // total_impuesto: data.total.tax, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con impuesto.)
-    // total_iva_devuelto: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con IVA devuelto.)
-    // total_iva_exonerado: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios exonerados.)
-    // total_otros_cargos: 0, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios con otros cargos.)
-    // total_comprobante: data.total.total, // float (opcional en caso de enviar detalle de factura: Total de los productos / servicios del comprobante.)
     forma_pago: methodMap[data.method],
     forma_pago_desc: methodDescMap[data.method],
     forma_pago_referencia: data.ref || '',
@@ -127,13 +119,13 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
     id_actividad: data.company.activityCode, // codigo actividad de aws
     idUsuario: data.company.identification, //cedula de aws
     nombreUsuario: data.company.name, // nombre de aws
-    // mh: EASYTAX_DEV_MODE ? 1 : 0, // probar bien
     mh: 1,
     latitud: '0',
     longitud: '0',
     modulo: 'POS',
-    crearUsuario: 'NO',
-    crearProducto: 'NO',
+    crearCliente: 'SI',
+    crearUsuario: 'SI',
+    crearProducto: 'SI',
     detalle_factura: data.lines.map((line, index) => ({
       numero_linea: index + 1,
       codigo_producto: line.cabys,
@@ -147,7 +139,7 @@ const formatGenerateDocumentParams = (data: DocumentData) => {
       total_gravado: line.subtotal,
       total_exento: 0,
       total_exonerado: 0,
-      total_impuesto: line.total,
+      total_impuesto: line.tax,
       total_impuesto_exonerado: 0,
       total_comprobante: line.total,
       codigo_impuesto: codigoImpuesto,

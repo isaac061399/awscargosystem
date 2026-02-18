@@ -685,6 +685,10 @@ model CusInvoice {
   iva_percentage         Float                   @default(0)
   selling_exchange_rate  Float                   @default(0)
   buying_exchange_rate   Float                   @default(0)
+  client_name            String
+  client_identification  String
+  client_email           String
+  client_activity_code   String
   currency               Currency
   payment_method         PaymentMethod
   payment_method_ref     String
@@ -801,14 +805,16 @@ model CusMoneyOutflowLog {
 }
 
 model CusOffice {
-  id             Int      @id @default(autoincrement())
-  name           String
-  mailbox_prefix String
-  shelves        String?
-  rows           String?
-  enabled        Boolean  @default(true)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  name             String
+  mailbox_prefix   String
+  shelves          String?
+  rows             String?
+  billing_number   Int
+  billing_terminal Int
+  enabled          Boolean  @default(true)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
 
   clients          CusClient[]
   administrators   Administrator[]

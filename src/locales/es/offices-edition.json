@@ -2,7 +2,9 @@
   "text": {
     "titleNew": "Nueva Oficina",
     "titleEdit": "Editando Oficina: ",
-    "btnSave": "Guardar"
+    "btnSave": "Guardar",
+    "locationsTitle": "Información de Ubicaciones",
+    "billingTitle": "Información de Facturación"
   },
   "form": {
     "labels": {
@@ -10,6 +12,8 @@
       "mailbox_prefix": "Prefijo de casillero",
       "shelves": "Estantes",
       "rows": "Filas",
+      "billing_number": "Número de sucursal",
+      "billing_terminal": "Número de terminal (caja)",
       "enabled": "Activa"
     },
     "placeholders": {
@@ -17,6 +21,8 @@
       "mailbox_prefix": "Ingrese un prefijo de casillero",
       "shelves": "Escriba y presione enter para agregar estantes",
       "rows": "Escriba y presione enter para agregar filas",
+      "billing_number": "Ingrese el número de sucursal",
+      "billing_terminal": "Ingrese el número de terminal (caja)",
       "enabled": ""
     },
     "errors": {
@@ -24,7 +30,10 @@
       "mailbox_prefix": "El prefijo de casillero es requerido",
       "shelves": "Los estantes son requeridos",
       "rows": "Las filas son requeridas",
-      "enabled": ""
+      "billing_number": "El número de sucursal es requerido",
+      "billing_terminal": "El número de terminal (caja) es requerido",
+      "enabled": "",
+      "invalidInteger": "El valor debe ser un número entero"
     },
     "successMessage": "Oficina guardada con éxito",
     "errorMessage": "Error al guardar la oficina, por favor inténtalo de nuevo"

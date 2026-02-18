@@ -17,15 +17,7 @@ export const getAllOffices = async () => {
 export const getOffice = async (id: number) => {
   try {
     const office = await prismaRead.cusOffice.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        mailbox_prefix: true,
-        shelves: true,
-        rows: true,
-        enabled: true
-      }
+      where: { id }
     });
 
     if (!office) {

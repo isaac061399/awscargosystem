@@ -26,7 +26,7 @@ import {
 } from '@/helpers/calculations';
 import { validateOrderStatus } from '@/controllers/Order.Controller';
 import { DocumentData, generateDocument } from '@/services/easytax';
-import { CusConfiguration, CusInvoice } from '@/prisma/generated/client';
+import { CusConfiguration, CusInvoice, CusOffice } from '@/prisma/generated/client';
 import { billingDefaultActivityCode, billingDefaultDesc, billingPaymentConditions } from '@/libs/constants';
 
 export const GET = withAuthApi(['invoices.list'], async (req) => {
@@ -148,7 +148,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
 
     // validate client and billing information
     const client = await prismaRead.cusClient.findUnique({
-      where: { id: clientId, office_id: cashRegister.office_id }
+      where: { id: clientId, office_id: cashRegister.office.id }
     });
     if (!client) {
       return NextResponse.json({ valid: false, message: textT?.errors?.noClient }, { status: 400 });
@@ -220,6 +220,10 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
           iva_percentage: configuration.iva_percentage,
           selling_exchange_rate: configuration.selling_exchange_rate,
           buying_exchange_rate: configuration.buying_exchange_rate,
+          client_name: client.billing_full_name,
+          client_identification: client.billing_identification,
+          client_email: client.billing_email,
+          client_activity_code: client.billing_activity_code || billingDefaultActivityCode,
           currency: baseCurrency,
           payment_method: mostValuablePayment?.method || PaymentMethod.CASH,
           payment_method_ref: mostValuablePayment?.ref || '',
@@ -283,10 +287,9 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
       // 5: send invoice to easytax service
       // const documentPayload = buildCreateDocumentPayload({
       //   configuration,
-      //   client,
+      //   office: cashRegister.office,
       //   invoice,
-      //   lines: linesData || [],
-      //   officeId: cashRegister.office_id
+      //   lines: linesData || []
       // });
       // const easytaxResponse = await generateDocument(documentPayload);
       // if (!easytaxResponse.valid) {
@@ -325,12 +328,11 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
 
 const buildCreateDocumentPayload = (data: {
   configuration: CusConfiguration;
-  client: any;
+  office: CusOffice;
   invoice: CusInvoice;
   lines: BillingLine[];
-  officeId: number;
 }): DocumentData => {
-  const { configuration, client, invoice, lines, officeId } = data;
+  const { configuration, office, invoice, lines } = data;
 
   return {
     company: {
@@ -338,12 +340,15 @@ const buildCreateDocumentPayload = (data: {
       identification: configuration.billing_identification,
       activityCode: configuration.billing_activity_code
     },
-    officeId,
+    office: {
+      number: office.billing_number,
+      terminal: office.billing_terminal
+    },
     client: {
-      name: client.billing_full_name,
-      identification: client.billing_identification,
-      email: client.billing_email,
-      activityCode: client.billing_activity_code || billingDefaultActivityCode
+      name: invoice.client_name,
+      identification: invoice.client_identification,
+      email: invoice.client_email,
+      activityCode: invoice.client_activity_code || billingDefaultActivityCode
     },
     invoiceType: invoice.type,
     date: moment(invoice.created_at),

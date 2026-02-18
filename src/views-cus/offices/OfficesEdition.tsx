@@ -56,6 +56,8 @@ const OfficesEdition = ({ office }: { office?: any }) => {
         mailbox_prefix: office ? office.mailbox_prefix : '',
         shelves: office ? `${office.shelves}`.split(',') : [],
         rows: office ? `${office.rows}`.split(',') : [],
+        billing_number: office ? office.billing_number : '',
+        billing_terminal: office ? office.billing_terminal : '',
         enabled: office ? office.enabled : true
       }),
       [office]
@@ -65,6 +67,8 @@ const OfficesEdition = ({ office }: { office?: any }) => {
       mailbox_prefix: yup.string().required(formT?.errors?.mailbox_prefix),
       shelves: yup.array().min(1, formT?.errors?.shelves).required(formT?.errors?.shelves),
       rows: yup.array().min(1, formT?.errors?.rows).required(formT?.errors?.rows),
+      billing_number: yup.number().integer(formT?.errors?.invalidInteger).required(formT?.errors?.billing_number),
+      billing_terminal: yup.number().integer(formT?.errors?.invalidInteger).required(formT?.errors?.billing_terminal),
       enabled: yup.boolean()
     }),
     onSubmit: async (values) => {
@@ -136,7 +140,7 @@ const OfficesEdition = ({ office }: { office?: any }) => {
               {alertState.open && <CardHeader title={<Alert severity={alertState.type}>{alertState.message}</Alert>} />}
               <CardContent>
                 <Grid container spacing={5}>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       fullWidth
                       required
@@ -153,7 +157,7 @@ const OfficesEdition = ({ office }: { office?: any }) => {
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <TextField
                       fullWidth
                       required
@@ -172,6 +176,26 @@ const OfficesEdition = ({ office }: { office?: any }) => {
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
+                  <Grid size={{ xs: 12, md: 3 }} className="flex items-center">
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={formik.values.enabled}
+                          onChange={(e) => {
+                            formik.setFieldValue('enabled', e.target.checked);
+                          }}
+                        />
+                      }
+                      label={formT?.labels?.enabled}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+              <CardContent>
+                <Divider textAlign="left" sx={{ mb: 5, mt: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.locationsTitle}</Typography>
+                </Divider>
+                <Grid container spacing={5}>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <MuiChipsInput
                       fullWidth
@@ -202,17 +226,49 @@ const OfficesEdition = ({ office }: { office?: any }) => {
                       disabled={formik.isSubmitting || isRedirecting}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={formik.values.enabled}
-                          onChange={(e) => {
-                            formik.setFieldValue('enabled', e.target.checked);
-                          }}
-                        />
+                </Grid>
+              </CardContent>
+              <CardContent>
+                <Divider textAlign="left" sx={{ mb: 5, mt: 5, '&::before': { width: 0 }, '&::after': { flex: 1 } }}>
+                  <Typography variant="h4">{textT?.billingTitle}</Typography>
+                </Divider>
+                <Grid container spacing={5}>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="number"
+                      id="billing_number"
+                      name="billing_number"
+                      label={formT?.labels?.billing_number}
+                      placeholder={formT?.placeholders?.billing_number}
+                      value={formik.values.billing_number}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_number && formik.errors.billing_number)}
+                      color={
+                        Boolean(formik.touched.billing_number && formik.errors.billing_number) ? 'error' : 'primary'
                       }
-                      label={formT?.labels?.enabled}
+                      helperText={formik.touched.billing_number && (formik.errors.billing_number as string)}
+                      disabled={formik.isSubmitting}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 3 }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="number"
+                      id="billing_terminal"
+                      name="billing_terminal"
+                      label={formT?.labels?.billing_terminal}
+                      placeholder={formT?.placeholders?.billing_terminal}
+                      value={formik.values.billing_terminal}
+                      onChange={formik.handleChange}
+                      error={Boolean(formik.touched.billing_terminal && formik.errors.billing_terminal)}
+                      color={
+                        Boolean(formik.touched.billing_terminal && formik.errors.billing_terminal) ? 'error' : 'primary'
+                      }
+                      helperText={formik.touched.billing_terminal && (formik.errors.billing_terminal as string)}
+                      disabled={formik.isSubmitting}
                     />
                   </Grid>
                 </Grid>
