@@ -2,7 +2,6 @@ import { Currency, OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/ge
 import { Prisma } from '@/prisma/generated/client';
 import { BillingLine, convertCRC, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
 import { prismaRead, Tx } from '@/libs/prisma';
-import { clientSelectSchema } from './Client.Controller';
 
 export const getInvoice = async (id: number) => {
   try {
@@ -16,13 +15,11 @@ export const getInvoice = async (id: number) => {
           select: {
             id: true,
             administrator: { select: { id: true, full_name: true, email: true } },
-            office: { select: { id: true, name: true } }
+            office: { select: { id: true, name: true, billing_number: true, billing_terminal: true } }
           }
         },
         client: {
-          select: {
-            ...clientSelectSchema,
-            address: true,
+          include: {
             district: {
               select: {
                 id: true,

@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from 'next/server';
-
 import moment from 'moment';
+
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
+import { billingDefaultActivityCode, billingDefaultDesc, billingPaymentConditions } from '@/libs/constants';
+import { DocumentData, generateDocument } from '@/services/easytax';
+
+import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
+import { CusConfiguration, CusInvoice, CusOffice } from '@/prisma/generated/client';
+
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 import { clientSelectSchema, isValidBillingInformation } from '@/controllers/Client.Controller';
 import {
@@ -15,6 +20,7 @@ import {
   validatePayments
 } from '@/controllers/Invoice.Controller';
 import { getConfiguration } from '@/controllers/Configuration.Controller';
+import { validateOrderStatus } from '@/controllers/Order.Controller';
 import {
   BillingLine,
   calculateBillingChangeAmount,
@@ -24,10 +30,6 @@ import {
   convertCRC,
   convertUSD
 } from '@/helpers/calculations';
-import { validateOrderStatus } from '@/controllers/Order.Controller';
-import { DocumentData, generateDocument } from '@/services/easytax';
-import { CusConfiguration, CusInvoice, CusOffice } from '@/prisma/generated/client';
-import { billingDefaultActivityCode, billingDefaultDesc, billingPaymentConditions } from '@/libs/constants';
 
 export const GET = withAuthApi(['invoices.list'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -245,6 +247,8 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
                   package_prev_status: line.refObj.type === 'package' ? line.refObj.obj.status : undefined,
                   order_product_prev_status: line.refObj.type === 'order_product' ? line.refObj.obj.status : undefined,
                   prev_payment_status: line.refObj.type !== 'product' ? line.refObj.obj.payment_status : undefined,
+                  cabys: line.refObj.type === 'product' ? line.refObj.obj.cabys : configuration.billing_cabys_default,
+                  description: line.refObj.type === 'product' ? line.refObj.obj.code : billingDefaultDesc,
                   currency: line.currency,
                   quantity: line.quantity,
                   unit_price: line.unit_price,

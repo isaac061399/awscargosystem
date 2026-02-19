@@ -697,6 +697,8 @@ model CusInvoice {
   total                  Float
   cash_change            Float
   status                 InvoiceStatus
+  canceled_consecutive   String?
+  cancelled_numeric_key  String?
   cancelled_by_id        Int?
   cancelled_at           DateTime?
   paid_at                DateTime?
@@ -723,6 +725,8 @@ model CusInvoiceLine {
   package_prev_status       PackageStatus?
   order_product_prev_status OrderStatus?
   prev_payment_status       PaymentStatus?
+  cabys                     String
+  description               String
   currency                  Currency
   quantity                  Float
   unit_price                Float
