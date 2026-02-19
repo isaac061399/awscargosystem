@@ -2,7 +2,9 @@
   "text": {
     "title": "Reportes",
     "filters": "Filtros",
-    "btnDownload": "Descargar"
+    "results": "Resultados",
+    "btnShow": "Mostrar Resultados",
+    "btnDownload": "Descargar Resultados"
   },
   "reportTypes": {
     "packagesReady": "Paquetes listos para retirar",

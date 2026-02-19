@@ -13,6 +13,7 @@ export const GET = withAuthApi(['reports.view'], async (req) => {
 
   try {
     // filters
+    const returnData = params.rd === 'true';
     const type = params.t;
     const officeId = params.oi && !isNaN(parseInt(params.oi)) ? parseInt(params.oi) : undefined;
     const startDate = params.sd;
@@ -39,6 +40,10 @@ export const GET = withAuthApi(['reports.view'], async (req) => {
         break;
       default:
         return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 400 });
+    }
+
+    if (returnData) {
+      return NextResponse.json({ valid: true, data: reportData });
     }
 
     const csv = parse(reportData.data, { fields: reportData.headers });
