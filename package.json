@@ -22,7 +22,8 @@
     "postinstall": "yarn run build:icons && yarn prisma generate",
     "db:update": "npx prisma db push",
     "db:seed": "npx prisma db seed --",
-    "db:init": "yarn run db:update && yarn run db:seed"
+    "db:init": "yarn run db:update && yarn run db:seed",
+    "data:migration": "tsx data/migration/script.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -108,6 +109,7 @@
     "@types/speakeasy": "^2.0.10",
     "@types/swagger-ui-react": "^5.18.0",
     "babel-plugin-react-compiler": "^1.0.0",
+    "csv-parser": "^3.2.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
     "postcss": "^8.5.6",
