@@ -1,0 +1,143 @@
+--- Migration run started at 2026-02-25T18:06:17.481Z ---
+[2026-02-25T18:06:18.018Z] [WARN] No matching usuario found for cliente ID: 10
+[2026-02-25T18:06:19.136Z] [WARN] No matching usuario found for cliente ID: 48
+[2026-02-25T18:06:19.401Z] [ERROR] Error processing cliente ID: 59 -
+Invalid `prisma.cusClient.create()` invocation in
+/Users/guillermo/Desktop/projects/awscargo-system/data/migration/script.ts:174:53
+
+  171   billingPhone = phone; // Set to phone if no valid billing phone number is available
+  172 }
+  173
+→ 174 const createdCliente = await prisma.cusClient.create({
+        data: {
+          id: 219,
+          office_id: 1,
+          mailbox: "AWS-219",
+          full_name: "Fiorela Espinoza Arce",
+          identification_type: "PHYSICAL",
+          identification: "207590182",
+          email: null,
+          phone: "+506 86239116",
+          notes: "",
+          district_id: 20504,
+          address: "San Isidro,calle Pavas,frente a la antigua pulpería de Daniel Sanchez",
+          password: "$argon2id$v=19$m=19923,t=2,p=1$wTphS5+4NFrBMOJ6lOCEpw$2mYsYw3YlD5gCg9GqHgk2kWJVeU4+mwcNsC0fg6U1Bs",
+          billing_full_name: "Fiorela Espinoza Arce",
+          billing_identification_type: "PHYSICAL",
+          billing_identification: "207590182",
+          billing_email: null,
+          billing_phone: "+506 86239116",
+          billing_district_id: 20504,
+          billing_address: "San Isidro,calle Pavas,frente a la antigua pulpería de Daniel Sanchez",
+          billing_activity_code: "00",
+          pound_fee: 7,
+          status: "ACTIVE",
+          created_at: "2020-02-19T18:07:41.573Z",
+      +   office: {
+      +     create: CusOfficeCreateWithoutClientsInput | CusOfficeUncheckedCreateWithoutClientsInput,
+      +     connectOrCreate: CusOfficeCreateOrConnectWithoutClientsInput,
+      +     connect: CusOfficeWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `office` is missing.
+[2026-02-25T18:06:19.401Z] [WARN] No matching usuario found for cliente ID: 60
+[2026-02-25T18:06:19.558Z] [WARN] No matching usuario found for cliente ID: 63
+[2026-02-25T18:06:19.562Z] [WARN] No matching usuario found for cliente ID: 66
+[2026-02-25T18:06:19.565Z] [WARN] No matching usuario found for cliente ID: 68
+[2026-02-25T18:06:20.035Z] [WARN] No matching usuario found for cliente ID: 85
+[2026-02-25T18:06:20.168Z] [WARN] No matching usuario found for cliente ID: 95
+[2026-02-25T18:06:21.104Z] [WARN] No matching usuario found for cliente ID: 1128
+[2026-02-25T18:06:22.028Z] [WARN] No matching usuario found for cliente ID: 5417
+[2026-02-25T18:06:22.591Z] [WARN] No matching usuario found for cliente ID: 6432
+[2026-02-25T18:06:23.128Z] [WARN] No matching usuario found for cliente ID: 6455
+[2026-02-25T18:06:23.380Z] [WARN] No matching usuario found for cliente ID: 13324
+[2026-02-25T18:06:24.234Z] [WARN] No matching usuario found for cliente ID: 7487
+[2026-02-25T18:06:24.236Z] [WARN] No matching usuario found for cliente ID: 8488
+[2026-02-25T18:06:24.919Z] [WARN] No matching usuario found for cliente ID: 8558
+[2026-02-25T18:06:25.698Z] [WARN] No matching usuario found for cliente ID: 8568
+[2026-02-25T18:06:25.999Z] [WARN] No matching usuario found for cliente ID: 8589
+[2026-02-25T18:06:26.187Z] [WARN] No matching usuario found for cliente ID: 8557
+[2026-02-25T18:06:26.216Z] [WARN] No matching usuario found for cliente ID: 8571
+[2026-02-25T18:06:26.220Z] [WARN] No matching usuario found for cliente ID: 8574
+[2026-02-25T18:06:26.223Z] [WARN] No matching usuario found for cliente ID: 8559
+[2026-02-25T18:06:26.226Z] [WARN] No matching usuario found for cliente ID: 8562
+[2026-02-25T18:06:26.230Z] [WARN] No matching usuario found for cliente ID: 8567
+[2026-02-25T18:06:26.260Z] [WARN] No matching usuario found for cliente ID: 8576
+[2026-02-25T18:06:26.263Z] [WARN] No matching usuario found for cliente ID: 8577
+[2026-02-25T18:06:26.295Z] [WARN] No matching usuario found for cliente ID: 8578
+[2026-02-25T18:06:26.586Z] [WARN] No matching usuario found for cliente ID: 9620
+[2026-02-25T18:06:26.591Z] [WARN] No matching usuario found for cliente ID: 9625
+[2026-02-25T18:06:26.594Z] [WARN] No matching usuario found for cliente ID: 8560
+[2026-02-25T18:06:26.598Z] [WARN] No matching usuario found for cliente ID: 8561
+[2026-02-25T18:06:26.626Z] [WARN] No matching usuario found for cliente ID: 8566
+[2026-02-25T18:06:26.630Z] [WARN] No matching usuario found for cliente ID: 8569
+[2026-02-25T18:06:26.634Z] [WARN] No matching usuario found for cliente ID: 8570
+[2026-02-25T18:06:26.637Z] [WARN] No matching usuario found for cliente ID: 8572
+[2026-02-25T18:06:26.743Z] [WARN] No matching usuario found for cliente ID: 8579
+[2026-02-25T18:06:27.456Z] [WARN] No matching usuario found for cliente ID: 9622
+[2026-02-25T18:06:27.459Z] [WARN] No matching usuario found for cliente ID: 9626
+[2026-02-25T18:06:27.462Z] [WARN] No matching usuario found for cliente ID: 9628
+[2026-02-25T18:06:27.466Z] [WARN] No matching usuario found for cliente ID: 9641
+[2026-02-25T18:06:27.633Z] [WARN] No matching usuario found for cliente ID: 9621
+[2026-02-25T18:06:27.687Z] [WARN] No matching usuario found for cliente ID: 9624
+[2026-02-25T18:06:27.690Z] [WARN] No matching usuario found for cliente ID: 9627
+[2026-02-25T18:06:27.694Z] [WARN] No matching usuario found for cliente ID: 9629
+[2026-02-25T18:06:27.697Z] [WARN] No matching usuario found for cliente ID: 9630
+[2026-02-25T18:06:27.701Z] [WARN] No matching usuario found for cliente ID: 9631
+[2026-02-25T18:06:27.704Z] [WARN] No matching usuario found for cliente ID: 9635
+[2026-02-25T18:06:27.708Z] [WARN] No matching usuario found for cliente ID: 9637
+[2026-02-25T18:06:27.765Z] [WARN] No matching usuario found for cliente ID: 9636
+[2026-02-25T18:06:27.768Z] [WARN] No matching usuario found for cliente ID: 9639
+[2026-02-25T18:06:27.772Z] [WARN] No matching usuario found for cliente ID: 9640
+[2026-02-25T18:06:27.854Z] [WARN] No matching usuario found for cliente ID: 9642
+[2026-02-25T18:06:28.412Z] [WARN] No matching usuario found for cliente ID: 9623
+[2026-02-25T18:06:28.416Z] [WARN] No matching usuario found for cliente ID: 9633
+[2026-02-25T18:06:28.419Z] [WARN] No matching usuario found for cliente ID: 9638
+[2026-02-25T18:06:28.478Z] [WARN] No matching usuario found for cliente ID: 9632
+[2026-02-25T18:06:28.567Z] [WARN] No matching usuario found for cliente ID: 9634
+[2026-02-25T18:06:28.787Z] [WARN] No matching usuario found for cliente ID: 8575
+[2026-02-25T18:06:36.381Z] [WARN] No matching usuario found for cliente ID: 9995
+[2026-02-25T18:06:40.374Z] [WARN] No matching usuario found for cliente ID: 10431
+[2026-02-25T18:06:43.279Z] [WARN] No matching usuario found for cliente ID: 10170
+[2026-02-25T18:06:47.544Z] [WARN] No matching usuario found for cliente ID: 10311
+[2026-02-25T18:06:47.823Z] [WARN] No matching usuario found for cliente ID: 10228
+[2026-02-25T18:06:59.833Z] [WARN] No matching usuario found for cliente ID: 10703
+[2026-02-25T18:07:04.054Z] [WARN] No matching usuario found for cliente ID: 10828
+[2026-02-25T18:07:05.062Z] [WARN] No matching usuario found for cliente ID: 10893
+[2026-02-25T18:07:10.237Z] [WARN] No matching usuario found for cliente ID: 11061
+[2026-02-25T18:07:11.525Z] [WARN] No matching usuario found for cliente ID: 11043
+[2026-02-25T18:07:18.597Z] [WARN] No matching usuario found for cliente ID: 11333
+[2026-02-25T18:07:19.184Z] [WARN] No matching usuario found for cliente ID: 11381
+[2026-02-25T18:07:31.064Z] [WARN] No matching usuario found for cliente ID: 11932
+[2026-02-25T18:07:31.324Z] [WARN] No matching usuario found for cliente ID: 11865
+[2026-02-25T18:07:33.389Z] [WARN] No matching usuario found for cliente ID: 2161
+[2026-02-25T18:07:33.709Z] [WARN] No matching usuario found for cliente ID: 2170
+[2026-02-25T18:07:35.793Z] [WARN] No matching usuario found for cliente ID: 3240
+[2026-02-25T18:07:36.613Z] [ERROR] Error processing cliente ID: 4266 -
+Invalid `prisma.cusClient.create()` invocation in
+/Users/guillermo/Desktop/projects/awscargo-system/data/migration/script.ts:174:53
+
+  171   billingPhone = phone; // Set to phone if no valid billing phone number is available
+  172 }
+  173
+→ 174 const createdCliente = await prisma.cusClient.create(
+Unique constraint failed on the fields: (`email`)
+[2026-02-25T18:07:36.683Z] [WARN] No matching usuario found for cliente ID: 4271
+[2026-02-25T18:07:36.965Z] [WARN] No matching usuario found for cliente ID: 4281
+[2026-02-25T18:07:37.340Z] [WARN] No matching usuario found for cliente ID: 5393
+[2026-02-25T18:07:39.858Z] [WARN] No matching usuario found for cliente ID: 11947
+[2026-02-25T18:07:43.782Z] [WARN] No matching usuario found for cliente ID: 12087
+[2026-02-25T18:07:46.788Z] [WARN] No matching usuario found for cliente ID: 12160
+[2026-02-25T18:08:03.015Z] [WARN] No matching usuario found for cliente ID: 14797
+[2026-02-25T18:08:06.396Z] [ERROR] Error processing cliente ID: 14882 -
+Invalid `prisma.cusClient.create()` invocation in
+/Users/guillermo/Desktop/projects/awscargo-system/data/migration/script.ts:174:53
+
+  171   billingPhone = phone; // Set to phone if no valid billing phone number is available
+  172 }
+  173
+→ 174 const createdCliente = await prisma.cusClient.create(
+Unique constraint failed on the fields: (`email`)
+[2026-02-25T18:08:10.766Z] [LOG] Saved 4086 clients to the database of 4089 total clientes

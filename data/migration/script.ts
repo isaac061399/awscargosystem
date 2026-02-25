@@ -116,6 +116,9 @@ const getDistrictId = ({ provincia, canton, distrito }: { provincia?: string; ca
     return null;
   }
 
+  if (canton.length === 1) canton = `0${canton}`;
+  if (distrito.length === 1) distrito = `0${distrito}`;
+
   return parseInt(`${provincia}${canton}${distrito}`);
 };
 
