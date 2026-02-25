@@ -12,6 +12,10 @@ type PackageReadyNotificationData = {
 };
 
 export const sendPackageReadyNotification = async (notificationData: PackageReadyNotificationData) => {
+  if (process.env.DASHBOARD_NOTIFICATIONS !== 'true') {
+    return;
+  }
+
   const { clientName, clientPhone, clientEmail, clientMailbox, tracking, amountUSD, amountCRC } = notificationData;
 
   // send whatsapp notification logic here

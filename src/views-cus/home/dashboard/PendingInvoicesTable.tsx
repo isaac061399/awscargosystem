@@ -55,7 +55,7 @@ const PendingInvoicesTable = ({ pendingInvoices }: { pendingInvoices: any[] }) =
               <TableBody>
                 {pendingInvoices.length <= 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
+                    <TableCell colSpan={7} align="center">
                       <Typography color="textSecondary" className="font-medium">
                         {textT?.noItems}
                       </Typography>

@@ -3,42 +3,52 @@ import 'dotenv/config';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import util from 'node:util';
 import csv from 'csv-parser';
 
-import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import moment from 'moment';
-import { PrismaClient } from '../../src/prisma/generated/client';
+import { PrismaClient } from '@/prisma/generated/client';
+
 import { getHash } from '@/libs/argon2id';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter: adapter });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+export const prisma = new PrismaClient({ adapter: adapter });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const logsPath = path.resolve(__dirname, 'migration.log');
 
+const originalLog = console.log.bind(console);
+const originalWarn = console.warn.bind(console);
+const originalError = console.error.bind(console);
+
+const writeLog = (level: 'LOG' | 'WARN' | 'ERROR', args: unknown[]) => {
+  const timestamp = new Date().toISOString();
+  const message = util.format(...args);
+  fs.appendFileSync(logsPath, `[${timestamp}] [${level}] ${message}\n`);
+};
+
+console.log = (...args: unknown[]) => {
+  writeLog('LOG', args);
+  originalLog(...args);
+};
+
+console.warn = (...args: unknown[]) => {
+  writeLog('WARN', args);
+  originalWarn(...args);
+};
+
+console.error = (...args: unknown[]) => {
+  writeLog('ERROR', args);
+  originalError(...args);
+};
+
+fs.appendFileSync(logsPath, `\n--- Migration run started at ${new Date().toISOString()} ---\n`);
+
+// CSV file paths
 const clientesDataPath = path.resolve(__dirname, 'Clientes.csv');
 const usuariosDataPath = path.resolve(__dirname, 'TBL_USUARIOS.csv');
-// const paquetesDataPath = path.resolve(__dirname, 'TBL_PAQUETES.csv');
-// const pedidosDataPath = path.resolve(__dirname, 'TBL_PEDIDOS.csv');
-// const detallePedidoDataPath = path.resolve(__dirname, 'TBL_DETALLE_PEDIDO.csv');
-// const provinciasDataPath = path.resolve(__dirname, 'Provincias.csv');
-
-type Row = Record<string, string>;
-
-const readCsvFile = async (path: string): Promise<Row[]> => {
-  return new Promise((resolve, reject) => {
-    const results: Row[] = [];
-
-    fs.createReadStream(path)
-      .on('error', reject)
-      .pipe(csv())
-      .on('data', (data: Row) => results.push(data))
-      .on('error', reject)
-      .on('end', () => resolve(results));
-  });
-};
 
 // Default values
 const defaultOfficeId = 1; // Default to ATENAS if no match found
@@ -52,143 +62,158 @@ const maps = {
   identificationTypes: { FISICA: 'PHYSICAL', JURIDICA: 'LEGAL', DIMEX: 'DIMEX', NITE: 'NITE', NULL: 'PHYSICAL' }
 };
 
-async function main() {
-  console.log(`\nInitializing script...`);
+type Row = Record<string, string>;
 
+const normalizeValue = (value: string | null | undefined) => {
+  if (value == null) return null;
+
+  const v = value.trim();
+
+  // SQL NULL string
+  if (v === '' || v.toUpperCase() === 'NULL') return null;
+
+  // No data values
+  if (v === '0' || v.toUpperCase() === 'SINDATO') return null;
+
+  return v;
+};
+
+const normalizeHeader = (header: string) => {
+  return header?.replace(/^\uFEFF/, '').trim(); // remove BOM
+};
+
+const readCsvFile = async (path: string): Promise<Row[]> => {
+  return new Promise((resolve, reject) => {
+    const results: Row[] = [];
+
+    fs.createReadStream(path)
+      .on('error', reject)
+      .pipe(
+        csv({
+          mapHeaders: ({ header }) => normalizeHeader(header),
+          mapValues: ({ value }) => normalizeValue(value)
+        })
+      )
+      .on('data', (data: Row) => results.push(data))
+      .on('error', reject)
+      .on('end', () => resolve(results));
+  });
+};
+
+const toTitleCase = (str: string) => {
+  if (!str) return str;
+
+  return str
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const getDistrictId = ({ provincia, canton, distrito }: { provincia?: string; canton?: string; distrito?: string }) => {
+  if (!provincia || !canton || !distrito) {
+    return null;
+  }
+
+  return parseInt(`${provincia}${canton}${distrito}`);
+};
+
+async function saveClients() {
   // clientes
   const resultClientes = await readCsvFile(clientesDataPath);
-  console.log(`\Read ${resultClientes.length} rows from ${clientesDataPath}`);
 
   // usuarios
   const resultUsuarios = await readCsvFile(usuariosDataPath);
-  console.log(`\Read ${resultUsuarios.length} rows from ${usuariosDataPath}`);
 
-  const clientesResult: { [key: string]: number } = {};
+  const clientIds: { [key: string]: number } = {};
 
   for (const cliente of resultClientes) {
-    // get matching usuario for cliente
-    let password = null;
-    const usuario = resultUsuarios.find((u) => u.ID === cliente.ID_CLIENTE);
-    if (usuario) {
-      password = await getHash(usuario['CONTRASEÑA'] || '');
-    } else {
-      console.warn(`\ xxxxxx -> No matching usuario found for cliente ID: ${cliente.ID_CLIENTE}`);
-    }
-
-    const officeId = maps.offices[cliente.SUCURSAL as keyof typeof maps.offices] || defaultOfficeId;
-    const clientId = parseInt(cliente.CASILLERO.split('-')[1].trim()); // Extract mailbox number after the dash
-    const districtId = parseInt(`${cliente.PROVINCIA.trim()}${cliente.CANTON.trim()}${cliente.DISTRITO.trim()}`); // Combine province, canton, and district codes
-    const identificationType =
-      maps.identificationTypes[cliente.TIPO_CEDULA as keyof typeof maps.identificationTypes] ||
-      maps.identificationTypes.NULL;
-    const billingIdentificationType =
-      maps.identificationTypes[cliente.TIPOCEDULAFACT as keyof typeof maps.identificationTypes];
-
-    let phone = `${cliente.CODIGO_PAIS.trim()} `;
-    if (cliente.TELEFONO_MOVIL && cliente.TELEFONO_MOVIL !== '0') {
-      phone = phone.concat(cliente.TELEFONO_MOVIL.trim());
-    } else if (cliente.TELEFONO_FIJO && cliente.TELEFONO_FIJO !== '0') {
-      phone = phone.concat(cliente.TELEFONO_FIJO.trim());
-    } else {
-      phone = ''; // Set to empty string if no valid phone number is available
-    }
-
-    let billingPhone = `${cliente.CODIGO_PAIS.trim()} `;
-    if (cliente.TELEFONOFACT && cliente.TELEFONOFACT !== '0') {
-      billingPhone = billingPhone.concat(cliente.TELEFONOFACT.trim());
-    } else {
-      billingPhone = phone; // Set to phone if no valid billing phone number is available
-    }
-
-    const createdCliente = await prisma.cusClient.create({
-      data: {
-        id: clientId,
-        office_id: officeId,
-        mailbox: `${maps.mailboxPrefixes[officeId as keyof typeof maps.mailboxPrefixes]}${clientId}`,
-        full_name: cliente.NOMBRE_COMPLETO,
-        identification_type: identificationType as any,
-        identification: cliente.CEDULA,
-        email: cliente.CORREO,
-        phone: phone,
-        notes: '',
-        district_id: districtId,
-        address: cliente.DIRECCION,
-        password: password,
-        billing_full_name: cliente.NOMBREFACT || cliente.NOMBRE_COMPLETO,
-        billing_identification_type: billingIdentificationType || (identificationType as any),
-        billing_identification: cliente.CEDULAFACT || cliente.CEDULA,
-        billing_email: cliente.CORREOFACT || cliente.CORREO,
-        billing_phone: billingPhone,
-        billing_district_id: districtId,
-        billing_address: cliente.DIRECCION,
-        billing_activity_code: cliente.CODIGO_ACTIVIDAD_COMERCIAL || defaultActivityCode,
-        pound_fee: cliente.TARIFA ? parseFloat(cliente.TARIFA) : defaultFee,
-        status: 'ACTIVE',
-        created_at: moment(cliente.FECHA_CREADO).toISOString()
+    try {
+      // get matching usuario for cliente
+      let password = null;
+      const usuario = resultUsuarios.find((u) => u.ID === cliente.ID_CLIENTE);
+      if (usuario) {
+        password = await getHash(usuario['CONTRASEÑA'] || '');
+      } else {
+        console.warn(`\No matching usuario found for cliente ID: ${cliente.ID_CLIENTE}`);
       }
-    });
 
-    clientesResult[cliente.ID_CLIENTE] = createdCliente.id;
+      const officeId = maps.offices[cliente.SUCURSAL as keyof typeof maps.offices] || defaultOfficeId;
+      const clientId = parseInt(cliente.CASILLERO.split('-')[1].trim()); // Extract mailbox number after the dash
+      const districtId = getDistrictId({
+        provincia: cliente.PROVINCIA,
+        canton: cliente.CANTON,
+        distrito: cliente.DISTRITO
+      });
+      const identificationType =
+        maps.identificationTypes[cliente.TIPO_CEDULA as keyof typeof maps.identificationTypes] ||
+        maps.identificationTypes.NULL;
+      const billingIdentificationType =
+        maps.identificationTypes[cliente.TIPOCEDULAFACT as keyof typeof maps.identificationTypes] || identificationType;
+
+      let phone = `${cliente.CODIGO_PAIS?.trim()} `;
+      if (cliente.TELEFONO_MOVIL) {
+        phone = phone.concat(cliente.TELEFONO_MOVIL?.trim());
+      } else if (cliente.TELEFONO_FIJO) {
+        phone = phone.concat(cliente.TELEFONO_FIJO?.trim());
+      } else {
+        phone = ''; // Set to empty string if no valid phone number is available
+      }
+
+      let billingPhone = `${cliente.CODIGO_PAIS?.trim()} `;
+      if (cliente.TELEFONOFACT) {
+        billingPhone = billingPhone.concat(cliente.TELEFONOFACT?.trim());
+      } else {
+        billingPhone = phone; // Set to phone if no valid billing phone number is available
+      }
+
+      const createdCliente = await prisma.cusClient.create({
+        data: {
+          id: clientId,
+          office_id: officeId,
+          mailbox: `${maps.mailboxPrefixes[officeId as keyof typeof maps.mailboxPrefixes]}${clientId}`,
+          full_name: toTitleCase(cliente.NOMBRE_COMPLETO || ''),
+          identification_type: identificationType as any,
+          identification: cliente.CEDULA || '',
+          email: cliente.CORREO,
+          phone: phone,
+          notes: '',
+          district_id: districtId,
+          address: cliente.DIRECCION || '',
+          password: password,
+          billing_full_name: toTitleCase(cliente.NOMBREFACT || cliente.NOMBRE_COMPLETO || ''),
+          billing_identification_type: billingIdentificationType || (identificationType as any),
+          billing_identification: cliente.CEDULAFACT || cliente.CEDULA || '',
+          billing_email: cliente.CORREOFACT || cliente.CORREO,
+          billing_phone: billingPhone,
+          billing_district_id: districtId,
+          billing_address: cliente.DIRECCION || '',
+          billing_activity_code: cliente.CODIGO_ACTIVIDAD_COMERCIAL || defaultActivityCode,
+          pound_fee: cliente.TARIFA ? parseFloat(cliente.TARIFA) : defaultFee,
+          status: 'ACTIVE',
+          created_at: moment(cliente.FECHA_CREADO).toISOString()
+        }
+      });
+
+      clientIds[cliente.ID_CLIENTE] = createdCliente.id;
+    } catch (error) {
+      console.error(
+        `Error processing cliente ID: ${cliente.ID_CLIENTE} - ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
-  console.log('Clientes data:', JSON.stringify(resultClientes, null, 2));
-  console.log('Usuarios data:', JSON.stringify(resultUsuarios, null, 2));
+  console.log(
+    `\Saved ${Object.keys(clientIds).length} clients to the database of ${resultClientes.length} total clientes`
+  );
 
-  // // paquetes
-  // const resultPaquetes = await readCsvFile(paquetesDataPath);
-  // console.log(`\Read ${resultPaquetes.length} rows from ${paquetesDataPath}`);
+  return clientIds;
+}
 
-  // // pedidos
-  // const resultPedidos = await readCsvFile(pedidosDataPath);
-  // console.log(`\Read ${resultPedidos.length} rows from ${pedidosDataPath}`);
-
-  // // detalle pedido
-  // const resultDetallePedido = await readCsvFile(detallePedidoDataPath);
-  // console.log(`\Read ${resultDetallePedido.length} rows from ${detallePedidoDataPath}`);
-
-  // // provincias
-  // const resultProvincias = await readCsvFile(provinciasDataPath);
-  // console.log(`\Read ${resultProvincias.length} rows from ${provinciasDataPath}`);
-
-  // for (const province of Object.values(typedData)) {
-  //   console.log(`\Saving province: ${province.name}`);
-
-  //   // save province
-  //   await prisma.cusProvince.create({
-  //     data: {
-  //       id: province.id,
-  //       name: province.name
-  //     }
-  //   });
-
-  //   console.log(`\Saving cantons of: ${province.name}`);
-
-  //   for (const canton of Object.values(province.cantons)) {
-  //     console.log(`\Saving canton: ${canton.name}`);
-  //     // save canton
-  //     await prisma.cusCanton.create({
-  //       data: {
-  //         id: canton.id,
-  //         name: canton.name,
-  //         province_id: province.id
-  //       }
-  //     });
-
-  //     console.log(`\Saving districts of: ${canton.name}`);
-
-  //     for (const district of Object.values(canton.districts)) {
-  //       console.log(`\Saving district: ${district.name}`);
-  //       // save district
-  //       await prisma.cusDistrict.create({
-  //         data: {
-  //           id: district.id,
-  //           name: district.name,
-  //           canton_id: canton.id
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
+async function main() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const clientIds = await saveClients();
 }
 
 main()
