@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from 'next/server';
 import moment from 'moment';
 
@@ -64,26 +63,26 @@ export const PUT = withAuthApi(['invoices.cancel'], async (req, { params }: { pa
       }
 
       // 3: send invoice credit note to easytax service
-      // const documentPayload = buildCancelDocumentPayload({
-      //   configuration,
-      //   office: entry.cash_register.office as CusOffice,
-      //   invoice: entry,
-      //   lines: entry.invoice_lines
-      // });
-      // const easytaxResponse = await generateCancelDocument(documentPayload);
-      // if (!easytaxResponse.valid) {
-      //   throw new TransactionError(500, textT?.errors?.easytaxService);
-      // }
+      const documentPayload = buildCancelDocumentPayload({
+        configuration,
+        office: entry.cash_register.office as CusOffice,
+        invoice: entry,
+        lines: entry.invoice_lines
+      });
+      const easytaxResponse = await generateCancelDocument(documentPayload);
+      if (!easytaxResponse.valid) {
+        throw new TransactionError(500, textT?.errors?.cancel);
+      }
 
-      // throw new TransactionError(500, textT?.errors?.save);
-
-      // 4: change invoice status to CANCELED
+      // 4: change invoice status to CANCELED and save easytax response data
       const canceledInvoice = await tx.cusInvoice.update({
         where: { id: entry.id },
         data: {
           status: InvoiceStatus.CANCELED,
-          cancelled_at: new Date(),
-          cancelled_by_id: admin.id
+          canceled_consecutive: easytaxResponse.consecutive,
+          cancelled_numeric_key: easytaxResponse.numericKey,
+          cancelled_by_id: admin.id,
+          cancelled_at: new Date()
         }
       });
       if (!canceledInvoice) {

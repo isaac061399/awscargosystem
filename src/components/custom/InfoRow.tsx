@@ -8,7 +8,7 @@ type InfoRowProps = {
 const InfoRow = ({ label, value }: InfoRowProps) => {
   return (
     <Stack direction="row" spacing={2} alignItems="baseline">
-      <Typography variant="body1" fontWeight={600} sx={{ minWidth: 195 }}>
+      <Typography variant="body1" fontWeight={600} sx={{ width: 195, minWidth: 195 }}>
         {label}
       </Typography>
       <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>

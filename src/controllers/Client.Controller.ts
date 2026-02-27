@@ -7,13 +7,7 @@ export const getClient = async (id: number) => {
     const client = await prismaRead.cusClient.findUnique({
       where: { id },
       include: {
-        office: {
-          select: {
-            id: true,
-            name: true,
-            mailbox_prefix: true
-          }
-        },
+        office: { select: { id: true, name: true, mailbox_prefix: true } },
         district: {
           select: {
             id: true,

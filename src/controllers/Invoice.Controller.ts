@@ -20,6 +20,7 @@ export const getInvoice = async (id: number) => {
         },
         client: {
           include: {
+            office: { select: { id: true, name: true, mailbox_prefix: true } },
             district: {
               select: {
                 id: true,

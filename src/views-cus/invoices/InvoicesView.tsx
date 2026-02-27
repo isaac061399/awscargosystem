@@ -339,25 +339,23 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                   )}
                   {invoice.status === InvoiceStatus.CANCELED && (
                     <>
-                      {invoice.cancelled_at && (
-                        <InfoRow
-                          label={textT?.datesInfo?.cancelDate}
-                          value={moment(invoice.cancelled_at).format(textT?.dateFormat)}
-                        />
-                      )}
-                      {invoice.cancelled_by && (
-                        <InfoRow
-                          label={textT?.datesInfo?.cancelBy}
-                          value={
-                            <Link
-                              href={`/administrators/edit/${invoice.cancelled_by?.id}`}
-                              target="_blank"
-                              className="underline">
-                              {invoice.cancelled_by?.email}
-                            </Link>
-                          }
-                        />
-                      )}
+                      <InfoRow
+                        label={textT?.datesInfo?.cancelDate}
+                        value={moment(invoice.cancelled_at).format(textT?.dateFormat)}
+                      />
+                      <InfoRow
+                        label={textT?.datesInfo?.cancelBy}
+                        value={
+                          <Link
+                            href={`/administrators/edit/${invoice.cancelled_by?.id}`}
+                            target="_blank"
+                            className="underline">
+                            {invoice.cancelled_by?.email}
+                          </Link>
+                        }
+                      />
+                      <InfoRow label={textT?.datesInfo?.cancelConsecutive} value={invoice.canceled_consecutive} />
+                      <InfoRow label={textT?.datesInfo?.cancelNumericKey} value={invoice.cancelled_numeric_key} />
                     </>
                   )}
                 </Stack>

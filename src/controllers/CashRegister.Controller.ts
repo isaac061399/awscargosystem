@@ -33,20 +33,9 @@ export const getCashRegister = async (
       where,
       include: {
         administrator: {
-          select: {
-            id: true,
-            first_name: true,
-            last_name: true,
-            full_name: true,
-            email: true
-          }
+          select: { id: true, first_name: true, last_name: true, full_name: true, email: true }
         },
-        office: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
+        office: { select: { id: true, name: true } },
         lines: {
           orderBy: { currency: 'desc' },
           select: {
@@ -96,20 +85,9 @@ export const getCashRegisterAdmin = async (email: string) => {
       },
       include: {
         administrator: {
-          select: {
-            id: true,
-            first_name: true,
-            last_name: true,
-            full_name: true,
-            email: true
-          }
+          select: { id: true, first_name: true, last_name: true, full_name: true, email: true }
         },
-        office: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
+        office: { select: { id: true, name: true } },
         lines: {
           orderBy: { currency: 'desc' },
           select: {

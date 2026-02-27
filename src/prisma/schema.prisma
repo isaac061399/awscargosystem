@@ -673,6 +673,16 @@ model CusDistrict {
   @@map("cus_district")
 }
 
+model CusEasyTaxLog {
+  id         Int       @id @default(autoincrement())
+  request    Json?
+  response   Json?
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("cus_easy_tax_log")
+}
+
 model CusInvoice {
   id                     Int                     @id @default(autoincrement())
   cash_register_id       Int

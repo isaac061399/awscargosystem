@@ -50,15 +50,9 @@ export const getAdmin = async (id: number) => {
         last_name: true,
         full_name: true,
         email: true,
-        role: {
-          select: { id: true, name: true }
-        },
-        user: {
-          select: { email: true, enabled: true }
-        },
-        office: {
-          select: { id: true, name: true }
-        }
+        role: { select: { id: true, name: true } },
+        user: { select: { email: true, enabled: true } },
+        office: { select: { id: true, name: true } }
       }
     });
 

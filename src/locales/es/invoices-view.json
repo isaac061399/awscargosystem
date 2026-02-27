@@ -32,7 +32,9 @@
       "paidDate": "Fecha de Pago",
       "expiredDate": "Fecha de Vencimiento",
       "cancelDate": "Fecha de Cancelación",
-      "cancelBy": "Cancelado por"
+      "cancelBy": "Cancelado por",
+      "cancelConsecutive": "Consecutivo de Cancelación",
+      "cancelNumericKey": "Clave de Cancelación"
     },
     "lines": {
       "title": "Líneas de la Factura",

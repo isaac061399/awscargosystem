@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from 'next/server';
 import moment from 'moment';
 
@@ -214,8 +213,8 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
         data: {
           cash_register_id: cashRegister.id,
           client_id: client.id,
-          consecutive: new Date().getTime().toString(), // TODO: generate consecutive according to easytax response
-          numeric_key: new Date().getTime().toString(), // TODO: generate numeric key according to easytax response
+          consecutive: '',
+          numeric_key: '',
           type: invoiceType,
           payment_condition: paymentCondition,
           payment_condition_days: paymentConditionDays,
@@ -289,21 +288,25 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
       }
 
       // 5: send invoice to easytax service
-      // const documentPayload = buildCreateDocumentPayload({
-      //   configuration,
-      //   office: cashRegister.office,
-      //   invoice,
-      //   lines: linesData || []
-      // });
-      // const easytaxResponse = await generateDocument(documentPayload);
-      // if (!easytaxResponse.valid) {
-      //   throw new TransactionError(500, textT?.errors?.easytaxService);
-      // }
-
-      // throw new TransactionError(500, textT?.errors?.save);
+      const documentPayload = buildCreateDocumentPayload({
+        configuration,
+        office: cashRegister.office,
+        invoice,
+        lines: linesData || []
+      });
+      const easytaxResponse = await generateDocument(documentPayload);
+      if (!easytaxResponse.valid) {
+        throw new TransactionError(500, textT?.errors?.save);
+      }
 
       // 6: save easytax response data
-      // TODO: adapt according to easytax response structure
+      await tx.cusInvoice.update({
+        where: { id: invoice.id },
+        data: {
+          consecutive: easytaxResponse.consecutive,
+          numeric_key: easytaxResponse.numericKey
+        }
+      });
 
       // 7: save log
       await tx.cusInvoiceLog.create({
