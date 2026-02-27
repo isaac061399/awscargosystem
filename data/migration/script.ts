@@ -73,7 +73,7 @@ const normalizeValue = (value: string | null | undefined) => {
   if (v === '' || v.toUpperCase() === 'NULL') return null;
 
   // No data values
-  if (v === '0' || v.toUpperCase() === 'SINDATO') return null;
+  if (v === '0' || v.toUpperCase() === 'SINDATO' || v.toUpperCase() === 'SIN DATO') return null;
 
   return v;
 };
@@ -123,6 +123,9 @@ const getDistrictId = ({ provincia, canton, distrito }: { provincia?: string; ca
 };
 
 async function saveClients() {
+  let noEmailCount = 0;
+  const mailboxToIgnore = ['AWS-3903'];
+
   // clientes
   const resultClientes = await readCsvFile(clientesDataPath);
 
@@ -133,6 +136,11 @@ async function saveClients() {
 
   for (const cliente of resultClientes) {
     try {
+      if (mailboxToIgnore.includes(cliente.CASILLERO || '')) {
+        console.warn(`\Skipping cliente ID: ${cliente.ID_CLIENTE} with mailbox: ${cliente.CASILLERO}`);
+        continue;
+      }
+
       // get matching usuario for cliente
       let password = null;
       const usuario = resultUsuarios.find((u) => u.ID === cliente.ID_CLIENTE);
@@ -171,6 +179,12 @@ async function saveClients() {
         billingPhone = phone; // Set to phone if no valid billing phone number is available
       }
 
+      let email = cliente.CORREO?.trim();
+      if (!email) {
+        noEmailCount++;
+        email = `sincorreo${noEmailCount}@gmail.com`;
+      }
+
       const createdCliente = await prisma.cusClient.create({
         data: {
           id: clientId,
@@ -179,7 +193,7 @@ async function saveClients() {
           full_name: toTitleCase(cliente.NOMBRE_COMPLETO || ''),
           identification_type: identificationType as any,
           identification: cliente.CEDULA || '',
-          email: cliente.CORREO,
+          email: email,
           phone: phone,
           notes: '',
           district_id: districtId,
@@ -188,7 +202,7 @@ async function saveClients() {
           billing_full_name: toTitleCase(cliente.NOMBREFACT || cliente.NOMBRE_COMPLETO || ''),
           billing_identification_type: billingIdentificationType || (identificationType as any),
           billing_identification: cliente.CEDULAFACT || cliente.CEDULA || '',
-          billing_email: cliente.CORREOFACT || cliente.CORREO,
+          billing_email: cliente.CORREOFACT || email,
           billing_phone: billingPhone,
           billing_district_id: districtId,
           billing_address: cliente.DIRECCION || '',
@@ -206,6 +220,8 @@ async function saveClients() {
       );
     }
   }
+
+  console.log(`\Clients with no email: ${noEmailCount}`);
 
   console.log(
     `\Saved ${Object.keys(clientIds).length} clients to the database of ${resultClientes.length} total clientes`

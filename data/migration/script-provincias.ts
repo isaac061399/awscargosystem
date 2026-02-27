@@ -14,7 +14,7 @@ export const prisma = new PrismaClient({ adapter: adapter });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const logsPath = path.resolve(__dirname, 'distritos.log');
+const logsPath = path.resolve(__dirname, 'provincias.log');
 
 const originalLog = console.log.bind(console);
 const originalWarn = console.warn.bind(console);
