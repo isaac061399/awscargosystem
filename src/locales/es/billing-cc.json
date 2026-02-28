@@ -1,6 +1,6 @@
 {
   "text": {
-    "title": "Facturación",
+    "title": "Facturación CC",
     "dateFormat": "DD/MM/YYYY hh:mm a",
     "btnSave": "Guardar",
     "btnCancel": "Cancelar",
@@ -9,11 +9,13 @@
     "noOptions": "No hay opciones disponibles",
     "cashRegisterAlert": "La caja aún no ha sido abierta para el día de hoy. Por favor, abra la caja para poder registrar facturas.",
     "cashRegisterAlertBtn": "Abrir caja",
+    "yesLabel": "Sí",
+    "noLabel": "No",
     "cards": {
       "client": {
         "title": "Cliente",
-        "subtitle": "Busque y seleccione un cliente para cargar paquetes/pedidos listos para retirar/facturar.",
-        "noClientSelected": "Seleccione un cliente para cargar las líneas disponibles.",
+        "subtitle": "Busque y seleccione un cliente para facturar.",
+        "noClientSelected": "Seleccione un cliente para facturar.",
         "clientSelected": "Cliente seleccionado: ",
         "clientSelectedLink": "Ver cliente"
       },
@@ -21,15 +23,15 @@
         "title": "Información de la Facturación",
         "subtitle": "Revise y edite la información de la facturación antes de guardarla."
       },
-      "billableLines": {
-        "title": "Líneas Facturables",
-        "subtitle": "Estos son los paquetes/pedidos encontrados para el cliente. Seleccione/deseleccione lo que desea facturar."
+      "lines": {
+        "title": "Líneas de Factura",
+        "subtitle": "Agregue líneas a la factura.",
+        "btnAdd": "Agregar línea"
       },
-      "selectedLines": {
-        "title": "Líneas Seleccionadas para Facturar",
-        "subtitle": "Estas son las líneas que se facturarán al cliente. Puede agregar líneas personalizadas o productos adicionales.",
-        "btnAddCustomLines": "Agregar Línea Personalizada",
-        "btnAddProduct": "Agregar Producto"
+      "additionalCharges": {
+        "title": "Cargos Adicionales",
+        "subtitle": "Agregue cargos adicionales a la factura.",
+        "btnAdd": "Agregar cargo adicional"
       },
       "totals": {
         "title": "Totales de la Facturación",
@@ -50,38 +52,12 @@
         "btnAddPayment": "Agregar Pago"
       }
     },
-    "lineTypes": {
-      "package": "Paquete",
-      "order_product": "Pedido",
-      "custom": "Línea Personalizada",
-      "product": "Producto"
-    },
-    "billableLinesTable": {
-      "type": {
-        "title": "Tipo",
-        "tooltip": "Ver más información"
+    "linesTable": {
+      "code": {
+        "title": "Código"
       },
-      "tracking": {
-        "title": "Tracking"
-      },
-      "description": {
-        "title": "Descripción"
-      },
-      "amount": {
-        "title": "Monto"
-      },
-      "location": {
-        "title": "Ubicación",
-        "format": "Estante {{ shelf }}, Fila {{ row }}",
-        "noLocation": "Sin ubicación"
-      }
-    },
-    "selectedLinesTable": {
-      "type": {
-        "title": "Tipo"
-      },
-      "ref": {
-        "title": "Ref"
+      "cabys": {
+        "title": "CAByS"
       },
       "description": {
         "title": "Descripción"
@@ -94,6 +70,26 @@
       },
       "total": {
         "title": "Total"
+      },
+      "is_exempt": {
+        "title": "Exento"
+      }
+    },
+    "additionalChargesTable": {
+      "type": {
+        "title": "Tipo",
+        "description": "Descripción",
+        "thirdPartyIdentification": "Identificación de tercero",
+        "thirdPartyName": "Nombre de tercero"
+      },
+      "details": {
+        "title": "Detalles"
+      },
+      "percentage": {
+        "title": "Porcentaje"
+      },
+      "amount": {
+        "title": "Monto"
       }
     },
     "paymentLinesTable": {
@@ -107,11 +103,11 @@
         "title": "Referencia"
       }
     },
-    "dialogCustomLine": {
-      "title": "Agregar Línea Personalizada a la Facturación"
+    "dialogLine": {
+      "title": "Agregar Línea a la Factura"
     },
-    "dialogProduct": {
-      "title": "Agregar Producto a la Facturación"
+    "dialogAdditionalCharge": {
+      "title": "Agregar Cargo Adicional a la Factura"
     },
     "dialogPayment": {
       "title": "Agregar Información de Pago a la Facturación"
@@ -122,13 +118,6 @@
       "viewInvoice": "Ver factura",
       "printTicket": "Imprimir tiquete",
       "newInvoice": "Nueva factura"
-    },
-    "dialogReadyOrders": {
-      "title": "Pedidos listos para retirar",
-      "subtitle": "Se han encontrado pedidos con productos listos para retirar. Si desea realizar el retiro del pedido haga clic en el detalle del pedido para ser redirigido, de lo contrario puede omitir esta ventana y continuar con la facturación.",
-      "orderNumber": "Número de pedido",
-      "orderProducts": "Productos listos para retirar",
-      "btnSkip": "Omitir"
     }
   },
   "form": {
@@ -159,48 +148,71 @@
     "errorMessage": "Error al crear la factura, por favor inténtalo de nuevo",
     "amountErrorMessage": "El monto pagado debe ser al menos igual al total de la factura"
   },
-  "formCustomLine": {
+  "formLine": {
     "labels": {
       "code": "Código",
+      "cabys": "CAByS",
       "description": "Descripción",
       "quantity": "Cantidad",
       "currency": "Moneda",
-      "unit_price": "Precio Unitario"
+      "unit_price": "Precio Unitario",
+      "is_exempt": "Exento"
     },
     "placeholders": {
       "code": "Ingrese el código",
+      "cabys": "Ingrese el CAByS",
       "description": "Ingrese la descripción",
       "quantity": "Ingrese la cantidad",
       "currency": "Seleccione la moneda",
-      "unit_price": "Ingrese el precio unitario"
+      "unit_price": "Ingrese el precio unitario",
+      "is_exempt": "Seleccione si está exento"
     },
     "errors": {
       "code": "El código es requerido",
+      "cabys": "El CAByS es requerido",
       "description": "La descripción es requerida",
       "quantity": "La cantidad es requerida",
       "quantityInteger": "La cantidad debe ser un número entero",
       "quantityMinimum": "La cantidad debe ser al menos 1",
       "currency": "La moneda es requerida",
-      "unit_price": "El precio unitario es requerido"
+      "unit_price": "El precio unitario es requerido",
+      "is_exempt": "El estado de exento es requerido"
     },
-    "errorMessage": "Error al agregar la línea personalizada, por favor inténtalo de nuevo"
+    "errorMessage": "Error al agregar la línea, por favor inténtalo de nuevo"
   },
-  "formProduct": {
+  "formAdditionalCharge": {
     "labels": {
-      "product": "Producto",
-      "quantity": "Cantidad"
+      "type": "Tipo",
+      "type_description": "Descripción del tipo",
+      "third_party_identification": "Identificación de tercero",
+      "third_party_name": "Nombre de tercero",
+      "details": "Detalles",
+      "percentage": "Porcentaje",
+      "currency": "Moneda",
+      "amount": "Monto"
     },
     "placeholders": {
-      "product": "Buscar por código o nombre",
-      "quantity": "Ingrese la cantidad"
+      "type": "Seleccione una opción",
+      "type_description": "Ingrese la descripción del tipo",
+      "third_party_identification": "Ingrese la identificación de tercero",
+      "third_party_name": "Ingrese el nombre de tercero",
+      "details": "Ingrese los detalles",
+      "percentage": "Ingrese el porcentaje",
+      "currency": "Seleccione la moneda",
+      "amount": "Ingrese el monto"
     },
     "errors": {
-      "product": "El producto es requerido",
-      "quantity": "La cantidad es requerida",
-      "quantityInteger": "La cantidad debe ser un número entero",
-      "quantityMinimum": "La cantidad debe ser al menos 1"
+      "type": "El tipo es requerido",
+      "type_description": "La descripción del tipo es requerida",
+      "third_party_identification": "La identificación de tercero es requerida",
+      "third_party_name": "El nombre de tercero es requerido",
+      "details": "Los detalles son requeridos",
+      "percentage": "El porcentaje es requerido",
+      "currency": "La moneda es requerida",
+      "amount": "El monto es requerido",
+      "amountMinimum": "El monto debe ser mayor a cero"
     },
-    "errorMessage": "Error al agregar el producto, por favor inténtalo de nuevo"
+    "errorMessage": "Error al agregar el cargo adicional, por favor inténtalo de nuevo"
   },
   "formPayment": {
     "labels": {

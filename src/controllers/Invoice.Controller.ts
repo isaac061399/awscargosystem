@@ -1,7 +1,28 @@
+import moment from 'moment';
+
 import { Currency, OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
-import { Prisma } from '@/prisma/generated/client';
-import { BillingLine, convertCRC, getOrderProductPrice, PaymentLine } from '@/helpers/calculations';
+import {
+  CusConfiguration,
+  CusInvoice,
+  CusInvoiceAdditionalCharge,
+  CusInvoiceLine,
+  CusOffice,
+  Prisma
+} from '@/prisma/generated/client';
+
 import { prismaRead, Tx } from '@/libs/prisma';
+import { billingDefaultActivityCode } from '@/libs/constants';
+
+import {
+  BillingLine,
+  calculateTaxes,
+  convertCRC,
+  convertUSD,
+  getOrderProductPrice,
+  PaymentLine
+} from '@/helpers/calculations';
+
+import { CancelDocumentData, DocumentData } from '@/services/easytax';
 
 export const getInvoice = async (id: number) => {
   try {
@@ -329,4 +350,111 @@ export const rollbackLineReferences = async (
 
     return false;
   }
+};
+
+export const buildCreateDocumentPayload = (data: {
+  configuration: CusConfiguration;
+  office: CusOffice;
+  invoice: CusInvoice;
+  lines: CusInvoiceLine[];
+  additionalCharges: CusInvoiceAdditionalCharge[];
+}): DocumentData => {
+  const { configuration, office, invoice, lines, additionalCharges } = data;
+
+  return {
+    company: {
+      name: configuration.billing_name,
+      identification: configuration.billing_identification,
+      activityCode: configuration.billing_activity_code
+    },
+    office: {
+      number: office.billing_number,
+      terminal: office.billing_terminal
+    },
+    client: {
+      name: invoice.client_name,
+      identification: invoice.client_identification,
+      email: invoice.client_email,
+      activityCode: invoice.client_activity_code || billingDefaultActivityCode
+    },
+    invoiceType: invoice.type,
+    date: moment(invoice.created_at),
+    expirationDate: moment(invoice.expired_at),
+    condition: invoice.payment_condition,
+    conditionDays: invoice.payment_condition_days,
+    currency: invoice.currency,
+    method: invoice.payment_method,
+    ref: invoice.payment_method_ref || '',
+    lines: buildDocumentLines(invoice, lines)
+  };
+};
+
+export const buildCancelDocumentPayload = (data: {
+  configuration: CusConfiguration;
+  office: CusOffice;
+  invoice: CusInvoice;
+  lines: CusInvoiceLine[];
+  additionalCharges: CusInvoiceAdditionalCharge[];
+}): CancelDocumentData => {
+  const { configuration, office, invoice, lines, additionalCharges } = data;
+
+  return {
+    reference: {
+      invoiceType: invoice.type,
+      consecutive: invoice.consecutive,
+      date: moment(invoice.created_at)
+    },
+    company: {
+      name: configuration.billing_name,
+      identification: configuration.billing_identification,
+      activityCode: configuration.billing_activity_code
+    },
+    office: {
+      number: office.billing_number,
+      terminal: office.billing_terminal
+    },
+    client: {
+      name: invoice.client_name,
+      identification: invoice.client_identification,
+      email: invoice.client_email,
+      activityCode: invoice.client_activity_code || billingDefaultActivityCode
+    },
+    currency: invoice.currency,
+    method: invoice.payment_method,
+    ref: invoice.payment_method_ref || '',
+    lines: buildDocumentLines(invoice, lines)
+  };
+};
+
+const buildDocumentLines = (invoice: CusInvoice, lines: CusInvoiceLine[]) => {
+  return lines.map((line) => {
+    const invoiceCurrency = invoice.currency;
+    let unitPrice = line.unit_price;
+    let subtotal = line.total;
+
+    if (line.currency !== invoiceCurrency) {
+      if (invoiceCurrency === Currency.CRC) {
+        unitPrice = convertCRC(line.unit_price, invoice.selling_exchange_rate);
+        subtotal = convertCRC(line.total, invoice.selling_exchange_rate);
+      } else if (invoiceCurrency === Currency.USD) {
+        unitPrice = convertUSD(line.unit_price, invoice.buying_exchange_rate);
+        subtotal = convertUSD(line.total, invoice.buying_exchange_rate);
+      }
+    }
+
+    const totals = calculateTaxes(subtotal, line.iva_percentage);
+
+    return {
+      code: line.code,
+      cabys: line.cabys,
+      description: line.description,
+      ivaPercentage: line.iva_percentage,
+      quantity: line.quantity,
+      unitPrice: unitPrice,
+      isExempt: line.is_exempt,
+      subtotal: totals.subtotal,
+      tax: totals.taxes,
+      total: totals.total
+    };
+  });
 };

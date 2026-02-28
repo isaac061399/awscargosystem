@@ -2,7 +2,7 @@ import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import { Moment } from 'moment';
 
-import { additionalExchangeRate } from './constants';
+import { additionalExchangeRate } from '../libs/constants';
 
 const config = {
   headers: {

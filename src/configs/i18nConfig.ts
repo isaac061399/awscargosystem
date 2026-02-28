@@ -42,6 +42,7 @@ const i18nConfig = {
     // customs
 
     '/[locale]/(dashboard)/billing': ['billing'],
+    '/[locale]/(dashboard)/billing-cc': ['billing-cc'],
     '/[locale]/(dashboard)/cash-control': ['cash-control'],
     '/[locale]/(dashboard)/cash-registers': ['cash-registers'],
     '/[locale]/(dashboard)/cash-registers/view/[id]': ['cash-registers-view'],

@@ -1,5 +1,5 @@
 import { CusCashRegisterLine, CusOrderProduct, CusPackage, CusProduct } from '@/prisma/generated/client';
-import { Currency, PaymentMethod } from '@/prisma/generated/enums';
+import { Currency, InvoiceAdditionalChargeType, PaymentMethod } from '@/prisma/generated/enums';
 import { poundToKgRate } from '@/libs/constants';
 
 export type BillingLine = {
@@ -14,6 +14,30 @@ export type BillingLine = {
   unit_price: number;
   currency: Currency;
   total: number;
+};
+
+export type BillingCCLine = {
+  id: string;
+  code: string;
+  cabys: string;
+  description: string;
+  quantity: number;
+  currency: Currency;
+  unit_price: number;
+  total: number;
+  is_exempt: boolean;
+};
+
+export type BillingCCAdditionalCharge = {
+  id: string;
+  type: InvoiceAdditionalChargeType;
+  type_description: string;
+  third_party_identification: string;
+  third_party_name: string;
+  details: string;
+  percentage: number;
+  currency: Currency;
+  amount: number;
 };
 
 export type PaymentLine = {
@@ -177,31 +201,102 @@ export const calculateBillingTotal = (
   buyingConversionRate: number,
   taxPercentage: number
 ) => {
-  let amount = 0;
+  let subtotal = 0;
+  let taxes = 0;
+  let total = 0;
 
   try {
-    // calculate subtotals
+    // calculate lines
     lines.forEach((line) => {
-      if (line.currency === baseCurrency) {
-        amount += line.total;
-      } else if (line.currency !== baseCurrency) {
+      let amount = line.total;
+      if (line.currency !== baseCurrency) {
         if (baseCurrency === Currency.CRC) {
-          amount += convertCRC(line.total, sellingConversionRate);
+          amount = convertCRC(line.total, sellingConversionRate);
         } else if (baseCurrency === Currency.USD) {
-          amount += convertUSD(line.total, buyingConversionRate);
+          amount = convertUSD(line.total, buyingConversionRate);
         }
       }
-    });
 
-    // calculate taxes and totals
-    const totals = calculateTaxes(amount, taxPercentage);
+      const lineTotals = calculateTaxes(amount, taxPercentage);
+      subtotal += amount;
+      taxes += lineTotals.taxes;
+      total += lineTotals.total;
+    });
 
     // round CRC totals
     if (baseCurrency === Currency.CRC) {
-      totals.total = roundCRC(totals.total);
+      total = roundCRC(total);
     }
 
-    return totals;
+    return { subtotal, taxes, total };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // console.error(`Error calculating billing total: ${error}`);
+
+    return { subtotal: 0, taxes: 0, total: 0 };
+  }
+};
+
+export const calculateBillingCCTotal = (
+  lines: BillingCCLine[],
+  additionalCharges: BillingCCAdditionalCharge[],
+  baseCurrency: Currency,
+  sellingConversionRate: number,
+  buyingConversionRate: number,
+  taxPercentage: number
+) => {
+  let subtotal = 0;
+  let taxes = 0;
+  let total = 0;
+
+  try {
+    // calculate lines
+    lines.forEach((line) => {
+      let amount = line.total;
+      if (line.currency !== baseCurrency) {
+        if (baseCurrency === Currency.CRC) {
+          amount = convertCRC(line.total, sellingConversionRate);
+        } else if (baseCurrency === Currency.USD) {
+          amount = convertUSD(line.total, buyingConversionRate);
+        }
+      }
+
+      console.log(`Line ${line.id} - Amount: ${amount}, Is Exempt: ${line.is_exempt}`);
+
+      if (!line.is_exempt) {
+        const lineTotals = calculateTaxes(amount, taxPercentage);
+        subtotal += amount;
+        taxes += lineTotals.taxes;
+        total += lineTotals.total;
+      } else {
+        subtotal += amount;
+        total += amount;
+      }
+    });
+
+    // calculate additional charges
+    additionalCharges.forEach((charge) => {
+      let amount = charge.amount;
+      if (charge.currency !== baseCurrency) {
+        if (baseCurrency === Currency.CRC) {
+          amount = convertCRC(charge.amount, sellingConversionRate);
+        } else if (baseCurrency === Currency.USD) {
+          amount = convertUSD(charge.amount, buyingConversionRate);
+        }
+      }
+
+      console.log(`Charge ${charge.id} - Amount: ${amount}, Currency: ${charge.currency}`);
+
+      subtotal += amount;
+      total += amount;
+    });
+
+    // round CRC totals
+    if (baseCurrency === Currency.CRC) {
+      total = roundCRC(total);
+    }
+
+    return { subtotal, taxes, total };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.error(`Error calculating billing total: ${error}`);

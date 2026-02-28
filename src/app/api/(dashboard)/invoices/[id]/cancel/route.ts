@@ -1,20 +1,17 @@
 import { NextResponse } from 'next/server';
-import moment from 'moment';
 
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { TransactionError, withTransaction } from '@libs/prisma';
-import { billingDefaultActivityCode } from '@/libs/constants';
-import { CancelDocumentData, generateCancelDocument } from '@/services/easytax';
+import { generateCancelDocument } from '@/services/easytax';
 
-import { CusConfiguration, CusInvoice, CusInvoiceLine, CusOffice } from '@/prisma/generated/client';
-import { Currency, InvoiceStatus } from '@/prisma/generated/enums';
+import { CusOffice } from '@/prisma/generated/client';
+import { InvoiceStatus } from '@/prisma/generated/enums';
 
 // import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
-import { getInvoice, rollbackLineReferences } from '@/controllers/Invoice.Controller';
+import { buildCancelDocumentPayload, getInvoice, rollbackLineReferences } from '@/controllers/Invoice.Controller';
 import { validateOrderStatus } from '@/controllers/Order.Controller';
 import { getConfiguration } from '@/controllers/Configuration.Controller';
-import { calculateTaxes, convertCRC, convertUSD } from '@/helpers/calculations';
 
 export const PUT = withAuthApi(['invoices.cancel'], async (req, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
@@ -67,7 +64,8 @@ export const PUT = withAuthApi(['invoices.cancel'], async (req, { params }: { pa
         configuration,
         office: entry.cash_register.office as CusOffice,
         invoice: entry,
-        lines: entry.invoice_lines
+        lines: entry.invoice_lines,
+        additionalCharges: []
       });
       const easytaxResponse = await generateCancelDocument(documentPayload);
       if (!easytaxResponse.valid) {
@@ -113,66 +111,3 @@ export const PUT = withAuthApi(['invoices.cancel'], async (req, { params }: { pa
     return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
   }
 });
-
-const buildCancelDocumentPayload = (data: {
-  configuration: CusConfiguration;
-  office: CusOffice;
-  invoice: CusInvoice;
-  lines: CusInvoiceLine[];
-}): CancelDocumentData => {
-  const { configuration, office, invoice, lines } = data;
-
-  return {
-    reference: {
-      invoiceType: invoice.type,
-      consecutive: invoice.consecutive,
-      date: moment(invoice.created_at)
-    },
-    company: {
-      name: configuration.billing_name,
-      identification: configuration.billing_identification,
-      activityCode: configuration.billing_activity_code
-    },
-    office: {
-      number: office.billing_number,
-      terminal: office.billing_terminal
-    },
-    client: {
-      name: invoice.client_name,
-      identification: invoice.client_identification,
-      email: invoice.client_email,
-      activityCode: invoice.client_activity_code || billingDefaultActivityCode
-    },
-    currency: invoice.currency,
-    method: invoice.payment_method,
-    ref: invoice.payment_method_ref || '',
-    ivaPercentage: invoice.iva_percentage,
-    lines: lines.map((line) => {
-      const invoiceCurrency = invoice.currency;
-
-      let unitPrice = line.unit_price;
-      let subtotal = line.total;
-      if (line.currency !== invoiceCurrency) {
-        if (invoiceCurrency === Currency.CRC) {
-          unitPrice = convertCRC(line.unit_price, invoice.selling_exchange_rate);
-          subtotal = convertCRC(line.total, invoice.selling_exchange_rate);
-        } else if (invoiceCurrency === Currency.USD) {
-          unitPrice = convertUSD(line.unit_price, invoice.buying_exchange_rate);
-          subtotal = convertUSD(line.total, invoice.buying_exchange_rate);
-        }
-      }
-
-      const totals = calculateTaxes(subtotal, invoice.iva_percentage);
-
-      return {
-        cabys: line.cabys,
-        description: line.description,
-        quantity: line.quantity,
-        unitPrice: unitPrice,
-        subtotal: totals.subtotal,
-        tax: totals.taxes,
-        total: totals.total
-      };
-    })
-  };
-};

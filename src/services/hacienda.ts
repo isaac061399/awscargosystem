@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { billingDefaultActivityCode } from './constants';
+import { billingDefaultActivityCode } from '../libs/constants';
 
 const endpoint = process.env.HACIENDA_ENDPOINT;
 

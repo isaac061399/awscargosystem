@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 
-import { getActivityCodes } from '@/libs/hacienda';
+import { getActivityCodes } from '@/services/hacienda';
 
 export const GET = withAuthApi(['clients.edit'], async (req) => {
   const { t } = await initTranslationsApi(req);

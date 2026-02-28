@@ -692,9 +692,8 @@ model CusInvoice {
   type                   InvoiceType
   payment_condition      InvoicePaymentCondition
   payment_condition_days Int
-  iva_percentage         Float                   @default(0)
-  selling_exchange_rate  Float                   @default(0)
-  buying_exchange_rate   Float                   @default(0)
+  selling_exchange_rate  Float
+  buying_exchange_rate   Float
   client_name            String
   client_identification  String
   client_email           String
@@ -716,14 +715,34 @@ model CusInvoice {
   created_at             DateTime                @default(now())
   updated_at             DateTime                @updatedAt
 
-  cash_register    CusCashRegister     @relation(fields: [cash_register_id], references: [id], onDelete: Restrict)
-  client           CusClient           @relation(fields: [client_id], references: [id], onDelete: Restrict)
-  cancelled_by     Administrator?      @relation(fields: [cancelled_by_id], references: [id], onDelete: SetNull)
-  invoice_lines    CusInvoiceLine[]
-  invoice_payments CusInvoicePayment[]
-  cusInvoiceLogs   CusInvoiceLog[]
+  cash_register              CusCashRegister              @relation(fields: [cash_register_id], references: [id], onDelete: Restrict)
+  client                     CusClient                    @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  cancelled_by               Administrator?               @relation(fields: [cancelled_by_id], references: [id], onDelete: SetNull)
+  invoice_additional_charges CusInvoiceAdditionalCharge[]
+  invoice_lines              CusInvoiceLine[]
+  invoice_payments           CusInvoicePayment[]
+  logs                       CusInvoiceLog[]
 
   @@map("cus_invoice")
+}
+
+model CusInvoiceAdditionalCharge {
+  id                         Int                         @id @default(autoincrement())
+  invoice_id                 Int
+  type                       InvoiceAdditionalChargeType
+  type_description           String?
+  third_party_identification String?
+  third_party_name           String?
+  details                    String
+  percentage                 Float
+  currency                   Currency
+  amount                     Float
+  created_at                 DateTime                    @default(now())
+  updated_at                 DateTime                    @updatedAt
+
+  invoice CusInvoice @relation(fields: [invoice_id], references: [id], onDelete: Restrict)
+
+  @@map("cus_invoice_additional_charge")
 }
 
 model CusInvoiceLine {
@@ -735,12 +754,15 @@ model CusInvoiceLine {
   package_prev_status       PackageStatus?
   order_product_prev_status OrderStatus?
   prev_payment_status       PaymentStatus?
+  iva_percentage            Float          @default(13)
+  code                      String
   cabys                     String
   description               String
   currency                  Currency
   quantity                  Float
   unit_price                Float
   total                     Float
+  is_exempt                 Boolean        @default(false)
   created_at                DateTime       @default(now())
   updated_at                DateTime       @updatedAt
 
@@ -1090,6 +1112,20 @@ enum IdentificationType {
   LEGAL
   DIMEX
   PASSPORT
+}
+
+enum InvoiceAdditionalChargeType {
+  PARAFISCAL_CONTRIBUTION
+  RED_CROSS_STAMP_DUTY
+  FIRE_DEPARTMENT_STAMP_DUTY
+  THIRD_PARTY_CHARGE
+  EXPORT_COSTS
+  SERVICE_TAX_10
+  PROFESSIONAL_ASSOCIATION_STAMP_DUTY
+  SECURITY_DEPOSIT
+  FINES_OR_PENALTIES
+  LATE_PAYMENT_INTEREST
+  OTHER
 }
 
 enum InvoiceType {

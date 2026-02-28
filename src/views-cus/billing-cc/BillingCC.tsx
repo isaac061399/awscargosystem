@@ -19,18 +19,17 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Divider,
+  FormControlLabel,
   Grid,
   IconButton,
   Stack,
+  Switch,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
@@ -39,24 +38,24 @@ import { enUS, esES } from '@mui/x-data-grid/locales';
 // Component Imports
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import ClientField from '@/components/custom/ClientField';
-import ProductField from '@/components/custom/ProductField';
 import Select from '@/components/Select';
 import MoneyField from '@/components/MoneyField';
 
 // Helpers Imports
-import { requestGetBillingLines, requestNewInvoice } from '@/helpers/request';
+import { requestNewInvoiceCC } from '@/helpers/request';
 import { bankAccounts, currencies } from '@/libs/constants';
-import { formatMoney, padStartZeros } from '@/libs/utils';
+import { formatMoney } from '@/libs/utils';
 import {
-  BillingLine,
+  BillingCCAdditionalCharge,
+  BillingCCLine,
+  calculateBillingCCTotal,
   calculateBillingChangeAmount,
   calculateBillingMissingAmountOtherCurrency,
   calculateBillingPaidAmount,
-  calculateBillingTotal,
   PaymentLine
 } from '@/helpers/calculations';
 import { useConfig } from '@/components/ConfigProvider';
-import { Currency, PaymentMethod } from '@/prisma/generated/enums';
+import { Currency, InvoiceAdditionalChargeType, PaymentMethod } from '@/prisma/generated/enums';
 
 /** ------- Default States ------- */
 const defaultAlertState = { open: false, type: 'success', message: '' };
@@ -66,44 +65,50 @@ function lineTotal(quantity: number, unit_price: number) {
   return (quantity || 0) * (unit_price || 0);
 }
 
-const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any }) => {
+const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any }) => {
   const { configuration } = useConfig();
   const sellingExchangeRate = configuration?.selling_exchange_rate ?? 0;
   const buyingExchangeRate = configuration?.buying_exchange_rate ?? 0;
   const ivaPercentage = configuration?.iva_percentage ?? 0;
 
   const { t, i18n } = useTranslation();
-  const textT: any = useMemo(() => t('billing:text', { returnObjects: true, default: {} }), [t]);
-  const formT: any = useMemo(() => t('billing:form', { returnObjects: true, default: {} }), [t]);
-  // const formCustomLineT: any = useMemo(() => t('billing:formCustomLine', { returnObjects: true, default: {} }), [t]);
-  const formProductT: any = useMemo(() => t('billing:formProduct', { returnObjects: true, default: {} }), [t]);
-  const formPaymentT: any = useMemo(() => t('billing:formPayment', { returnObjects: true, default: {} }), [t]);
+  const textT: any = useMemo(() => t('billing-cc:text', { returnObjects: true, default: {} }), [t]);
+  const formT: any = useMemo(() => t('billing-cc:form', { returnObjects: true, default: {} }), [t]);
+  const formLineT: any = useMemo(() => t('billing-cc:formLine', { returnObjects: true, default: {} }), [t]);
+  const formAdditionalChargeT: any = useMemo(
+    () => t('billing-cc:formAdditionalCharge', { returnObjects: true, default: {} }),
+    [t]
+  );
+  const formPaymentT: any = useMemo(() => t('billing-cc:formPayment', { returnObjects: true, default: {} }), [t]);
   const labelsT: any = useMemo(() => t('constants:labels', { returnObjects: true, default: {} }), [t]);
   const dgLocale = i18n.language === 'en' ? enUS : esES;
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-  const [billableLines, setBillableLines] = useState<any[]>([]);
-  const [billableLinesSelected, setBillableLinesSelected] = useState<any[]>([]);
-  const [selectedLines, setSelectedLines] = useState<BillingLine[]>([]);
+  const [lines, setLines] = useState<BillingCCLine[]>([]);
+  const [additionalCharges, setAdditionalCharges] = useState<BillingCCAdditionalCharge[]>([]);
   const [paymentLines, setPaymentLines] = useState<PaymentLine[]>([]);
   const [totals, setTotals] = useState<any>(
-    calculateBillingTotal(selectedLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate, ivaPercentage)
+    calculateBillingCCTotal(
+      lines,
+      additionalCharges,
+      Currency.CRC,
+      sellingExchangeRate,
+      buyingExchangeRate,
+      ivaPercentage
+    )
   );
   const [paidAmount, setPaidAmount] = useState<any>(
     calculateBillingPaidAmount(paymentLines, Currency.CRC, sellingExchangeRate, buyingExchangeRate)
   );
   const [successState, setSuccessState] = useState({ open: false, id: 0, changeAmountCRC: 0 });
-  const [readyOrdersState, setReadyOrdersState] = useState({ open: false, orders: [] as any[] });
 
   // Billing lines dialogs
-  // const [customOpen, setCustomOpen] = useState(false);
-  const [productOpen, setProductOpen] = useState(false);
+  const [lineOpen, setLineOpen] = useState(false);
+  const [additionalChargeOpen, setAdditionalChargeOpen] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
 
   const clientFieldRef = useRef<HTMLInputElement>(null);
-  // const customLineCodeFieldRef = useRef<HTMLInputElement>(null);
-  const productFieldRef = useRef<HTMLInputElement>(null);
+  const lineCodeFieldRef = useRef<HTMLInputElement>(null);
   const paymentAmountFieldRef = useRef<HTMLInputElement>(null);
 
   const formik = useFormik({
@@ -144,12 +149,8 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
           type: values.invoice_type,
           payment_condition: values.invoice_payment_condition,
           currency: values.invoice_currency,
-          lines: selectedLines.map((line) => ({
-            package_id: line.refObj.type === 'package' ? line.refObj.obj.id : null,
-            order_product_id: line.refObj.type === 'order_product' ? line.refObj.obj.id : null,
-            product_id: line.refObj.type === 'product' ? line.refObj.obj.id : null,
-            quantity: line.quantity
-          })),
+          lines,
+          additional_charges: additionalCharges,
           payments: paymentLines.map((line) => ({
             currency: line.currency,
             method: line.method,
@@ -159,7 +160,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
           }))
         };
 
-        const result = await requestNewInvoice(newValues, i18n.language);
+        const result = await requestNewInvoiceCC(newValues, i18n.language);
 
         if (!result.valid) {
           return setAlertState({ open: true, type: 'error', message: result.message || formT?.errorMessage });
@@ -180,107 +181,141 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
     }
   });
 
-  // const formikCustomLine = useFormik({
-  //   validateOnChange: false,
-  //   validateOnBlur: false,
-  //   enableReinitialize: true,
-  //   initialValues: useMemo(
-  //     () => ({
-  //       code: '',
-  //       description: '',
-  //       quantity: 1,
-  //       currency: Currency.CRC,
-  //       unit_price: 0
-  //     }),
-  //     []
-  //   ),
-  //   validationSchema: yup.object({
-  //     code: yup.string().required(formCustomLineT?.errors?.code),
-  //     description: yup.string().required(formCustomLineT?.errors?.description),
-  //     quantity: yup
-  //       .number()
-  //       .integer(formCustomLineT?.errors?.quantityInteger)
-  //       .required(formCustomLineT?.errors?.quantity)
-  //       .min(1, formCustomLineT?.errors?.quantityMinimum),
-  //     currency: yup.string().required(formCustomLineT?.errors?.currency),
-  //     unit_price: yup.number().required(formCustomLineT?.errors?.unit_price)
-  //   }),
-  //   onSubmit: async (values) => {
-  //     setAlertState({ ...defaultAlertState });
-
-  //     try {
-  //       const line: BillingLine = {
-  //         id: `custom-${Date.now()}`,
-  //         refObj: { type: 'custom', obj: null },
-  //         ref: values.code,
-  //         description: values.description,
-  //         quantity: Number(values.quantity),
-  //         unit_price: Number(values.unit_price),
-  //         currency: values.currency,
-  //         total: lineTotal(Number(values.quantity), Number(values.unit_price))
-  //       };
-  //       setSelectedLines((prev) => [...prev, line]);
-
-  //       setCustomOpen(false);
-  //       setTimeout(() => {
-  //         formikCustomLine.resetForm();
-  //       }, 500);
-  //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //     } catch (error) {
-  //       // console.error(error);
-  //       setAlertState({ open: true, type: 'error', message: formCustomLineT?.errorMessage });
-  //       setTimeout(() => {
-  //         setAlertState({ ...defaultAlertState });
-  //       }, 5000);
-
-  //       return;
-  //     }
-  //   }
-  // });
-
-  const formikProduct = useFormik({
+  const formikLine = useFormik({
     validateOnChange: false,
     validateOnBlur: false,
     enableReinitialize: true,
     initialValues: useMemo(
       () => ({
-        product: null as any,
-        quantity: 1
+        code: '',
+        cabys: '',
+        description: '',
+        quantity: 1,
+        currency: Currency.CRC,
+        unit_price: 0,
+        is_exempt: false
       }),
       []
     ),
     validationSchema: yup.object({
-      product: yup.object().required(formProductT?.errors?.product),
+      code: yup.string().required(formLineT?.errors?.code),
+      cabys: yup.string().required(formLineT?.errors?.cabys),
+      description: yup.string().required(formLineT?.errors?.description),
       quantity: yup
         .number()
-        .integer(formProductT?.errors?.quantityInteger)
-        .required(formProductT?.errors?.quantity)
-        .min(1, formProductT?.errors?.quantityMinimum)
+        .integer(formLineT?.errors?.quantityInteger)
+        .required(formLineT?.errors?.quantity)
+        .min(1, formLineT?.errors?.quantityMinimum),
+      currency: yup.string().required(formLineT?.errors?.currency),
+      unit_price: yup.number().required(formLineT?.errors?.unit_price),
+      is_exempt: yup.boolean().required(formLineT?.errors?.is_exempt)
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
 
       try {
-        const line: BillingLine = {
-          id: `product-${values.product.id}-${Date.now()}`,
-          refObj: { type: 'product', obj: values.product },
-          ref: values.product.code,
-          description: values.product.name,
+        const line: BillingCCLine = {
+          id: `${Date.now()}`,
+          code: values.code,
+          cabys: values.cabys,
+          description: values.description,
           quantity: Number(values.quantity),
-          unit_price: Number(values.product.price),
-          currency: values.product.currency,
-          total: lineTotal(Number(values.quantity), Number(values.product.price))
+          unit_price: Number(values.unit_price),
+          currency: values.currency,
+          is_exempt: values.is_exempt,
+          total: lineTotal(Number(values.quantity), Number(values.unit_price))
         };
-        setSelectedLines((prev) => [...prev, line]);
+        setLines((prev) => [...prev, line]);
 
-        setProductOpen(false);
+        setLineOpen(false);
         setTimeout(() => {
-          formikProduct.resetForm();
+          formikLine.resetForm();
         }, 500);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         // console.error(error);
-        setAlertState({ open: true, type: 'error', message: formProductT?.errorMessage });
+        setAlertState({ open: true, type: 'error', message: formLineT?.errorMessage });
+        setTimeout(() => {
+          setAlertState({ ...defaultAlertState });
+        }, 5000);
+
+        return;
+      }
+    }
+  });
+
+  const formikAdditionalCharge = useFormik({
+    validateOnChange: false,
+    validateOnBlur: false,
+    enableReinitialize: true,
+    initialValues: useMemo(
+      () => ({
+        type: '',
+        type_description: '',
+        third_party_identification: '',
+        third_party_name: '',
+        details: '',
+        percentage: 0,
+        currency: Currency.CRC,
+        amount: 0
+      }),
+      []
+    ),
+    validationSchema: yup.object({
+      type: yup.string().required(formAdditionalChargeT?.errors?.type),
+
+      type_description: yup.string().when('type', {
+        is: InvoiceAdditionalChargeType.OTHER,
+        then: (schema) => schema.required(formAdditionalChargeT?.errors?.type_description),
+        otherwise: (schema) => schema.notRequired()
+      }),
+
+      third_party_identification: yup.string().when('type', {
+        is: InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE,
+        then: (schema) => schema.required(formAdditionalChargeT?.errors?.third_party_identification),
+        otherwise: (schema) => schema.notRequired()
+      }),
+      third_party_name: yup.string().when('type', {
+        is: InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE,
+        then: (schema) => schema.required(formAdditionalChargeT?.errors?.third_party_name),
+        otherwise: (schema) => schema.notRequired()
+      }),
+
+      details: yup.string().required(formAdditionalChargeT?.errors?.details),
+      percentage: yup.number().required(formAdditionalChargeT?.errors?.percentage),
+      currency: yup.string().required(formAdditionalChargeT?.errors?.currency),
+      amount: yup
+        .number()
+        .required(formAdditionalChargeT?.errors?.amount)
+        .moreThan(0, formAdditionalChargeT?.errors?.amountMinimum)
+    }),
+    onSubmit: async (values) => {
+      setAlertState({ ...defaultAlertState });
+
+      try {
+        const line: BillingCCAdditionalCharge = {
+          id: `${Date.now()}`,
+          type: values.type as InvoiceAdditionalChargeType,
+          type_description: values.type === InvoiceAdditionalChargeType.OTHER ? values.type_description : '',
+          third_party_identification:
+            values.type === InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE ? values.third_party_identification : '',
+          third_party_name:
+            values.type === InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE ? values.third_party_name : '',
+          details: values.details,
+          percentage: Number(values.percentage),
+          currency: values.currency,
+          amount: Number(values.amount)
+        };
+        setAdditionalCharges((prev) => [...prev, line]);
+
+        setAdditionalChargeOpen(false);
+        setTimeout(() => {
+          formikAdditionalCharge.resetForm();
+        }, 500);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        // console.error(error);
+        setAlertState({ open: true, type: 'error', message: formAdditionalChargeT?.errorMessage });
         setTimeout(() => {
           setAlertState({ ...defaultAlertState });
         }, 5000);
@@ -364,23 +399,14 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // focus custom line code field when custom line dialog opens
-  // useEffect(() => {
-  //   if (customOpen) {
-  //     setTimeout(() => {
-  //       customLineCodeFieldRef.current?.focus();
-  //     }, 0);
-  //   }
-  // }, [customOpen]);
-
-  // focus product field when product dialog opens
+  // focus line code field when line dialog opens
   useEffect(() => {
-    if (productOpen) {
+    if (lineOpen) {
       setTimeout(() => {
-        productFieldRef.current?.focus();
+        lineCodeFieldRef.current?.focus();
       }, 0);
     }
-  }, [productOpen]);
+  }, [lineOpen]);
 
   // focus payment field when payment dialog opens
   useEffect(() => {
@@ -391,66 +417,25 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
     }
   }, [paymentOpen]);
 
-  // load billable lines when client changes
+  // update totals when lines and additional charges change
   useEffect(() => {
-    if (formik.values.client) {
-      const fetchLinesData = async () => {
-        setIsLoading(true);
-
-        const result = await requestGetBillingLines(formik.values.client?.id || 0, i18n.language);
-
-        setIsLoading(false);
-        setBillableLines(result.lines || []);
-        setBillableLinesSelected(result.lines || []);
-
-        if (result.ready_orders && result.ready_orders.length > 0) {
-          setReadyOrdersState({ open: true, orders: result.ready_orders });
-        } else {
-          setReadyOrdersState({ open: false, orders: [] });
-        }
-      };
-
-      fetchLinesData();
-    } else {
-      setBillableLines([]);
-      setBillableLinesSelected([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.client]);
-
-  // update selectedLines when billableLinesSelected changes
-  useEffect(() => {
-    setSelectedLines((prev) => {
-      // keep any previously added custom/product lines
-      const extras = prev.filter((x) => x.refObj.type !== 'package' && x.refObj.type !== 'order_product');
-
-      // build selected base billable lines
-      const selected: BillingLine[] = billableLinesSelected.map((line) => ({
-        id: line.id,
-        refObj: { type: line.type, obj: line.type === 'package' ? line.package : line.order_product },
-        ref: line.tracking,
-        description: line.description,
-        quantity: 1,
-        unit_price: Number(line.billing_amount),
-        currency: Currency.USD,
-        total: Number(line.billing_amount)
-      }));
-
-      return [...selected, ...extras];
-    });
-  }, [billableLinesSelected, billableLines]);
-
-  // update totals when selectedLines changes
-  useEffect(() => {
-    const result = calculateBillingTotal(
-      selectedLines,
+    const result = calculateBillingCCTotal(
+      lines,
+      additionalCharges,
       formik.values.invoice_currency,
       sellingExchangeRate,
       buyingExchangeRate,
       ivaPercentage
     );
     setTotals(result);
-  }, [selectedLines, formik.values.invoice_currency, sellingExchangeRate, buyingExchangeRate, ivaPercentage]);
+  }, [
+    lines,
+    additionalCharges,
+    formik.values.invoice_currency,
+    sellingExchangeRate,
+    buyingExchangeRate,
+    ivaPercentage
+  ]);
 
   // update paid amount when paymentLines changes
   useEffect(() => {
@@ -493,31 +478,26 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
     }
   }, [formik.values.invoice_payment_condition]);
 
-  const removeSelectedLine = (id: string) => {
-    // If it’s a base billable line, unselect it from ToBill
-    if (billableLines.some((b) => b.id === id)) {
-      setBillableLinesSelected((prev) => prev.filter((x) => x.id !== id));
+  const removeLine = (id: string) => {
+    setLines((prev) => prev.filter((x) => x.id !== id));
+  };
 
-      return;
-    }
-
-    // If it’s an extra line (custom/product), remove from selectedLines
-    setSelectedLines((prev) => prev.filter((x) => x.id !== id));
+  const removeAdditionalCharge = (id: string) => {
+    setAdditionalCharges((prev) => prev.filter((x) => x.id !== id));
   };
 
   const removePaymentLine = (id: string) => {
-    // If it’s an extra line (custom/product), remove from selectedLines
     setPaymentLines((prev) => prev.filter((x) => x.id !== id));
   };
 
-  // const openCustomLineDialog = () => {
-  //   formikCustomLine.resetForm();
-  //   setCustomOpen(true);
-  // };
+  const openLineDialog = () => {
+    formikLine.resetForm();
+    setLineOpen(true);
+  };
 
-  const openProductDialog = () => {
-    formikProduct.resetForm();
-    setProductOpen(true);
+  const openAdditionalChargeDialog = () => {
+    formikAdditionalCharge.resetForm();
+    setAdditionalChargeOpen(true);
   };
 
   const openPaymentDialog = () => {
@@ -537,106 +517,134 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
   };
 
   /** --- grids --- */
-  const billableCols: GridColDef[] = [
+  const linesCols: GridColDef[] = [
     {
-      field: 'type',
-      headerName: textT?.billableLinesTable?.type?.title,
-      width: 120,
-      sortable: false,
-      renderCell: (params) => {
-        const href =
-          params.row.type === 'package'
-            ? '/packages/view/' + params.row.package.id
-            : '/orders/edit/' + params.row.order_product.order.id;
-
-        return (
-          <Chip
-            size="small"
-            label={
-              <Tooltip title={textT?.billableLinesTable?.type?.tooltip} placement="top">
-                <Link href={href} target="_blank" className="flex items-center gap-1">
-                  {textT?.lineTypes?.[params.value]} <i className="ri-information-line text-lg"></i>
-                </Link>
-              </Tooltip>
-            }
-          />
-        );
-      }
-    },
-    { field: 'tracking', headerName: textT?.billableLinesTable?.tracking?.title, width: 200, sortable: false },
-    {
-      field: 'location_shelf',
-      headerName: textT?.billableLinesTable?.location?.title,
-      width: 200,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.location_shelf && params.row.location_row
-          ? textT?.billableLinesTable?.location?.format
-              .replace('{{ shelf }}', params.row.location_shelf)
-              .replace('{{ row }}', params.row.location_row)
-          : textT?.billableLinesTable?.location?.noLocation
-    },
-    {
-      field: 'billing_amount',
-      headerName: textT?.billableLinesTable?.amount?.title,
-      width: 120,
-      sortable: false,
-      valueGetter: (value, row) => formatMoney(row.billing_amount, `${currencies.USD.symbol}`)
-    },
-    {
-      field: 'description',
-      headerName: textT?.billableLinesTable?.description?.title,
+      field: 'code',
+      headerName: textT?.linesTable?.code?.title,
       flex: 1,
-      minWidth: 250,
+      minWidth: 200,
       sortable: false
-    }
-  ];
-
-  const selectedCols: GridColDef[] = [
-    {
-      field: 'refObj',
-      headerName: textT?.selectedLinesTable?.type?.title,
-      width: 120,
-      sortable: false,
-      renderCell: (params) => <Chip size="small" label={textT?.lineTypes?.[params.value.type]} />
     },
-    { field: 'ref', headerName: textT?.selectedLinesTable?.ref?.title, width: 200, sortable: false },
+    { field: 'cabys', headerName: textT?.linesTable?.cabys?.title, flex: 1, minWidth: 200, sortable: false },
     {
       field: 'description',
-      headerName: textT?.selectedLinesTable?.description?.title,
+      headerName: textT?.linesTable?.description?.title,
       flex: 1,
-      minWidth: 250,
+      minWidth: 300,
       sortable: false
     },
     {
       field: 'quantity',
-      headerName: textT?.selectedLinesTable?.quantity?.title,
-      width: 80,
-      type: 'number',
+      headerName: textT?.linesTable?.quantity?.title,
+      flex: 1,
+      minWidth: 120,
       sortable: false
     },
     {
       field: 'unit_price',
-      headerName: textT?.selectedLinesTable?.unit_price?.title,
-      width: 120,
+      headerName: textT?.linesTable?.unit_price?.title,
+      flex: 1,
+      minWidth: 170,
       sortable: false,
       valueGetter: (value, row) => formatMoney(row.unit_price, `${currencies[row.currency].symbol} `)
     },
     {
       field: 'total',
-      headerName: textT?.selectedLinesTable?.total?.title,
-      width: 120,
+      headerName: textT?.linesTable?.total?.title,
+      flex: 1,
+      minWidth: 170,
       sortable: false,
       valueGetter: (value, row) => formatMoney(row.total, `${currencies[row.currency].symbol} `)
     },
     {
+      field: 'is_exempt',
+      headerName: textT?.linesTable?.is_exempt?.title,
+      flex: 1,
+      minWidth: 100,
+      sortable: false,
+      valueGetter: (value, row) => (row.is_exempt ? textT?.yesLabel : textT?.noLabel)
+    },
+    {
       field: 'actions',
       headerName: '',
-      width: 70,
+      flex: 1,
+      minWidth: 70,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <IconButton aria-label="remove line" onClick={() => removeSelectedLine(params.row.id)}>
+        <IconButton aria-label="remove line" onClick={() => removeLine(params.row.id)}>
+          <i className="ri-delete-bin-2-fill" />
+        </IconButton>
+      )
+    }
+  ];
+
+  const additionalChargesCols: GridColDef[] = [
+    {
+      field: 'type',
+      headerName: textT?.additionalChargesTable?.type?.title,
+      flex: 1,
+      minWidth: 400,
+      sortable: false,
+      renderCell: (params) => {
+        const type = labelsT?.invoiceAdditionalChargeType?.[params.row.type] || params.row.type;
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span>{type}</span>
+            {params.row.type_description !== '' && (
+              <span>
+                <strong>{textT?.additionalChargesTable?.type?.description}: </strong>
+                {params.row.type_description}
+              </span>
+            )}
+            {params.row.third_party_identification !== '' && (
+              <span>
+                <strong>{textT?.additionalChargesTable?.type?.thirdPartyIdentification}: </strong>
+                {params.row.third_party_identification}
+              </span>
+            )}
+            {params.row.third_party_name !== '' && (
+              <span>
+                <strong>{textT?.additionalChargesTable?.type?.thirdPartyName}: </strong>
+                {params.row.third_party_name}
+              </span>
+            )}
+          </div>
+        );
+      }
+    },
+    {
+      field: 'details',
+      headerName: textT?.additionalChargesTable?.details?.title,
+      flex: 1,
+      minWidth: 400,
+      sortable: false
+    },
+    {
+      field: 'percentage',
+      headerName: textT?.additionalChargesTable?.percentage?.title,
+      flex: 1,
+      minWidth: 120,
+      sortable: false
+    },
+    {
+      field: 'amount',
+      headerName: textT?.additionalChargesTable?.amount?.title,
+      flex: 1,
+      minWidth: 170,
+      sortable: false,
+      valueGetter: (value, row) => formatMoney(row.amount, `${currencies[row.currency].symbol} `)
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      flex: 1,
+      minWidth: 70,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <IconButton aria-label="remove line" onClick={() => removeAdditionalCharge(params.row.id)}>
           <i className="ri-delete-bin-2-fill" />
         </IconButton>
       )
@@ -758,7 +766,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                       error={Boolean(formik.touched.client && formik.errors.client)}
                       color={Boolean(formik.touched.client && formik.errors.client) ? 'error' : 'primary'}
                       helperText={formik.touched.client && (formik.errors.client as string)}
-                      disabled={formik.isSubmitting || isLoading}
+                      disabled={formik.isSubmitting}
                     />
 
                     {formik.values.client ? (
@@ -837,66 +845,27 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
             </Grid>
           </Grid>
 
-          {/* Middle row: left = To bill, right = Selected lines */}
+          {/* Middle row: lines, additional charges */}
           <Grid container spacing={2} className="items-stretch">
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, md: 12 }}>
               <Card className="h-full">
-                <CardHeader
-                  title={textT?.cards?.billableLines?.title}
-                  subheader={textT?.cards?.billableLines?.subtitle}
-                />
-                <Divider />
-                <CardContent>
-                  <Box className="h-117">
-                    <DataGrid
-                      loading={isLoading}
-                      rows={billableLines}
-                      columns={billableCols}
-                      checkboxSelection
-                      disableRowSelectionOnClick
-                      disableRowSelectionExcludeModel
-                      rowSelectionModel={{
-                        type: 'include',
-                        ids: new Set(billableLinesSelected.map((line) => line.id))
-                      }}
-                      onRowSelectionModelChange={(m) => {
-                        const linesSelected = billableLines.filter((b) => Array.from(m.ids).includes(b.id));
-                        setBillableLinesSelected(linesSelected);
-                      }}
-                      hideFooterPagination
-                      hideFooter
-                      // pagination
-                      // pageSizeOptions={[5, 10, 25]}
-                      // initialState={{
-                      //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
-                      // }}
-                      localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Card className="h-full">
-                <CardHeader
-                  title={textT?.cards?.selectedLines?.title}
-                  subheader={textT?.cards?.selectedLines?.subtitle}
-                />
+                <CardHeader title={textT?.cards?.lines?.title} subheader={textT?.cards?.lines?.subtitle} />
                 <Divider />
                 <CardContent>
                   <Stack direction="row" spacing={1} className="mb-3">
                     <Button
                       variant="contained"
                       startIcon={<i className="ri-add-large-line" />}
-                      onClick={openProductDialog}>
-                      {textT?.cards?.selectedLines?.btnAddProduct}
+                      onClick={openLineDialog}>
+                      {textT?.cards?.lines?.btnAdd}
                     </Button>
                   </Stack>
 
-                  <Box className="h-105">
+                  <Box>
                     <DataGrid
-                      rows={selectedLines}
-                      columns={selectedCols}
+                      autoHeight
+                      rows={lines}
+                      columns={linesCols}
                       checkboxSelection={false}
                       disableRowSelectionOnClick
                       hideFooterPagination
@@ -907,6 +876,45 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                       //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
                       // }}
                       localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
+                      getRowHeight={() => 'auto'}
+                    />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, md: 12 }}>
+              <Card className="h-full">
+                <CardHeader
+                  title={textT?.cards?.additionalCharges?.title}
+                  subheader={textT?.cards?.additionalCharges?.subtitle}
+                />
+                <Divider />
+                <CardContent>
+                  <Stack direction="row" spacing={1} className="mb-3">
+                    <Button
+                      variant="contained"
+                      startIcon={<i className="ri-add-large-line" />}
+                      onClick={openAdditionalChargeDialog}>
+                      {textT?.cards?.additionalCharges?.btnAdd}
+                    </Button>
+                  </Stack>
+
+                  <Box>
+                    <DataGrid
+                      autoHeight
+                      rows={additionalCharges}
+                      columns={additionalChargesCols}
+                      checkboxSelection={false}
+                      disableRowSelectionOnClick
+                      hideFooterPagination
+                      hideFooter
+                      // pagination
+                      // pageSizeOptions={[5, 10, 25]}
+                      // initialState={{
+                      //   pagination: { paginationModel: { pageSize: 10, page: 0 } }
+                      // }}
+                      localeText={dgLocale?.components?.MuiDataGrid?.defaultProps?.localeText}
+                      getRowHeight={() => 'auto'}
                     />
                   </Box>
                 </CardContent>
@@ -940,7 +948,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                         Boolean(formik.touched.invoice_currency && formik.errors.invoice_currency) ? 'error' : 'primary'
                       }
                       helperText={formik.touched.invoice_currency && (formik.errors.invoice_currency as string)}
-                      disabled={formik.isSubmitting || isLoading}
+                      disabled={formik.isSubmitting}
                     />
                   </div>
                   <Stack spacing={1}>
@@ -996,7 +1004,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                             disabled={
                               !formik.values.client ||
                               !cashRegister ||
-                              selectedLines.length === 0 ||
+                              (lines.length === 0 && additionalCharges.length === 0) ||
                               formik.values.invoice_payment_condition !== 'CASH'
                             }>
                             {textT?.cards?.payment?.btnAddPayment}
@@ -1032,8 +1040,12 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                             type="submit"
                             variant="contained"
                             color="primary"
-                            loading={formik.isSubmitting || isLoading}
-                            disabled={!formik.values.client || !cashRegister || selectedLines.length === 0}>
+                            loading={formik.isSubmitting}
+                            disabled={
+                              !formik.values.client ||
+                              !cashRegister ||
+                              (lines.length === 0 && additionalCharges.length === 0)
+                            }>
                             {textT?.cards?.payment?.btnSubmit}
                           </Button>
 
@@ -1059,31 +1071,46 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
         </Stack>
       </form>
 
-      {/* Custom line dialog */}
-      {/* <Dialog
-        open={customOpen}
-        onClose={() => setCustomOpen(false)}
-        aria-labelledby="dialog-custom-line-title"
+      {/* Line dialog */}
+      <Dialog
+        open={lineOpen}
+        onClose={() => setLineOpen(false)}
+        aria-labelledby="dialog-line-title"
         maxWidth="sm"
         fullWidth>
-        <form noValidate onSubmit={formikCustomLine.handleSubmit}>
-          <DialogTitle id="dialog-custom-line-title">{textT?.dialogCustomLine?.title}</DialogTitle>
+        <form noValidate onSubmit={formikLine.handleSubmit}>
+          <DialogTitle id="dialog-line-title">{textT?.dialogLine?.title}</DialogTitle>
           <DialogContent dividers className="flex flex-col gap-6">
             <TextField
-              inputRef={customLineCodeFieldRef}
+              inputRef={lineCodeFieldRef}
               fullWidth
               required
               type="text"
               id="code"
               name="code"
-              label={formCustomLineT?.labels?.code}
-              placeholder={formCustomLineT?.placeholders?.code}
-              value={formikCustomLine.values.code}
-              onChange={formikCustomLine.handleChange}
-              error={Boolean(formikCustomLine.touched.code && formikCustomLine.errors.code)}
-              color={Boolean(formikCustomLine.touched.code && formikCustomLine.errors.code) ? 'error' : 'primary'}
-              helperText={formikCustomLine.touched.code && (formikCustomLine.errors.code as string)}
-              disabled={formikCustomLine.isSubmitting}
+              label={formLineT?.labels?.code}
+              placeholder={formLineT?.placeholders?.code}
+              value={formikLine.values.code}
+              onChange={formikLine.handleChange}
+              error={Boolean(formikLine.touched.code && formikLine.errors.code)}
+              color={Boolean(formikLine.touched.code && formikLine.errors.code) ? 'error' : 'primary'}
+              helperText={formikLine.touched.code && (formikLine.errors.code as string)}
+              disabled={formikLine.isSubmitting}
+            />
+            <TextField
+              fullWidth
+              required
+              type="text"
+              id="cabys"
+              name="cabys"
+              label={formLineT?.labels?.cabys}
+              placeholder={formLineT?.placeholders?.cabys}
+              value={formikLine.values.cabys}
+              onChange={formikLine.handleChange}
+              error={Boolean(formikLine.touched.cabys && formikLine.errors.cabys)}
+              color={Boolean(formikLine.touched.cabys && formikLine.errors.cabys) ? 'error' : 'primary'}
+              helperText={formikLine.touched.cabys && (formikLine.errors.cabys as string)}
+              disabled={formikLine.isSubmitting}
             />
             <TextField
               fullWidth
@@ -1091,18 +1118,14 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               type="text"
               id="description"
               name="description"
-              label={formCustomLineT?.labels?.description}
-              placeholder={formCustomLineT?.placeholders?.description}
-              value={formikCustomLine.values.description}
-              onChange={formikCustomLine.handleChange}
-              error={Boolean(formikCustomLine.touched.description && formikCustomLine.errors.description)}
-              color={
-                Boolean(formikCustomLine.touched.description && formikCustomLine.errors.description)
-                  ? 'error'
-                  : 'primary'
-              }
-              helperText={formikCustomLine.touched.description && (formikCustomLine.errors.description as string)}
-              disabled={formikCustomLine.isSubmitting}
+              label={formLineT?.labels?.description}
+              placeholder={formLineT?.placeholders?.description}
+              value={formikLine.values.description}
+              onChange={formikLine.handleChange}
+              error={Boolean(formikLine.touched.description && formikLine.errors.description)}
+              color={Boolean(formikLine.touched.description && formikLine.errors.description) ? 'error' : 'primary'}
+              helperText={formikLine.touched.description && (formikLine.errors.description as string)}
+              disabled={formikLine.isSubmitting}
             />
             <TextField
               fullWidth
@@ -1110,16 +1133,14 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               type="number"
               id="quantity"
               name="quantity"
-              label={formCustomLineT?.labels?.quantity}
-              placeholder={formCustomLineT?.placeholders?.quantity}
-              value={formikCustomLine.values.quantity}
-              onChange={formikCustomLine.handleChange}
-              error={Boolean(formikCustomLine.touched.quantity && formikCustomLine.errors.quantity)}
-              color={
-                Boolean(formikCustomLine.touched.quantity && formikCustomLine.errors.quantity) ? 'error' : 'primary'
-              }
-              helperText={formikCustomLine.touched.quantity && (formikCustomLine.errors.quantity as string)}
-              disabled={formikCustomLine.isSubmitting}
+              label={formLineT?.labels?.quantity}
+              placeholder={formLineT?.placeholders?.quantity}
+              value={formikLine.values.quantity}
+              onChange={formikLine.handleChange}
+              error={Boolean(formikLine.touched.quantity && formikLine.errors.quantity)}
+              color={Boolean(formikLine.touched.quantity && formikLine.errors.quantity) ? 'error' : 'primary'}
+              helperText={formikLine.touched.quantity && (formikLine.errors.quantity as string)}
+              disabled={formikLine.isSubmitting}
             />
             <Select
               options={Object.keys(labelsT?.currency).map((value) => ({
@@ -1130,16 +1151,14 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               required
               id="currency"
               name="currency"
-              label={formCustomLineT?.labels?.currency}
-              // placeholder={formCustomLineT?.placeholders?.currency}
-              value={formikCustomLine.values.currency}
-              onChange={formikCustomLine.handleChange}
-              error={Boolean(formikCustomLine.touched.currency && formikCustomLine.errors.currency)}
-              color={
-                Boolean(formikCustomLine.touched.currency && formikCustomLine.errors.currency) ? 'error' : 'primary'
-              }
-              helperText={formikCustomLine.touched.currency && (formikCustomLine.errors.currency as string)}
-              disabled={formikCustomLine.isSubmitting}
+              label={formLineT?.labels?.currency}
+              // placeholder={formLineT?.placeholders?.currency}
+              value={formikLine.values.currency}
+              onChange={formikLine.handleChange}
+              error={Boolean(formikLine.touched.currency && formikLine.errors.currency)}
+              color={Boolean(formikLine.touched.currency && formikLine.errors.currency) ? 'error' : 'primary'}
+              helperText={formikLine.touched.currency && (formikLine.errors.currency as string)}
+              disabled={formikLine.isSubmitting}
             />
             <MoneyField
               fullWidth
@@ -1148,90 +1167,263 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               decimalScale={2}
               decimalSeparator="."
               thousandSeparator=","
-              prefix={`${currencies[formikCustomLine.values.currency]?.symbol || ''} `}
+              prefix={`${currencies[formikLine.values.currency]?.symbol || ''} `}
               id="unit_price"
               name="unit_price"
-              label={formCustomLineT?.labels?.unit_price}
-              placeholder={formCustomLineT?.placeholders?.unit_price}
-              value={formikCustomLine.values.unit_price}
-              onChange={formikCustomLine.handleChange}
-              error={Boolean(formikCustomLine.touched.unit_price && formikCustomLine.errors.unit_price)}
-              color={
-                Boolean(formikCustomLine.touched.unit_price && formikCustomLine.errors.unit_price) ? 'error' : 'primary'
-              }
-              helperText={formikCustomLine.touched.unit_price && (formikCustomLine.errors.unit_price as string)}
-              disabled={formikCustomLine.isSubmitting}
+              label={formLineT?.labels?.unit_price}
+              placeholder={formLineT?.placeholders?.unit_price}
+              value={formikLine.values.unit_price}
+              onChange={formikLine.handleChange}
+              error={Boolean(formikLine.touched.unit_price && formikLine.errors.unit_price)}
+              color={Boolean(formikLine.touched.unit_price && formikLine.errors.unit_price) ? 'error' : 'primary'}
+              helperText={formikLine.touched.unit_price && (formikLine.errors.unit_price as string)}
+              disabled={formikLine.isSubmitting}
             />
+            <Box display="flex" justifyContent="flex-start">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formikLine.values.is_exempt}
+                    onChange={(e) => {
+                      formikLine.setFieldValue('is_exempt', e.target.checked);
+                    }}
+                  />
+                }
+                label={formLineT?.labels?.is_exempt}
+                labelPlacement="start"
+                sx={{ marginLeft: 0 }}
+              />
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button
               variant="text"
               color="secondary"
-              onClick={() => setCustomOpen(false)}
-              disabled={formikCustomLine.isSubmitting}>
+              onClick={() => setLineOpen(false)}
+              disabled={formikLine.isSubmitting}>
               {textT?.btnCancel}
             </Button>
-            <Button type="submit" variant="text" color="primary" loading={formikCustomLine.isSubmitting}>
+            <Button type="submit" variant="text" color="primary" loading={formikLine.isSubmitting}>
               {textT?.btnAdd}
             </Button>
           </DialogActions>
         </form>
-      </Dialog> */}
+      </Dialog>
 
-      {/* Product dialog */}
+      {/* Additional Charge dialog */}
       <Dialog
-        open={productOpen}
-        onClose={() => setProductOpen(false)}
-        aria-labelledby="dialog-product-title"
+        open={additionalChargeOpen}
+        onClose={() => setAdditionalChargeOpen(false)}
+        aria-labelledby="dialog-additional-charge-title"
         maxWidth="sm"
         fullWidth>
-        <form noValidate onSubmit={formikProduct.handleSubmit}>
-          <DialogTitle id="dialog-product-title">{textT?.dialogProduct?.title}</DialogTitle>
+        <form noValidate onSubmit={formikAdditionalCharge.handleSubmit}>
+          <DialogTitle id="dialog-additional-charge-title">{textT?.dialogAdditionalCharge?.title}</DialogTitle>
           <DialogContent dividers className="flex flex-col gap-6">
-            <ProductField
-              inputRef={productFieldRef}
-              initialOptions={[]}
-              isOptionEqualToValue={(option, v) => option.id === v.id}
-              loadingText={textT?.loading}
-              noOptionsText={textT?.noOptions}
-              value={formikProduct.values.product}
-              onChange={(value) => {
-                formikProduct.setFieldValue('product', value || null);
-              }}
-              id="product"
-              name="product"
-              label={formProductT?.labels?.product}
-              placeholder={formProductT?.placeholders?.product}
-              error={Boolean(formikProduct.touched.product && formikProduct.errors.product)}
-              color={Boolean(formikProduct.touched.product && formikProduct.errors.product) ? 'error' : 'primary'}
-              helperText={formikProduct.touched.product && (formikProduct.errors.product as string)}
-              disabled={formikProduct.isSubmitting || isLoading}
+            <Select
+              options={Object.keys(labelsT?.invoiceAdditionalChargeType).map((value) => ({
+                value,
+                label: labelsT?.invoiceAdditionalChargeType[value]
+              }))}
+              fullWidth
+              required
+              id="type"
+              name="type"
+              label={formAdditionalChargeT?.labels?.type}
+              placeholder={formAdditionalChargeT?.placeholders?.type}
+              value={formikAdditionalCharge.values.type}
+              onChange={formikAdditionalCharge.handleChange}
+              error={Boolean(formikAdditionalCharge.touched.type && formikAdditionalCharge.errors.type)}
+              color={
+                Boolean(formikAdditionalCharge.touched.type && formikAdditionalCharge.errors.type) ? 'error' : 'primary'
+              }
+              helperText={formikAdditionalCharge.touched.type && (formikAdditionalCharge.errors.type as string)}
+              disabled={formikAdditionalCharge.isSubmitting}
+            />
+            {/* only show description if type is OTHER, otherwise set description as type label */}
+            {formikAdditionalCharge.values.type === InvoiceAdditionalChargeType.OTHER && (
+              <TextField
+                fullWidth
+                required
+                type="text"
+                id="type_description"
+                name="type_description"
+                label={formAdditionalChargeT?.labels?.type_description}
+                placeholder={formAdditionalChargeT?.placeholders?.type_description}
+                value={formikAdditionalCharge.values.type_description}
+                onChange={formikAdditionalCharge.handleChange}
+                error={Boolean(
+                  formikAdditionalCharge.touched.type_description && formikAdditionalCharge.errors.type_description
+                )}
+                color={
+                  Boolean(
+                    formikAdditionalCharge.touched.type_description && formikAdditionalCharge.errors.type_description
+                  )
+                    ? 'error'
+                    : 'primary'
+                }
+                helperText={
+                  formikAdditionalCharge.touched.type_description &&
+                  (formikAdditionalCharge.errors.type_description as string)
+                }
+                disabled={formikAdditionalCharge.isSubmitting}
+              />
+            )}
+
+            {/* only show third party fields if type is THIRD_PARTY, otherwise set those fields as null */}
+            {formikAdditionalCharge.values.type === InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE && (
+              <>
+                <TextField
+                  fullWidth
+                  required
+                  type="text"
+                  id="third_party_identification"
+                  name="third_party_identification"
+                  label={formAdditionalChargeT?.labels?.third_party_identification}
+                  placeholder={formAdditionalChargeT?.placeholders?.third_party_identification}
+                  value={formikAdditionalCharge.values.third_party_identification}
+                  onChange={formikAdditionalCharge.handleChange}
+                  error={Boolean(
+                    formikAdditionalCharge.touched.third_party_identification &&
+                    formikAdditionalCharge.errors.third_party_identification
+                  )}
+                  color={
+                    Boolean(
+                      formikAdditionalCharge.touched.third_party_identification &&
+                      formikAdditionalCharge.errors.third_party_identification
+                    )
+                      ? 'error'
+                      : 'primary'
+                  }
+                  helperText={
+                    formikAdditionalCharge.touched.third_party_identification &&
+                    (formikAdditionalCharge.errors.third_party_identification as string)
+                  }
+                  disabled={formikAdditionalCharge.isSubmitting}
+                />
+                <TextField
+                  fullWidth
+                  required
+                  type="text"
+                  id="third_party_name"
+                  name="third_party_name"
+                  label={formAdditionalChargeT?.labels?.third_party_name}
+                  placeholder={formAdditionalChargeT?.placeholders?.third_party_name}
+                  value={formikAdditionalCharge.values.third_party_name}
+                  onChange={formikAdditionalCharge.handleChange}
+                  error={Boolean(
+                    formikAdditionalCharge.touched.third_party_name && formikAdditionalCharge.errors.third_party_name
+                  )}
+                  color={
+                    Boolean(
+                      formikAdditionalCharge.touched.third_party_name && formikAdditionalCharge.errors.third_party_name
+                    )
+                      ? 'error'
+                      : 'primary'
+                  }
+                  helperText={
+                    formikAdditionalCharge.touched.third_party_name &&
+                    (formikAdditionalCharge.errors.third_party_name as string)
+                  }
+                  disabled={formikAdditionalCharge.isSubmitting}
+                />
+              </>
+            )}
+            <TextField
+              fullWidth
+              required
+              type="text"
+              id="details"
+              name="details"
+              label={formAdditionalChargeT?.labels?.details}
+              placeholder={formAdditionalChargeT?.placeholders?.details}
+              value={formikAdditionalCharge.values.details}
+              onChange={formikAdditionalCharge.handleChange}
+              error={Boolean(formikAdditionalCharge.touched.details && formikAdditionalCharge.errors.details)}
+              color={
+                Boolean(formikAdditionalCharge.touched.details && formikAdditionalCharge.errors.details)
+                  ? 'error'
+                  : 'primary'
+              }
+              helperText={formikAdditionalCharge.touched.details && (formikAdditionalCharge.errors.details as string)}
+              disabled={formikAdditionalCharge.isSubmitting}
             />
             <TextField
               fullWidth
               required
               type="number"
-              id="quantity"
-              name="quantity"
-              label={formProductT?.labels?.quantity}
-              placeholder={formProductT?.placeholders?.quantity}
-              value={formikProduct.values.quantity}
-              onChange={formikProduct.handleChange}
-              error={Boolean(formikProduct.touched.quantity && formikProduct.errors.quantity)}
-              color={Boolean(formikProduct.touched.quantity && formikProduct.errors.quantity) ? 'error' : 'primary'}
-              helperText={formikProduct.touched.quantity && (formikProduct.errors.quantity as string)}
-              disabled={formikProduct.isSubmitting}
+              id="percentage"
+              name="percentage"
+              label={formAdditionalChargeT?.labels?.percentage}
+              placeholder={formAdditionalChargeT?.placeholders?.percentage}
+              value={formikAdditionalCharge.values.percentage}
+              onChange={formikAdditionalCharge.handleChange}
+              error={Boolean(formikAdditionalCharge.touched.percentage && formikAdditionalCharge.errors.percentage)}
+              color={
+                Boolean(formikAdditionalCharge.touched.percentage && formikAdditionalCharge.errors.percentage)
+                  ? 'error'
+                  : 'primary'
+              }
+              helperText={
+                formikAdditionalCharge.touched.percentage && (formikAdditionalCharge.errors.percentage as string)
+              }
+              disabled={formikAdditionalCharge.isSubmitting}
+            />
+            <Select
+              options={Object.keys(labelsT?.currency).map((value) => ({
+                value,
+                label: labelsT?.currency[value]
+              }))}
+              fullWidth
+              required
+              id="currency"
+              name="currency"
+              label={formAdditionalChargeT?.labels?.currency}
+              // placeholder={formAdditionalChargeT?.placeholders?.currency}
+              value={formikAdditionalCharge.values.currency}
+              onChange={formikAdditionalCharge.handleChange}
+              error={Boolean(formikAdditionalCharge.touched.currency && formikAdditionalCharge.errors.currency)}
+              color={
+                Boolean(formikAdditionalCharge.touched.currency && formikAdditionalCharge.errors.currency)
+                  ? 'error'
+                  : 'primary'
+              }
+              helperText={formikAdditionalCharge.touched.currency && (formikAdditionalCharge.errors.currency as string)}
+              disabled={formikAdditionalCharge.isSubmitting}
+            />
+            <MoneyField
+              fullWidth
+              required
+              type="text"
+              decimalScale={2}
+              decimalSeparator="."
+              thousandSeparator=","
+              prefix={`${currencies[formikAdditionalCharge.values.currency]?.symbol || ''} `}
+              id="amount"
+              name="amount"
+              label={formAdditionalChargeT?.labels?.amount}
+              placeholder={formAdditionalChargeT?.placeholders?.amount}
+              value={formikAdditionalCharge.values.amount}
+              onChange={formikAdditionalCharge.handleChange}
+              error={Boolean(formikAdditionalCharge.touched.amount && formikAdditionalCharge.errors.amount)}
+              color={
+                Boolean(formikAdditionalCharge.touched.amount && formikAdditionalCharge.errors.amount)
+                  ? 'error'
+                  : 'primary'
+              }
+              helperText={formikAdditionalCharge.touched.amount && (formikAdditionalCharge.errors.amount as string)}
+              disabled={formikAdditionalCharge.isSubmitting}
             />
           </DialogContent>
           <DialogActions>
             <Button
               variant="text"
               color="secondary"
-              onClick={() => setProductOpen(false)}
-              disabled={formikProduct.isSubmitting}>
+              onClick={() => setAdditionalChargeOpen(false)}
+              disabled={formikAdditionalCharge.isSubmitting}>
               {textT?.btnCancel}
             </Button>
-            <Button type="submit" variant="text" color="primary" loading={formikProduct.isSubmitting}>
+            <Button type="submit" variant="text" color="primary" loading={formikAdditionalCharge.isSubmitting}>
               {textT?.btnAdd}
             </Button>
           </DialogActions>
@@ -1264,7 +1456,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               error={Boolean(formikPayment.touched.currency && formikPayment.errors.currency)}
               color={Boolean(formikPayment.touched.currency && formikPayment.errors.currency) ? 'error' : 'primary'}
               helperText={formikPayment.touched.currency && (formikPayment.errors.currency as string)}
-              disabled={formikPayment.isSubmitting || isLoading}
+              disabled={formikPayment.isSubmitting}
             />
             <Select
               options={Object.keys(labelsT?.paymentMethod).map((value) => ({
@@ -1282,7 +1474,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               error={Boolean(formikPayment.touched.method && formikPayment.errors.method)}
               color={Boolean(formikPayment.touched.method && formikPayment.errors.method) ? 'error' : 'primary'}
               helperText={formikPayment.touched.method && (formikPayment.errors.method as string)}
-              disabled={formikPayment.isSubmitting || isLoading}
+              disabled={formikPayment.isSubmitting}
             />
             <MoneyField
               inputRef={paymentAmountFieldRef}
@@ -1302,7 +1494,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
               error={Boolean(formikPayment.touched.amount && formikPayment.errors.amount)}
               color={Boolean(formikPayment.touched.amount && formikPayment.errors.amount) ? 'error' : 'primary'}
               helperText={formikPayment.touched.amount && (formikPayment.errors.amount as string)}
-              disabled={formikPayment.isSubmitting || isLoading}
+              disabled={formikPayment.isSubmitting}
             />
             {formikPayment.values.method !== PaymentMethod.CASH && (
               <TextField
@@ -1318,7 +1510,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                 error={Boolean(formikPayment.touched.ref && formikPayment.errors.ref)}
                 color={Boolean(formikPayment.touched.ref && formikPayment.errors.ref) ? 'error' : 'primary'}
                 helperText={formikPayment.touched.ref && (formikPayment.errors.ref as string)}
-                disabled={formikPayment.isSubmitting || isLoading}
+                disabled={formikPayment.isSubmitting}
               />
             )}
             {formikPayment.values.method === PaymentMethod.TRANSFER && (
@@ -1338,7 +1530,7 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
                 error={Boolean(formikPayment.touched.ref_bank && formikPayment.errors.ref_bank)}
                 color={Boolean(formikPayment.touched.ref_bank && formikPayment.errors.ref_bank) ? 'error' : 'primary'}
                 helperText={formikPayment.touched.ref_bank && (formikPayment.errors.ref_bank as string)}
-                disabled={formikPayment.isSubmitting || isLoading}
+                disabled={formikPayment.isSubmitting}
               />
             )}
           </DialogContent>
@@ -1397,53 +1589,6 @@ const Billing = ({ cashRegister, client }: { cashRegister?: any; client?: any })
           </Stack>
         </DialogContent>
       </Dialog>
-
-      {/* Ready orders dialog */}
-      <Dialog
-        open={readyOrdersState.open}
-        onClose={() => setReadyOrdersState({ ...readyOrdersState, open: false })}
-        aria-labelledby="dialog-ready-orders-title"
-        aria-describedby="dialog-ready-description"
-        maxWidth="sm"
-        fullWidth>
-        <DialogTitle id="dialog-ready-orders-title">{textT?.dialogReadyOrders?.title}</DialogTitle>
-        <DialogContent dividers className="flex flex-col gap-6">
-          <DialogContentText id="dialog-ready-description">{textT?.dialogReadyOrders?.subtitle}</DialogContentText>
-          <Stack direction="column" spacing={2}>
-            {readyOrdersState.orders.map((order) => (
-              <Button
-                key={order.id}
-                LinkComponent={Link}
-                variant="outlined"
-                color="primary"
-                href={`/orders/edit/${order.id}`}
-                target="_blank"
-                fullWidth
-                className="justify-start">
-                <Stack direction="column" spacing={0.5} alignItems="flex-start" className="w-full">
-                  <Typography variant="body1" className="font-semibold">
-                    {`ID: # ${padStartZeros(order.id, 4)}`}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {`${textT?.dialogReadyOrders?.orderNumber}: ${order.number}`}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {`${textT?.dialogReadyOrders?.orderProducts}: ${order.products?.length || 0}`}
-                  </Typography>
-                </Stack>
-              </Button>
-            ))}
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="text"
-            color="secondary"
-            onClick={() => setReadyOrdersState({ ...readyOrdersState, open: false })}>
-            {textT?.dialogReadyOrders?.btnSkip}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </DashboardLayout>
   );
 };
@@ -1461,4 +1606,4 @@ const Row = ({ label, value, strong }: { label: string; value: string; strong?: 
   );
 };
 
-export default Billing;
+export default BillingCC;

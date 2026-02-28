@@ -50,6 +50,7 @@ const permissions = [
 
   // custom permissions
   { id: 'billing.create', name: 'Create' },
+  { id: 'billing-cc.create', name: 'Create' },
   { id: 'cash-control.close', name: 'Close' },
   { id: 'cash-control.open', name: 'Open' },
   { id: 'cash-registers.list', name: 'List' },

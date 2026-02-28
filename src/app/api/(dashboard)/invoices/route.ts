@@ -4,15 +4,20 @@ import moment from 'moment';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
-import { billingDefaultActivityCode, billingDefaultDesc, billingPaymentConditions } from '@/libs/constants';
-import { DocumentData, generateDocument } from '@/services/easytax';
+import {
+  billingDefaultActivityCode,
+  billingDefaultCode,
+  billingDefaultDesc,
+  billingPaymentConditions
+} from '@/libs/constants';
+import { generateDocument } from '@/services/easytax';
 
 import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
-import { CusConfiguration, CusInvoice, CusOffice } from '@/prisma/generated/client';
 
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
 import { clientSelectSchema, isValidBillingInformation } from '@/controllers/Client.Controller';
 import {
+  buildCreateDocumentPayload,
   getMostValuablePayment,
   updateLineReferences,
   validateLines,
@@ -21,13 +26,9 @@ import {
 import { getConfiguration } from '@/controllers/Configuration.Controller';
 import { validateOrderStatus } from '@/controllers/Order.Controller';
 import {
-  BillingLine,
   calculateBillingChangeAmount,
   calculateBillingPaidAmount,
-  calculateBillingTotal,
-  calculateTaxes,
-  convertCRC,
-  convertUSD
+  calculateBillingTotal
 } from '@/helpers/calculations';
 
 export const GET = withAuthApi(['invoices.list'], async (req) => {
@@ -218,7 +219,6 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
           type: invoiceType,
           payment_condition: paymentCondition,
           payment_condition_days: paymentConditionDays,
-          iva_percentage: configuration.iva_percentage,
           selling_exchange_rate: configuration.selling_exchange_rate,
           buying_exchange_rate: configuration.buying_exchange_rate,
           client_name: client.billing_full_name,
@@ -246,12 +246,15 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
                   package_prev_status: line.refObj.type === 'package' ? line.refObj.obj.status : undefined,
                   order_product_prev_status: line.refObj.type === 'order_product' ? line.refObj.obj.status : undefined,
                   prev_payment_status: line.refObj.type !== 'product' ? line.refObj.obj.payment_status : undefined,
+                  iva_percentage: configuration.iva_percentage,
+                  code: line.refObj.type === 'product' ? line.refObj.obj.code : billingDefaultCode,
                   cabys: line.refObj.type === 'product' ? line.refObj.obj.cabys : configuration.billing_cabys_default,
                   description: line.refObj.type === 'product' ? line.refObj.obj.code : billingDefaultDesc,
                   currency: line.currency,
                   quantity: line.quantity,
                   unit_price: line.unit_price,
-                  total: line.total
+                  total: line.total,
+                  is_exempt: false
                 })) || []
             }
           },
@@ -267,6 +270,9 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
                 })) || []
             }
           }
+        },
+        include: {
+          invoice_lines: true
         }
       });
       if (!invoice) {
@@ -292,7 +298,8 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
         configuration,
         office: cashRegister.office,
         invoice,
-        lines: linesData || []
+        lines: invoice.invoice_lines || [],
+        additionalCharges: []
       });
       const easytaxResponse = await generateDocument(documentPayload);
       if (!easytaxResponse.valid) {
@@ -332,75 +339,3 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
   }
 });
-
-const buildCreateDocumentPayload = (data: {
-  configuration: CusConfiguration;
-  office: CusOffice;
-  invoice: CusInvoice;
-  lines: BillingLine[];
-}): DocumentData => {
-  const { configuration, office, invoice, lines } = data;
-
-  return {
-    company: {
-      name: configuration.billing_name,
-      identification: configuration.billing_identification,
-      activityCode: configuration.billing_activity_code
-    },
-    office: {
-      number: office.billing_number,
-      terminal: office.billing_terminal
-    },
-    client: {
-      name: invoice.client_name,
-      identification: invoice.client_identification,
-      email: invoice.client_email,
-      activityCode: invoice.client_activity_code || billingDefaultActivityCode
-    },
-    invoiceType: invoice.type,
-    date: moment(invoice.created_at),
-    expirationDate: moment(invoice.expired_at),
-    condition: invoice.payment_condition,
-    conditionDays: invoice.payment_condition_days,
-    currency: invoice.currency,
-    method: invoice.payment_method,
-    ref: invoice.payment_method_ref || '',
-    ivaPercentage: invoice.iva_percentage,
-    lines: lines.map((line) => {
-      const invoiceCurrency = invoice.currency;
-
-      let cabys, description;
-      if (line.refObj.type === 'product') {
-        cabys = line.refObj.obj.cabys;
-        description = line.refObj.obj.code;
-      } else {
-        cabys = configuration.billing_cabys_default;
-        description = billingDefaultDesc;
-      }
-
-      let unitPrice = line.unit_price;
-      let subtotal = line.total;
-      if (line.currency !== invoiceCurrency) {
-        if (invoiceCurrency === Currency.CRC) {
-          unitPrice = convertCRC(line.unit_price, invoice.selling_exchange_rate);
-          subtotal = convertCRC(line.total, invoice.selling_exchange_rate);
-        } else if (invoiceCurrency === Currency.USD) {
-          unitPrice = convertUSD(line.unit_price, invoice.buying_exchange_rate);
-          subtotal = convertUSD(line.total, invoice.buying_exchange_rate);
-        }
-      }
-
-      const totals = calculateTaxes(subtotal, invoice.iva_percentage);
-
-      return {
-        cabys,
-        description,
-        quantity: line.quantity,
-        unitPrice: unitPrice,
-        subtotal: totals.subtotal,
-        tax: totals.taxes,
-        total: totals.total
-      };
-    })
-  };
-};

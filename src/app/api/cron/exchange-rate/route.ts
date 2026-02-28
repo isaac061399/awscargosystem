@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import moment from 'moment';
 
-import { getBuyingExchangeRate, getSellingExchangeRate } from '@/libs/exchangeRate';
+import { getBuyingExchangeRate, getSellingExchangeRate } from '@/services/bccr';
 import { prismaWrite } from '@/libs/prisma';
 import { defaultConfigId } from '@/libs/constants';
 

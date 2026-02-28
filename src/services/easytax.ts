@@ -18,7 +18,6 @@ const tipoNotaCredito = 3; // nota de crédito
 const condicionNotaCredito = '01'; // contado (la nota de crédito siempre es para corregir una factura ya emitida, por lo que se asume que la condición es contado)
 const codigoReferencia = '01'; // anulación de la factura original
 const razonReferencia = (consecutive: string) => `Anulación de factura original ${consecutive}`; // razón de la referencia
-const getProductCode = (cabys: string, description: string) => `${cabys}-${description}`.substring(0, 30);
 
 // Types
 export type DocumentData = {
@@ -45,12 +44,14 @@ export type DocumentData = {
   currency: Currency;
   method: PaymentMethod;
   ref?: string;
-  ivaPercentage: number;
   lines: Array<{
+    code: string;
     cabys: string;
     description: string;
+    ivaPercentage: number;
     quantity: number;
     unitPrice: number;
+    isExempt: boolean;
     subtotal: number;
     tax: number;
     total: number;
@@ -81,12 +82,14 @@ export type CancelDocumentData = {
   currency: Currency;
   method: PaymentMethod;
   ref?: string;
-  ivaPercentage: number;
   lines: Array<{
+    code: string;
     cabys: string;
     description: string;
+    ivaPercentage: number;
     quantity: number;
     unitPrice: number;
+    isExempt: boolean;
     subtotal: number;
     tax: number;
     total: number;
@@ -164,16 +167,16 @@ const formatDocumentParams = (data: DocumentData) => {
     detalle_factura: data.lines.map((line, index) => ({
       numero_linea: index + 1,
       codigoCabys: line.cabys,
-      codigo_producto: getProductCode(line.cabys, line.description),
+      codigo_producto: line.code,
       descripcion_producto: line.description,
       tipo_transaccion: tipoTransaccion,
       cantidad: line.quantity,
       precio_unitario: line.unitPrice,
       subtotal: line.subtotal,
-      IVA: data.ivaPercentage,
+      IVA: line.ivaPercentage,
       total_descuento: 0,
-      total_gravado: line.subtotal,
-      total_exento: 0,
+      total_gravado: line.isExempt ? 0 : line.subtotal,
+      total_exento: line.isExempt ? line.subtotal : 0,
       total_exonerado: 0,
       total_impuesto: line.tax,
       total_impuesto_exonerado: 0,
@@ -224,20 +227,20 @@ const formatCancelDocumentParams = (data: CancelDocumentData) => {
     referencia_fecha_emision: data.reference.date.format('YYYY-MM-DD HH:mm:ss'),
     referencia_codigo_referencia: codigoReferencia,
     referencia_razon: razonReferencia(data.reference.consecutive),
-    //detalle
+    // detalle
     detalle_factura: data.lines.map((line, index) => ({
       numero_linea: index + 1,
       codigoCabys: line.cabys,
-      codigo_producto: getProductCode(line.cabys, line.description),
+      codigo_producto: line.code,
       descripcion_producto: line.description,
       tipo_transaccion: tipoTransaccion,
       cantidad: line.quantity,
       precio_unitario: line.unitPrice,
       subtotal: line.subtotal,
-      IVA: data.ivaPercentage,
+      IVA: line.ivaPercentage,
       total_descuento: 0,
-      total_gravado: line.subtotal,
-      total_exento: 0,
+      total_gravado: line.isExempt ? 0 : line.subtotal,
+      total_exento: line.isExempt ? line.subtotal : 0,
       total_exonerado: 0,
       total_impuesto: line.tax,
       total_impuesto_exonerado: 0,

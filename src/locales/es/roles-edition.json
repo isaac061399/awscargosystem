@@ -17,6 +17,7 @@
       "global-settings": "CMS - Configuración Global",
 
       "billing": "Finanzas - Movimientos - Facturación",
+      "billing-cc": "Finanzas - Movimientos - Facturación CC",
       "cash-control": "Finanzas - Control - Control de Caja",
       "cash-registers": "Finanzas - Control - Registros de Caja",
       "clients": "Logística - Clientes",

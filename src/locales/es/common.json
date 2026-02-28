@@ -330,7 +330,17 @@
       },
       {
         "sectionTitle": "Finanzas",
-        "permissions": ["billing.create", "money-outflows.list"],
+        "permissions": [
+          "billing.create",
+          "billing-cc.create",
+          "money-outflows.list",
+          "cash-control.open",
+          "billing.list",
+          "cash-registers.list",
+          "cash-control.open",
+          "cash-registers.list",
+          "invoices.list"
+        ],
         "items": [
           {
             "label": "Movimientos",
@@ -339,6 +349,7 @@
             "icon": "ri-hand-coin-line",
             "permissions": [
               "billing.create",
+              "billing-cc.create",
               "money-outflows.list",
               "cash-control.open",
               "billing.list",
@@ -351,6 +362,13 @@
                 "externalLink": false,
                 "icon": "",
                 "permissions": ["billing.create"]
+              },
+              {
+                "label": "Facturación CC",
+                "link": "/billing-cc",
+                "externalLink": false,
+                "icon": "",
+                "permissions": ["billing-cc.create"]
               },
               {
                 "label": "Salidas de Efectivo",

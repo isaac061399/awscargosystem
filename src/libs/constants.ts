@@ -39,6 +39,8 @@ export const bankAccounts = { BAC: 'BAC Credomatic', BN: 'Banco Nacional' };
 
 export const billingDefaultActivityCode = '00';
 
+export const billingDefaultCode = 'ENVIO';
+
 export const billingDefaultDesc = 'ENVIO';
 
 export const billingPaymentConditions = {

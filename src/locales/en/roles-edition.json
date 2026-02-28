@@ -17,6 +17,7 @@
       "global-settings": "CMS - Global Settings",
 
       "billing": "Finance - Movements - Billing",
+      "billing-cc": "Finance - Movements - Billing CC",
       "cash-control": "Finance - Control - Cash Control",
       "cash-registers": "Finance - Control - Cash Registers",
       "clients": "Logistics - Clients",

@@ -22,6 +22,19 @@
       "TICKET": "Tiquete Electrónico",
       "ELECTRONIC": "Factura Electrónica"
     },
+    "invoiceAdditionalChargeType": {
+      "PARAFISCAL_CONTRIBUTION": "Contribución Parafiscal",
+      "RED_CROSS_STAMP_DUTY": "Timbre de la Cruz Roja",
+      "FIRE_DEPARTMENT_STAMP_DUTY": "Timbre de Benemérito Cuerpo de Bomberos de Costa Rica",
+      "THIRD_PARTY_CHARGE": "Cobro de un Tercero",
+      "EXPORT_COSTS": "Costos de Exportación",
+      "SERVICE_TAX_10": "Impuesto de Servicio 10%",
+      "PROFESSIONAL_ASSOCIATION_STAMP_DUTY": "Timbre de Colegios Profesionales",
+      "SECURITY_DEPOSIT": "Depósito de Garantía",
+      "FINES_OR_PENALTIES": "Multas o Penalizaciones",
+      "LATE_PAYMENT_INTEREST": "Intereses Moratorios",
+      "OTHER": "Otros Cargos"
+    },
     "invoicePaymentCondition": {
       "CASH": "Contado",
       "CREDIT": "Crédito"
