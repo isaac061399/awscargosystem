@@ -129,7 +129,7 @@ export const POST = withAuthApi(['orders.create'], async (req) => {
           order_id: order.id,
           administrator_id: admin.id,
           action: 'order.create',
-          data: JSON.stringify(data)
+          data: data
         }
       });
 

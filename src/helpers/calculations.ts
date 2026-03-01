@@ -35,7 +35,6 @@ export type BillingCCAdditionalCharge = {
   third_party_identification: string;
   third_party_name: string;
   details: string;
-  percentage: number;
   currency: Currency;
   amount: number;
 };
@@ -261,8 +260,6 @@ export const calculateBillingCCTotal = (
         }
       }
 
-      console.log(`Line ${line.id} - Amount: ${amount}, Is Exempt: ${line.is_exempt}`);
-
       if (!line.is_exempt) {
         const lineTotals = calculateTaxes(amount, taxPercentage);
         subtotal += amount;
@@ -284,8 +281,6 @@ export const calculateBillingCCTotal = (
           amount = convertUSD(charge.amount, buyingConversionRate);
         }
       }
-
-      console.log(`Charge ${charge.id} - Amount: ${amount}, Currency: ${charge.currency}`);
 
       subtotal += amount;
       total += amount;

@@ -59,7 +59,7 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
           order_id: entry.id,
           administrator_id: admin.id,
           action: 'order.products.delivered',
-          data: JSON.stringify(entry)
+          data: entry
         }
       });
     });

@@ -255,7 +255,6 @@ const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any 
         third_party_identification: '',
         third_party_name: '',
         details: '',
-        percentage: 0,
         currency: Currency.CRC,
         amount: 0
       }),
@@ -282,7 +281,6 @@ const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any 
       }),
 
       details: yup.string().required(formAdditionalChargeT?.errors?.details),
-      percentage: yup.number().required(formAdditionalChargeT?.errors?.percentage),
       currency: yup.string().required(formAdditionalChargeT?.errors?.currency),
       amount: yup
         .number()
@@ -302,7 +300,6 @@ const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any 
           third_party_name:
             values.type === InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE ? values.third_party_name : '',
           details: values.details,
-          percentage: Number(values.percentage),
           currency: values.currency,
           amount: Number(values.amount)
         };
@@ -730,7 +727,7 @@ const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any 
             <Grid size={{ xs: 12 }}>
               <Alert severity="info">
                 {textT?.cashRegisterAlert}
-                <Link href="/cash-control?r=billing" className="underline ml-2">
+                <Link href="/cash-control?r=billing-cc" className="underline ml-2">
                   {textT?.cashRegisterAlertBtn}
                 </Link>
               </Alert>
@@ -1346,27 +1343,6 @@ const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any 
                   : 'primary'
               }
               helperText={formikAdditionalCharge.touched.details && (formikAdditionalCharge.errors.details as string)}
-              disabled={formikAdditionalCharge.isSubmitting}
-            />
-            <TextField
-              fullWidth
-              required
-              type="number"
-              id="percentage"
-              name="percentage"
-              label={formAdditionalChargeT?.labels?.percentage}
-              placeholder={formAdditionalChargeT?.placeholders?.percentage}
-              value={formikAdditionalCharge.values.percentage}
-              onChange={formikAdditionalCharge.handleChange}
-              error={Boolean(formikAdditionalCharge.touched.percentage && formikAdditionalCharge.errors.percentage)}
-              color={
-                Boolean(formikAdditionalCharge.touched.percentage && formikAdditionalCharge.errors.percentage)
-                  ? 'error'
-                  : 'primary'
-              }
-              helperText={
-                formikAdditionalCharge.touched.percentage && (formikAdditionalCharge.errors.percentage as string)
-              }
               disabled={formikAdditionalCharge.isSubmitting}
             />
             <Select

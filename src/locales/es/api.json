@@ -113,6 +113,8 @@
     "errors": {
       "notEnoughPaidAmount": "El monto pagado no cubre el total de la factura",
       "paymentsError": "Los pagos presentan los siguientes errores: {{ errors }}",
+      "nothingToBill": "No hay cargos ni líneas de facturación para generar la factura",
+      "additionalChargesError": "Los cargos adicionales presentan los siguientes errores: {{ errors }}",
       "linesError": "Las líneas de facturación presentan los siguientes errores: {{ errors }}",
       "noClientBillingInfo": "El cliente tiene la información de facturación incompleta",
       "noClient": "Cliente inválido",

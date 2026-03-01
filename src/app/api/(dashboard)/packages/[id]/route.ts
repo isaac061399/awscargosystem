@@ -58,7 +58,7 @@ export const PUT = withAuthApi(['packages.edit'], async (req, { params }: { para
           package_id: pkg.id,
           administrator_id: admin.id,
           action: 'package.edit',
-          data: JSON.stringify(data)
+          data: data
         }
       });
 
@@ -109,7 +109,7 @@ export const DELETE = withAuthApi(['packages.delete'], async (req, { params }: {
         data: {
           administrator_id: admin.id,
           action: 'package.delete',
-          data: JSON.stringify(entry)
+          data: entry
         }
       });
     });

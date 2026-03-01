@@ -113,7 +113,7 @@ export const POST = withAuthApi(['money-outflows.create'], async (req) => {
           money_outflow_id: moneyOutflow.id,
           administrator_id: admin.id,
           action: 'money-outflow.create',
-          data: JSON.stringify(moneyOutflow)
+          data: moneyOutflow
         }
       });
 

@@ -93,7 +93,7 @@ export const PUT = withAuthApi(['invoices.cancel'], async (req, { params }: { pa
           invoice_id: canceledInvoice.id,
           administrator_id: admin.id,
           action: 'invoice.cancel',
-          data: JSON.stringify(entry)
+          data: entry
         }
       });
 

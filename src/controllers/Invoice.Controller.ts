@@ -1,6 +1,12 @@
 import moment from 'moment';
 
-import { Currency, OrderStatus, PackageStatus, PaymentStatus } from '@/prisma/generated/enums';
+import {
+  Currency,
+  InvoiceAdditionalChargeType,
+  OrderStatus,
+  PackageStatus,
+  PaymentStatus
+} from '@/prisma/generated/enums';
 import {
   CusConfiguration,
   CusInvoice,
@@ -14,6 +20,8 @@ import { prismaRead, Tx } from '@/libs/prisma';
 import { billingDefaultActivityCode } from '@/libs/constants';
 
 import {
+  BillingCCAdditionalCharge,
+  BillingCCLine,
   BillingLine,
   calculateTaxes,
   convertCRC,
@@ -161,6 +169,85 @@ export const validateLines = async (
     } else {
       errors.push(`Línea inválida en la línea ${i + 1}`);
     }
+  }
+
+  return {
+    valid: errors.length === 0,
+    data: errors.length === 0 ? data : [],
+    errors: errors.length > 0 ? errors : undefined
+  };
+};
+
+export const validateLinesCC = async (
+  lines: any[]
+): Promise<{ valid: boolean; data?: BillingCCLine[]; errors?: string[] }> => {
+  if (!lines || !Array.isArray(lines) || lines.length === 0) {
+    return { valid: true, data: [] };
+  }
+
+  const data: BillingCCLine[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    const quantity = line.quantity && !isNaN(line.quantity) ? parseInt(line.quantity) : 1;
+    const unitPrice = line.unit_price && !isNaN(line.unit_price) ? parseFloat(line.unit_price) : 0;
+    const total = parseFloat((quantity * unitPrice).toFixed(2));
+
+    data.push({
+      id: `line-${i + 1}`,
+      code: line.code || '',
+      cabys: line.cabys || '',
+      description: line.description || '',
+      quantity: quantity,
+      currency: line.currency || Currency.CRC,
+      unit_price: unitPrice,
+      total: total,
+      is_exempt: line.is_exempt || false
+    });
+  }
+
+  return { valid: true, data: data };
+};
+
+export const validateAdditionalChargesCC = async (
+  additionalCharges: any[]
+): Promise<{ valid: boolean; data?: BillingCCAdditionalCharge[]; errors?: string[] }> => {
+  if (!additionalCharges || !Array.isArray(additionalCharges) || additionalCharges.length === 0) {
+    return { valid: true, data: [] };
+  }
+
+  const errors: string[] = [];
+  const data: BillingCCAdditionalCharge[] = [];
+  for (let i = 0; i < additionalCharges.length; i++) {
+    const line = additionalCharges[i];
+
+    if (!line.type) {
+      errors.push(`Tipo de cargo adicional inválido en la línea ${i + 1}`);
+      continue;
+    } else if (!InvoiceAdditionalChargeType[line.type as keyof typeof InvoiceAdditionalChargeType]) {
+      errors.push(`Tipo de cargo adicional inválido en la línea ${i + 1}`);
+      continue;
+    } else if (line.type === InvoiceAdditionalChargeType.OTHER && !line.type_description) {
+      errors.push(`Descripción requerida para tipo de cargo adicional 'Otros Cargos' en la línea ${i + 1}`);
+      continue;
+    } else if (
+      line.type === InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE &&
+      (!line.third_party_identification || !line.third_party_name)
+    ) {
+      errors.push(`Información requerida para tipo de cargo adicional 'Cobro de un Tercero' en la línea ${i + 1}`);
+      continue;
+    }
+
+    data.push({
+      id: `line-${i + 1}`,
+      type: line.type || InvoiceAdditionalChargeType.OTHER,
+      type_description: line.type_description || '',
+      third_party_identification: line.third_party_identification || '',
+      third_party_name: line.third_party_name || '',
+      details: line.details || '',
+      currency: line.currency || Currency.CRC,
+      amount: line.amount && !isNaN(line.amount) ? parseFloat(line.amount) : 0
+    });
   }
 
   return {
@@ -385,7 +472,8 @@ export const buildCreateDocumentPayload = (data: {
     currency: invoice.currency,
     method: invoice.payment_method,
     ref: invoice.payment_method_ref || '',
-    lines: buildDocumentLines(invoice, lines)
+    lines: buildDocumentLines(invoice, lines),
+    additionalCharges: buildDocumentAdditionalCharges(invoice, additionalCharges)
   };
 };
 
@@ -422,13 +510,16 @@ export const buildCancelDocumentPayload = (data: {
     currency: invoice.currency,
     method: invoice.payment_method,
     ref: invoice.payment_method_ref || '',
-    lines: buildDocumentLines(invoice, lines)
+    lines: buildDocumentLines(invoice, lines),
+    additionalCharges: buildDocumentAdditionalCharges(invoice, additionalCharges)
   };
 };
 
 const buildDocumentLines = (invoice: CusInvoice, lines: CusInvoiceLine[]) => {
+  const invoiceCurrency = invoice.currency;
+
   return lines.map((line) => {
-    const invoiceCurrency = invoice.currency;
+    const taxPercentage = line.is_exempt ? 0 : line.iva_percentage;
     let unitPrice = line.unit_price;
     let subtotal = line.total;
 
@@ -442,7 +533,7 @@ const buildDocumentLines = (invoice: CusInvoice, lines: CusInvoiceLine[]) => {
       }
     }
 
-    const totals = calculateTaxes(subtotal, line.iva_percentage);
+    const totals = calculateTaxes(subtotal, taxPercentage);
 
     return {
       code: line.code,
@@ -455,6 +546,30 @@ const buildDocumentLines = (invoice: CusInvoice, lines: CusInvoiceLine[]) => {
       subtotal: totals.subtotal,
       tax: totals.taxes,
       total: totals.total
+    };
+  });
+};
+
+const buildDocumentAdditionalCharges = (invoice: CusInvoice, additionalCharges: CusInvoiceAdditionalCharge[]) => {
+  return additionalCharges.map((line) => {
+    const invoiceCurrency = invoice.currency;
+    let amount = line.amount;
+
+    if (line.currency !== invoiceCurrency) {
+      if (invoiceCurrency === Currency.CRC) {
+        amount = convertCRC(line.amount, invoice.selling_exchange_rate);
+      } else if (invoiceCurrency === Currency.USD) {
+        amount = convertUSD(line.amount, invoice.buying_exchange_rate);
+      }
+    }
+
+    return {
+      type: line.type,
+      typeDescription: line.type_description || '',
+      thirdPartyIdentification: line.third_party_identification || '',
+      thirdPartyName: line.third_party_name || '',
+      details: line.details,
+      amount: amount
     };
   });
 };

@@ -4,114 +4,26 @@ import moment from 'moment';
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
 import { prismaRead, TransactionError, withTransaction } from '@libs/prisma';
-import {
-  billingDefaultActivityCode,
-  billingDefaultCode,
-  billingDefaultDesc,
-  billingPaymentConditions
-} from '@/libs/constants';
+import { billingDefaultActivityCode, billingPaymentConditions } from '@/libs/constants';
 import { generateDocument } from '@/services/easytax';
 
 import { Currency, InvoicePaymentCondition, InvoiceStatus, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
 
 import { getOpenCashRegister } from '@/controllers/CashRegister.Controller';
-import { clientSelectSchema, isValidBillingInformation } from '@/controllers/Client.Controller';
+import { isValidBillingInformation } from '@/controllers/Client.Controller';
 import {
   buildCreateDocumentPayload,
   getMostValuablePayment,
-  updateLineReferences,
-  validateLines,
+  validateAdditionalChargesCC,
+  validateLinesCC,
   validatePayments
 } from '@/controllers/Invoice.Controller';
 import { getConfiguration } from '@/controllers/Configuration.Controller';
-import { validateOrderStatus } from '@/controllers/Order.Controller';
 import {
+  calculateBillingCCTotal,
   calculateBillingChangeAmount,
-  calculateBillingPaidAmount,
-  calculateBillingTotal
+  calculateBillingPaidAmount
 } from '@/helpers/calculations';
-
-export const GET = withAuthApi(['invoices.list'], async (req) => {
-  const { t } = await initTranslationsApi(req);
-  const textT: any = t('api:invoices', { returnObjects: true, default: {} });
-
-  const params = Object.fromEntries(req.nextUrl.searchParams.entries());
-
-  try {
-    // filters
-    const where: any = {};
-    const search = params.s || '';
-    const status = params.status || '';
-    const clientId = params.client_id || '';
-    const credits = params.credits === 'true';
-    const cash = params.cash === 'true';
-
-    if (search.trim() !== '') {
-      where['OR'] = [
-        { number: { contains: search.trim(), mode: 'insensitive' } },
-        { consecutive: { contains: search.trim(), mode: 'insensitive' } },
-        { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
-        { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
-        { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
-      ];
-      if (!isNaN(parseInt(search.trim()))) {
-        where['OR'].push({ client: { id: parseInt(search.trim()) } });
-      }
-    }
-
-    if (status !== '') {
-      where['status'] = status;
-    }
-
-    if (clientId !== '') {
-      where['client_id'] = parseInt(clientId);
-    }
-
-    if (credits) {
-      where['payment_condition'] = { not: InvoicePaymentCondition.CASH };
-    } else if (cash) {
-      where['payment_condition'] = InvoicePaymentCondition.CASH;
-    }
-
-    // query
-    const invoices = await prismaRead.cusInvoice.findMany({
-      take: params.limit ? parseInt(params.limit) : 100,
-      skip: params.offset ? parseInt(params.offset) : 0,
-      where,
-      orderBy: [{ id: 'desc' }],
-      select: {
-        id: true,
-        consecutive: true,
-        type: true,
-        payment_condition: true,
-        payment_condition_days: true,
-        status: true,
-        expired_at: true,
-        created_at: true,
-        cash_register: {
-          select: {
-            id: true,
-            office: { select: { id: true, name: true } }
-          }
-        },
-        client: { select: clientSelectSchema }
-      }
-    });
-
-    if (!invoices) {
-      return NextResponse.json({ valid: true, data: [], pagination: { total: 0, count: 0 } }, { status: 200 });
-    }
-
-    const total = await prismaRead.cusInvoice.count({ where });
-    const pagination = { total: total || 0, count: invoices?.length || 0 };
-
-    return NextResponse.json({ valid: true, data: invoices, pagination }, { status: 200 });
-  } catch (error) {
-    console.error(`Error: ${error}`);
-
-    return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 500 });
-  }
-});
 
 export const POST = withAuthApi(['billing.create'], async (req) => {
   const { t } = await initTranslationsApi(req);
@@ -160,12 +72,36 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     }
 
     // validate lines
-    const { valid: linesValid, data: linesData, errors: linesErrors } = await validateLines(lines);
+    const { valid: linesValid, data: linesData, errors: linesErrors } = await validateLinesCC(lines);
     if (!linesValid) {
       return NextResponse.json(
         { valid: false, message: textT?.errors?.linesError?.replace('{{ errors }}', linesErrors?.join(', ') || '') },
         { status: 400 }
       );
+    }
+
+    // validate additional charges lines
+    const {
+      valid: additionalChargesValid,
+      data: additionalChargesData,
+      errors: additionalChargesErrors
+    } = await validateAdditionalChargesCC(data.additional_charges);
+    if (!additionalChargesValid) {
+      return NextResponse.json(
+        {
+          valid: false,
+          message: textT?.errors?.additionalChargesError?.replace(
+            '{{ errors }}',
+            additionalChargesErrors?.join(', ') || ''
+          )
+        },
+        { status: 400 }
+      );
+    }
+
+    // validate that there is something to bill
+    if ((!linesData || linesData.length === 0) && (!additionalChargesData || additionalChargesData.length === 0)) {
+      return NextResponse.json({ valid: false, message: textT?.errors?.nothingToBill }, { status: 400 });
     }
 
     // validate payments
@@ -181,8 +117,9 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     }
 
     // validate totals
-    const totals = calculateBillingTotal(
+    const totals = calculateBillingCCTotal(
       linesData || [],
+      additionalChargesData || [],
       baseCurrency,
       configuration.selling_exchange_rate,
       configuration.buying_exchange_rate,
@@ -240,21 +177,30 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
             createMany: {
               data:
                 linesData?.map((line) => ({
-                  package_id: line.refObj.type === 'package' ? line.refObj.obj.id : undefined,
-                  order_product_id: line.refObj.type === 'order_product' ? line.refObj.obj.id : undefined,
-                  product_id: line.refObj.type === 'product' ? line.refObj.obj.id : undefined,
-                  package_prev_status: line.refObj.type === 'package' ? line.refObj.obj.status : undefined,
-                  order_product_prev_status: line.refObj.type === 'order_product' ? line.refObj.obj.status : undefined,
-                  prev_payment_status: line.refObj.type !== 'product' ? line.refObj.obj.payment_status : undefined,
                   iva_percentage: configuration.iva_percentage,
-                  code: line.refObj.type === 'product' ? line.refObj.obj.code : billingDefaultCode,
-                  cabys: line.refObj.type === 'product' ? line.refObj.obj.cabys : configuration.billing_cabys_default,
-                  description: line.refObj.type === 'product' ? line.refObj.obj.code : billingDefaultDesc,
+                  code: line.code,
+                  cabys: line.cabys,
+                  description: line.description,
                   currency: line.currency,
                   quantity: line.quantity,
                   unit_price: line.unit_price,
                   total: line.total,
-                  is_exempt: false
+                  is_exempt: line.is_exempt
+                })) || []
+            }
+          },
+          invoice_additional_charges: {
+            createMany: {
+              data:
+                additionalChargesData?.map((charge) => ({
+                  type: charge.type,
+                  type_description: charge.type_description,
+                  third_party_identification: charge.third_party_identification,
+                  third_party_name: charge.third_party_name,
+                  details: charge.details,
+                  percentage: 0,
+                  currency: charge.currency,
+                  amount: charge.amount
                 })) || []
             }
           },
@@ -272,41 +218,28 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
           }
         },
         include: {
-          invoice_lines: true
+          invoice_lines: true,
+          invoice_additional_charges: true
         }
       });
       if (!invoice) {
         throw new TransactionError(400, textT?.errors?.save);
       }
 
-      // 3: change packages and order products payment status to PAID and delivered if applies
-      const statusUpdated = await updateLineReferences(linesData || [], tx);
-      if (!statusUpdated) {
-        throw new TransactionError(400, textT?.errors?.save);
-      }
-
-      // 4: validate order statuses of order products
-      for (const line of linesData || []) {
-        if (line.refObj.type === 'order_product') {
-          // validate order status
-          await validateOrderStatus(line.refObj.obj.order_id, tx);
-        }
-      }
-
-      // 5: send invoice to easytax service
+      // 3: send invoice to easytax service
       const documentPayload = buildCreateDocumentPayload({
         configuration,
         office: cashRegister.office,
         invoice,
         lines: invoice.invoice_lines || [],
-        additionalCharges: []
+        additionalCharges: invoice.invoice_additional_charges || []
       });
       const easytaxResponse = await generateDocument(documentPayload);
       if (!easytaxResponse.valid) {
         throw new TransactionError(500, textT?.errors?.save);
       }
 
-      // 6: save easytax response data
+      // 4: save easytax response data
       await tx.cusInvoice.update({
         where: { id: invoice.id },
         data: {
@@ -315,7 +248,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
         }
       });
 
-      // 7: save log
+      // 5: save log
       await tx.cusInvoiceLog.create({
         data: {
           invoice_id: invoice.id,

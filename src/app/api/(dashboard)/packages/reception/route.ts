@@ -172,7 +172,7 @@ const savePackageReception = async (
         package_id: entry.id,
         administrator_id: admin_id,
         action: 'package.reception',
-        data: JSON.stringify({ entry, updates: data })
+        data: { entry, updates: data }
       }
     });
 
@@ -273,7 +273,7 @@ const saveOrderReception = async (
         order_id: entry.id,
         administrator_id: admin_id,
         action: 'package.reception',
-        data: JSON.stringify({ entry, updates: data })
+        data: { entry, updates: data }
       }
     });
 
@@ -353,7 +353,7 @@ const saveNewPackageReception = async (
         package_id: result.id,
         administrator_id: admin_id,
         action: 'package.reception',
-        data: JSON.stringify({ entry: null, updates: data })
+        data: { entry: null, updates: data }
       }
     });
 

@@ -37,7 +37,7 @@ export const DELETE = withAuthApi(['orders.edit'], async (req, { params }: { par
         data: {
           administrator_id: admin.id,
           action: 'order.product.delete',
-          data: JSON.stringify(entry)
+          data: entry
         }
       });
     });

@@ -47,7 +47,7 @@ export const DELETE = withAuthApi(
           data: {
             administrator_id: admin.id,
             action: 'money-outflow.delete',
-            data: JSON.stringify(entry)
+            data: entry
           }
         });
       });

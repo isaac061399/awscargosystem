@@ -187,7 +187,6 @@
       "third_party_identification": "Identificación de tercero",
       "third_party_name": "Nombre de tercero",
       "details": "Detalles",
-      "percentage": "Porcentaje",
       "currency": "Moneda",
       "amount": "Monto"
     },
@@ -197,7 +196,6 @@
       "third_party_identification": "Ingrese la identificación de tercero",
       "third_party_name": "Ingrese el nombre de tercero",
       "details": "Ingrese los detalles",
-      "percentage": "Ingrese el porcentaje",
       "currency": "Seleccione la moneda",
       "amount": "Ingrese el monto"
     },
@@ -207,7 +205,6 @@
       "third_party_identification": "La identificación de tercero es requerida",
       "third_party_name": "El nombre de tercero es requerido",
       "details": "Los detalles son requeridos",
-      "percentage": "El porcentaje es requerido",
       "currency": "La moneda es requerida",
       "amount": "El monto es requerido",
       "amountMinimum": "El monto debe ser mayor a cero"

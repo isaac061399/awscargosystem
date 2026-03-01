@@ -115,7 +115,7 @@ export const POST = withAuthApi(['invoices.pay'], async (req, { params }: { para
           invoice_id: paidInvoice.id,
           administrator_id: admin.id,
           action: 'invoice.pay',
-          data: JSON.stringify(entry)
+          data: entry
         }
       });
 

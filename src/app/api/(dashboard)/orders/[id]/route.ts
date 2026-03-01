@@ -77,7 +77,7 @@ export const PUT = withAuthApi(['orders.edit'], async (req, { params }: { params
           order_id: order.id,
           administrator_id: admin.id,
           action: 'order.edit',
-          data: JSON.stringify(data)
+          data: data
         }
       });
 
@@ -135,7 +135,7 @@ export const DELETE = withAuthApi(['orders.delete'], async (req, { params }: { p
         data: {
           administrator_id: admin.id,
           action: 'order.delete',
-          data: JSON.stringify(entry)
+          data: entry
         }
       });
     });

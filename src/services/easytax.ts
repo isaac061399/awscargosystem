@@ -1,7 +1,13 @@
 import axios from 'axios';
 import moment, { Moment } from 'moment';
 
-import { Currency, InvoicePaymentCondition, InvoiceType, PaymentMethod } from '@/prisma/generated/enums';
+import {
+  Currency,
+  InvoiceAdditionalChargeType,
+  InvoicePaymentCondition,
+  InvoiceType,
+  PaymentMethod
+} from '@/prisma/generated/enums';
 import { prismaWrite } from '@/libs/prisma';
 
 const EASYTAX_ENDPOINT = process.env.EASYTAX_ENDPOINT || '';
@@ -56,6 +62,14 @@ export type DocumentData = {
     tax: number;
     total: number;
   }>;
+  additionalCharges: Array<{
+    type: InvoiceAdditionalChargeType;
+    typeDescription: string;
+    thirdPartyIdentification: string;
+    thirdPartyName: string;
+    details: string;
+    amount: number;
+  }>;
 };
 
 export type CancelDocumentData = {
@@ -94,6 +108,14 @@ export type CancelDocumentData = {
     tax: number;
     total: number;
   }>;
+  additionalCharges: Array<{
+    type: InvoiceAdditionalChargeType;
+    typeDescription: string;
+    thirdPartyIdentification: string;
+    thirdPartyName: string;
+    details: string;
+    amount: number;
+  }>;
 };
 
 // Functions
@@ -105,8 +127,8 @@ export const generateDocument = async (data: DocumentData) => {
   // save log of request and response in database for debugging and auditing purposes
   await prismaWrite.cusEasyTaxLog.create({
     data: {
-      request: JSON.stringify(params),
-      response: JSON.stringify(response)
+      request: params,
+      response: response
     }
   });
 
@@ -121,8 +143,8 @@ export const generateCancelDocument = async (data: CancelDocumentData) => {
   // save log of request and response in database for debugging and auditing purposes
   await prismaWrite.cusEasyTaxLog.create({
     data: {
-      request: JSON.stringify(params),
-      response: JSON.stringify(response)
+      request: params,
+      response: response
     }
   });
 
@@ -184,6 +206,19 @@ const formatDocumentParams = (data: DocumentData) => {
       codigo_tarifa: codigoTarifa,
       monto_exportacion: 0,
       observaciones: ''
+    })),
+    // cargos adicionales
+    detalle_otros_cargos: data.additionalCharges.map((line, index) => ({
+      numero_linea: index + 1,
+      tipo_documento: additionalChargeTypeMap[line.type],
+      tipo_documento_otros: line.typeDescription,
+      // tipo_documento_otros_cargos_otros: 'Descripcion Otro Cargo',
+      numero_identidad_tercero: line.thirdPartyIdentification,
+      nombre_tercero: line.thirdPartyName,
+      detalle: line.details,
+      porcentaje: 0,
+      monto_cargo: line.amount,
+      terminal: data.office.terminal // se refiere al número de caja, el 1 está reservado para POS
     }))
   };
 };
@@ -248,6 +283,19 @@ const formatCancelDocumentParams = (data: CancelDocumentData) => {
       codigo_tarifa: codigoTarifa,
       monto_exportacion: 0,
       observaciones: ''
+    })),
+    // cargos adicionales
+    detalle_otros_cargos: data.additionalCharges.map((line, index) => ({
+      numero_linea: index + 1,
+      tipo_documento: additionalChargeTypeMap[line.type],
+      tipo_documento_otros: line.typeDescription,
+      // tipo_documento_otros_cargos_otros: 'Descripcion Otro Cargo',
+      numero_identidad_tercero: line.thirdPartyIdentification,
+      nombre_tercero: line.thirdPartyName,
+      detalle: line.details,
+      porcentaje: 0,
+      monto_cargo: line.amount,
+      terminal: data.office.terminal // se refiere al número de caja, el 1 está reservado para POS
     }))
   };
 };
@@ -318,4 +366,18 @@ const methodDescMap: Record<PaymentMethod, string> = {
   [PaymentMethod.SINPE]: 'Sinpe',
   [PaymentMethod.TRANSFER]: 'Efectivo',
   [PaymentMethod.CARD]: 'Tarjeta'
+};
+
+const additionalChargeTypeMap: Record<InvoiceAdditionalChargeType, string> = {
+  [InvoiceAdditionalChargeType.PARAFISCAL_CONTRIBUTION]: '01',
+  [InvoiceAdditionalChargeType.RED_CROSS_STAMP_DUTY]: '02',
+  [InvoiceAdditionalChargeType.FIRE_DEPARTMENT_STAMP_DUTY]: '03',
+  [InvoiceAdditionalChargeType.THIRD_PARTY_CHARGE]: '04',
+  [InvoiceAdditionalChargeType.EXPORT_COSTS]: '05',
+  [InvoiceAdditionalChargeType.SERVICE_TAX_10]: '06',
+  [InvoiceAdditionalChargeType.PROFESSIONAL_ASSOCIATION_STAMP_DUTY]: '07',
+  [InvoiceAdditionalChargeType.SECURITY_DEPOSIT]: '08',
+  [InvoiceAdditionalChargeType.FINES_OR_PENALTIES]: '09',
+  [InvoiceAdditionalChargeType.LATE_PAYMENT_INTEREST]: '10',
+  [InvoiceAdditionalChargeType.OTHER]: '99'
 };

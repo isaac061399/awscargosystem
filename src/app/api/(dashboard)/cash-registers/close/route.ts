@@ -47,7 +47,7 @@ export const POST = withAuthApi(['cash-control.close'], async (req) => {
                 where: { currency: Currency.CRC },
                 data: {
                   cash_reported: cashDataCRC.total,
-                  cash_reported_data: JSON.stringify(cashDataCRC.details),
+                  cash_reported_data: cashDataCRC.details,
                   cash_in: closeDataCRC.cash_in,
                   sinpe_in: closeDataCRC.sinpe_in,
                   transfer_in: closeDataCRC.transfer_in,
@@ -66,7 +66,7 @@ export const POST = withAuthApi(['cash-control.close'], async (req) => {
                 where: { currency: Currency.USD },
                 data: {
                   cash_reported: cashDataUSD.total,
-                  cash_reported_data: JSON.stringify(cashDataUSD.details),
+                  cash_reported_data: cashDataUSD.details,
                   cash_in: closeDataUSD.cash_in,
                   sinpe_in: closeDataUSD.sinpe_in,
                   transfer_in: closeDataUSD.transfer_in,
