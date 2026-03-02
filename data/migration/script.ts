@@ -8,7 +8,7 @@ import csv from 'csv-parser';
 
 import { PrismaPg } from '@prisma/adapter-pg';
 import moment from 'moment';
-import { PrismaClient } from '@/prisma/generated/client';
+import { PackageStatus, PrismaClient } from '@/prisma/generated/client';
 
 import { getHash } from '@/libs/argon2id';
 
@@ -48,7 +48,8 @@ fs.appendFileSync(logsPath, `\n--- Migration run started at ${new Date().toISOSt
 
 // CSV file paths
 const clientesDataPath = path.resolve(__dirname, 'Clientes.csv');
-const usuariosDataPath = path.resolve(__dirname, 'TBL_USUARIOS.csv');
+const usuariosDataPath = path.resolve(__dirname, 'Usuarios.csv');
+const paquetesDataPath = path.resolve(__dirname, 'Paquetes.csv');
 
 // Default values
 const defaultOfficeId = 1; // Default to ATENAS if no match found
@@ -122,7 +123,29 @@ const getDistrictId = ({ provincia, canton, distrito }: { provincia?: string; ca
   return parseInt(`${provincia}${canton}${distrito}`);
 };
 
+const getPackageLocation = (str: string) => {
+  const match = str.match(/COLUMNA:\s*(\S+)\s+FILA:\s*(\S+)/);
+
+  return {
+    shelf: match ? match[1]?.trim() : '',
+    row: match ? match[2]?.trim() : ''
+  };
+};
+
+const getPackagePrice = (poundFee: number, weight: number) => {
+  let price = weight * poundFee;
+
+  // ensure minimum fee of one pound
+  if (price < poundFee) {
+    price = poundFee;
+  }
+
+  return parseFloat(price.toFixed(2));
+};
+
 async function saveClients() {
+  console.log(`Starting clients migration...`);
+
   let noEmailCount = 0;
   const mailboxToIgnore = ['AWS-3903'];
 
@@ -226,13 +249,93 @@ async function saveClients() {
   console.log(
     `\Saved ${Object.keys(clientIds).length} clients to the database of ${resultClientes.length} total clientes`
   );
+}
 
-  return clientIds;
+async function savePackages() {
+  console.log(`Starting packages migration...`);
+
+  // paquetes
+  const resultPaquetes = await readCsvFile(paquetesDataPath);
+
+  const result: { [key: string]: number } = {};
+
+  let count = 0;
+  for (const paquete of resultPaquetes) {
+    count++;
+    try {
+      const clientId = parseInt(paquete.CASILLERO.split('-')[1].trim()); // Extract mailbox number after the dash
+      const tracking = paquete.TRACKING?.trim() || null;
+      const weight = paquete.PESO ? parseFloat(paquete.PESO) : 1;
+      const location = getPackageLocation(paquete.UBICACION || '');
+
+      if (!tracking) {
+        console.warn(`\Skipping paquete: ${count} with missing tracking number`);
+        continue;
+      }
+
+      const client = await prisma.cusClient.findUnique({ where: { id: clientId } });
+      if (!client) {
+        console.warn(`\Skipping paquete: ${count} with non-existing client ID: ${clientId}`);
+        continue;
+      }
+
+      const pkgExisting = await prisma.cusPackage.findUnique({ where: { tracking } });
+      if (pkgExisting) {
+        console.warn(`\Skipping paquete: ${count} with duplicate tracking number: ${tracking}`);
+        continue;
+      }
+
+      const price = getPackagePrice(client.pound_fee, weight);
+
+      const pkg = await prisma.cusPackage.create({
+        data: {
+          client_id: client.id,
+          tracking,
+          courier_company: '',
+          purchase_page: '',
+          price: 0,
+          description: '',
+          notes: '',
+          billing_weight: weight,
+          billing_pound_fee: client.pound_fee,
+          billing_amount: price,
+          location_shelf: location.shelf,
+          location_row: location.row,
+          status: PackageStatus.READY,
+          status_date: new Date()
+        }
+      });
+
+      if (!pkg) {
+        console.error(`Error processing paquete: ${count} - Error saving package to database`);
+      }
+
+      // save status log
+      await prisma.cusPackageStatusLog.create({
+        data: {
+          package_id: pkg.id,
+          status: PackageStatus.READY
+        }
+      });
+
+      result[tracking] = pkg.id;
+    } catch (error) {
+      console.error(`Error processing paquete: ${count} - ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  console.log(
+    `\Saved ${Object.keys(result).length} packages to the database of ${resultPaquetes.length} total paquetes`
+  );
 }
 
 async function main() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const clientIds = await saveClients();
+  console.log(`Starting data migration at ${new Date().toISOString()}...`);
+
+  await saveClients();
+  await savePackages();
+
+  console.log(`Data migration completed at ${new Date().toISOString()}`);
 }
 
 main()

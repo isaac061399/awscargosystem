@@ -187,7 +187,7 @@ const Orders = () => {
       field: 'number',
       headerName: textT?.table?.number?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 250,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           <span>{params.row.number}</span>
@@ -201,7 +201,7 @@ const Orders = () => {
       field: 'client.office',
       headerName: textT?.table?.office?.title,
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">{params.row.client?.office?.name}</div>
       )

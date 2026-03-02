@@ -168,7 +168,7 @@ const Packages = () => {
       field: 'tracking',
       headerName: textT?.table?.tracking?.title,
       flex: 1,
-      minWidth: 200,
+      minWidth: 300,
       renderCell: (params) => (
         <div className="h-full inline-flex flex-col justify-center py-2">
           {canView ? (
@@ -187,7 +187,7 @@ const Packages = () => {
       field: 'client.office',
       headerName: textT?.table?.office?.title,
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: (params: any) => (
         <div className="h-full inline-flex flex-col justify-center py-2">{params.row.client?.office?.name}</div>
       )
