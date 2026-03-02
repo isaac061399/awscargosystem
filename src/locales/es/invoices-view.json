@@ -38,7 +38,7 @@
     },
     "details": {
       "lines": {
-        "title": "Líneas de la Factura",
+        "title": "Detalle de la Factura",
         "package": "Paquete",
         "orderProduct": "Pedido",
         "product": "Producto",

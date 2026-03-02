@@ -17,7 +17,7 @@ import {
 } from '@/prisma/generated/client';
 
 import { prismaRead, Tx } from '@/libs/prisma';
-import { billingDefaultActivityCode } from '@/libs/constants';
+import { additionalExchangeRate, billingDefaultActivityCode } from '@/libs/constants';
 
 import {
   BillingCCAdditionalCharge,
@@ -449,6 +449,11 @@ export const buildCreateDocumentPayload = (data: {
 }): DocumentData => {
   const { configuration, office, invoice, lines, additionalCharges } = data;
 
+  let exchangeRate = 1;
+  if (invoice.currency === Currency.USD) {
+    exchangeRate = invoice.selling_exchange_rate - additionalExchangeRate;
+  }
+
   return {
     company: {
       name: configuration.billing_name,
@@ -471,6 +476,7 @@ export const buildCreateDocumentPayload = (data: {
     condition: invoice.payment_condition,
     conditionDays: invoice.payment_condition_days,
     currency: invoice.currency,
+    exchangeRate: exchangeRate,
     method: invoice.payment_method,
     ref: invoice.payment_method_ref || '',
     lines: buildDocumentLines(invoice, lines),
@@ -486,6 +492,11 @@ export const buildCancelDocumentPayload = (data: {
   additionalCharges: CusInvoiceAdditionalCharge[];
 }): CancelDocumentData => {
   const { configuration, office, invoice, lines, additionalCharges } = data;
+
+  let exchangeRate = 1;
+  if (invoice.currency === Currency.USD) {
+    exchangeRate = invoice.selling_exchange_rate - additionalExchangeRate;
+  }
 
   return {
     reference: {
@@ -510,6 +521,7 @@ export const buildCancelDocumentPayload = (data: {
     },
     currency: invoice.currency,
     method: invoice.payment_method,
+    exchangeRate: exchangeRate,
     ref: invoice.payment_method_ref || '',
     lines: buildDocumentLines(invoice, lines),
     additionalCharges: buildDocumentAdditionalCharges(invoice, additionalCharges)

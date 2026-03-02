@@ -86,7 +86,7 @@ const PendingInvoicesTable = ({ pendingInvoices }: { pendingInvoices: any[] }) =
                     </TableCell>
                     <TableCell>
                       <Typography color="text.primary">
-                        {`${labelsT?.invoicePaymentCondition?.[invoice.payment_condition]} ${invoice.payment_condition !== InvoicePaymentCondition.CASH ? `(${invoice.payment_condition_days} ${textT?.paymentInfo?.paymentConditionDays})` : ''}`}
+                        {`${labelsT?.invoicePaymentCondition?.[invoice.payment_condition]} ${invoice.payment_condition !== InvoicePaymentCondition.CASH ? `(${invoice.payment_condition_days} ${textT?.paymentConditionDays})` : ''}`}
                       </Typography>
                     </TableCell>
                     <TableCell>

@@ -44,8 +44,6 @@ console.error = (...args: unknown[]) => {
   originalError(...args);
 };
 
-fs.appendFileSync(logsPath, `\n--- Migration run started at ${new Date().toISOString()} ---\n`);
-
 // CSV file paths
 const clientesDataPath = path.resolve(__dirname, 'Clientes.csv');
 const usuariosDataPath = path.resolve(__dirname, 'Usuarios.csv');
