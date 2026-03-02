@@ -67,7 +67,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
     if (!client) {
       return NextResponse.json({ valid: false, message: textT?.errors?.noClient }, { status: 400 });
     }
-    if (!isValidBillingInformation(client)) {
+    if (!isValidBillingInformation(client, invoiceType === InvoiceType.ELECTRONIC)) {
       return NextResponse.json({ valid: false, message: textT?.errors?.noClientBillingInfo }, { status: 400 });
     }
 

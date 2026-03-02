@@ -1,4 +1,4 @@
-import { mailboxPrefix } from '@/libs/constants';
+import { billingDefaultActivityCode, mailboxPrefix } from '@/libs/constants';
 import { CusClient } from '@/prisma/generated/client';
 import { prismaRead } from '@libs/prisma';
 
@@ -76,7 +76,7 @@ export const getMailbox = (id: number) => {
   return `${mailboxPrefix}${id.toString().padStart(3, '0')}`;
 };
 
-export const isValidBillingInformation = (client: CusClient) => {
+export const isValidBillingInformation = (client: CusClient, validateActivityCode: boolean) => {
   if (!client.billing_full_name || client.billing_full_name.trim() === '') {
     return false;
   }
@@ -87,6 +87,8 @@ export const isValidBillingInformation = (client: CusClient) => {
     return false;
   }
   if (!client.billing_activity_code || client.billing_activity_code.trim() === '') {
+    return false;
+  } else if (validateActivityCode && client.billing_activity_code == billingDefaultActivityCode) {
     return false;
   }
 
