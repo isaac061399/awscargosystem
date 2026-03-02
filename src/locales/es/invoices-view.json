@@ -36,17 +36,31 @@
       "cancelConsecutive": "Consecutivo de Cancelación",
       "cancelNumericKey": "Clave de Cancelación"
     },
-    "lines": {
-      "title": "Líneas de la Factura",
-      "package": "Paquete",
-      "orderProduct": "Pedido",
-      "product": "Producto",
-      "tracking": "Tracking",
-      "code": "Código",
-      "description": "Descripción",
-      "quantity": "Cantidad",
-      "unitPrice": "Precio Unitario",
-      "totalPrice": "Precio Total",
+    "details": {
+      "lines": {
+        "title": "Líneas de la Factura",
+        "package": "Paquete",
+        "orderProduct": "Pedido",
+        "product": "Producto",
+        "tracking": "Tracking",
+        "code": "Código",
+        "description": "Descripción",
+        "exempt": "Exento",
+        "yes": "Sí",
+        "no": "No",
+        "quantity": "Cantidad",
+        "unitPrice": "Precio Unitario",
+        "totalPrice": "Precio Total"
+      },
+      "additionalCharges": {
+        "title": "Otros Cargos",
+        "type": "Tipo",
+        "typeDescription": "Descripción del Tipo",
+        "thirdPartyIdentification": "Identificación de Tercero",
+        "thirdPartyName": "Nombre de Tercero",
+        "details": "Detalles",
+        "amount": "Monto"
+      },
       "subtotal": "Subtotal",
       "tax": "Impuesto (IVA)",
       "total": "Total"

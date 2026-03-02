@@ -85,9 +85,6 @@
       "details": {
         "title": "Detalles"
       },
-      "percentage": {
-        "title": "Porcentaje"
-      },
       "amount": {
         "title": "Monto"
       }

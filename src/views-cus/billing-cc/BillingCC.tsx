@@ -619,13 +619,6 @@ const BillingCC = ({ cashRegister, client }: { cashRegister?: any; client?: any 
       sortable: false
     },
     {
-      field: 'percentage',
-      headerName: textT?.additionalChargesTable?.percentage?.title,
-      flex: 1,
-      minWidth: 120,
-      sortable: false
-    },
-    {
       field: 'amount',
       headerName: textT?.additionalChargesTable?.amount?.title,
       flex: 1,

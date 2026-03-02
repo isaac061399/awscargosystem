@@ -20,6 +20,7 @@ const authorization = Buffer.from(`${EASYTAX_USERNAME}:${EASYTAX_PASSWORD}`).toS
 // Constants
 const tipoTransaccion = '01'; // venta normal de bienes y servicios
 const codigoTarifa = '08'; // tarifa general 13%
+const codigoTarifaExenta = '10'; // tarifa exenta
 const tipoNotaCredito = 3; // nota de crédito
 const condicionNotaCredito = '01'; // contado (la nota de crédito siempre es para corregir una factura ya emitida, por lo que se asume que la condición es contado)
 const codigoReferencia = '01'; // anulación de la factura original
@@ -203,7 +204,7 @@ const formatDocumentParams = (data: DocumentData) => {
       total_impuesto: line.tax,
       total_impuesto_exonerado: 0,
       total_comprobante: line.total,
-      codigo_tarifa: codigoTarifa,
+      codigo_tarifa: line.isExempt ? codigoTarifaExenta : codigoTarifa,
       monto_exportacion: 0,
       observaciones: ''
     })),
@@ -280,7 +281,7 @@ const formatCancelDocumentParams = (data: CancelDocumentData) => {
       total_impuesto: line.tax,
       total_impuesto_exonerado: 0,
       total_comprobante: line.total,
-      codigo_tarifa: codigoTarifa,
+      codigo_tarifa: line.isExempt ? codigoTarifaExenta : codigoTarifa,
       monto_exportacion: 0,
       observaciones: ''
     })),

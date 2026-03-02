@@ -397,20 +397,22 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
               </div>
             </Paper>
 
-            {/* Lines */}
+            {/* Lines, Additional charges and Totals */}
             <Paper className="p-4 md:p-6" elevation={1}>
+              {/* Lines */}
               <Typography variant="h6" fontWeight={700} className="mb-3">
-                {textT?.lines?.title}
+                {textT?.details?.lines?.title}
               </Typography>
 
               <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>#</TableCell>
-                    <TableCell>{textT?.lines?.description}</TableCell>
-                    <TableCell align="right">{textT?.lines?.quantity}</TableCell>
-                    <TableCell align="right">{textT?.lines?.unitPrice}</TableCell>
-                    <TableCell align="right">{textT?.lines?.totalPrice}</TableCell>
+                    <TableCell>{textT?.details?.lines?.description}</TableCell>
+                    <TableCell>{textT?.details?.lines?.exempt}</TableCell>
+                    <TableCell align="right">{textT?.details?.lines?.quantity}</TableCell>
+                    <TableCell align="right">{textT?.details?.lines?.unitPrice}</TableCell>
+                    <TableCell align="right">{textT?.details?.lines?.totalPrice}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -419,17 +421,19 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                     let desc2 = '';
                     let href = '#';
                     if (l.package) {
-                      desc = `${textT?.lines?.package}: ${textT?.lines?.tracking} ${l.package.tracking}`;
+                      desc = `${textT?.details?.lines?.package}: ${textT?.details?.lines?.tracking} ${l.package.tracking}`;
                       desc2 = l.package.description;
                       href = `/packages/view/${l.package.id}`;
                     } else if (l.order_product) {
-                      desc = `${textT?.lines?.orderProduct}: ${textT?.lines?.tracking} ${l.order_product.tracking}`;
+                      desc = `${textT?.details?.lines?.orderProduct}: ${textT?.details?.lines?.tracking} ${l.order_product.tracking}`;
                       desc2 = `${l.order_product.quantity} x ${l.order_product.name}`;
                       href = `/orders/edit/${l.order_product.order_id}`;
                     } else if (l.product) {
-                      desc = `${textT?.lines?.product}: ${textT?.lines?.code} ${l.product.code}`;
+                      desc = `${textT?.details?.lines?.product}: ${textT?.details?.lines?.code} ${l.product.code}`;
                       desc2 = l.product.name;
                       href = `/products/edit/${l.product.id}`;
+                    } else {
+                      desc = l.description || '-';
                     }
 
                     const invoiceCurrency = invoice.currency;
@@ -450,12 +454,17 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <Link href={href} target="_blank" className="underline">
+                            {href !== '#' ? (
+                              <Link href={href} target="_blank" className="underline">
+                                <span className="font-medium">{desc}</span>
+                              </Link>
+                            ) : (
                               <span className="font-medium">{desc}</span>
-                            </Link>
+                            )}
                             <span className="text-xs text-gray-500">{desc2}</span>
                           </div>
                         </TableCell>
+                        <TableCell>{l.is_exempt ? textT?.details?.lines?.yes : textT?.details?.lines?.no}</TableCell>
                         <TableCell align="right">{l.quantity}</TableCell>
                         <TableCell align="right">
                           {formatMoney(unitPrice, `${currencies[invoiceCurrency].symbol} `)}
@@ -471,24 +480,83 @@ const InvoicesView = ({ invoice }: { invoice: any }) => {
 
               <Divider className="my-4" />
 
+              {/* Additional charges */}
+              <Typography variant="h6" fontWeight={700} className="mb-3">
+                {textT?.details?.additionalCharges?.title}
+              </Typography>
+
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell>{textT?.details?.additionalCharges?.type}</TableCell>
+                    <TableCell>{textT?.details?.additionalCharges?.typeDescription}</TableCell>
+                    <TableCell>{textT?.details?.additionalCharges?.thirdPartyIdentification}</TableCell>
+                    <TableCell>{textT?.details?.additionalCharges?.thirdPartyName}</TableCell>
+                    <TableCell>{textT?.details?.additionalCharges?.details}</TableCell>
+                    <TableCell align="right">{textT?.details?.additionalCharges?.amount}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {invoice.invoice_additional_charges?.map((l: any, index: number) => {
+                    const invoiceCurrency = invoice.currency;
+                    let amount = l.amount;
+                    if (l.currency !== invoiceCurrency) {
+                      if (invoiceCurrency === Currency.CRC) {
+                        amount = convertCRC(l.amount, invoice.selling_exchange_rate);
+                      } else if (invoiceCurrency === Currency.USD) {
+                        amount = convertUSD(l.amount, invoice.buying_exchange_rate);
+                      }
+                    }
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          <span className="font-medium">{labelsT?.invoiceAdditionalChargeType[l.type]}</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-medium">{l.type_description || '--'}</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-medium">{l.third_party_identification || '--'}</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-medium">{l.third_party_name || '--'}</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-xs text-gray-500">{l.details}</span>
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatMoney(amount, `${currencies[invoiceCurrency].symbol} `)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+
+              <Divider className="my-4" />
+
+              {/* Totals */}
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <div />
                 <div />
                 <div className="space-y-1">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">{textT?.lines?.subtotal}</span>
+                    <span className="text-sm text-gray-600">{textT?.details?.subtotal}</span>
                     <span className="text-sm font-semibold">
                       {formatMoney(invoice.subtotal, `${currencies[invoice.currency].symbol} `)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">{textT?.lines?.tax}</span>
+                    <span className="text-sm text-gray-600">{textT?.details?.tax}</span>
                     <span className="text-sm font-semibold">
                       {formatMoney(invoice.tax, `${currencies[invoice.currency].symbol} `)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-base font-bold">{textT?.lines?.total}</span>
+                    <span className="text-base font-bold">{textT?.details?.total}</span>
                     <span className="text-base font-bold">
                       {formatMoney(invoice.total, `${currencies[invoice.currency].symbol} `)}
                     </span>

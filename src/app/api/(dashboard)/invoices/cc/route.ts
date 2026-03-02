@@ -177,7 +177,7 @@ export const POST = withAuthApi(['billing.create'], async (req) => {
             createMany: {
               data:
                 linesData?.map((line) => ({
-                  iva_percentage: configuration.iva_percentage,
+                  iva_percentage: line.is_exempt ? 0 : configuration.iva_percentage,
                   code: line.code,
                   cabys: line.cabys,
                   description: line.description,

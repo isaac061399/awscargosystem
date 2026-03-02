@@ -74,6 +74,7 @@ export const getInvoice = async (id: number) => {
             product: true
           }
         },
+        invoice_additional_charges: true,
         invoice_payments: true
       }
     });
@@ -519,7 +520,6 @@ const buildDocumentLines = (invoice: CusInvoice, lines: CusInvoiceLine[]) => {
   const invoiceCurrency = invoice.currency;
 
   return lines.map((line) => {
-    const taxPercentage = line.is_exempt ? 0 : line.iva_percentage;
     let unitPrice = line.unit_price;
     let subtotal = line.total;
 
@@ -533,7 +533,7 @@ const buildDocumentLines = (invoice: CusInvoice, lines: CusInvoiceLine[]) => {
       }
     }
 
-    const totals = calculateTaxes(subtotal, taxPercentage);
+    const totals = calculateTaxes(subtotal, line.iva_percentage);
 
     return {
       code: line.code,
