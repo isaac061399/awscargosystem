@@ -8,9 +8,9 @@ import csv from 'csv-parser';
 
 import { PrismaPg } from '@prisma/adapter-pg';
 import moment from 'moment';
-import { PackageStatus, PrismaClient } from '@/prisma/generated/client';
+import { hash } from '@node-rs/argon2';
 
-import { getHash } from '@/libs/argon2id';
+import { PackageStatus, PrismaClient } from '@/prisma/generated/client';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 export const prisma = new PrismaClient({ adapter: adapter });
@@ -143,6 +143,19 @@ const getPackagePrice = (poundFee: number, weight: number) => {
   return parseFloat(price.toFixed(2));
 };
 
+const getHash = async (password: string): Promise<string> => {
+  const options = {
+    memoryCost: 19923, // 19 MiB
+    timeCost: 2, // iteration
+    outputLen: 32,
+    parallelism: 1,
+    version: 1, // v0x13
+    secret: Buffer.from(`59E1j2e9r5FbiDtKbxyeuzSEwX5hqoj5`)
+  };
+
+  return await hash(password.normalize('NFKC'), options);
+};
+
 async function saveClients() {
   console.log(`Starting clients migration...`);
 
@@ -162,15 +175,6 @@ async function saveClients() {
       if (mailboxToIgnore.includes(cliente.CASILLERO || '')) {
         console.warn(`\Skipping cliente ID: ${cliente.ID_CLIENTE} with mailbox: ${cliente.CASILLERO}`);
         continue;
-      }
-
-      // get matching usuario for cliente
-      let password = null;
-      const usuario = resultUsuarios.find((u) => u.ID === cliente.ID_CLIENTE);
-      if (usuario) {
-        password = await getHash(usuario['CONTRASEÑA'] || '');
-      } else {
-        console.warn(`\No matching usuario found for cliente ID: ${cliente.ID_CLIENTE}`);
       }
 
       const officeId = maps.offices[cliente.SUCURSAL as keyof typeof maps.offices] || defaultOfficeId;
@@ -206,6 +210,15 @@ async function saveClients() {
       if (!email) {
         noEmailCount++;
         email = `sincorreo${noEmailCount}@gmail.com`;
+      }
+
+      // get matching usuario for cliente
+      let password = null;
+      const usuario = resultUsuarios.find((u) => u.CORREO?.trim() === email);
+      if (usuario) {
+        password = await getHash(usuario['CONTRASEÑA'] || '');
+      } else {
+        console.warn(`\No matching usuario found for cliente ID: ${cliente.ID_CLIENTE}`);
       }
 
       const createdCliente = await prisma.cusClient.create({
@@ -330,12 +343,8 @@ async function savePackages() {
 }
 
 async function main() {
-  console.log(`Starting data migration at ${new Date().toISOString()}...`);
-
   await saveClients();
   await savePackages();
-
-  console.log(`Data migration completed at ${new Date().toISOString()}`);
 }
 
 main()

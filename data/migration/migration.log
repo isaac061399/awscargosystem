@@ -1,0 +1,31 @@
+
+--- Migration run started at 2026-03-02T21:37:50.201Z ---
+[2026-03-02T21:37:50.203Z] [LOG] Starting clients migration...
+[2026-03-02T21:37:50.762Z] [WARN] No matching usuario found for cliente ID: 8
+[2026-03-02T21:37:52.373Z] [WARN] No matching usuario found for cliente ID: 57
+[2026-03-02T21:37:52.406Z] [WARN] No matching usuario found for cliente ID: 59
+[2026-03-02T21:37:53.100Z] [WARN] No matching usuario found for cliente ID: 1093
+[2026-03-02T21:37:57.541Z] [WARN] No matching usuario found for cliente ID: 7474
+[2026-03-02T21:38:00.488Z] [WARN] No matching usuario found for cliente ID: 8585
+[2026-03-02T21:38:00.714Z] [WARN] No matching usuario found for cliente ID: 8600
+[2026-03-02T21:38:01.545Z] [WARN] No matching usuario found for cliente ID: 8614
+[2026-03-02T21:38:26.583Z] [WARN] No matching usuario found for cliente ID: 10529
+[2026-03-02T21:38:54.499Z] [WARN] No matching usuario found for cliente ID: 11583
+[2026-03-02T21:39:02.898Z] [WARN] No matching usuario found for cliente ID: 11946
+[2026-03-02T21:39:05.981Z] [WARN] No matching usuario found for cliente ID: 5394
+[2026-03-02T21:39:07.574Z] [ERROR] Error processing cliente ID: 4266 -
+Invalid `prisma.cusClient.create()` invocation in
+/Users/guillermo/Desktop/projects/awscargo-system/data/migration/script.ts:224:53
+
+  221   console.warn(`\No matching usuario found for cliente ID: ${cliente.ID_CLIENTE}`);
+  222 }
+  223
+→ 224 const createdCliente = await prisma.cusClient.create(
+Unique constraint failed on the fields: (`email`)
+[2026-03-02T21:39:23.459Z] [WARN] No matching usuario found for cliente ID: 13386
+[2026-03-02T21:39:27.023Z] [WARN] No matching usuario found for cliente ID: 13448
+[2026-03-02T21:39:37.679Z] [WARN] Skipping cliente ID: 14882 with mailbox: AWS-3903
+[2026-03-02T21:39:41.914Z] [LOG] Clients with no email: 2
+[2026-03-02T21:39:41.915Z] [LOG] Saved 4087 clients to the database of 4089 total clientes
+[2026-03-02T21:39:41.915Z] [LOG] Starting packages migration...
+[2026-03-02T21:39:42.108Z] [LOG] Saved 30 packages to the database of 30 total paquetes
