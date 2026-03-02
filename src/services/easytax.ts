@@ -215,7 +215,6 @@ const formatDocumentParams = (data: DocumentData) => {
       numero_linea: index + 1,
       tipo_documento: additionalChargeTypeMap[line.type],
       tipo_documento_otros: line.typeDescription,
-      // tipo_documento_otros_cargos_otros: 'Descripcion Otro Cargo',
       numero_identidad_tercero: line.thirdPartyIdentification,
       nombre_tercero: line.thirdPartyName,
       detalle: line.details,
