@@ -56,37 +56,37 @@ const OrderDelivered = ({ order, original }: { order: any; original?: string }) 
       <div className="line" />
 
       {/* OrderDelivered meta */}
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Fecha Impresión:</span> {moment().format('DD/MM/YYYY hh:mm a')}
       </div>
 
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">ID de Pedido:</span> # {padStartZeros(order.id, 4)}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Número de Pedido:</span> {order.number}
       </div>
 
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Usuario:</span> {admin.email}
       </div>
 
       <div className="line" />
 
       {/* Customer */}
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Cédula:</span> {order.client.identification}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Nombre:</span> {order.client.full_name}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Correo:</span> {order.client.email}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Teléfono:</span> {order.client.phone}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Dirección:</span> {getClientAddress(order.client)}
       </div>
 

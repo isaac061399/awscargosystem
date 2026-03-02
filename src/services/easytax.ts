@@ -49,6 +49,7 @@ export type DocumentData = {
   condition: InvoicePaymentCondition;
   conditionDays: number;
   currency: Currency;
+  exchangeRate: number;
   method: PaymentMethod;
   ref?: string;
   lines: Array<{
@@ -95,6 +96,7 @@ export type CancelDocumentData = {
     activityCode: string;
   };
   currency: Currency;
+  exchangeRate: number;
   method: PaymentMethod;
   ref?: string;
   lines: Array<{
@@ -170,7 +172,7 @@ const formatDocumentParams = (data: DocumentData) => {
     condicion_pago: conditionMap[data.condition],
     plazoCredito: data.conditionDays,
     moneda: currencyMap[data.currency],
-    // tipo_cambio: 1, // no enviar para que se use el del día
+    tipo_cambio: data.exchangeRate, // 1 para colones o tipo de cambio del día para dólares
     forma_pago: methodMap[data.method],
     forma_pago_desc: methodDescMap[data.method],
     forma_pago_referencia: data.ref || '',
@@ -241,7 +243,7 @@ const formatCancelDocumentParams = (data: CancelDocumentData) => {
     condicion_pago: condicionNotaCredito,
     plazoCredito: 0,
     moneda: currencyMap[data.currency],
-    // tipo_cambio: 1, // no enviar para que se use el del día
+    tipo_cambio: data.exchangeRate, // 1 para colones o tipo de cambio del día para dólares
     forma_pago: methodMap[data.method],
     forma_pago_desc: methodDescMap[data.method],
     forma_pago_referencia: data.ref || '',

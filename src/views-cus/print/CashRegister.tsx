@@ -65,25 +65,25 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
       <div className="line" />
 
       {/* Cash Register meta */}
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Oficina:</span> {cashRegister.office.name}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Usuario:</span> {cashRegister.administrator.email}
       </div>
 
       <br />
 
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Apertura:</span> {moment(cashRegister.open_date).format('DD/MM/YYYY hh:mm a')}
       </div>
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Cierre:</span> {moment(cashRegister.close_date).format('DD/MM/YYYY hh:mm a')}
       </div>
 
       <br />
 
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Cantidad Facturas:</span> {cashRegister.invoice_count}
       </div>
 
@@ -99,70 +99,70 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
 
         return (
           <Fragment key={index}>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Moneda:</span> {labelsT?.currency[line.currency]}
             </div>
 
             <br />
 
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Entradas Efectivo:</span> {formatMoney(line.cash_in, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Entradas Sinpe:</span> {formatMoney(line.sinpe_in, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Entradas Transferencia:</span> {formatMoney(line.transfer_in, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Entradas Tarjeta:</span> {formatMoney(line.card_in, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Total Entradas:</span> {formatMoney(totals.in, moneyPrefix)}
             </div>
 
             <br />
 
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Salidas Efectivo:</span> {formatMoney(line.cash_out, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Salidas Sinpe:</span> {formatMoney(line.sinpe_out, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Salidas Transferencia:</span> {formatMoney(line.transfer_out, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Salidas Tarjeta:</span> {formatMoney(line.card_out, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Total Salidas:</span> {formatMoney(totals.out, moneyPrefix)}
             </div>
 
             <br />
 
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Vueltos:</span> {formatMoney(totals.change, moneyPrefix)}
             </div>
 
             <br />
 
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Balance inicial:</span> {formatMoney(line.cash_balance, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Efectivo Reportado:</span> {formatMoney(totals.cash.reported, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Efectivo Sistema:</span> {formatMoney(totals.cash.system, moneyPrefix)}
             </div>
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Diferencia:</span> {formatMoney(totals.cash.difference, moneyPrefix)}
             </div>
 
             <br />
 
-            <div className="kv">
+            <div className="kv wrap">
               <span className="bold">Monto Para Entregar:</span> {formatMoney(totalForAdmin, moneyPrefix)}
             </div>
 
@@ -173,7 +173,7 @@ const CashRegister = ({ cashRegister, original }: { cashRegister: any; original?
 
       {/* Comment */}
 
-      <div className="kv">
+      <div className="kv wrap">
         <span className="bold">Comentario:</span> {cashRegister.comment || '--'}
       </div>
 

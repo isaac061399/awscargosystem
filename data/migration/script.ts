@@ -44,8 +44,6 @@ console.error = (...args: unknown[]) => {
   originalError(...args);
 };
 
-fs.appendFileSync(logsPath, `\n--- Migration run started at ${new Date().toISOString()} ---\n`);
-
 // CSV file paths
 const clientesDataPath = path.resolve(__dirname, 'Clientes.csv');
 const usuariosDataPath = path.resolve(__dirname, 'TBL_USUARIOS.csv');
@@ -226,13 +224,10 @@ async function saveClients() {
   console.log(
     `\Saved ${Object.keys(clientIds).length} clients to the database of ${resultClientes.length} total clientes`
   );
-
-  return clientIds;
 }
 
 async function main() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const clientIds = await saveClients();
+  await saveClients();
 }
 
 main()
