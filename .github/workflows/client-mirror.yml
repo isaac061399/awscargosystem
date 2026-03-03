@@ -1,0 +1,46 @@
+name: Sync main to client
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sync-main
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # include tags if you use --follow-tags
+          persist-credentials: false
+
+      - name: Configure Git
+        run: |
+          git config user.name  "pangea-mirror-bot"
+          git config user.email "mirror-bot@users.noreply.github.com"
+
+      - name: Add client remote
+        env:
+          CLIENT_REPO: ${{ secrets.CLIENT_REPO }} # e.g. client-org/client-repo
+          CLIENT_TOKEN: ${{ secrets.CLIENT_TOKEN }} # PAT with Contents:RW on target repo
+        run: |
+          test -n "$CLIENT_REPO" && test -n "$CLIENT_TOKEN" || { echo "Missing CLIENT_REPO or CLIENT_TOKEN"; exit 1; }
+          git remote add client "https://x-access-token:${CLIENT_TOKEN}@github.com/${CLIENT_REPO}.git"
+          git ls-remote --heads client >/dev/null
+
+      - name: Ensure local main branch points at HEAD
+        run: |
+          git checkout -B main
+
+      - name: Push main only (no force)
+        run: |
+          # Push the current main to client's main; includes tags reachable from main
+          git push client main:main --follow-tags
