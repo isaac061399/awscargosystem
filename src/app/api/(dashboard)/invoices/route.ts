@@ -48,8 +48,8 @@ export const GET = withAuthApi(['invoices.list'], async (req) => {
 
     if (search.trim() !== '') {
       where['OR'] = [
-        { number: { contains: search.trim(), mode: 'insensitive' } },
         { consecutive: { contains: search.trim(), mode: 'insensitive' } },
+        { numeric_key: { contains: search.trim(), mode: 'insensitive' } },
         { client: { full_name: { contains: search.trim(), mode: 'insensitive' } } },
         { client: { identification: { contains: search.trim(), mode: 'insensitive' } } },
         { client: { email: { contains: search.trim(), mode: 'insensitive' } } }
