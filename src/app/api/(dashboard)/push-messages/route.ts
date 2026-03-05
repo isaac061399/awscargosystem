@@ -68,7 +68,7 @@ export const POST = withAuthApi(['push-messages.send'], async (req) => {
           topic: data.topic,
           title: data.title,
           message: data.message,
-          data: JSON.stringify({})
+          data: {}
         }
       });
 

@@ -100,10 +100,7 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
 
   // CRC calculations
   const totalsCRC = calculateCashRegisterTotals(lines['CRC']);
-  const cashDetailCRC = getCashDetail(
-    moneyT?.CRC || {},
-    lines.CRC?.cash_reported_data ? JSON.parse(lines.CRC.cash_reported_data) : {}
-  );
+  const cashDetailCRC = getCashDetail(moneyT?.CRC || {}, lines.CRC?.cash_reported_data || {});
   const [resultIconCRC, resultColorCRC] =
     totalsCRC.cash.difference < 0
       ? ['arrow-down-circle-fill', 'error']
@@ -113,10 +110,7 @@ const CashRegistersView = ({ cashRegister }: { cashRegister: any }) => {
 
   // USD calculations
   const totalsUSD = calculateCashRegisterTotals(lines['USD']);
-  const cashDetailUSD = getCashDetail(
-    moneyT?.USD || {},
-    lines.USD?.cash_reported_data ? JSON.parse(lines.USD.cash_reported_data) : {}
-  );
+  const cashDetailUSD = getCashDetail(moneyT?.USD || {}, lines.USD?.cash_reported_data || {});
   const [resultIconUSD, resultColorUSD] =
     totalsUSD.cash.difference < 0
       ? ['arrow-down-circle-fill', 'error']

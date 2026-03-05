@@ -114,7 +114,7 @@ export const POST = appProxy(false, async (req) => {
       await tx.cmsForm.create({
         data: {
           type: data.type,
-          data: data.data
+          data: JSON.parse(data.data)
         }
       });
     });
