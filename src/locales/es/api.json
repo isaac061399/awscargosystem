@@ -411,6 +411,17 @@
           "pounds": "Libras",
           "kilos": "Kilos"
         }
+      },
+      "packagesInfoInCut": {
+        "documentName": "packages-info-in-cut",
+        "headers": {
+          "number": "Número",
+          "cut": "Corte",
+          "office": "Oficina",
+          "tracking": "Tracking",
+          "pounds": "Libras",
+          "kilos": "Kilos"
+        }
       }
     }
   },

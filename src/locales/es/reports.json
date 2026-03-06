@@ -10,26 +10,30 @@
     "packagesReady": "Paquetes listos para retirar",
     "ordersReady": "Pedidos listos para retirar",
     "cashRegisterMovement": "Movimiento de caja",
-    "packageCuts": "Cortes de paquetes"
+    "packageCuts": "Cortes de paquetes",
+    "packagesInfoInCut": "Paquetes de un corte"
   },
   "form": {
     "labels": {
       "type": "Tipo",
       "office_id": "Oficina",
       "start_date": "Desde",
-      "end_date": "Hasta"
+      "end_date": "Hasta",
+      "cut_number": "Número de corte"
     },
     "placeholders": {
       "type": "Seleccione un tipo",
       "office_id": "Todas las oficinas",
       "start_date": "Seleccione una fecha",
-      "end_date": "Seleccione una fecha"
+      "end_date": "Seleccione una fecha",
+      "cut_number": "Ingrese el número de corte"
     },
     "errors": {
       "type": "El tipo es requerido",
       "office_id": "La oficina es requerida",
       "start_date": "La fecha es requerida",
-      "end_date": "La fecha es requerida"
+      "end_date": "La fecha es requerida",
+      "cut_number": "El número de corte es requerido"
     },
     "errorMessage": "Error al obtener el reporte, por favor inténtalo de nuevo"
   }

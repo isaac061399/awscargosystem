@@ -3,7 +3,13 @@ import { parse } from 'json2csv';
 
 import withAuthApi from '@libs/auth/withAuthApi';
 import { initTranslationsApi } from '@libs/translate/functions';
-import { getCashRegisterMovement, getCuts, getOrdersReady, getPackagesReady } from '@/controllers/Reports.Controller';
+import {
+  getCashRegisterMovement,
+  getCuts,
+  getOrdersReady,
+  getPackagesInfoInCut,
+  getPackagesReady
+} from '@/controllers/Reports.Controller';
 
 export const GET = withAuthApi(['reports.view'], async (req) => {
   const { t } = await initTranslationsApi(req, ['constants']);
@@ -18,6 +24,7 @@ export const GET = withAuthApi(['reports.view'], async (req) => {
     const officeId = params.oi && !isNaN(parseInt(params.oi)) ? parseInt(params.oi) : undefined;
     const startDate = params.sd;
     const endDate = params.ed;
+    const cutNumber = params.cn;
 
     let reportData;
 
@@ -37,6 +44,9 @@ export const GET = withAuthApi(['reports.view'], async (req) => {
         break;
       case 'packageCuts':
         reportData = await getCuts(textT?.types?.packageCuts);
+        break;
+      case 'packagesInfoInCut':
+        reportData = await getPackagesInfoInCut(textT?.types?.packagesInfoInCut, { officeId, cutNumber });
         break;
       default:
         return NextResponse.json({ valid: false, message: textT?.errors?.general }, { status: 400 });

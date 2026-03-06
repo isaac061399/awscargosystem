@@ -294,6 +294,8 @@ const PackageReception = () => {
 
         setPrice(amount);
       }, 500);
+    } else {
+      setPrice(0);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,6 +310,7 @@ const PackageReception = () => {
       formik.setFieldValue('package_id', '');
     }
 
+    formik.setFieldValue('mailbox', '');
     formik.setFieldValue('client', client);
 
     if (weight) {
@@ -324,9 +327,15 @@ const PackageReception = () => {
   };
 
   const setNoTrackingItem = () => {
+    // clear package_id, order_id, client and weight fields
     formik.setFieldValue('package_id', '');
     formik.setFieldValue('order_id', '');
+    formik.setFieldValue('mailbox', '');
     formik.setFieldValue('client', null);
+    formik.setFieldValue('weight', '');
+
+    // unblock weight field
+    setBlockWeightField(false);
 
     // show the client fields and focus mailbox field
     setShowClientFields(true);

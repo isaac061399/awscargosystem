@@ -25,6 +25,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography
 } from '@mui/material';
 
@@ -47,11 +48,12 @@ import tableStyles from '@core/styles/table.module.css';
 const defaultAlertState = { open: false, type: 'success', message: '' };
 
 const filtersConfig = {
-  packagesReady: { start: true, end: false, office_id: true },
-  ordersReady: { start: true, end: false, office_id: true },
-  cashRegisterMovement: { start: true, end: true, office_id: true },
-  packageCuts: { start: false, end: false, office_id: false }
-} as const satisfies Record<string, { start: boolean; end: boolean; office_id: boolean }>;
+  packagesReady: { start: true, end: false, office_id: true, cut_number: false },
+  ordersReady: { start: true, end: false, office_id: true, cut_number: false },
+  cashRegisterMovement: { start: true, end: true, office_id: true, cut_number: false },
+  packageCuts: { start: false, end: false, office_id: false, cut_number: false },
+  packagesInfoInCut: { start: false, end: false, office_id: true, cut_number: true }
+} as const satisfies Record<string, { start: boolean; end: boolean; office_id: boolean; cut_number: boolean }>;
 
 const Reports = () => {
   const { offices } = useConfig();
@@ -73,15 +75,22 @@ const Reports = () => {
         type: '',
         office_id: '',
         start_date: null,
-        end_date: null
+        end_date: null,
+        cut_number: ''
       }),
       []
     ),
     validationSchema: yup.object({
-      type: yup.string().required(formT?.errors?.type)
+      type: yup.string().required(formT?.errors?.type),
+      cut_number: yup.string().when('type', {
+        is: (value: string) => value === 'packagesInfoInCut',
+        then: (schema) => schema.required(formT?.errors?.cut_number)
+      })
     }),
     onSubmit: async (values) => {
       setAlertState({ ...defaultAlertState });
+
+      const config = filtersConfig[values.type as keyof typeof filtersConfig] || {};
 
       try {
         if (!values.return_data) {
@@ -89,16 +98,20 @@ const Reports = () => {
 
           searchParams.append('t', values.type);
 
-          if (values.office_id) {
+          if (config.office_id && values.office_id) {
             searchParams.append('oi', values.office_id);
           }
 
-          if (values.start_date) {
+          if (config.start && values.start_date) {
             searchParams.append('sd', moment(values.start_date).format('YYYY-MM-DD'));
           }
 
-          if (values.end_date) {
+          if (config.end && values.end_date) {
             searchParams.append('ed', moment(values.end_date).format('YYYY-MM-DD'));
+          }
+
+          if (config.cut_number && values.cut_number) {
+            searchParams.append('cn', values.cut_number);
           }
 
           const reportUrl = `/api/reports?${searchParams.toString()}`;
@@ -110,16 +123,20 @@ const Reports = () => {
             t: values.type
           };
 
-          if (values.office_id) {
+          if (config.office_id && values.office_id) {
             params.oi = values.office_id;
           }
 
-          if (values.start_date) {
+          if (config.start && values.start_date) {
             params.sd = moment(values.start_date).format('YYYY-MM-DD');
           }
 
-          if (values.end_date) {
+          if (config.end && values.end_date) {
             params.ed = moment(values.end_date).format('YYYY-MM-DD');
+          }
+
+          if (config.cut_number && values.cut_number) {
+            params.cn = values.cut_number;
           }
 
           const result = await requestGetReports(params, i18n.language);
@@ -143,7 +160,10 @@ const Reports = () => {
     formik.setFieldValue('start_date', null);
     formik.setFieldValue('end_date', null);
     formik.setFieldValue('office_id', '');
+    formik.setFieldValue('cut_number', '');
   };
+
+  const config = filtersConfig[formik.values.type as keyof typeof filtersConfig] || {};
 
   return (
     <DashboardLayout>
@@ -221,7 +241,7 @@ const Reports = () => {
                 </Divider>
 
                 <Grid container spacing={5}>
-                  {(filtersConfig[formik.values.type as keyof typeof filtersConfig]?.office_id ?? false) && (
+                  {config.office_id && (
                     <Grid size={{ xs: 12, md: 4 }}>
                       <Select
                         options={offices.map((office) => ({ value: office.id, label: office.name }))}
@@ -239,90 +259,104 @@ const Reports = () => {
                       />
                     </Grid>
                   )}
-                  {(filtersConfig[formik.values.type as keyof typeof filtersConfig]?.start ?? false) &&
-                    (filtersConfig[formik.values.type as keyof typeof filtersConfig]?.end ?? false) && (
-                      <Grid size={{ xs: 12, md: 8 }}>
-                        <DateRangeField
-                          locale={i18n.language}
-                          startDateProps={{
-                            name: 'start_date',
-                            label: formT?.labels?.start_date,
-                            defaultValue: formik.values.start_date,
-                            onChange: (value) => formik.setFieldValue('start_date', value),
-                            slotProps: {
-                              textField: {
-                                fullWidth: true,
-                                error: Boolean(formik.touched.start_date && formik.errors.start_date),
-                                color: Boolean(formik.touched.start_date && formik.errors.start_date)
-                                  ? 'error'
-                                  : 'primary',
-                                helperText: formik.touched.start_date && String(formik.errors.start_date || ''),
-                                disabled: formik.isSubmitting
-                              }
-                            }
-                          }}
-                          endDateProps={{
-                            name: 'end_date',
-                            label: formT?.labels?.end_date,
-                            defaultValue: formik.values.end_date,
-                            onChange: (value) => formik.setFieldValue('end_date', value),
-                            slotProps: {
-                              textField: {
-                                fullWidth: true,
-                                error: Boolean(formik.touched.end_date && formik.errors.end_date),
-                                color: Boolean(formik.touched.end_date && formik.errors.end_date) ? 'error' : 'primary',
-                                helperText: formik.touched.end_date && String(formik.errors.end_date || ''),
-                                disabled: formik.isSubmitting
-                              }
-                            }
-                          }}
-                        />
-                      </Grid>
-                    )}
-                  {(filtersConfig[formik.values.type as keyof typeof filtersConfig]?.start ?? false) &&
-                    !(filtersConfig[formik.values.type as keyof typeof filtersConfig]?.end ?? false) && (
-                      <Grid size={{ xs: 12, md: 4 }}>
-                        <DateField
-                          locale={i18n.language}
-                          name="start_date"
-                          label={formT?.labels?.start_date}
-                          defaultValue={formik.values.start_date}
-                          onChange={(value) => formik.setFieldValue('start_date', value)}
-                          slotProps={{
+                  {config.start && config.end && (
+                    <Grid size={{ xs: 12, md: 8 }}>
+                      <DateRangeField
+                        locale={i18n.language}
+                        startDateProps={{
+                          name: 'start_date',
+                          label: formT?.labels?.start_date,
+                          defaultValue: formik.values.start_date,
+                          onChange: (value) => formik.setFieldValue('start_date', value),
+                          slotProps: {
                             textField: {
                               fullWidth: true,
                               error: Boolean(formik.touched.start_date && formik.errors.start_date),
                               color: Boolean(formik.touched.start_date && formik.errors.start_date)
                                 ? 'error'
                                 : 'primary',
-                              helperText: formik.touched.start_date && (formik.errors.start_date as unknown as string),
+                              helperText: formik.touched.start_date && String(formik.errors.start_date || ''),
                               disabled: formik.isSubmitting
                             }
-                          }}
-                        />
-                      </Grid>
-                    )}
-                  {!(filtersConfig[formik.values.type as keyof typeof filtersConfig]?.start ?? false) &&
-                    (filtersConfig[formik.values.type as keyof typeof filtersConfig]?.end ?? false) && (
-                      <Grid size={{ xs: 12, md: 4 }}>
-                        <DateField
-                          locale={i18n.language}
-                          name="end_date"
-                          label={formT?.labels?.end_date}
-                          defaultValue={formik.values.end_date}
-                          onChange={(value) => formik.setFieldValue('end_date', value)}
-                          slotProps={{
+                          }
+                        }}
+                        endDateProps={{
+                          name: 'end_date',
+                          label: formT?.labels?.end_date,
+                          defaultValue: formik.values.end_date,
+                          onChange: (value) => formik.setFieldValue('end_date', value),
+                          slotProps: {
                             textField: {
                               fullWidth: true,
                               error: Boolean(formik.touched.end_date && formik.errors.end_date),
                               color: Boolean(formik.touched.end_date && formik.errors.end_date) ? 'error' : 'primary',
-                              helperText: formik.touched.end_date && (formik.errors.end_date as unknown as string),
+                              helperText: formik.touched.end_date && String(formik.errors.end_date || ''),
                               disabled: formik.isSubmitting
                             }
-                          }}
-                        />
-                      </Grid>
-                    )}
+                          }
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  {config.start && !config.end && (
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <DateField
+                        locale={i18n.language}
+                        name="start_date"
+                        label={formT?.labels?.start_date}
+                        defaultValue={formik.values.start_date}
+                        onChange={(value) => formik.setFieldValue('start_date', value)}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            error: Boolean(formik.touched.start_date && formik.errors.start_date),
+                            color: Boolean(formik.touched.start_date && formik.errors.start_date) ? 'error' : 'primary',
+                            helperText: formik.touched.start_date && (formik.errors.start_date as unknown as string),
+                            disabled: formik.isSubmitting
+                          }
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  {!config.start && config.end && (
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <DateField
+                        locale={i18n.language}
+                        name="end_date"
+                        label={formT?.labels?.end_date}
+                        defaultValue={formik.values.end_date}
+                        onChange={(value) => formik.setFieldValue('end_date', value)}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            error: Boolean(formik.touched.end_date && formik.errors.end_date),
+                            color: Boolean(formik.touched.end_date && formik.errors.end_date) ? 'error' : 'primary',
+                            helperText: formik.touched.end_date && (formik.errors.end_date as unknown as string),
+                            disabled: formik.isSubmitting
+                          }
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  {config.cut_number && (
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        required
+                        type="text"
+                        id="cut_number"
+                        name="cut_number"
+                        label={formT?.labels?.cut_number}
+                        placeholder={formT?.placeholders?.cut_number}
+                        value={formik.values.cut_number}
+                        onChange={formik.handleChange}
+                        error={Boolean(formik.touched.cut_number && formik.errors.cut_number)}
+                        color={Boolean(formik.touched.cut_number && formik.errors.cut_number) ? 'error' : 'primary'}
+                        helperText={formik.touched.cut_number && (formik.errors.cut_number as string)}
+                        disabled={formik.isSubmitting}
+                      />
+                    </Grid>
+                  )}
                 </Grid>
               </CardContent>
               {data && (

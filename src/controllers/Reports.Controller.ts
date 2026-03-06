@@ -18,6 +18,7 @@ type Filters = {
   officeId?: number;
   startDate?: string;
   endDate?: string;
+  cutNumber?: string;
 };
 
 export const getPackagesReady = async (textT: any, filters: Filters) => {
@@ -108,7 +109,7 @@ export const getOrdersReady = async (textT: any, filters: Filters) => {
     }
 
     const orderProducts = await prismaRead.cusOrderProduct.findMany({
-      where: { order: { client: { office_id: filters.officeId } }, ...where },
+      where,
       orderBy: [{ status_date: 'asc' }, { order_id: 'asc' }],
       select: {
         id: true,
@@ -455,6 +456,62 @@ export const getCuts = async (textT: any) => {
         [textT?.headers.packagesCount]: cut._count.id || 0,
         [textT?.headers.pounds]: cut._sum.weight || 0,
         [textT?.headers.kilos]: convertPoundToKg(cut._sum.weight || 0)
+      };
+    });
+
+    return result;
+  } catch (error) {
+    console.error(`Report Error: ${error}`);
+
+    return result;
+  }
+};
+
+export const getPackagesInfoInCut = async (textT: any, filters: Filters) => {
+  const result = {
+    documentName: textT.documentName,
+    headers: Object.values(textT.headers) as string[],
+    data: [] as any[]
+  };
+
+  try {
+    const where: any = {};
+
+    if (filters.officeId) {
+      where.order = { client: { office_id: filters.officeId } };
+    }
+
+    if (filters.cutNumber) {
+      where.status_date = { gte: moment(filters.startDate).startOf('day').toISOString() };
+    }
+
+    const cutLogs = await prismaRead.cusCutLog.findMany({
+      where: {
+        OR: [
+          { package: { client: { office_id: filters.officeId } } },
+          { order: { client: { office_id: filters.officeId } } }
+        ],
+        number: filters.cutNumber
+      },
+      orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        number: true,
+        tracking: true,
+        weight: true,
+        package: { select: { client: { select: clientSelectSchema } } },
+        order: { select: { client: { select: clientSelectSchema } } }
+      }
+    });
+
+    result.data = cutLogs?.map((cl, index) => {
+      return {
+        [textT?.headers.number]: index + 1,
+        [textT?.headers.cut]: cl.number,
+        [textT?.headers.office]: cl.package?.client?.office?.name || cl.order?.client?.office?.name,
+        [textT?.headers.tracking]: cl.tracking,
+        [textT?.headers.pounds]: cl.weight,
+        [textT?.headers.kilos]: convertPoundToKg(cl.weight)
       };
     });
 
