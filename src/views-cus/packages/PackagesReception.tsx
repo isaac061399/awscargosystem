@@ -71,12 +71,17 @@ const PackageReception = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<any>({ ...defaultAlertState });
-  const [errorAlert, setErrorAlert] = useState<any>({ open: false, inputRef: null, message: '' });
   const [trackingHasChanged, setTrackingHasChanged] = useState<boolean>(false);
   const [showClientFields, setShowClientFields] = useState<boolean>(false);
   const [showAllOtherFields, setShowAllOtherFields] = useState<boolean>(false);
   const [blockWeightField, setBlockWeightField] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
+  const [errorAlert, setErrorAlert] = useState({
+    open: false,
+    message: '',
+    showPrintButton: false,
+    makeSound: false
+  });
   const [unownedPackageState, setUnownedPackageState] = useState({
     open: false,
     loading: false,
@@ -90,6 +95,7 @@ const PackageReception = () => {
   });
 
   const lastFieldRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const cutFieldRef = useRef<HTMLInputElement>(null);
   const trackingFieldRef = useRef<HTMLInputElement>(null);
@@ -171,6 +177,14 @@ const PackageReception = () => {
       cutFieldRef.current?.focus();
       lastFieldRef.current = cutFieldRef.current;
     }, 0);
+
+    audioRef.current = new Audio('/sounds/warning-alarm.mp3');
+    audioRef.current.preload = 'auto';
+
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+    };
   }, []);
 
   // focus mailbox field when showClientFields is true
@@ -209,7 +223,12 @@ const PackageReception = () => {
       setIsLoading(false);
 
       if (!result.valid) {
-        setErrorAlert({ open: true, inputRef: trackingFieldRef, message: textT?.trackingAlertMessage });
+        setErrorAlert({
+          open: true,
+          message: textT?.trackingAlertMessage,
+          showPrintButton: true,
+          makeSound: false
+        });
 
         return;
       }
@@ -270,7 +289,9 @@ const PackageReception = () => {
       if (formik.values.client.office.id !== formik.values.office_id) {
         setErrorAlert({
           open: true,
-          message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || '')
+          message: textT?.officeAlertMessage?.replace('{{ office }}', formik.values.client?.office?.name || ''),
+          showPrintButton: false,
+          makeSound: true
         });
       } else {
         setTimeout(() => {
@@ -300,6 +321,16 @@ const PackageReception = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.weight]);
+
+  // when alert with sound is open, play the sound
+  useEffect(() => {
+    if (errorAlert.open && errorAlert.makeSound && audioRef.current) {
+      audioRef.current.play();
+    } else if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [errorAlert]);
 
   const setTrackingItem = (type: 'package' | 'order', id: string, client: any, weight?: number) => {
     if (type === 'package') {
@@ -425,7 +456,12 @@ const PackageReception = () => {
       setIsLoading(false);
 
       if (!result.valid || !result.client) {
-        setErrorAlert({ open: true, inputRef: mailboxFieldRef, message: textT?.clientAlertMessage });
+        setErrorAlert({
+          open: true,
+          message: textT?.clientAlertMessage,
+          showPrintButton: false,
+          makeSound: false
+        });
 
         return;
       }
@@ -454,7 +490,7 @@ const PackageReception = () => {
       }, 500);
     }
 
-    setErrorAlert({ ...errorAlert, open: false });
+    setErrorAlert({ ...errorAlert, open: false, makeSound: false });
   };
 
   return (
@@ -937,6 +973,18 @@ const PackageReception = () => {
           <DialogContentText id="office-alert-description" variant="h3">
             {errorAlert.message}
           </DialogContentText>
+          {errorAlert.showPrintButton && (
+            <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  window.open(`/print/sticker/${formik.values.tracking}`, '_blank');
+                }}>
+                {textT?.btnPrint}
+              </Button>
+            </Stack>
+          )}
         </DialogContent>
         <DialogActions>
           <Button variant="text" color="primary" onClick={() => onAlertClose()}>
