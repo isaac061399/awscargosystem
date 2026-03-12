@@ -2,7 +2,7 @@ import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import { Moment } from 'moment';
 
-import { additionalExchangeRate } from '../libs/constants';
+import { sellingExchangeRateAdjustment, buyingExchangeRateAdjustment } from '../libs/constants';
 
 const config = {
   headers: {
@@ -32,7 +32,7 @@ export const getSellingExchangeRate = async (date: Moment): Promise<number | nul
     return null;
   }
 
-  return rate + additionalExchangeRate;
+  return rate + sellingExchangeRateAdjustment;
 };
 
 export const getBuyingExchangeRate = async (date: Moment): Promise<number | null> => {
@@ -48,7 +48,7 @@ export const getBuyingExchangeRate = async (date: Moment): Promise<number | null
     return null;
   }
 
-  return rate + additionalExchangeRate;
+  return rate + buyingExchangeRateAdjustment;
 };
 
 const getResponseData = async (date: Moment, indicatorCode: string): Promise<any> => {

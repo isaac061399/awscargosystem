@@ -29,7 +29,8 @@ export const defaultConfigId = 1;
 
 export const mailboxPrefix = 'AWS-';
 
-export const additionalExchangeRate = 6;
+export const sellingExchangeRateAdjustment = 6;
+export const buyingExchangeRateAdjustment = -3;
 
 export const sellersPages = ['Amazon', 'eBay', 'AliExpress', 'Shein', 'Target'];
 

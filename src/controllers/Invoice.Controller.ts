@@ -17,7 +17,7 @@ import {
 } from '@/prisma/generated/client';
 
 import { prismaRead, Tx } from '@/libs/prisma';
-import { additionalExchangeRate, billingDefaultActivityCode } from '@/libs/constants';
+import { sellingExchangeRateAdjustment, billingDefaultActivityCode } from '@/libs/constants';
 
 import {
   BillingCCAdditionalCharge,
@@ -451,7 +451,7 @@ export const buildCreateDocumentPayload = (data: {
 
   let exchangeRate = 1;
   if (invoice.currency === Currency.USD) {
-    exchangeRate = invoice.selling_exchange_rate - additionalExchangeRate;
+    exchangeRate = invoice.selling_exchange_rate - sellingExchangeRateAdjustment;
   }
 
   return {
@@ -495,7 +495,7 @@ export const buildCancelDocumentPayload = (data: {
 
   let exchangeRate = 1;
   if (invoice.currency === Currency.USD) {
-    exchangeRate = invoice.selling_exchange_rate - additionalExchangeRate;
+    exchangeRate = invoice.selling_exchange_rate - sellingExchangeRateAdjustment;
   }
 
   return {
